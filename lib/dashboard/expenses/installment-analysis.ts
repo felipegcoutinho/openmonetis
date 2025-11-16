@@ -145,14 +145,22 @@ export async function fetchInstallmentAnalysis(
   }
 
   // Calcular quantas parcelas já foram pagas para cada grupo
-  const installmentGroups = Array.from(seriesMap.values()).map((group) => {
-    // Contar quantas parcelas estão marcadas como pagas (settled)
-    const paidCount = group.pendingInstallments.filter(
-      (i) => i.isSettled
-    ).length;
-    group.paidInstallments = paidCount;
-    return group;
-  });
+  const installmentGroups = Array.from(seriesMap.values())
+    .map((group) => {
+      // Contar quantas parcelas estão marcadas como pagas (settled)
+      const paidCount = group.pendingInstallments.filter(
+        (i) => i.isSettled
+      ).length;
+      group.paidInstallments = paidCount;
+      return group;
+    })
+    // Filtrar apenas séries que têm pelo menos uma parcela em aberto (não paga)
+    .filter((group) => {
+      const hasUnpaidInstallments = group.pendingInstallments.some(
+        (i) => !i.isSettled
+      );
+      return hasUnpaidInstallments;
+    });
 
   // Calcular totais
   const totalPendingInstallments = installmentGroups.reduce(
