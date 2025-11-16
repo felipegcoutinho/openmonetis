@@ -6,7 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils/ui";
-import { RiArrowDownSLine, RiArrowRightSLine } from "@remixicon/react";
+import {
+  RiArrowDownSLine,
+  RiArrowRightSLine,
+  RiCheckboxCircleFill,
+} from "@remixicon/react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
@@ -66,15 +70,20 @@ export function InstallmentGroupCard({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold">{group.name}</p>
-                <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                  {group.cartaoName && (
-                    <>
-                      <span>{group.cartaoName}</span>
-                      <span>•</span>
-                    </>
-                  )}
-                  <span>{group.paymentMethod}</span>
-                </div>
+                {group.cartaoName && (
+                  <div className="mt-0.5 flex items-center gap-1">
+                    {group.cartaoLogo && (
+                      <img
+                        src={`/logos/${group.cartaoLogo}`}
+                        alt={group.cartaoName}
+                        className="h-5 w-auto object-contain rounded"
+                      />
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {group.cartaoName}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex shrink-0 flex-col items-end gap-0.5">
@@ -101,7 +110,7 @@ export function InstallmentGroupCard({
                   {unpaidCount} {unpaidCount === 1 ? "pendente" : "pendentes"}
                 </span>
               </div>
-              <Progress value={progress} className="h-1.5" />
+              <Progress value={progress} className="h-2" />
             </div>
 
             {/* Badges de status */}
@@ -117,7 +126,7 @@ export function InstallmentGroupCard({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-3 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              className="mt-2 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               {isExpanded ? (
                 <>
@@ -136,7 +145,7 @@ export function InstallmentGroupCard({
 
         {/* Lista de parcelas expandida */}
         {isExpanded && (
-          <div className="ml-9 mt-2 flex flex-col gap-2 border-l-2 border-muted pl-4">
+          <div className="px-8 mt-2 flex flex-col gap-2">
             {group.pendingInstallments.map((installment) => {
               const isSelected = selectedInstallments.has(installment.id);
               const isPaid = installment.isSettled;
@@ -153,7 +162,7 @@ export function InstallmentGroupCard({
                     "flex items-center gap-3 rounded-md border p-2 transition-colors",
                     isSelected && !isPaid && "border-primary/50 bg-primary/5",
                     isPaid &&
-                      "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30"
+                      "border-green-400 bg-green-50 dark:border-green-900 dark:bg-green-950/30"
                   )}
                 >
                   <Checkbox
@@ -169,7 +178,7 @@ export function InstallmentGroupCard({
                     <div className="min-w-0">
                       <p
                         className={cn(
-                          "text-sm font-medium",
+                          "text-xs font-medium",
                           isPaid &&
                             "text-green-700 dark:text-green-400 line-through decoration-green-600/50"
                         )}
@@ -179,15 +188,15 @@ export function InstallmentGroupCard({
                         {isPaid && (
                           <Badge
                             variant="outline"
-                            className="ml-2 text-xs border-green-700 text-green-700 dark:text-green-400"
+                            className="ml-1 text-xs border-none border-green-700 text-green-700 dark:text-green-400"
                           >
-                            Paga
+                            <RiCheckboxCircleFill /> Pago
                           </Badge>
                         )}
                       </p>
                       <p
                         className={cn(
-                          "text-xs",
+                          "text-xs mt-1",
                           isPaid
                             ? "text-green-700 dark:text-green-500"
                             : "text-muted-foreground"

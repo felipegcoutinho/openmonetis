@@ -42,6 +42,7 @@ export type InstallmentGroup = {
   cartaoId: string | null;
   cartaoName: string | null;
   cartaoDueDay: string | null;
+  cartaoLogo: string | null;
   totalInstallments: number;
   paidInstallments: number;
   pendingInstallments: InstallmentDetail[];
@@ -75,6 +76,7 @@ export async function fetchInstallmentAnalysis(
       cartaoId: lancamentos.cartaoId,
       cartaoName: cartoes.name,
       cartaoDueDay: cartoes.dueDay,
+      cartaoLogo: cartoes.logo,
     })
     .from(lancamentos)
     .leftJoin(cartoes, eq(lancamentos.cartaoId, cartoes.id))
@@ -132,6 +134,7 @@ export async function fetchInstallmentAnalysis(
         cartaoId: row.cartaoId,
         cartaoName: row.cartaoName,
         cartaoDueDay: row.cartaoDueDay,
+        cartaoLogo: row.cartaoLogo,
         totalInstallments: row.installmentCount ?? 0,
         paidInstallments: 0,
         pendingInstallments: [installmentDetail],
