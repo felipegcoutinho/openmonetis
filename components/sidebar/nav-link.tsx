@@ -4,12 +4,12 @@ import {
   RiBankLine,
   RiCalendarEventLine,
   RiDashboardLine,
-  RiFileListLine,
   RiFundsLine,
   RiGroupLine,
   RiPriceTag3Line,
   RiSettingsLine,
   RiSparklingLine,
+  RiTodoLine,
   type RemixiconComponentType,
 } from "@remixicon/react";
 
@@ -129,7 +129,7 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
           {
             title: "Anotações",
             url: "/anotacoes",
-            icon: RiFileListLine,
+            icon: RiTodoLine,
           },
           {
             title: "Insights",

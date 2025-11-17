@@ -5,14 +5,8 @@ import { fetchAccountsForUser } from "./data";
 export default async function Page() {
   const userId = await getUserId();
   const now = new Date();
-  const currentPeriod = `${now.getFullYear()}-${String(
-    now.getMonth() + 1
-  ).padStart(2, "0")}`;
 
-  const { accounts, logoOptions } = await fetchAccountsForUser(
-    userId,
-    currentPeriod
-  );
+  const { accounts, logoOptions } = await fetchAccountsForUser(userId);
 
   return (
     <main className="flex flex-col items-start gap-6">

@@ -13,24 +13,24 @@ import { RecentTransactionsWidget } from "@/components/dashboard/recent-transact
 import { RecurringExpensesWidget } from "@/components/dashboard/recurring-expenses-widget";
 import { TopEstablishmentsWidget } from "@/components/dashboard/top-establishments-widget";
 import { TopExpensesWidget } from "@/components/dashboard/top-expenses-widget";
-import Link from "next/link";
 import {
   RiArrowUpDoubleLine,
   RiBarChartBoxLine,
   RiBarcodeLine,
   RiBillLine,
-  RiCalculatorLine,
   RiExchangeLine,
   RiLineChartLine,
   RiMoneyDollarCircleLine,
   RiNumbersLine,
   RiPieChartLine,
   RiRefreshLine,
+  RiSecurePaymentLine,
   RiSlideshowLine,
   RiStore2Line,
   RiStore3Line,
   RiWallet3Line,
 } from "@remixicon/react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type { DashboardData } from "./fetch-dashboard-data";
 
@@ -142,7 +142,7 @@ export const widgetsConfig: WidgetConfig[] = [
         href="/dashboard/analise-parcelas"
         className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
       >
-        <RiCalculatorLine className="inline mr-1 size-4" />
+        <RiSecurePaymentLine className="inline mr-1 size-4" />
         Análise
       </Link>
     ),

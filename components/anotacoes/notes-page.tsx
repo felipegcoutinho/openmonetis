@@ -4,7 +4,7 @@ import { deleteNoteAction } from "@/app/(dashboard)/anotacoes/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
-import { RiAddCircleLine, RiFileListLine } from "@remixicon/react";
+import { RiAddCircleLine, RiTodoLine } from "@remixicon/react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
@@ -117,7 +117,7 @@ export function NotesPage({ notes }: NotesPageProps) {
         {sortedNotes.length === 0 ? (
           <Card className="flex min-h-[50vh] w-full items-center justify-center py-12">
             <EmptyState
-              media={<RiFileListLine className="size-6 text-primary" />}
+              media={<RiTodoLine className="size-6 text-primary" />}
               title="Nenhuma anotação registrada"
               description="Crie anotações personalizadas para acompanhar lembretes, decisões ou observações financeiras importantes."
             />

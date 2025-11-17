@@ -2,8 +2,8 @@ import { DashboardGrid } from "@/components/dashboard/dashboard-grid";
 import { DashboardWelcome } from "@/components/dashboard/dashboard-welcome";
 import { SectionCards } from "@/components/dashboard/section-cards";
 import MonthPicker from "@/components/month-picker/month-picker";
-import { fetchDashboardData } from "@/lib/dashboard/fetch-dashboard-data";
 import { getUser } from "@/lib/auth/server";
+import { fetchDashboardData } from "@/lib/dashboard/fetch-dashboard-data";
 import { parsePeriodParam } from "@/lib/utils/period";
 
 type PageSearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: PageProps) {
   const data = await fetchDashboardData(user.id, selectedPeriod);
 
   return (
-    <main className="flex flex-col gap-4 px-4">
+    <main className="flex flex-col gap-4 px-6">
       <DashboardWelcome name={user.name} />
       <MonthPicker />
       <SectionCards metrics={data.metrics} />

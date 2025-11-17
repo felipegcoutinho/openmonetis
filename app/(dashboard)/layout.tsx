@@ -1,11 +1,11 @@
 import { SiteHeader } from "@/components/header-dashboard";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { fetchDashboardNotifications } from "@/lib/dashboard/notifications";
 import { getUserSession } from "@/lib/auth/server";
-import { parsePeriodParam } from "@/lib/utils/period";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { fetchDashboardNotifications } from "@/lib/dashboard/notifications";
 import { fetchPagadoresWithAccess } from "@/lib/pagadores/access";
+import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { parsePeriodParam } from "@/lib/utils/period";
 
 export default async function layout({
   children,
@@ -29,8 +29,8 @@ export default async function layout({
     typeof periodoParam === "string"
       ? periodoParam
       : Array.isArray(periodoParam)
-        ? periodoParam[0]
-        : null;
+      ? periodoParam[0]
+      : null;
   const { period: currentPeriod } = parsePeriodParam(
     singlePeriodoParam ?? null
   );

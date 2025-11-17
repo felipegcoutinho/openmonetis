@@ -3,14 +3,14 @@
 import MoneyValues from "@/components/money-values";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMemo, useState } from "react";
-import type { InstallmentAnalysisData } from "./types";
-import { InstallmentGroupCard } from "./installment-group-card";
 import {
   RiCalculatorLine,
   RiCheckboxBlankLine,
   RiCheckboxLine,
 } from "@remixicon/react";
+import { useMemo, useState } from "react";
+import { InstallmentGroupCard } from "./installment-group-card";
+import type { InstallmentAnalysisData } from "./types";
 
 type InstallmentAnalysisPageProps = {
   data: InstallmentAnalysisData;
@@ -128,30 +128,17 @@ export function InstallmentAnalysisPage({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
-          <RiCalculatorLine className="size-4 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold">Análise de Parcelas</h1>
-          <p className="text-xs text-muted-foreground">
-            Quanto você gastaria pagando tudo que está em aberto
-          </p>
-        </div>
-      </div>
-
       {/* Card de resumo principal */}
-      <Card className="border-primary/20 bg-linear-to-br from-primary/5 to-primary/10">
-        <CardContent className="flex flex-col items-start justify-center gap-2 py-5">
-          <p className="text-xs font-medium text-muted-foreground">
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="flex flex-col items-start justify-center gap-2 py-2">
+          <p className="text-sm font-medium text-muted-foreground">
             Se você pagar tudo que está selecionado:
           </p>
           <MoneyValues
             amount={grandTotal}
             className="text-3xl font-bold text-primary"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {selectedCount} {selectedCount === 1 ? "parcela" : "parcelas"}{" "}
             selecionadas
           </p>

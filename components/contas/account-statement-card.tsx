@@ -101,12 +101,65 @@ export function AccountStatementCard({
       </CardHeader>
 
       <CardContent className="space-y-4 border-t border-border/60 border-dashed pt-4">
-        {/* Destaque Principal */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* Composição do Saldo */}
+        <div className="space-y-3">
           <DetailItem
-            label="Saldo atual"
+            label="Saldo no início do período"
+            value={<MoneyValues amount={openingBalance} className="text-2xl" />}
+            tooltip="Saldo inicial cadastrado na conta somado aos lançamentos pagos anteriores a este mês."
+          />
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <DetailItem
+              label="Entradas"
+              value={
+                <span className="font-medium text-emerald-600">
+                  {formatCurrency(totalIncomes)}
+                </span>
+              }
+              tooltip="Total de receitas deste mês classificadas como pagas para esta conta."
+            />
+            <DetailItem
+              label="Saídas"
+              value={
+                <span className="font-medium text-destructive">
+                  {formatCurrency(totalExpenses)}
+                </span>
+              }
+              tooltip="Total de despesas pagas neste mês (considerando divisão entre pagadores)."
+            />
+
+            <DetailItem
+              label="Resultado do período"
+              value={
+                <MoneyValues
+                  amount={totalIncomes - totalExpenses}
+                  className={cn(
+                    "font-semibold text-xl",
+                    totalIncomes - totalExpenses >= 0
+                      ? "text-emerald-600"
+                      : "text-destructive"
+                  )}
+                />
+              }
+              tooltip="Diferença entre entradas e saídas do mês; positivo indica saldo crescente."
+            />
+          </div>
+
+          {/* Saldo Atual - Destaque Principal */}
+          <DetailItem
+            label="Saldo ao final do período"
             value={<MoneyValues amount={currentBalance} className="text-2xl" />}
             tooltip="Saldo inicial do período + entradas - saídas realizadas neste mês."
+          />
+        </div>
+
+        {/* Informações da Conta */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2 border-t border-border/60 border-dashed">
+          <DetailItem
+            label="Tipo da conta"
+            value={accountType}
+            tooltip="Classificação definida na criação da conta (corrente, poupança, etc.)."
           />
           <DetailItem
             label="Status da conta"
@@ -123,61 +176,6 @@ export function AccountStatementCard({
             tooltip="Indica se a conta está ativa para lançamentos ou foi desativada."
           />
         </div>
-
-        {/* Movimentação do Período */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <DetailItem
-            label="Saldo inicial"
-            value={
-              <MoneyValues
-                amount={openingBalance}
-                className="font-medium text-foreground"
-              />
-            }
-            tooltip="Saldo inicial cadastrado na conta somado aos lançamentos pagos anteriores a este mês."
-          />
-          <DetailItem
-            label="Entradas"
-            value={
-              <span className="font-medium text-emerald-600">
-                {formatCurrency(totalIncomes)}
-              </span>
-            }
-            tooltip="Total de receitas deste mês classificadas como pagas para esta conta."
-          />
-          <DetailItem
-            label="Saídas"
-            value={
-              <span className="font-medium text-destructive">
-                {formatCurrency(totalExpenses)}
-              </span>
-            }
-            tooltip="Total de despesas pagas neste mês (considerando divisão entre pagadores)."
-          />
-          <DetailItem
-            label="Resultado"
-            value={
-              <MoneyValues
-                amount={totalIncomes - totalExpenses}
-                className={cn(
-                  "font-semibold",
-                  totalIncomes - totalExpenses >= 0
-                    ? "text-emerald-600"
-                    : "text-destructive"
-                )}
-              />
-            }
-            tooltip="Diferença entre entradas e saídas do mês; positivo indica saldo crescente."
-          />
-        </div>
-
-        {/* Informações da Conta */}
-        <DetailItem
-          label="Tipo da conta"
-          value={accountType}
-          tooltip="Classificação definida na criação da conta (corrente, poupança, etc.)."
-          className="sm:w-1/2"
-        />
       </CardContent>
     </Card>
   );

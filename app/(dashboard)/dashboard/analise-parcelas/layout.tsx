@@ -1,8 +1,8 @@
 import PageDescription from "@/components/page-description";
-import { RiTodoLine } from "@remixicon/react";
+import { RiSecurePaymentLine } from "@remixicon/react";
 
 export const metadata = {
-  title: "Anotações | OpenSheets",
+  title: "Análise de Parcelas | OpenSheets",
 };
 
 export default function RootLayout({
@@ -13,9 +13,9 @@ export default function RootLayout({
   return (
     <section className="space-y-6 px-6">
       <PageDescription
-        icon={<RiTodoLine />}
-        title="Notas"
-        subtitle="Gerencie suas anotações e mantenha o controle sobre suas ideias e tarefas."
+        icon={<RiSecurePaymentLine />}
+        title="Análise de Parcelas"
+        subtitle="Quanto você gastaria pagando suas despesas parceladas à vista?"
       />
       {children}
     </section>

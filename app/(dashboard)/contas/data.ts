@@ -18,8 +18,7 @@ export type AccountData = {
 };
 
 export async function fetchAccountsForUser(
-  userId: string,
-  currentPeriod: string
+  userId: string
 ): Promise<{ accounts: AccountData[]; logoOptions: LogoOption[] }> {
   const [accountRows, logoOptions] = await Promise.all([
     db
@@ -50,14 +49,10 @@ export async function fetchAccountsForUser(
         and(
           eq(lancamentos.contaId, contas.id),
           eq(lancamentos.userId, userId),
-          eq(lancamentos.period, currentPeriod),
           eq(lancamentos.isSettled, true)
         )
       )
-      .leftJoin(
-        pagadores,
-        eq(lancamentos.pagadorId, pagadores.id)
-      )
+      .leftJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
       .where(
         and(
           eq(contas.userId, userId),
