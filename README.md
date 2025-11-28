@@ -251,19 +251,27 @@ Esta é a **melhor opção para desenvolvedores** que vão modificar o código.
 
    Isso sobe **apenas o banco de dados** em container. A aplicação roda localmente.
 
-5. **Execute as migrations**
+5. **Ative as extensões necessárias no PostgreSQL**
+
+   ```bash
+   pnpm db:enableExtensions
+   ```
+
+   Ou você pode importar o script diretamente no banco de dados: `scripts/postgres/init.sql`
+
+6. **Execute as migrations**
 
    ```bash
    pnpm db:push
    ```
 
-6. **Inicie o servidor de desenvolvimento**
+7. **Inicie o servidor de desenvolvimento**
 
    ```bash
    pnpm dev
    ```
 
-7. **Acesse a aplicação**
+8. **Acesse a aplicação**
    ```
    http://localhost:3000
    ```
