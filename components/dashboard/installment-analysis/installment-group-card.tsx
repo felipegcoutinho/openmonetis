@@ -41,18 +41,26 @@ export function InstallmentGroupCard({
     selectedInstallments.size === unpaidInstallments.length &&
     unpaidInstallments.length > 0;
 
-  const isPartiallySelected =
-    selectedInstallments.size > 0 &&
-    selectedInstallments.size < unpaidInstallments.length;
-
   const progress =
     group.totalInstallments > 0
       ? (group.paidInstallments / group.totalInstallments) * 100
       : 0;
 
   const selectedAmount = group.pendingInstallments
-    .filter((i) => selectedInstallments.has(i.id))
-    .reduce((sum, i) => sum + i.amount, 0);
+    .filter((i) => selectedInstallments.has(i.id) && !i.isSettled)
+    .reduce((sum, i) => sum + Number(i.amount), 0);
+
+  // Calcular valor total de todas as parcelas (pagas + pendentes)
+  const totalAmount = group.pendingInstallments.reduce(
+    (sum, i) => sum + i.amount,
+    0
+  );
+
+  // Calcular valor pendente (apenas não pagas)
+  const pendingAmount = unpaidInstallments.reduce(
+    (sum, i) => sum + i.amount,
+    0
+  );
 
   return (
     <Card className={cn(isFullySelected && "border-primary/50")}>
@@ -84,22 +92,23 @@ export function InstallmentGroupCard({
                 </div>
               </div>
 
-              <div className="shrink-0 flex items-center gap-0.5">
-                <MoneyValues
-                  amount={group.totalPendingAmount}
-                  className="text-base font-bold"
-                />
-
-                {selectedInstallments.size > 0 && (
-                  <span className="mx-1 text-muted-foreground">|</span>
-                )}
-
-                {selectedInstallments.size > 0 && (
+              <div className="shrink-0 flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">Total:</span>
                   <MoneyValues
-                    amount={selectedAmount}
-                    className="text-base text-primary"
+                    amount={totalAmount}
+                    className="text-base font-bold"
                   />
-                )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">
+                    Pendente:
+                  </span>
+                  <MoneyValues
+                    amount={pendingAmount}
+                    className="text-sm font-medium text-primary"
+                  />
+                </div>
               </div>
             </div>
 
@@ -109,20 +118,18 @@ export function InstallmentGroupCard({
                 <span>
                   {group.paidInstallments} de {group.totalInstallments} pagas
                 </span>
-                <span>
-                  {unpaidCount} {unpaidCount === 1 ? "pendente" : "pendentes"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span>
+                    {unpaidCount} {unpaidCount === 1 ? "pendente" : "pendentes"}
+                  </span>
+                  {selectedInstallments.size > 0 && (
+                    <span className="text-primary font-medium">
+                      • Selecionado: <MoneyValues amount={selectedAmount} className="text-xs font-medium text-primary inline" />
+                    </span>
+                  )}
+                </div>
               </div>
               <Progress value={progress} className="h-2" />
-            </div>
-
-            {/* Badges de status */}
-            <div className="mt-2 flex flex-wrap gap-2">
-              {isPartiallySelected && (
-                <Badge variant="secondary" className="text-xs">
-                  {selectedInstallments.size} de {unpaidCount} selecionadas
-                </Badge>
-              )}
             </div>
 
             {/* Botão de expandir */}

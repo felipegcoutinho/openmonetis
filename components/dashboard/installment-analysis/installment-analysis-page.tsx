@@ -81,7 +81,8 @@ export function InstallmentAnalysisPage({
     installmentId: string
   ) => {
     const newMap = new Map(selectedInstallments);
-    const current = newMap.get(seriesId) || new Set<string>();
+    // Criar uma NOVA instância do Set para React detectar a mudança
+    const current = new Set(newMap.get(seriesId) || []);
 
     if (current.has(installmentId)) {
       current.delete(installmentId);

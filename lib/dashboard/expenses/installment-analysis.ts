@@ -19,7 +19,8 @@ function calculateDueDate(period: string, dueDay: string | null): Date | null {
     const day = parseInt(dueDay, 10);
     if (isNaN(day)) return null;
 
-    return new Date(parseInt(year), parseInt(month) - 1, day);
+    // Criar data ao meio-dia para evitar problemas de timezone
+    return new Date(parseInt(year), parseInt(month) - 1, day, 12, 0, 0);
   } catch {
     return null;
   }
