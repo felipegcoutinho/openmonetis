@@ -59,7 +59,6 @@ export function LoginForm({ className, ...props }: DivProps) {
             toast.error("Ocorreu uma falha na requisição. Tente novamente mais tarde.");
           }
 
-
           setError(ctx.error.message);
           setLoadingEmail(false);
         },
