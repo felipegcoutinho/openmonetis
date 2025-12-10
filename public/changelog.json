@@ -1,7 +1,39 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2025-12-08T15:16:10.003Z",
+  "generatedAt": "2025-12-10T16:45:04.592Z",
   "entries": [
+    {
+      "id": "89765d4373b820a3e7c8e4fa40479dd2673558b0",
+      "type": "chore",
+      "title": "remover arquivo PLAN.md",
+      "date": "2025-12-09 17:26:08 +0000",
+      "icon": "🔧",
+      "category": "chore"
+    },
+    {
+      "id": "95d6a45a95c1a383dfa532aa72f764fcd4bff64e",
+      "type": "feat",
+      "title": "adicionar análise e sugestões para OpenSheets",
+      "date": "2025-12-09 17:24:07 +0000",
+      "icon": "✨",
+      "category": "feature"
+    },
+    {
+      "id": "0c445ee4a5a70dbeee834ba511ace1ea79471ada",
+      "type": "feat",
+      "title": "adicionar alerta de privacidade e ajustar estilos",
+      "date": "2025-12-09 17:23:45 +0000",
+      "icon": "✨",
+      "category": "feature"
+    },
+    {
+      "id": "ed2b7070ebd14c3274dcd515613d5eebbd990b24",
+      "type": "feat",
+      "title": "adicionar funcionalidades de leitura de atualizações",
+      "date": "2025-12-08 15:17:10 +0000",
+      "icon": "✨",
+      "category": "feature"
+    },
     {
       "id": "b7fcba77b7ed0f887ba26e2b0ceae19904e140cd",
       "type": "feat",
@@ -129,38 +161,6 @@
       "date": "2025-11-22 12:49:56 -0300",
       "icon": "✨",
       "category": "feature"
-    },
-    {
-      "id": "4d076772e623cc3cb1a51f94551125ad9b791841",
-      "type": "refactor",
-      "title": "Relocate `PrivacyProvider` to the dashboard layout and update `tsconfig` `jsx` compiler option.",
-      "date": "2025-11-21 09:40:41 -0300",
-      "icon": "♻️",
-      "category": "refactor"
-    },
-    {
-      "id": "3d8772e55f2d25b757b0b3fe398f7db2fafcb745",
-      "type": "feat",
-      "title": "adiciona tipos para d3-array e ajusta configurações do TypeScript",
-      "date": "2025-11-17 20:58:05 -0300",
-      "icon": "✨",
-      "category": "feature"
-    },
-    {
-      "id": "a7736b7ab9249dd0e82b30f71ca74530dad0fdb0",
-      "type": "feat",
-      "title": "adicionar babel-plugin-react-compiler como dependência",
-      "date": "2025-11-17 19:55:21 -0300",
-      "icon": "✨",
-      "category": "feature"
-    },
-    {
-      "id": "835d94f140670888df920834ab2b77eb365362ce",
-      "type": "chore",
-      "title": "add package-lock.json for dependency version locking",
-      "date": "2025-11-17 19:45:01 +0000",
-      "icon": "🔧",
-      "category": "chore"
     }
   ]
 }

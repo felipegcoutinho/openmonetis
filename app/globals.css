@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --spacing-custom-height-1: 29rem;
+  --spacing-custom-height-1: 30rem;
 }
 
 :root {
@@ -41,11 +41,12 @@
   --ring: oklch(69.18% 0.18855 38.353);
 
   /* Charts - harmonious, distinct, accessible */
-  --chart-1: oklch(65% 0.18 160);
-  --chart-2: oklch(60% 0.2 28);
-  --chart-3: oklch(58% 0.19 295);
-  --chart-4: oklch(55% 0.2 260);
-  --chart-5: oklch(68% 0.16 85);
+  --chart-1: var(--color-emerald-400);
+  --chart-2: var(--color-orange-400);
+  --chart-3: var(--color-indigo-400);
+  --chart-4: var(--color-amber-400);
+  --chart-5: var(--color-pink-400);
+  --chart-6: var(--color-stone-400);
 
   /* Sidebar - slight elevation from background */
   --sidebar: oklch(94.637% 0.00925 62.27);
@@ -121,11 +122,12 @@
   --ring: oklch(69.18% 0.18855 38.353);
 
   /* Charts - bright and distinct on dark */
-  --chart-1: oklch(72% 0.17 158);
-  --chart-2: oklch(68% 0.19 30);
-  --chart-3: oklch(68% 0.18 298);
-  --chart-4: oklch(65% 0.18 262);
-  --chart-5: oklch(74% 0.15 88);
+  --chart-1: var(--color-emerald-500);
+  --chart-2: var(--color-orange-500);
+  --chart-3: var(--color-indigo-500);
+  --chart-4: var(--color-amber-500);
+  --chart-5: var(--color-pink-500);
+  --chart-6: var(--color-stone-500);
 
   /* Sidebar - slight separation from main */
   --sidebar: oklch(24.039% 0.00151 16.27);
@@ -192,6 +194,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

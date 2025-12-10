@@ -1,6 +1,8 @@
 import { BoletosWidget } from "@/components/dashboard/boletos-widget";
 import { ExpensesByCategoryWidget } from "@/components/dashboard/expenses-by-category-widget";
+import { ExpensesByCategoryWidgetWithChart } from "@/components/dashboard/expenses-by-category-widget-with-chart";
 import { IncomeByCategoryWidget } from "@/components/dashboard/income-by-category-widget";
+import { IncomeByCategoryWidgetWithChart } from "@/components/dashboard/income-by-category-widget-with-chart";
 import { IncomeExpenseBalanceWidget } from "@/components/dashboard/income-expense-balance-widget";
 import { InstallmentExpensesWidget } from "@/components/dashboard/installment-expenses-widget";
 import { InvoicesWidget } from "@/components/dashboard/invoices-widget";
@@ -183,7 +185,7 @@ export const widgetsConfig: WidgetConfig[] = [
     subtitle: "Distribuição de receitas por categoria",
     icon: <RiPieChartLine className="size-4" />,
     component: ({ data, period }) => (
-      <IncomeByCategoryWidget
+      <IncomeByCategoryWidgetWithChart
         data={data.incomeByCategoryData}
         period={period}
       />
@@ -195,7 +197,7 @@ export const widgetsConfig: WidgetConfig[] = [
     subtitle: "Distribuição de despesas por categoria",
     icon: <RiPieChartLine className="size-4" />,
     component: ({ data, period }) => (
-      <ExpensesByCategoryWidget
+      <ExpensesByCategoryWidgetWithChart
         data={data.expensesByCategoryData}
         period={period}
       />

@@ -103,7 +103,7 @@ export function IncomeExpenseBalanceWidget({
                           className="flex items-center gap-2"
                         >
                           <div
-                            className="h-2.5 w-2.5 rounded"
+                            className="h-3 w-3 rounded-full"
                             style={{ backgroundColor: config?.color }}
                           />
                           <span className="text-xs text-muted-foreground">
@@ -144,7 +144,7 @@ export function IncomeExpenseBalanceWidget({
       <div className="flex items-center justify-center gap-6">
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded"
+            className="h-3 w-3 rounded-full"
             style={{ backgroundColor: chartConfig.receita.color }}
           />
           <span className="text-sm text-muted-foreground">
@@ -153,7 +153,7 @@ export function IncomeExpenseBalanceWidget({
         </div>
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded"
+            className="h-3 w-3 rounded-full"
             style={{ backgroundColor: chartConfig.despesa.color }}
           />
           <span className="text-sm text-muted-foreground">
@@ -162,7 +162,7 @@ export function IncomeExpenseBalanceWidget({
         </div>
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded"
+            className="h-3 w-3 rounded-full"
             style={{ backgroundColor: chartConfig.balanco.color }}
           />
           <span className="text-sm text-muted-foreground">
