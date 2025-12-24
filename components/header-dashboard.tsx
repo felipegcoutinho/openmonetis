@@ -1,6 +1,6 @@
 import { ChangelogNotification } from "@/components/changelog/changelog-notification";
 import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
-import { NotificationBell } from "@/components/notifications/notification-bell";
+import { NotificationBell } from "@/components/notificacoes/notification-bell";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getUser } from "@/lib/auth/server";
 import { getUnreadUpdates } from "@/lib/changelog/data";

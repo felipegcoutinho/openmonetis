@@ -3,9 +3,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
+  RiArchiveLine,
   RiCheckLine,
   RiDeleteBin5Line,
   RiEyeLine,
+  RiInboxUnarchiveLine,
   RiPencilLine,
 } from "@remixicon/react";
 import { useMemo } from "react";
@@ -20,9 +22,18 @@ interface NoteCardProps {
   onEdit?: (note: Note) => void;
   onDetails?: (note: Note) => void;
   onRemove?: (note: Note) => void;
+  onArquivar?: (note: Note) => void;
+  isArquivadas?: boolean;
 }
 
-export function NoteCard({ note, onEdit, onDetails, onRemove }: NoteCardProps) {
+export function NoteCard({
+  note,
+  onEdit,
+  onDetails,
+  onRemove,
+  onArquivar,
+  isArquivadas = false,
+}: NoteCardProps) {
   const { formattedDate, displayTitle } = useMemo(() => {
     const resolvedTitle = note.title.trim().length
       ? note.title
@@ -53,6 +64,16 @@ export function NoteCard({ note, onEdit, onDetails, onRemove }: NoteCardProps) {
       variant: "default" as const,
     },
     {
+      label: isArquivadas ? "desarquivar" : "arquivar",
+      icon: isArquivadas ? (
+        <RiInboxUnarchiveLine className="size-4" aria-hidden />
+      ) : (
+        <RiArchiveLine className="size-4" aria-hidden />
+      ),
+      onClick: onArquivar,
+      variant: "default" as const,
+    },
+    {
       label: "remover",
       icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
       onClick: onRemove,
@@ -68,20 +89,17 @@ export function NoteCard({ note, onEdit, onDetails, onRemove }: NoteCardProps) {
             <h3 className="text-lg font-semibold leading-tight text-foreground wrap-break-word">
               {displayTitle}
             </h3>
-            {isTask && (
-              <Badge variant="outline" className="text-xs">
-                {completedCount}/{totalCount} concluídas
-              </Badge>
-            )}
           </div>
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground whitespace-nowrap">
-            {formattedDate}
-          </span>
+          {isTask && (
+            <Badge variant="outline" className="text-xs">
+              {completedCount}/{totalCount} concluídas
+            </Badge>
+          )}
         </div>
 
         {isTask ? (
-          <div className="flex-1 overflow-auto space-y-2">
-            {tasks.slice(0, 4).map((task) => (
+          <div className="flex-1 overflow-auto space-y-2 mt-2">
+            {tasks.slice(0, 5).map((task) => (
               <div key={task.id} className="flex items-start gap-2 text-sm">
                 <div
                   className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
@@ -96,24 +114,22 @@ export function NoteCard({ note, onEdit, onDetails, onRemove }: NoteCardProps) {
                 </div>
                 <span
                   className={`leading-relaxed ${
-                    task.completed
-                      ? "line-through text-muted-foreground"
-                      : "text-foreground"
+                    task.completed ? "text-muted-foreground" : "text-foreground"
                   }`}
                 >
                   {task.text}
                 </span>
               </div>
             ))}
-            {tasks.length > 4 && (
+            {tasks.length > 5 && (
               <p className="text-xs text-muted-foreground pl-5 py-1">
-                +{tasks.length - 4}{" "}
-                {tasks.length - 4 === 1 ? "tarefa" : "tarefas"}...
+                +{tasks.length - 5}
+                {tasks.length - 5 === 1 ? "tarefa" : "tarefas"}...
               </p>
             )}
           </div>
         ) : (
-          <p className="flex-1 overflow-auto whitespace-pre-line text-sm text-muted-foreground wrap-break-word leading-relaxed">
+          <p className="flex-1 overflow-auto whitespace-pre-line text-sm text-muted-foreground wrap-break-word leading-relaxed mt-2">
             {note.description}
           </p>
         )}

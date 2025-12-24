@@ -12,6 +12,7 @@ export interface Note {
   description: string;
   type: NoteType;
   tasks?: Task[];
+  arquivada: boolean;
   createdAt: string;
 }
 

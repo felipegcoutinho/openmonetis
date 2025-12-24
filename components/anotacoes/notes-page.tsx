@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteNoteAction } from "@/app/(dashboard)/anotacoes/actions";
+import { arquivarAnotacaoAction, deleteNoteAction } from "@/app/(dashboard)/anotacoes/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,10 @@ import type { Note } from "./types";
 
 interface NotesPageProps {
   notes: Note[];
+  isArquivadas?: boolean;
 }
 
-export function NotesPage({ notes }: NotesPageProps) {
+export function NotesPage({ notes, isArquivadas = false }: NotesPageProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<Note | null>(null);
@@ -25,6 +26,8 @@ export function NotesPage({ notes }: NotesPageProps) {
   const [noteDetails, setNoteDetails] = useState<Note | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [noteToRemove, setNoteToRemove] = useState<Note | null>(null);
+  const [arquivarOpen, setArquivarOpen] = useState(false);
+  const [noteToArquivar, setNoteToArquivar] = useState<Note | null>(null);
 
   const sortedNotes = useMemo(
     () =>
@@ -60,6 +63,13 @@ export function NotesPage({ notes }: NotesPageProps) {
     }
   }, []);
 
+  const handleArquivarOpenChange = useCallback((open: boolean) => {
+    setArquivarOpen(open);
+    if (!open) {
+      setNoteToArquivar(null);
+    }
+  }, []);
+
   const handleEditRequest = useCallback((note: Note) => {
     setNoteToEdit(note);
     setEditOpen(true);
@@ -74,6 +84,30 @@ export function NotesPage({ notes }: NotesPageProps) {
     setNoteToRemove(note);
     setRemoveOpen(true);
   }, []);
+
+  const handleArquivarRequest = useCallback((note: Note) => {
+    setNoteToArquivar(note);
+    setArquivarOpen(true);
+  }, []);
+
+  const handleArquivarConfirm = useCallback(async () => {
+    if (!noteToArquivar) {
+      return;
+    }
+
+    const result = await arquivarAnotacaoAction({
+      id: noteToArquivar.id,
+      arquivada: !isArquivadas,
+    });
+
+    if (result.success) {
+      toast.success(result.message);
+      return;
+    }
+
+    toast.error(result.error);
+    throw new Error(result.error);
+  }, [noteToArquivar, isArquivadas]);
 
   const handleRemoveConfirm = useCallback(async () => {
     if (!noteToRemove) {
@@ -97,29 +131,51 @@ export function NotesPage({ notes }: NotesPageProps) {
       : "Remover anotação?"
     : "Remover anotação?";
 
+  const arquivarTitle = noteToArquivar
+    ? noteToArquivar.title.trim().length
+      ? isArquivadas
+        ? `Desarquivar anotação "${noteToArquivar.title}"?`
+        : `Arquivar anotação "${noteToArquivar.title}"?`
+      : isArquivadas
+      ? "Desarquivar anotação?"
+      : "Arquivar anotação?"
+    : isArquivadas
+    ? "Desarquivar anotação?"
+    : "Arquivar anotação?";
+
   return (
     <>
       <div className="flex w-full flex-col gap-6">
-        <div className="flex justify-start">
-          <NoteDialog
-            mode="create"
-            open={createOpen}
-            onOpenChange={handleCreateOpenChange}
-            trigger={
-              <Button>
-                <RiAddCircleLine className="size-4" />
-                Nova anotação
-              </Button>
-            }
-          />
-        </div>
+        {!isArquivadas && (
+          <div className="flex justify-start">
+            <NoteDialog
+              mode="create"
+              open={createOpen}
+              onOpenChange={handleCreateOpenChange}
+              trigger={
+                <Button>
+                  <RiAddCircleLine className="size-4" />
+                  Nova anotação
+                </Button>
+              }
+            />
+          </div>
+        )}
 
         {sortedNotes.length === 0 ? (
           <Card className="flex min-h-[50vh] w-full items-center justify-center py-12">
             <EmptyState
               media={<RiTodoLine className="size-6 text-primary" />}
-              title="Nenhuma anotação registrada"
-              description="Crie anotações personalizadas para acompanhar lembretes, decisões ou observações financeiras importantes."
+              title={
+                isArquivadas
+                  ? "Nenhuma anotação arquivada"
+                  : "Nenhuma anotação registrada"
+              }
+              description={
+                isArquivadas
+                  ? "As anotações arquivadas aparecerão aqui."
+                  : "Crie anotações personalizadas para acompanhar lembretes, decisões ou observações financeiras importantes."
+              }
             />
           </Card>
         ) : (
@@ -131,6 +187,8 @@ export function NotesPage({ notes }: NotesPageProps) {
                 onEdit={handleEditRequest}
                 onDetails={handleDetailsRequest}
                 onRemove={handleRemoveRequest}
+                onArquivar={handleArquivarRequest}
+                isArquivadas={isArquivadas}
               />
             ))}
           </div>
@@ -148,6 +206,21 @@ export function NotesPage({ notes }: NotesPageProps) {
         note={noteDetails}
         open={detailsOpen}
         onOpenChange={handleDetailsOpenChange}
+      />
+
+      <ConfirmActionDialog
+        open={arquivarOpen}
+        onOpenChange={handleArquivarOpenChange}
+        title={arquivarTitle}
+        description={
+          isArquivadas
+            ? "A anotação será movida de volta para a lista principal."
+            : "A anotação será movida para arquivadas."
+        }
+        confirmLabel={isArquivadas ? "Desarquivar" : "Arquivar"}
+        confirmVariant="default"
+        pendingLabel={isArquivadas ? "Desarquivando..." : "Arquivando..."}
+        onConfirm={handleArquivarConfirm}
       />
 
       <ConfirmActionDialog

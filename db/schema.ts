@@ -347,6 +347,7 @@ export const anotacoes = pgTable("anotacoes", {
   description: text("descricao"),
   type: text("tipo").notNull().default("nota"), // "nota" ou "tarefa"
   tasks: text("tasks"), // JSON stringificado com array de tarefas
+  arquivada: boolean("arquivada").notNull().default(false),
   createdAt: timestamp("created_at", {
     mode: "date",
     withTimezone: true,

@@ -7,9 +7,10 @@ import { usePrivacyMode } from "./privacy-provider";
 type Props = {
   amount: number;
   className?: string;
+  showPositiveSign?: boolean;
 };
 
-function MoneyValues({ amount, className }: Props) {
+function MoneyValues({ amount, className, showPositiveSign = false }: Props) {
   const { privacyMode } = usePrivacyMode();
 
   const formattedValue = amount.toLocaleString("pt-BR", {
@@ -17,6 +18,10 @@ function MoneyValues({ amount, className }: Props) {
     currency: "BRL",
     maximumFractionDigits: 2,
   });
+
+  const displayValue = showPositiveSign && amount > 0
+    ? `+${formattedValue}`
+    : formattedValue;
 
   return (
     <span
@@ -27,13 +32,13 @@ function MoneyValues({ amount, className }: Props) {
           "blur-[6px] select-none hover:blur-none focus-within:blur-none",
         className
       )}
-      aria-label={privacyMode ? "Valor oculto" : formattedValue}
+      aria-label={privacyMode ? "Valor oculto" : displayValue}
       data-privacy={privacyMode ? "hidden" : undefined}
       title={
         privacyMode ? "Valor oculto - passe o mouse para revelar" : undefined
       }
     >
-      {formattedValue}
+      {displayValue}
     </span>
   );
 }

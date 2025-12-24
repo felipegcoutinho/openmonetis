@@ -18,17 +18,18 @@ export const EVENT_TYPE_STYLES: Record<
 > = {
   lancamento: {
     wrapper:
-      "bg-orange-100 text-orange-600 dark:bg-orange-800 dark:text-orange-50",
+      "bg-orange-100 text-orange-600 dark:bg-orange-900/10 dark:text-orange-50 border-l-4 border-orange-500",
     dot: "bg-orange-600",
   },
   boleto: {
     wrapper:
-      "bg-emerald-100 text-emerald-600 dark:bg-emerald-800 dark:text-emerald-50",
-    dot: "bg-emerald-600",
+      "bg-blue-100 text-blue-600 dark:bg-blue-900/10 dark:text-blue-50 border-l-4 border-blue-500",
+    dot: "bg-blue-600",
   },
   cartao: {
-    wrapper: "bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-50",
-    dot: "bg-blue-600",
+    wrapper:
+      "bg-violet-100 text-violet-600 dark:bg-violet-900/10 dark:text-violet-50 border-l-4 border-violet-500",
+    dot: "bg-violet-600",
   },
 };
 
@@ -75,10 +76,28 @@ const buildEventComplement = (event: CalendarEvent) => {
   }
 };
 
+const isPagamentoFatura = (event: CalendarEvent) => {
+  return (
+    event.type === "lancamento" &&
+    event.lancamento.name.startsWith("Pagamento fatura -")
+  );
+};
+
+const getEventStyle = (event: CalendarEvent) => {
+  if (isPagamentoFatura(event)) {
+    return {
+      wrapper:
+        "bg-green-100 text-green-600 dark:bg-green-900/10 dark:text-green-50 border-l-4 border-green-500",
+      dot: "bg-green-600",
+    };
+  }
+  return eventStyles[event.type];
+};
+
 const DayEventPreview = ({ event }: { event: CalendarEvent }) => {
   const complement = buildEventComplement(event);
   const label = buildEventLabel(event);
-  const style = eventStyles[event.type];
+  const style = getEventStyle(event);
 
   return (
     <div
@@ -88,7 +107,6 @@ const DayEventPreview = ({ event }: { event: CalendarEvent }) => {
       )}
     >
       <div className="flex min-w-0 items-center gap-1">
-        <span className={cn("size-1.5 rounded-full", style.dot)} />
         <span className="truncate">{label}</span>
       </div>
       {complement ? (

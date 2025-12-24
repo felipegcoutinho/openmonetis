@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { RiCheckLine } from "@remixicon/react";
 import { useMemo } from "react";
+import { Card } from "../ui/card";
 import type { Note } from "./types";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
@@ -71,9 +72,9 @@ export function NoteDetailsDialog({
         {isTask ? (
           <div className="max-h-[320px] overflow-auto space-y-3">
             {tasks.map((task) => (
-              <div
+              <Card
                 key={task.id}
-                className="flex items-start gap-3 p-3 rounded-lg border bg-card"
+                className="flex gap-3 p-3 flex-row items-center"
               >
                 <div
                   className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
@@ -88,14 +89,12 @@ export function NoteDetailsDialog({
                 </div>
                 <span
                   className={`text-sm ${
-                    task.completed
-                      ? "line-through text-muted-foreground"
-                      : "text-foreground"
+                    task.completed ? "text-muted-foreground" : "text-foreground"
                   }`}
                 >
                   {task.text}
                 </span>
-              </div>
+              </Card>
             ))}
           </div>
         ) : (

@@ -1,5 +1,7 @@
 "use client";
 
+import { EVENT_TYPE_STYLES } from "@/components/calendario/day-cell";
+import type { CalendarDay, CalendarEvent } from "@/components/calendario/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,12 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { friendlyDate, parseLocalDateString } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/ui";
-import { useMemo, type ReactNode } from "react";
-import type { CalendarDay, CalendarEvent } from "@/components/calendario/types";
-import { parseDateKey } from "@/components/calendario/utils";
-import { EVENT_TYPE_STYLES } from "@/components/calendario/day-cell";
-import { currencyFormatter } from "@/lib/lancamentos/formatting-helpers";
+import type { ReactNode } from "react";
+import MoneyValues from "../money-values";
+import { Badge } from "../ui/badge";
+import { Card } from "../ui/card";
 
 type EventModalProps = {
   open: boolean;
@@ -23,36 +25,26 @@ type EventModalProps = {
   onCreate: (date: string) => void;
 };
 
-const fullDateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
-
-const capitalize = (value: string) =>
-  value.length > 0 ? value[0]?.toUpperCase().concat(value.slice(1)) : value;
-
-const formatCurrency = (value: number, isReceita: boolean) => {
-  const formatted = currencyFormatter.format(value ?? 0);
-  return isReceita ? `+${formatted}` : formatted;
-};
-
 const EventCard = ({
   children,
   type,
+  isPagamentoFatura = false,
 }: {
   children: ReactNode;
   type: CalendarEvent["type"];
+  isPagamentoFatura?: boolean;
 }) => {
-  const style = EVENT_TYPE_STYLES[type];
+  const style = isPagamentoFatura
+    ? { dot: "bg-green-600" }
+    : EVENT_TYPE_STYLES[type];
   return (
-    <div className="flex gap-3 rounded-xl border border-border/60 bg-card/85 p-4">
+    <Card className="flex flex-row gap-2 p-3 mb-1">
       <span
-        className={cn("mt-1 size-2.5 shrink-0 rounded-full", style.dot)}
+        className={cn("mt-1 size-3 shrink-0 rounded-full", style.dot)}
         aria-hidden
       />
-      <div className="flex flex-1 flex-col gap-2">{children}</div>
-    </div>
+      <div className="flex flex-1 flex-col">{children}</div>
+    </Card>
   );
 };
 
@@ -60,41 +52,38 @@ const renderLancamento = (
   event: Extract<CalendarEvent, { type: "lancamento" }>
 ) => {
   const isReceita = event.lancamento.transactionType === "Receita";
-  const subtitleParts = [
-    event.lancamento.categoriaName,
-    event.lancamento.paymentMethod,
-    event.lancamento.pagadorName,
-  ].filter(Boolean);
+  const isPagamentoFatura =
+    event.lancamento.name.startsWith("Pagamento fatura -");
 
   return (
-    <EventCard type="lancamento">
+    <EventCard type="lancamento" isPagamentoFatura={isPagamentoFatura}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold">{event.lancamento.name}</span>
-          {subtitleParts.length ? (
-            <span className="text-xs text-muted-foreground">
-              {subtitleParts.join(" • ")}
-            </span>
-          ) : null}
+        <div className="flex flex-col gap-1">
+          <span
+            className={`text-sm font-semibold leading-tight ${
+              isPagamentoFatura && "text-green-600 dark:text-green-400"
+            }`}
+          >
+            {event.lancamento.name}
+          </span>
+
+          <div className="flex gap-1">
+            <Badge variant={"outline"}>{event.lancamento.condition}</Badge>
+            <Badge variant={"outline"}>{event.lancamento.paymentMethod}</Badge>
+            <Badge variant={"outline"}>{event.lancamento.categoriaName}</Badge>
+          </div>
         </div>
         <span
           className={cn(
-            "text-sm font-semibold",
-            isReceita ? "text-emerald-600" : "text-foreground"
+            "text-sm font-semibold whitespace-nowrap",
+            isReceita ? "text-green-600 dark:text-green-400" : "text-foreground"
           )}
         >
-          {formatCurrency(event.lancamento.amount, isReceita)}
-        </span>
-      </div>
-      <div className="flex flex-wrap gap-2 text-[11px] font-medium text-muted-foreground">
-        <span className="rounded-full bg-muted px-2 py-0.5">
-          {capitalize(event.lancamento.transactionType)}
-        </span>
-        <span className="rounded-full bg-muted px-2 py-0.5">
-          {event.lancamento.condition}
-        </span>
-        <span className="rounded-full bg-muted px-2 py-0.5">
-          {event.lancamento.paymentMethod}
+          <MoneyValues
+            showPositiveSign
+            className="text-base"
+            amount={event.lancamento.amount}
+          />
         </span>
       </div>
     </EventCard>
@@ -111,26 +100,25 @@ const renderBoleto = (event: Extract<CalendarEvent, { type: "boleto" }>) => {
   return (
     <EventCard type="boleto">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold">{event.lancamento.name}</span>
-          <span className="text-xs text-muted-foreground">
-            Boleto{formattedDueDate ? ` - Vence em ${formattedDueDate}` : ""}
-          </span>
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-1 items-center">
+            <span className="text-sm font-semibold leading-tight">
+              {event.lancamento.name}
+            </span>
+
+            {formattedDueDate && (
+              <span className="text-xs text-muted-foreground leading-tight">
+                Vence em {formattedDueDate}
+              </span>
+            )}
+          </div>
+
+          <Badge variant={"outline"}>{isPaid ? "Pago" : "Pendente"}</Badge>
         </div>
-        <span className="text-sm font-semibold text-foreground">
-          {currencyFormatter.format(event.lancamento.amount ?? 0)}
+        <span className="font-semibold">
+          <MoneyValues amount={event.lancamento.amount} />
         </span>
       </div>
-      <span
-        className={cn(
-          "inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-          isPaid
-            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
-            : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
-        )}
-      >
-        {isPaid ? "Pago" : "Pendente"}
-      </span>
     </EventCard>
   );
 };
@@ -138,25 +126,18 @@ const renderBoleto = (event: Extract<CalendarEvent, { type: "boleto" }>) => {
 const renderCard = (event: Extract<CalendarEvent, { type: "cartao" }>) => (
   <EventCard type="cartao">
     <div className="flex items-start justify-between gap-3">
-      <div className="flex flex-col">
-        <span className="text-sm font-semibold">Cartão {event.card.name}</span>
-        <span className="text-xs text-muted-foreground">
-          Vencimento dia {event.card.dueDay}
-        </span>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-1 items-center">
+          <span className="text-sm font-semibold leading-tight">
+            Vencimento Fatura - {event.card.name}
+          </span>
+        </div>
+
+        <Badge variant={"outline"}>{event.card.status ?? "Fatura"}</Badge>
       </div>
       {event.card.totalDue !== null ? (
-        <span className="text-sm font-semibold text-foreground">
-          {currencyFormatter.format(event.card.totalDue)}
-        </span>
-      ) : null}
-    </div>
-    <div className="flex flex-wrap gap-2 text-[11px] font-medium text-muted-foreground">
-      <span className="rounded-full bg-muted px-2 py-0.5">
-        Status: {event.card.status ?? "Indefinido"}
-      </span>
-      {event.card.closingDay ? (
-        <span className="rounded-full bg-muted px-2 py-0.5">
-          Fechamento dia {event.card.closingDay}
+        <span className="font-semibold">
+          <MoneyValues amount={event.card.totalDue} />
         </span>
       ) : null}
     </div>
@@ -177,11 +158,9 @@ const renderEvent = (event: CalendarEvent) => {
 };
 
 export function EventModal({ open, day, onClose, onCreate }: EventModalProps) {
-  const formattedDate = useMemo(() => {
-    if (!day) return "";
-    const parsed = parseDateKey(day.date);
-    return capitalize(fullDateFormatter.format(parsed));
-  }, [day]);
+  const formattedDate = !day
+    ? ""
+    : friendlyDate(parseLocalDateString(day.date));
 
   const handleCreate = () => {
     if (!day) return;
@@ -201,7 +180,7 @@ export function EventModal({ open, day, onClose, onCreate }: EventModalProps) {
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[380px] space-y-3 overflow-y-auto pr-2">
+        <div className="max-h-[380px] space-y-2 overflow-y-auto pr-2">
           {day?.events.length ? (
             day.events.map((event) => (
               <div key={event.id}>{renderEvent(event)}</div>

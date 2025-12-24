@@ -1,8 +1,8 @@
 "use server";
 
 import { anotacoes } from "@/db/schema";
-import { type ActionResult, handleActionError } from "@/lib/actions/helpers";
-import { revalidateForEntity } from "@/lib/actions/helpers";
+import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
+import type { ActionResult } from "@/lib/actions/types";
 import { uuidSchema } from "@/lib/schemas/common";
 import { db } from "@/lib/db";
 import { getUser } from "@/lib/auth/server";
@@ -138,6 +138,48 @@ export async function deleteNoteAction(
     revalidateForEntity("anotacoes");
 
     return { success: true, message: "Anotação removida com sucesso." };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}
+
+const arquivarNoteSchema = z.object({
+  id: uuidSchema("Anotação"),
+  arquivada: z.boolean(),
+});
+
+type NoteArquivarInput = z.infer<typeof arquivarNoteSchema>;
+
+export async function arquivarAnotacaoAction(
+  input: NoteArquivarInput
+): Promise<ActionResult> {
+  try {
+    const user = await getUser();
+    const data = arquivarNoteSchema.parse(input);
+
+    const [updated] = await db
+      .update(anotacoes)
+      .set({
+        arquivada: data.arquivada,
+      })
+      .where(and(eq(anotacoes.id, data.id), eq(anotacoes.userId, user.id)))
+      .returning({ id: anotacoes.id });
+
+    if (!updated) {
+      return {
+        success: false,
+        error: "Anotação não encontrada.",
+      };
+    }
+
+    revalidateForEntity("anotacoes");
+
+    return {
+      success: true,
+      message: data.arquivada
+        ? "Anotação arquivada com sucesso."
+        : "Anotação desarquivada com sucesso."
+    };
   } catch (error) {
     return handleActionError(error);
   }

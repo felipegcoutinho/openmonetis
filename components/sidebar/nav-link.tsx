@@ -1,4 +1,5 @@
 import {
+  RiArchiveLine,
   RiArrowLeftRightLine,
   RiBankCardLine,
   RiBankLine,
@@ -142,6 +143,14 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
             title: "Anotações",
             url: "/anotacoes",
             icon: RiTodoLine,
+            items: [
+              {
+                title: "Arquivadas",
+                url: "/anotacoes/arquivadas",
+                key: "anotacoes-arquivadas",
+                icon: RiArchiveLine,
+              },
+            ],
           },
           {
             title: "Insights",

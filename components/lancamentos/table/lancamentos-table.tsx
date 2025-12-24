@@ -309,6 +309,7 @@ const buildColumns = ({
         return (
           <MoneyValues
             amount={row.original.amount}
+            showPositiveSign={isReceita}
             className={cn(
               "whitespace-nowrap",
               isReceita

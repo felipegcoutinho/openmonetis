@@ -30,6 +30,7 @@ import {
   useTransition,
 } from "react";
 import { toast } from "sonner";
+import { Card } from "../ui/card";
 import type { Note, NoteFormValues, Task } from "./types";
 
 type NoteDialogMode = "create" | "update";
@@ -404,11 +405,12 @@ export function NoteDialog({
                   </label>
                   <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
                     {formState.tasks.map((task) => (
-                      <div
+                      <Card
                         key={task.id}
-                        className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                        className="flex items-center gap-3 px-3 py-2 flex-row mt-1"
                       >
                         <Checkbox
+                          className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
                           checked={task.completed}
                           onCheckedChange={() => handleToggleTask(task.id)}
                           disabled={isPending}
@@ -419,7 +421,7 @@ export function NoteDialog({
                         <span
                           className={`flex-1 text-sm wrap-break-word ${
                             task.completed
-                              ? "line-through text-muted-foreground"
+                              ? "text-muted-foreground"
                               : "text-foreground"
                           }`}
                         >
@@ -436,7 +438,7 @@ export function NoteDialog({
                         >
                           <RiDeleteBinLine className="h-4 w-4" />
                         </Button>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </div>
