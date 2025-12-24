@@ -16,6 +16,7 @@ import { CardItem } from "./card-item";
 type AccountOption = {
   id: string;
   name: string;
+  logo: string | null;
 };
 
 interface CardsPageProps {
