@@ -109,8 +109,6 @@ export const userPreferences = pgTable("user_preferences", {
     .unique()
     .references(() => user.id, { onDelete: "cascade" }),
   disableMagnetlines: boolean("disable_magnetlines").notNull().default(false),
-  periodMonthsBefore: integer("period_months_before").notNull().default(3),
-  periodMonthsAfter: integer("period_months_after").notNull().default(3),
   createdAt: timestamp("created_at", {
     mode: "date",
     withTimezone: true,

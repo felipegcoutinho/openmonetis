@@ -23,11 +23,10 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { PeriodPicker } from "@/components/period-picker";
 import { groupAndSortCategorias } from "@/lib/lancamentos/categoria-helpers";
 import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
 import { getTodayDateString } from "@/lib/utils/date";
-import { createMonthOptions } from "@/lib/utils/period";
-import type { PeriodPreferences } from "@/lib/user-preferences/period";
 import { RiAddLine, RiDeleteBinLine } from "@remixicon/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -52,7 +51,6 @@ interface MassAddDialogProps {
   categoriaOptions: SelectOption[];
   estabelecimentos: string[];
   selectedPeriod: string;
-  periodPreferences: PeriodPreferences;
   defaultPagadorId?: string | null;
 }
 
@@ -93,7 +91,6 @@ export function MassAddDialog({
   categoriaOptions,
   estabelecimentos,
   selectedPeriod,
-  periodPreferences,
   defaultPagadorId,
 }: MassAddDialogProps) {
   const [loading, setLoading] = useState(false);
@@ -119,17 +116,6 @@ export function MassAddDialog({
       pagadorId: defaultPagadorId ?? undefined,
     },
   ]);
-
-  // Period options
-  const periodOptions = useMemo(
-    () =>
-      createMonthOptions(
-        selectedPeriod,
-        periodPreferences.monthsBefore,
-        periodPreferences.monthsAfter
-      ),
-    [selectedPeriod, periodPreferences.monthsBefore, periodPreferences.monthsAfter]
-  );
 
   // Categorias agrupadas e filtradas por tipo de transação
   const groupedCategorias = useMemo(() => {
@@ -336,18 +322,11 @@ export function MassAddDialog({
               {/* Period */}
               <div className="space-y-2">
                 <Label htmlFor="period">Período</Label>
-                <Select value={period} onValueChange={setPeriod}>
-                  <SelectTrigger id="period" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {periodOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <PeriodPicker
+                  value={period}
+                  onChange={setPeriod}
+                  className="w-full truncate"
+                />
               </div>
 
               {/* Conta/Cartao */}

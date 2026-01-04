@@ -12,7 +12,7 @@ import type {
   LancamentoItem,
   SelectOption,
 } from "@/components/lancamentos/types";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { pagadores } from "@/db/schema";
 import { getUserId } from "@/lib/auth/server";
@@ -30,9 +30,8 @@ import {
   type SlugMaps,
   type SluggedFilters,
 } from "@/lib/lancamentos/page-helpers";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
-import { parsePeriodParam } from "@/lib/utils/period";
 import { getPagadorAccess } from "@/lib/pagadores/access";
+import { parsePeriodParam } from "@/lib/utils/period";
 import {
   fetchPagadorBoletoStats,
   fetchPagadorCardUsage,
@@ -137,7 +136,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     boletoStats,
     shareRows,
     estabelecimentos,
-    periodPreferences,
   ] = await Promise.all([
     fetchPagadorLancamentos(filters),
     fetchPagadorMonthlyBreakdown({
@@ -162,7 +160,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     }),
     sharesPromise,
     getRecentEstablishmentsAction(),
-    fetchUserPeriodPreferences(dataOwnerId),
   ]);
 
   const mappedLancamentos = mapLancamentosData(lancamentoRows);
@@ -183,7 +180,12 @@ export default async function Page({ params, searchParams }: PageProps) {
   } else {
     effectiveSluggedFilters = {
       pagadorFiltersRaw: [
-        { id: pagador.id, label: pagador.name, slug: pagador.id, role: pagador.role },
+        {
+          id: pagador.id,
+          label: pagador.name,
+          slug: pagador.id,
+          role: pagador.role,
+        },
       ],
       categoriaFiltersRaw: [],
       contaFiltersRaw: [],
@@ -240,7 +242,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="mb-2">
@@ -296,7 +298,6 @@ export default async function Page({ params, searchParams }: PageProps) {
               contaCartaoFilterOptions={optionSets.contaCartaoFilterOptions}
               selectedPeriod={selectedPeriod}
               estabelecimentos={estabelecimentos}
-              periodPreferences={periodPreferences}
               allowCreate={canEdit}
             />
           </section>
@@ -306,8 +307,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   );
 }
 
-const normalizeOptionLabel = (value: string | null | undefined, fallback: string) =>
-  value?.trim().length ? value.trim() : fallback;
+const normalizeOptionLabel = (
+  value: string | null | undefined,
+  fallback: string
+) => (value?.trim().length ? value.trim() : fallback);
 
 function buildReadOnlyOptionSets(
   items: LancamentoItem[],

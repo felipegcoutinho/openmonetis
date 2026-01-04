@@ -7,7 +7,6 @@ import {
   fetchLancamentoFilterSources,
   mapLancamentosData,
 } from "@/lib/lancamentos/page-helpers";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
 import { and, eq, gte, lte, ne, or } from "drizzle-orm";
 
@@ -60,7 +59,7 @@ export const fetchCalendarData = async ({
   const rangeStartKey = toDateKey(rangeStart);
   const rangeEndKey = toDateKey(rangeEnd);
 
-  const [lancamentoRows, cardRows, filterSources, periodPreferences] =
+  const [lancamentoRows, cardRows, filterSources] =
     await Promise.all([
       db.query.lancamentos.findMany({
         where: and(
@@ -96,7 +95,6 @@ export const fetchCalendarData = async ({
         where: eq(cartoes.userId, userId),
       }),
       fetchLancamentoFilterSources(userId),
-      fetchUserPeriodPreferences(userId),
     ]);
 
   const lancamentosData = mapLancamentosData(lancamentoRows);
@@ -217,7 +215,6 @@ export const fetchCalendarData = async ({
       cartaoOptions: optionSets.cartaoOptions,
       categoriaOptions: optionSets.categoriaOptions,
       estabelecimentos,
-      periodPreferences,
     },
   };
 };

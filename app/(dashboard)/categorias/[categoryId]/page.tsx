@@ -1,7 +1,7 @@
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
 import { CategoryDetailHeader } from "@/components/categorias/category-detail-header";
 import { LancamentosPage } from "@/components/lancamentos/page/lancamentos-page";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { fetchCategoryDetails } from "@/lib/dashboard/categories/category-details";
 import { getUserId } from "@/lib/auth/server";
 import {
@@ -9,7 +9,6 @@ import {
   buildSluggedFilters,
   fetchLancamentoFilterSources,
 } from "@/lib/lancamentos/page-helpers";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
 import { displayPeriod, parsePeriodParam } from "@/lib/utils/period";
 import { notFound } from "next/navigation";
 
@@ -37,12 +36,12 @@ export default async function Page({ params, searchParams }: PageProps) {
   const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
   const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
-  const [detail, filterSources, estabelecimentos, periodPreferences] = await Promise.all([
-    fetchCategoryDetails(userId, categoryId, selectedPeriod),
-    fetchLancamentoFilterSources(userId),
-    getRecentEstablishmentsAction(),
-    fetchUserPeriodPreferences(userId),
-  ]);
+  const [detail, filterSources, estabelecimentos] =
+    await Promise.all([
+      fetchCategoryDetails(userId, categoryId, selectedPeriod),
+      fetchLancamentoFilterSources(userId),
+      getRecentEstablishmentsAction(),
+    ]);
 
   if (!detail) {
     notFound();
@@ -69,7 +68,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
       <CategoryDetailHeader
         category={detail.category}
         currentPeriodLabel={currentPeriodLabel}
@@ -92,7 +91,6 @@ export default async function Page({ params, searchParams }: PageProps) {
         contaCartaoFilterOptions={contaCartaoFilterOptions}
         selectedPeriod={detail.period}
         estabelecimentos={estabelecimentos}
-        periodPreferences={periodPreferences}
         allowCreate={true}
       />
     </main>

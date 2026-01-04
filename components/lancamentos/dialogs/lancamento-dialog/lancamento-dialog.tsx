@@ -22,7 +22,6 @@ import {
   applyFieldDependencies,
   buildLancamentoInitialState,
 } from "@/lib/lancamentos/form-helpers";
-import { createMonthOptions } from "@/lib/utils/period";
 import {
   useCallback,
   useEffect,
@@ -58,7 +57,6 @@ export function LancamentoDialog({
   estabelecimentos,
   lancamento,
   defaultPeriod,
-  periodPreferences,
   defaultCartaoId,
   defaultPaymentMethod,
   defaultPurchaseDate,
@@ -125,15 +123,6 @@ export function LancamentoDialog({
     return groupAndSortCategorias(filtered);
   }, [categoriaOptions, formState.transactionType]);
 
-  const monthOptions = useMemo(
-    () =>
-      createMonthOptions(
-        formState.period,
-        periodPreferences.monthsBefore,
-        periodPreferences.monthsAfter
-      ),
-    [formState.period, periodPreferences.monthsBefore, periodPreferences.monthsAfter]
-  );
 
   const handleFieldChange = useCallback(
     <Key extends keyof FormState>(key: Key, value: FormState[Key]) => {
@@ -352,7 +341,6 @@ export function LancamentoDialog({
             formState={formState}
             onFieldChange={handleFieldChange}
             estabelecimentos={estabelecimentos}
-            monthOptions={monthOptions}
           />
 
           <CategorySection

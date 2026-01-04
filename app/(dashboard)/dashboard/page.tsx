@@ -1,7 +1,7 @@
 import { DashboardGrid } from "@/components/dashboard/dashboard-grid";
 import { DashboardWelcome } from "@/components/dashboard/dashboard-welcome";
 import { SectionCards } from "@/components/dashboard/section-cards";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { getUser } from "@/lib/auth/server";
 import { fetchDashboardData } from "@/lib/dashboard/fetch-dashboard-data";
 import { parsePeriodParam } from "@/lib/utils/period";
@@ -44,8 +44,11 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-4 px-6">
-      <DashboardWelcome name={user.name} disableMagnetlines={disableMagnetlines} />
-      <MonthPicker />
+      <DashboardWelcome
+        name={user.name}
+        disableMagnetlines={disableMagnetlines}
+      />
+      <MonthNavigation />
       <SectionCards metrics={data.metrics} />
       <DashboardGrid data={data} period={selectedPeriod} />
     </main>

@@ -167,7 +167,7 @@ O projeto é open source, seus dados ficam no seu controle (pode rodar localment
 - **UI Library:** React 19
 - **Styling:** Tailwind CSS v4
 - **Components:** shadcn/ui (Radix UI)
-- **Icons:** Lucide React, Remixicon
+- **Icons:** Remixicon
 - **Animations:** Framer Motion
 
 ### Backend
@@ -649,10 +649,10 @@ pnpm env:setup
 
 ### Escolhendo entre Local e Remoto
 
-| Modo       | Quando usar                           | Como configurar                               |
-| ---------- | ------------------------------------- | --------------------------------------------- |
-| **Local**  | Desenvolvimento, testes, prototipagem | `DATABASE_URL` com host "db" ou "localhost"   |
-| **Remoto** | Produção, deploy, banco gerenciado    | `DATABASE_URL` com URL completa do provider   |
+| Modo       | Quando usar                           | Como configurar                             |
+| ---------- | ------------------------------------- | ------------------------------------------- |
+| **Local**  | Desenvolvimento, testes, prototipagem | `DATABASE_URL` com host "db" ou "localhost" |
+| **Remoto** | Produção, deploy, banco gerenciado    | `DATABASE_URL` com URL completa do provider |
 
 ### Drizzle ORM
 

@@ -5,9 +5,9 @@ import {
   RiBankLine,
   RiCalendarEventLine,
   RiDashboardLine,
+  RiFileChartLine,
   RiFundsLine,
   RiGroupLine,
-  RiLineChartLine,
   RiPriceTag3Line,
   RiSettingsLine,
   RiSparklingLine,
@@ -125,14 +125,6 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
             title: "Categorias",
             url: "/categorias",
             icon: RiPriceTag3Line,
-            items: [
-              {
-                title: "Histórico",
-                url: "/categorias/historico",
-                key: "historico-categorias",
-                icon: RiLineChartLine,
-              },
-            ],
           },
         ],
       },
@@ -156,6 +148,16 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
             title: "Insights",
             url: "/insights",
             icon: RiSparklingLine,
+          },
+        ],
+      },
+      {
+        title: "Relatórios",
+        items: [
+          {
+            title: "Categorias",
+            url: "/relatorios/categorias",
+            icon: RiFileChartLine,
           },
         ],
       },

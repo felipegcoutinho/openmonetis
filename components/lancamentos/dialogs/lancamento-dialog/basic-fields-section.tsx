@@ -2,13 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { PeriodPicker } from "@/components/period-picker";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { CalculatorDialogButton } from "@/components/calculadora/calculator-dialog";
 import { RiCalculatorLine } from "@remixicon/react";
@@ -19,8 +13,7 @@ export function BasicFieldsSection({
   formState,
   onFieldChange,
   estabelecimentos,
-  monthOptions,
-}: BasicFieldsSectionProps) {
+}: Omit<BasicFieldsSectionProps, "monthOptions">) {
   return (
     <>
       <div className="flex w-full flex-col gap-2 md:flex-row">
@@ -37,21 +30,11 @@ export function BasicFieldsSection({
 
         <div className="w-1/2 space-y-1">
           <Label htmlFor="period">Período</Label>
-          <Select
+          <PeriodPicker
             value={formState.period}
-            onValueChange={(value) => onFieldChange("period", value)}
-          >
-            <SelectTrigger id="period" className="w-full">
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              {monthOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(value) => onFieldChange("period", value)}
+            className="w-full"
+          />
         </div>
       </div>
 

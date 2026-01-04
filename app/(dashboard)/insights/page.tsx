@@ -1,5 +1,5 @@
 import { InsightsPage } from "@/components/insights/insights-page";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { parsePeriodParam } from "@/lib/utils/period";
 
 type PageSearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -24,7 +24,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
       <InsightsPage period={selectedPeriod} />
     </main>
   );

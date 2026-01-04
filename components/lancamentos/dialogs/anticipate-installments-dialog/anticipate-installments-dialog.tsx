@@ -32,11 +32,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PeriodPicker } from "@/components/period-picker";
 import { useControlledState } from "@/hooks/use-controlled-state";
 import { useFormState } from "@/hooks/use-form-state";
 import type { EligibleInstallment } from "@/lib/installments/anticipation-types";
-import type { PeriodPreferences } from "@/lib/user-preferences/period";
-import { createMonthOptions } from "@/lib/utils/period";
 import { RiLoader4Line } from "@remixicon/react";
 import {
   useCallback,
@@ -55,7 +54,6 @@ interface AnticipateInstallmentsDialogProps {
   categorias: Array<{ id: string; name: string; icon: string | null }>;
   pagadores: Array<{ id: string; name: string }>;
   defaultPeriod: string;
-  periodPreferences: PeriodPreferences;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -75,7 +73,6 @@ export function AnticipateInstallmentsDialog({
   categorias,
   pagadores,
   defaultPeriod,
-  periodPreferences,
   open,
   onOpenChange,
 }: AnticipateInstallmentsDialogProps) {
@@ -103,16 +100,6 @@ export function AnticipateInstallmentsDialog({
       categoriaId: "",
       note: "",
     });
-
-  const periodOptions = useMemo(
-    () =>
-      createMonthOptions(
-        formState.anticipationPeriod,
-        periodPreferences.monthsBefore,
-        periodPreferences.monthsAfter
-      ),
-    [formState.anticipationPeriod, periodPreferences.monthsBefore, periodPreferences.monthsAfter]
-  );
 
   // Buscar parcelas elegíveis ao abrir o dialog
   useEffect(() => {
@@ -262,24 +249,14 @@ export function AnticipateInstallmentsDialog({
               <Field className="gap-1">
                 <FieldLabel htmlFor="anticipation-period">Período</FieldLabel>
                 <FieldContent>
-                  <Select
+                  <PeriodPicker
                     value={formState.anticipationPeriod}
-                    onValueChange={(value) =>
+                    onChange={(value) =>
                       updateField("anticipationPeriod", value)
                     }
                     disabled={isPending}
-                  >
-                    <SelectTrigger id="anticipation-period" className="w-full">
-                      <SelectValue placeholder="Selecione o período" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {periodOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    className="w-full"
+                  />
                 </FieldContent>
               </Field>
 

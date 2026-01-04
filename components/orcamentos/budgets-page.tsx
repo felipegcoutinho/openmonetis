@@ -4,7 +4,6 @@ import { deleteBudgetAction } from "@/app/(dashboard)/orcamentos/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
-import type { PeriodPreferences } from "@/lib/user-preferences/period";
 import { RiAddCircleLine, RiFundsLine } from "@remixicon/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -18,7 +17,6 @@ interface BudgetsPageProps {
   categories: BudgetCategory[];
   selectedPeriod: string;
   periodLabel: string;
-  periodPreferences: PeriodPreferences;
 }
 
 export function BudgetsPage({
@@ -26,7 +24,6 @@ export function BudgetsPage({
   categories,
   selectedPeriod,
   periodLabel,
-  periodPreferences,
 }: BudgetsPageProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
@@ -94,7 +91,6 @@ export function BudgetsPage({
             mode="create"
             categories={categories}
             defaultPeriod={selectedPeriod}
-            periodPreferences={periodPreferences}
             trigger={
               <Button disabled={categories.length === 0}>
                 <RiAddCircleLine className="size-4" />
@@ -132,7 +128,6 @@ export function BudgetsPage({
         budget={selectedBudget ?? undefined}
         categories={categories}
         defaultPeriod={selectedPeriod}
-        periodPreferences={periodPreferences}
         open={editOpen && !!selectedBudget}
         onOpenChange={handleEditOpenChange}
       />

@@ -1,5 +1,4 @@
 import type { LancamentoItem, SelectOption } from "@/components/lancamentos/types";
-import type { PeriodPreferences } from "@/lib/user-preferences/period";
 
 export type CalendarEventType = "lancamento" | "boleto" | "cartao";
 
@@ -54,7 +53,6 @@ export type CalendarFormOptions = {
   cartaoOptions: SelectOption[];
   categoriaOptions: SelectOption[];
   estabelecimentos: string[];
-  periodPreferences: PeriodPreferences;
 };
 
 export type CalendarData = {

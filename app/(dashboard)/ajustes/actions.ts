@@ -50,16 +50,6 @@ const deleteAccountSchema = z.object({
 
 const updatePreferencesSchema = z.object({
   disableMagnetlines: z.boolean(),
-  periodMonthsBefore: z
-    .number()
-    .int("Deve ser um número inteiro")
-    .min(1, "Mínimo de 1 mês")
-    .max(24, "Máximo de 24 meses"),
-  periodMonthsAfter: z
-    .number()
-    .int("Deve ser um número inteiro")
-    .min(1, "Mínimo de 1 mês")
-    .max(24, "Máximo de 24 meses"),
 });
 
 // Actions
@@ -374,8 +364,6 @@ export async function updatePreferencesAction(
         .update(schema.userPreferences)
         .set({
           disableMagnetlines: validated.disableMagnetlines,
-          periodMonthsBefore: validated.periodMonthsBefore,
-          periodMonthsAfter: validated.periodMonthsAfter,
           updatedAt: new Date(),
         })
         .where(eq(schema.userPreferences.userId, session.user.id));
@@ -384,8 +372,6 @@ export async function updatePreferencesAction(
       await db.insert(schema.userPreferences).values({
         userId: session.user.id,
         disableMagnetlines: validated.disableMagnetlines,
-        periodMonthsBefore: validated.periodMonthsBefore,
-        periodMonthsAfter: validated.periodMonthsAfter,
       });
     }
 

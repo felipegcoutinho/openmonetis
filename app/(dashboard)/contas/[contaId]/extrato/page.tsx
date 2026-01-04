@@ -3,7 +3,7 @@ import { AccountDialog } from "@/components/contas/account-dialog";
 import { AccountStatementCard } from "@/components/contas/account-statement-card";
 import type { Account } from "@/components/contas/types";
 import { LancamentosPage as LancamentosSection } from "@/components/lancamentos/page/lancamentos-page";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { Button } from "@/components/ui/button";
 import { lancamentos } from "@/db/schema";
 import { db } from "@/lib/db";
@@ -20,7 +20,6 @@ import {
   type ResolvedSearchParams,
 } from "@/lib/lancamentos/page-helpers";
 import { loadLogoOptions } from "@/lib/logo/options";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
 import { parsePeriodParam } from "@/lib/utils/period";
 import { RiPencilLine } from "@remixicon/react";
 import { and, desc, eq } from "drizzle-orm";
@@ -62,13 +61,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     logoOptions,
     accountSummary,
     estabelecimentos,
-    periodPreferences,
   ] = await Promise.all([
     fetchLancamentoFilterSources(userId),
     loadLogoOptions(),
     fetchAccountSummary(userId, contaId, selectedPeriod),
     getRecentEstablishmentsAction(),
-    fetchUserPeriodPreferences(userId),
   ]);
   const sluggedFilters = buildSluggedFilters(filterSources);
   const slugMaps = buildSlugMaps(sluggedFilters);
@@ -130,7 +127,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
 
       <AccountStatementCard
         accountName={account.name}
@@ -176,7 +173,6 @@ export default async function Page({ params, searchParams }: PageProps) {
           contaCartaoFilterOptions={contaCartaoFilterOptions}
           selectedPeriod={selectedPeriod}
           estabelecimentos={estabelecimentos}
-          periodPreferences={periodPreferences}
           allowCreate={false}
         />
       </section>

@@ -1,4 +1,4 @@
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { LancamentosPage } from "@/components/lancamentos/page/lancamentos-page";
 import { getUserId } from "@/lib/auth/server";
 import {
@@ -12,7 +12,6 @@ import {
   mapLancamentosData,
   type ResolvedSearchParams,
 } from "@/lib/lancamentos/page-helpers";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
 import { parsePeriodParam } from "@/lib/utils/period";
 import { fetchLancamentos } from "./data";
 import { getRecentEstablishmentsAction } from "./actions";
@@ -32,10 +31,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   const searchFilters = extractLancamentoSearchFilters(resolvedSearchParams);
 
-  const [filterSources, periodPreferences] = await Promise.all([
-    fetchLancamentoFilterSources(userId),
-    fetchUserPeriodPreferences(userId),
-  ]);
+  const filterSources = await fetchLancamentoFilterSources(userId);
 
   const sluggedFilters = buildSluggedFilters(filterSources);
   const slugMaps = buildSlugMaps(sluggedFilters);
@@ -69,7 +65,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
       <LancamentosPage
         lancamentos={lancamentosData}
         pagadorOptions={pagadorOptions}
@@ -83,7 +79,6 @@ export default async function Page({ searchParams }: PageProps) {
         contaCartaoFilterOptions={contaCartaoFilterOptions}
         selectedPeriod={selectedPeriod}
         estabelecimentos={estabelecimentos}
-        periodPreferences={periodPreferences}
       />
     </main>
   );

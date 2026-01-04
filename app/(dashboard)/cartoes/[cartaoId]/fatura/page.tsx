@@ -3,7 +3,7 @@ import { CardDialog } from "@/components/cartoes/card-dialog";
 import type { Card } from "@/components/cartoes/types";
 import { InvoiceSummaryCard } from "@/components/faturas/invoice-summary-card";
 import { LancamentosPage as LancamentosSection } from "@/components/lancamentos/page/lancamentos-page";
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { Button } from "@/components/ui/button";
 import { lancamentos, type Conta } from "@/db/schema";
 import { db } from "@/lib/db";
@@ -20,7 +20,6 @@ import {
   type ResolvedSearchParams,
 } from "@/lib/lancamentos/page-helpers";
 import { loadLogoOptions } from "@/lib/logo/options";
-import { fetchUserPeriodPreferences } from "@/lib/user-preferences/period";
 import { parsePeriodParam } from "@/lib/utils/period";
 import { RiPencilLine } from "@remixicon/react";
 import { and, desc } from "drizzle-orm";
@@ -59,13 +58,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     logoOptions,
     invoiceData,
     estabelecimentos,
-    periodPreferences,
   ] = await Promise.all([
     fetchLancamentoFilterSources(userId),
     loadLogoOptions(),
     fetchInvoiceData(userId, cartaoId, selectedPeriod),
     getRecentEstablishmentsAction(),
-    fetchUserPeriodPreferences(userId),
   ]);
   const sluggedFilters = buildSluggedFilters(filterSources);
   const slugMaps = buildSlugMaps(sluggedFilters);
@@ -145,7 +142,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-6">
-      <MonthPicker />
+      <MonthNavigation />
 
       <section className="flex flex-col gap-4">
         <InvoiceSummaryCard
@@ -198,7 +195,6 @@ export default async function Page({ params, searchParams }: PageProps) {
           contaCartaoFilterOptions={contaCartaoFilterOptions}
           selectedPeriod={selectedPeriod}
           estabelecimentos={estabelecimentos}
-          periodPreferences={periodPreferences}
           allowCreate
           defaultCartaoId={card.id}
           defaultPaymentMethod="Cartão de crédito"

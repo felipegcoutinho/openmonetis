@@ -8,7 +8,7 @@ import LoadingSpinner from "./loading-spinner";
 import NavigationButton from "./nav-button";
 import ReturnButton from "./return-button";
 
-export default function MonthPicker() {
+export default function MonthNavigation() {
   const {
     monthNames,
     currentMonth,

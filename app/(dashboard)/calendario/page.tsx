@@ -1,4 +1,4 @@
-import MonthPicker from "@/components/month-picker/month-picker";
+import MonthNavigation from "@/components/month-picker/month-navigation";
 import { getUserId } from "@/lib/auth/server";
 import {
   getSingleParam,
@@ -36,7 +36,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <main className="flex flex-col gap-3">
-      <MonthPicker />
+      <MonthNavigation />
       <MonthlyCalendar
         period={calendarPeriod}
         events={calendarData.events}

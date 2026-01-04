@@ -11,21 +11,15 @@ import { toast } from "sonner";
 
 interface PreferencesFormProps {
   disableMagnetlines: boolean;
-  periodMonthsBefore: number;
-  periodMonthsAfter: number;
 }
 
 export function PreferencesForm({
   disableMagnetlines,
-  periodMonthsBefore,
-  periodMonthsAfter,
 }: PreferencesFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [magnetlinesDisabled, setMagnetlinesDisabled] =
     useState(disableMagnetlines);
-  const [monthsBefore, setMonthsBefore] = useState(periodMonthsBefore);
-  const [monthsAfter, setMonthsAfter] = useState(periodMonthsAfter);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,8 +27,6 @@ export function PreferencesForm({
     startTransition(async () => {
       const result = await updatePreferencesAction({
         disableMagnetlines: magnetlinesDisabled,
-        periodMonthsBefore: monthsBefore,
-        periodMonthsAfter: monthsAfter,
       });
 
       if (result.success) {
@@ -73,58 +65,6 @@ export function PreferencesForm({
             onCheckedChange={setMagnetlinesDisabled}
             disabled={isPending}
           />
-        </div>
-
-        <div className="space-y-4 rounded-lg border border-dashed p-4">
-          <div>
-            <h3 className="text-base font-medium mb-2">
-              Seleção de Período
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Configure quantos meses antes e depois do mês atual serão exibidos
-              nos seletores de período.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="monthsBefore" className="text-sm">
-                Meses anteriores
-              </Label>
-              <Input
-                id="monthsBefore"
-                type="number"
-                min={1}
-                max={24}
-                value={monthsBefore}
-                onChange={(e) => setMonthsBefore(Number(e.target.value))}
-                disabled={isPending}
-                className="w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                1 a 24 meses
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="monthsAfter" className="text-sm">
-                Meses posteriores
-              </Label>
-              <Input
-                id="monthsAfter"
-                type="number"
-                min={1}
-                max={24}
-                value={monthsAfter}
-                onChange={(e) => setMonthsAfter(Number(e.target.value))}
-                disabled={isPending}
-                className="w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                1 a 24 meses
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 

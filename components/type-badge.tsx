@@ -37,13 +37,13 @@ export function TypeBadge({ type, className }: TypeBadgeProps) {
 
   const colorClass = isTransferencia
     ? "text-blue-700 dark:text-blue-400"
-    : (isReceita || isSaldoInicial)
+    : isReceita || isSaldoInicial
     ? "text-green-700  dark:text-green-400"
     : "text-red-700 dark:text-red-400";
 
   const dotColor = isTransferencia
     ? "bg-blue-700 dark:bg-blue-400"
-    : (isReceita || isSaldoInicial)
+    : isReceita || isSaldoInicial
     ? "bg-green-600 dark:bg-green-400"
     : "bg-red-600 dark:bg-red-400";
 

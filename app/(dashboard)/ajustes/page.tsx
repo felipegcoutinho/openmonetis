@@ -32,8 +32,6 @@ export default async function Page() {
   const userPreferencesResult = await db
     .select({
       disableMagnetlines: schema.userPreferences.disableMagnetlines,
-      periodMonthsBefore: schema.userPreferences.periodMonthsBefore,
-      periodMonthsAfter: schema.userPreferences.periodMonthsAfter,
     })
     .from(schema.userPreferences)
     .where(eq(schema.userPreferences.userId, session.user.id))
@@ -71,8 +69,6 @@ export default async function Page() {
                 disableMagnetlines={
                   userPreferences?.disableMagnetlines ?? false
                 }
-                periodMonthsBefore={userPreferences?.periodMonthsBefore ?? 3}
-                periodMonthsAfter={userPreferences?.periodMonthsAfter ?? 3}
               />
             </div>
           </Card>

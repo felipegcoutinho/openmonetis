@@ -24,10 +24,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { PeriodPicker } from "@/components/period-picker";
 import { useControlledState } from "@/hooks/use-controlled-state";
 import { useFormState } from "@/hooks/use-form-state";
-import type { PeriodPreferences } from "@/lib/user-preferences/period";
-import { createMonthOptions } from "@/lib/utils/period";
 import {
   useCallback,
   useEffect,
@@ -45,7 +44,6 @@ interface BudgetDialogProps {
   budget?: Budget;
   categories: BudgetCategory[];
   defaultPeriod: string;
-  periodPreferences: PeriodPreferences;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -68,7 +66,6 @@ export function BudgetDialog({
   budget,
   categories,
   defaultPeriod,
-  periodPreferences,
   open,
   onOpenChange,
 }: BudgetDialogProps) {
@@ -109,16 +106,6 @@ export function BudgetDialog({
       setErrorMessage(null);
     }
   }, [dialogOpen]);
-
-  const periodOptions = useMemo(
-    () =>
-      createMonthOptions(
-        formState.period,
-        periodPreferences.monthsBefore,
-        periodPreferences.monthsAfter
-      ),
-    [formState.period, periodPreferences.monthsBefore, periodPreferences.monthsAfter]
-  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -244,21 +231,11 @@ export function BudgetDialog({
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="budget-period">Período</Label>
-                <Select
+                <PeriodPicker
                   value={formState.period}
-                  onValueChange={(value) => updateField("period", value)}
-                >
-                  <SelectTrigger id="budget-period" className="w-full">
-                    <SelectValue placeholder="Selecione o período" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    {periodOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(value) => updateField("period", value)}
+                  className="w-full"
+                />
               </div>
 
               <div className="space-y-2">
