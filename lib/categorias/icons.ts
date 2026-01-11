@@ -15,7 +15,7 @@ export const CATEGORY_ICON_OPTIONS: CategoryIconOption[] = [
   { label: "Dinheiro", value: "RiMoneyDollarCircleLine" },
   { label: "Carteira", value: "RiWallet3Line" },
   { label: "Carteira 2", value: "RiWalletLine" },
-  { label: "Cartão", value: "RiBankCardLine" },
+  { label: "Cartão", value: "RiBankCard2Line" },
   { label: "Banco", value: "RiBankLine" },
   { label: "Moedas", value: "RiHandCoinLine" },
   { label: "Gráfico", value: "RiLineChartLine" },

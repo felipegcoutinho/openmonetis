@@ -5,6 +5,7 @@ import { PagadorInfoCard } from "@/components/pagadores/details/pagador-info-car
 import { PagadorMonthlySummaryCard } from "@/components/pagadores/details/pagador-monthly-summary-card";
 import { PagadorBoletoCard } from "@/components/pagadores/details/pagador-payment-method-cards";
 import { PagadorSharingCard } from "@/components/pagadores/details/pagador-sharing-card";
+import { PagadorLeaveShareCard } from "@/components/pagadores/details/pagador-leave-share-card";
 import { LancamentosPage as LancamentosSection } from "@/components/lancamentos/page/lancamentos-page";
 import type {
   ContaCartaoFilterOption,
@@ -39,7 +40,7 @@ import {
   fetchPagadorMonthlyBreakdown,
 } from "@/lib/pagadores/details";
 import { notFound } from "next/navigation";
-import { fetchPagadorLancamentos, fetchPagadorShares } from "./data";
+import { fetchPagadorLancamentos, fetchPagadorShares, fetchCurrentUserShare } from "./data";
 
 type PageSearchParams = Promise<ResolvedSearchParams>;
 
@@ -92,9 +93,13 @@ export default async function Page({ params, searchParams }: PageProps) {
   } = parsePeriodParam(periodoParamRaw);
   const periodLabel = `${capitalize(monthName)} de ${year}`;
 
+  const allSearchFilters = extractLancamentoSearchFilters(resolvedSearchParams);
   const searchFilters = canEdit
-    ? extractLancamentoSearchFilters(resolvedSearchParams)
-    : EMPTY_FILTERS;
+    ? allSearchFilters
+    : {
+        ...EMPTY_FILTERS,
+        searchFilter: allSearchFilters.searchFilter, // Permitir busca mesmo em modo read-only
+      };
 
   let filterSources: Awaited<
     ReturnType<typeof fetchLancamentoFilterSources>
@@ -133,6 +138,10 @@ export default async function Page({ params, searchParams }: PageProps) {
     ? fetchPagadorShares(pagador.id)
     : Promise.resolve([]);
 
+  const currentUserSharePromise = !canEdit
+    ? fetchCurrentUserShare(pagador.id, userId)
+    : Promise.resolve(null);
+
   const [
     lancamentoRows,
     monthlyBreakdown,
@@ -140,6 +149,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     cardUsage,
     boletoStats,
     shareRows,
+    currentUserShare,
     estabelecimentos,
   ] = await Promise.all([
     fetchPagadorLancamentos(filters),
@@ -164,6 +174,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       period: selectedPeriod,
     }),
     sharesPromise,
+    currentUserSharePromise,
     getRecentEstablishmentsAction(),
   ]);
 
@@ -279,6 +290,13 @@ export default async function Page({ params, searchParams }: PageProps) {
               pagadorId={pagador.id}
               shareCode={pagadorData.shareCode}
               shares={pagadorSharesData}
+            />
+          ) : null}
+          {!canEdit && currentUserShare ? (
+            <PagadorLeaveShareCard
+              shareId={currentUserShare.id}
+              pagadorName={pagadorData.name}
+              createdAt={currentUserShare.createdAt}
             />
           ) : null}
         </TabsContent>

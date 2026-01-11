@@ -78,6 +78,19 @@ export function buildLancamentoInitialState(
       ? getTodayDateString()
       : "");
 
+  // Calcular o valor correto para importação de parcelados
+  let amountValue = "";
+  if (typeof lancamento?.amount === "number") {
+    let baseAmount = Math.abs(lancamento.amount);
+
+    // Se está importando e é parcelado, usar o valor total (parcela * quantidade)
+    if (isImporting && lancamento.condition === "Parcelado" && lancamento.installmentCount) {
+      baseAmount = baseAmount * lancamento.installmentCount;
+    }
+
+    amountValue = (Math.round(baseAmount * 100) / 100).toFixed(2);
+  }
+
   return {
     purchaseDate,
     period:
@@ -87,10 +100,7 @@ export function buildLancamentoInitialState(
     name: lancamento?.name ?? "",
     transactionType:
       lancamento?.transactionType ?? LANCAMENTO_TRANSACTION_TYPES[0],
-    amount:
-      typeof lancamento?.amount === "number"
-        ? (Math.round(Math.abs(lancamento.amount) * 100) / 100).toFixed(2)
-        : "",
+    amount: amountValue,
     condition: lancamento?.condition ?? LANCAMENTO_CONDITIONS[0],
     paymentMethod,
     pagadorId: fallbackPagadorId ?? undefined,

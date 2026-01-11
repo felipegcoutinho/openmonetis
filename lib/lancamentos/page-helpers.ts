@@ -15,7 +15,7 @@ import {
 } from "@/lib/lancamentos/constants";
 import { PAGADOR_ROLE_ADMIN, PAGADOR_ROLE_TERCEIRO } from "@/lib/pagadores/constants";
 import type { SQL } from "drizzle-orm";
-import { eq, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, isNotNull, or } from "drizzle-orm";
 
 type PagadorRow = typeof pagadores.$inferSelect;
 type ContaRow = typeof contas.$inferSelect;
@@ -370,8 +370,12 @@ export const buildLancamentoWhere = ({
     where.push(
       or(
         ilike(lancamentos.name, searchPattern),
-        ilike(lancamentos.note, searchPattern)
-      )
+        ilike(lancamentos.note, searchPattern),
+        ilike(lancamentos.paymentMethod, searchPattern),
+        ilike(lancamentos.condition, searchPattern),
+        and(isNotNull(contas.name), ilike(contas.name, searchPattern)),
+        and(isNotNull(cartoes.name), ilike(cartoes.name, searchPattern))
+      )!
     );
   }
 

@@ -21,7 +21,7 @@ import {
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import {
   RiArrowRightSLine,
-  RiStackshareLine,
+  RiUserSharedLine,
   type RemixiconComponentType,
 } from "@remixicon/react";
 import Link from "next/link";
@@ -182,7 +182,7 @@ export function NavMain({ sections }: { sections: NavSection[] }) {
                                         ) : null}
                                         <span>{subItem.title}</span>
                                         {subItem.isShared ? (
-                                          <RiStackshareLine className="size-3.5 text-muted-foreground" />
+                                          <RiUserSharedLine className="size-3.5 text-muted-foreground" />
                                         ) : null}
                                       </Link>
                                     </SidebarMenuSubButton>

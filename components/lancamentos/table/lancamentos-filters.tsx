@@ -130,6 +130,7 @@ interface LancamentosFiltersProps {
   contaCartaoOptions: ContaCartaoFilterOption[];
   className?: string;
   exportButton?: ReactNode;
+  hideAdvancedFilters?: boolean;
 }
 
 export function LancamentosFilters({
@@ -138,6 +139,7 @@ export function LancamentosFilters({
   contaCartaoOptions,
   className,
   exportButton,
+  hideAdvancedFilters = false,
 }: LancamentosFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -277,22 +279,31 @@ export function LancamentosFilters({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
+      <Input
+        value={searchValue}
+        onChange={(event) => setSearchValue(event.target.value)}
+        placeholder="Buscar"
+        aria-label="Buscar lançamentos"
+        className="w-[250px] text-sm border-dashed"
+      />
+
       {exportButton}
 
-      <Drawer direction="right" open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerTrigger asChild>
-          <Button
-            variant="outline"
-            className="text-sm border-dashed relative"
-            aria-label="Abrir filtros"
-          >
-            <RiFilter3Line className="size-4" />
-            Filtros
-            {hasActiveFilters && (
-              <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
-            )}
-          </Button>
-        </DrawerTrigger>
+      {!hideAdvancedFilters && (
+        <Drawer direction="right" open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button
+              variant="outline"
+              className="text-sm border-dashed relative"
+              aria-label="Abrir filtros"
+            >
+              <RiFilter3Line className="size-4" />
+              Filtros
+              {hasActiveFilters && (
+                <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Filtros</DrawerTitle>
@@ -319,7 +330,9 @@ export function LancamentosFilters({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Condição</label>
+              <label className="text-sm font-medium">
+                Condição de Lançamento
+              </label>
               <FilterSelect
                 param="condicao"
                 placeholder="Todas"
@@ -335,7 +348,7 @@ export function LancamentosFilters({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Pagamento</label>
+              <label className="text-sm font-medium">Forma de Pagamento</label>
               <FilterSelect
                 param="pagamento"
                 placeholder="Todos"
@@ -532,15 +545,8 @@ export function LancamentosFilters({
             </Button>
           </DrawerFooter>
         </DrawerContent>
-      </Drawer>
-
-      <Input
-        value={searchValue}
-        onChange={(event) => setSearchValue(event.target.value)}
-        placeholder="Buscar"
-        aria-label="Buscar lançamentos"
-        className="w-[250px] text-sm border-dashed"
-      />
+        </Drawer>
+      )}
     </div>
   );
 }

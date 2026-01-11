@@ -2,7 +2,7 @@ import MoneyValues from "@/components/money-values";
 import { WidgetEmptyState } from "@/components/widget-empty-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PagadorCardUsageItem } from "@/lib/pagadores/details";
-import { RiBankCardLine } from "@remixicon/react";
+import { RiBankCard2Line } from "@remixicon/react";
 import Image from "next/image";
 
 const resolveLogoPath = (logo?: string | null) => {
@@ -36,7 +36,7 @@ export function PagadorCardUsageCard({ items }: PagadorCardUsageCardProps) {
       <CardContent className="space-y-3 pt-2">
         {items.length === 0 ? (
           <WidgetEmptyState
-            icon={<RiBankCardLine className="size-6 text-muted-foreground" />}
+            icon={<RiBankCard2Line className="size-6 text-muted-foreground" />}
             title="Nenhum lançamento com cartão de crédito"
             description="Quando houver despesas registradas com cartão, elas aparecerão aqui."
           />

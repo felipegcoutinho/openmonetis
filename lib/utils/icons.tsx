@@ -49,14 +49,16 @@ export const getPaymentMethodIcon = (paymentMethod: string): ReactNode => {
       <RemixIcons.RiMoneyDollarCircleLine className={ICON_CLASS} aria-hidden />
     ),
     cartaodecredito: (
-      <RemixIcons.RiBankCardLine className={ICON_CLASS} aria-hidden />
+      <RemixIcons.RiBankCard2Line className={ICON_CLASS} aria-hidden />
     ),
     cartaodedebito: (
-      <RemixIcons.RiBankCardLine className={ICON_CLASS} aria-hidden />
+      <RemixIcons.RiBankCard2Line className={ICON_CLASS} aria-hidden />
     ),
-    debito: <RemixIcons.RiBankCardLine className={ICON_CLASS} aria-hidden />,
+    debito: <RemixIcons.RiBankCard2Line className={ICON_CLASS} aria-hidden />,
     prepagovrva: <RemixIcons.RiCouponLine className={ICON_CLASS} aria-hidden />,
-    transferenciabancaria: <RemixIcons.RiExchangeLine className={ICON_CLASS} aria-hidden />,
+    transferenciabancaria: (
+      <RemixIcons.RiExchangeLine className={ICON_CLASS} aria-hidden />
+    ),
   };
 
   return registry[key] ?? null;

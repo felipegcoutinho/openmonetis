@@ -1,17 +1,19 @@
 import {
   RiArchiveLine,
   RiArrowLeftRightLine,
-  RiBankCardLine,
+  RiBankCard2Line,
   RiBankLine,
   RiCalendarEventLine,
   RiDashboardLine,
   RiFileChartLine,
   RiFundsLine,
   RiGroupLine,
+  RiNoCreditCardLine,
   RiPriceTag3Line,
   RiSettingsLine,
   RiSparklingLine,
   RiTodoLine,
+  RiEyeOffLine,
   type RemixiconComponentType,
 } from "@remixicon/react";
 
@@ -98,12 +100,28 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
           {
             title: "Cartões",
             url: "/cartoes",
-            icon: RiBankCardLine,
+            icon: RiBankCard2Line,
+            items: [
+              {
+                title: "Inativos",
+                url: "/cartoes/inativos",
+                key: "cartoes-inativos",
+                icon: RiNoCreditCardLine,
+              },
+            ],
           },
           {
             title: "Contas",
             url: "/contas",
             icon: RiBankLine,
+            items: [
+              {
+                title: "Inativas",
+                url: "/contas/inativos",
+                key: "contas-inativos",
+                icon: RiEyeOffLine,
+              },
+            ],
           },
           {
             title: "Orçamentos",

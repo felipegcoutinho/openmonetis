@@ -734,9 +734,8 @@ export function LancamentosTable({
     0
   );
 
-  // Check if all data belongs to current user to determine if filters should be shown
-  const isOwnData = data.every((item) => item.userId === currentUserId);
-  const shouldShowFilters = showFilters && isOwnData;
+  // Check if there's any data from other users
+  const hasOtherUserData = data.some((item) => item.userId !== currentUserId);
 
   const handleBulkDelete = () => {
     if (onBulkDelete && selectedCount > 0) {
@@ -755,7 +754,7 @@ export function LancamentosTable({
   };
 
   const showTopControls =
-    Boolean(onCreate) || Boolean(onMassAdd) || shouldShowFilters;
+    Boolean(onCreate) || Boolean(onMassAdd) || showFilters;
 
   return (
     <TooltipProvider>
@@ -791,15 +790,16 @@ export function LancamentosTable({
               ) : null}
             </div>
           ) : (
-            <span className={shouldShowFilters ? "hidden sm:block" : ""} />
+            <span className={showFilters ? "hidden sm:block" : ""} />
           )}
 
-          {shouldShowFilters ? (
+          {showFilters ? (
             <LancamentosFilters
               pagadorOptions={pagadorFilterOptions}
               categoriaOptions={categoriaFilterOptions}
               contaCartaoOptions={contaCartaoFilterOptions}
               className="w-full lg:flex-1 lg:justify-end"
+              hideAdvancedFilters={hasOtherUserData}
               exportButton={
                 selectedPeriod ? (
                   <LancamentosExport

@@ -5,7 +5,7 @@ import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { RiAddCircleLine, RiBankCardLine } from "@remixicon/react";
+import { RiAddCircleLine, RiBankCard2Line } from "@remixicon/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -21,9 +21,15 @@ interface CardsPageProps {
   cards: Card[];
   accounts: AccountOption[];
   logoOptions: string[];
+  isInativos?: boolean;
 }
 
-export function CardsPage({ cards, accounts, logoOptions }: CardsPageProps) {
+export function CardsPage({
+  cards,
+  accounts,
+  logoOptions,
+  isInativos = false,
+}: CardsPageProps) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -102,19 +108,21 @@ export function CardsPage({ cards, accounts, logoOptions }: CardsPageProps) {
   return (
     <>
       <div className="flex w-full flex-col gap-6">
-        <div className="flex justify-start">
-          <CardDialog
-            mode="create"
-            accounts={accounts}
-            logoOptions={logoOptions}
-            trigger={
-              <Button>
-                <RiAddCircleLine className="size-4" />
-                Novo cartão
-              </Button>
-            }
-          />
-        </div>
+        {!isInativos && (
+          <div className="flex justify-start">
+            <CardDialog
+              mode="create"
+              accounts={accounts}
+              logoOptions={logoOptions}
+              trigger={
+                <Button>
+                  <RiAddCircleLine className="size-4" />
+                  Novo cartão
+                </Button>
+              }
+            />
+          </div>
+        )}
 
         {hasCards ? (
           <div className="flex flex-wrap gap-4">
@@ -141,9 +149,17 @@ export function CardsPage({ cards, accounts, logoOptions }: CardsPageProps) {
         ) : (
           <Card className="flex w-full items-center justify-center py-12">
             <EmptyState
-              media={<RiBankCardLine className="size-6 text-primary" />}
-              title="Nenhum cartão cadastrado"
-              description="Adicione seu primeiro cartão para acompanhar limites e faturas com mais controle."
+              media={<RiBankCard2Line className="size-6 text-primary" />}
+              title={
+                isInativos
+                  ? "Nenhum cartão inativo"
+                  : "Nenhum cartão cadastrado"
+              }
+              description={
+                isInativos
+                  ? "Os cartões inativos aparecerão aqui."
+                  : "Adicione seu primeiro cartão para acompanhar limites e faturas com mais controle."
+              }
             />
           </Card>
         )}

@@ -9,13 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getIconComponent } from "@/lib/utils/icons";
-import { formatPeriodLabel } from "@/lib/relatorios/utils";
 import type { CategoryReportData } from "@/lib/relatorios/types";
-import { CategoryCell } from "./category-cell";
-import { formatCurrency } from "@/lib/relatorios/utils";
-import { Card } from "../ui/card";
+import { formatCurrency, formatPeriodLabel } from "@/lib/relatorios/utils";
+import { getIconComponent } from "@/lib/utils/icons";
 import DotIcon from "../dot-icon";
+import { Card } from "../ui/card";
+import { CategoryCell } from "./category-cell";
 
 interface CategoryReportTableProps {
   data: CategoryReportData;
@@ -88,16 +87,19 @@ export function CategoryReportTable({ data }: CategoryReportTableProps) {
 
         <TableFooter>
           <TableRow>
-            <TableCell>Total Geral</TableCell>
+            <TableCell className="min-h-[2.5rem]">Total Geral</TableCell>
             {periods.map((period) => {
               const periodTotal = totals.get(period) ?? 0;
               return (
-                <TableCell key={period} className="text-right font-semibold">
+                <TableCell
+                  key={period}
+                  className="text-right font-semibold min-h-8"
+                >
                   {formatCurrency(periodTotal)}
                 </TableCell>
               );
             })}
-            <TableCell className="text-right font-semibold">
+            <TableCell className="text-right font-semibold min-h-8">
               {formatCurrency(grandTotal)}
             </TableCell>
           </TableRow>

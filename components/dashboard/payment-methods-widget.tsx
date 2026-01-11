@@ -1,7 +1,7 @@
 import MoneyValues from "@/components/money-values";
 import type { PaymentMethodsData } from "@/lib/dashboard/payments/payment-methods";
 import { getPaymentMethodIcon } from "@/lib/utils/icons";
-import { RiBankCardLine, RiMoneyDollarCircleLine } from "@remixicon/react";
+import { RiBankCard2Line, RiMoneyDollarCircleLine } from "@remixicon/react";
 import { Progress } from "../ui/progress";
 import { WidgetEmptyState } from "../widget-empty-state";
 
@@ -28,7 +28,7 @@ const resolveIcon = (paymentMethod: string | null | undefined) => {
     return icon;
   }
 
-  return <RiBankCardLine className="size-5" aria-hidden />;
+  return <RiBankCard2Line className="size-5" aria-hidden />;
 };
 
 export function PaymentMethodsWidget({ data }: PaymentMethodsWidgetProps) {

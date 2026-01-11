@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getOptionalUserSession } from "@/lib/auth/server";
 import {
   RiArrowRightSLine,
-  RiBankCardLine,
+  RiBankCard2Line,
   RiBarChartBoxLine,
   RiCalendarLine,
   RiCodeSSlashLine,
@@ -15,7 +15,6 @@ import {
   RiGithubFill,
   RiLineChartLine,
   RiLockLine,
-  RiMoneyDollarCircleLine,
   RiPieChartLine,
   RiShieldCheckLine,
   RiTimeLine,
@@ -234,9 +233,9 @@ export default async function Page() {
                         Parcelamentos avançados
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Controle completo de compras parceladas. Antecipe parcelas
-                        com cálculo automático de desconto. Veja análise
-                        consolidada de todas as parcelas em aberto.
+                        Controle completo de compras parceladas. Antecipe
+                        parcelas com cálculo automático de desconto. Veja
+                        análise consolidada de todas as parcelas em aberto.
                       </p>
                     </div>
                   </div>
@@ -254,9 +253,9 @@ export default async function Page() {
                         Insights com IA
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Análises financeiras geradas por IA (Claude, GPT, Gemini).
-                        Insights personalizados sobre seus padrões de gastos e
-                        recomendações inteligentes.
+                        Análises financeiras geradas por IA (Claude, GPT,
+                        Gemini). Insights personalizados sobre seus padrões de
+                        gastos e recomendações inteligentes.
                       </p>
                     </div>
                   </div>
@@ -287,16 +286,16 @@ export default async function Page() {
                 <CardContent className="pt-6">
                   <div className="flex flex-col gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <RiBankCardLine size={24} className="text-primary" />
+                      <RiBankCard2Line size={24} className="text-primary" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">
                         Faturas de cartão
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Cadastre seus cartões e acompanhe as faturas por período.
-                        Veja o que ainda não foi fechado. Controle limites,
-                        vencimentos e fechamentos.
+                        Cadastre seus cartões e acompanhe as faturas por
+                        período. Veja o que ainda não foi fechado. Controle
+                        limites, vencimentos e fechamentos.
                       </p>
                     </div>
                   </div>
@@ -315,8 +314,8 @@ export default async function Page() {
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         Compartilhe pagadores com permissões granulares (admin/
-                        viewer). Notificações automáticas por e-mail. Colabore em
-                        lançamentos compartilhados.
+                        viewer). Notificações automáticas por e-mail. Colabore
+                        em lançamentos compartilhados.
                       </p>
                     </div>
                   </div>
@@ -334,9 +333,9 @@ export default async function Page() {
                         Categorias e orçamentos
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Crie categorias personalizadas. Defina orçamentos mensais
-                        e acompanhe o quanto gastou vs. planejado com indicadores
-                        visuais.
+                        Crie categorias personalizadas. Defina orçamentos
+                        mensais e acompanhe o quanto gastou vs. planejado com
+                        indicadores visuais.
                       </p>
                     </div>
                   </div>
@@ -394,9 +393,9 @@ export default async function Page() {
                         Importação em massa
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Cole múltiplos lançamentos de uma vez. Economize tempo ao
-                        registrar várias transações. Formatação inteligente para
-                        facilitar a entrada de dados.
+                        Cole múltiplos lançamentos de uma vez. Economize tempo
+                        ao registrar várias transações. Formatação inteligente
+                        para facilitar a entrada de dados.
                       </p>
                     </div>
                   </div>
@@ -434,9 +433,9 @@ export default async function Page() {
                         Performance otimizada
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Dashboard carrega em ~200-500ms com 18+ queries paralelas.
-                        Índices otimizados. Type-safe em toda codebase. Isolamento
-                        completo de dados por usuário.
+                        Dashboard carrega em ~200-500ms com 18+ queries
+                        paralelas. Índices otimizados. Type-safe em toda
+                        codebase. Isolamento completo de dados por usuário.
                       </p>
                     </div>
                   </div>

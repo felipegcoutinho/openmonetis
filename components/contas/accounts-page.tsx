@@ -19,6 +19,7 @@ import type { Account } from "./types";
 interface AccountsPageProps {
   accounts: Account[];
   logoOptions: string[];
+  isInativos?: boolean;
 }
 
 const resolveLogoSrc = (logo: string | null) => {
@@ -30,7 +31,7 @@ const resolveLogoSrc = (logo: string | null) => {
   return `/logos/${fileName}`;
 };
 
-export function AccountsPage({ accounts, logoOptions }: AccountsPageProps) {
+export function AccountsPage({ accounts, logoOptions, isInativos = false }: AccountsPageProps) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
@@ -169,8 +170,8 @@ export function AccountsPage({ accounts, logoOptions }: AccountsPageProps) {
           <Card className="flex min-h-[50vh] w-full items-center justify-center py-12">
             <EmptyState
               media={<RiBankLine className="size-6 text-primary" />}
-              title="Nenhuma conta cadastrada"
-              description="Cadastre sua primeira conta para começar a organizar os lançamentos."
+              title={isInativos ? "Nenhuma conta inativa" : "Nenhuma conta cadastrada"}
+              description={isInativos ? "Não há contas inativas no momento." : "Cadastre sua primeira conta para começar a organizar os lançamentos."}
             />
           </Card>
         )}
