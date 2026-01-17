@@ -454,10 +454,6 @@ const buildLancamentoRecords = ({
       installment += 1
     ) {
       const installmentPeriod = addMonthsToPeriod(period, installment);
-      const installmentPurchaseDate = addMonthsToDate(
-        purchaseDate,
-        installment
-      );
       const installmentDueDate = dueDate
         ? addMonthsToDate(dueDate, installment)
         : null;
@@ -469,7 +465,7 @@ const buildLancamentoRecords = ({
           ...basePayload,
           amount: centsToDecimalString(amountCents * amountSign),
           pagadorId: share.pagadorId,
-          purchaseDate: installmentPurchaseDate,
+          purchaseDate: purchaseDate,
           period: installmentPeriod,
           isSettled: settled,
           installmentCount: installmentTotal,
