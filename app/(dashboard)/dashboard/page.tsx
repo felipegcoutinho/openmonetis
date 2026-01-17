@@ -29,25 +29,22 @@ export default async function Page({ searchParams }: PageProps) {
   const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
   const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
-  const data = await fetchDashboardData(user.id, selectedPeriod);
-
-  // Buscar preferências do usuário
-  const preferencesResult = await db
-    .select({
-      disableMagnetlines: schema.userPreferences.disableMagnetlines,
-    })
-    .from(schema.userPreferences)
-    .where(eq(schema.userPreferences.userId, user.id))
-    .limit(1);
+  const [data, preferencesResult] = await Promise.all([
+    fetchDashboardData(user.id, selectedPeriod),
+    db
+      .select({
+        disableMagnetlines: schema.userPreferences.disableMagnetlines,
+      })
+      .from(schema.userPreferences)
+      .where(eq(schema.userPreferences.userId, user.id))
+      .limit(1),
+  ]);
 
   const disableMagnetlines = preferencesResult[0]?.disableMagnetlines ?? false;
 
   return (
     <main className="flex flex-col gap-4 px-6">
-      <DashboardWelcome
-        name={user.name}
-        disableMagnetlines={disableMagnetlines}
-      />
+      <DashboardWelcome name={user.name} disableMagnetlines={disableMagnetlines} />
       <MonthNavigation />
       <SectionCards metrics={data.metrics} />
       <DashboardGrid data={data} period={selectedPeriod} />
