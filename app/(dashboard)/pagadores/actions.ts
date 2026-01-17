@@ -1,6 +1,6 @@
 "use server";
 
-import { pagadores, pagadorShares } from "@/db/schema";
+import { pagadores, pagadorShares, user } from "@/db/schema";
 import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
 import type { ActionResult } from "@/lib/actions/types";
 import { db } from "@/lib/db";
@@ -113,11 +113,11 @@ export async function updatePagadorAction(
   input: UpdateInput
 ): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const currentUser = await getUser();
     const data = updateSchema.parse(input);
 
     const existing = await db.query.pagadores.findFirst({
-      where: and(eq(pagadores.id, data.id), eq(pagadores.userId, user.id)),
+      where: and(eq(pagadores.id, data.id), eq(pagadores.userId, currentUser.id)),
     });
 
     if (!existing) {
@@ -139,7 +139,17 @@ export async function updatePagadorAction(
         isAutoSend: data.isAutoSend ?? false,
         role: existing.role ?? PAGADOR_ROLE_TERCEIRO,
       })
-      .where(and(eq(pagadores.id, data.id), eq(pagadores.userId, user.id)));
+      .where(and(eq(pagadores.id, data.id), eq(pagadores.userId, currentUser.id)));
+
+    // Se o pagador é admin, sincronizar nome com o usuário
+    if (existing.role === PAGADOR_ROLE_ADMIN) {
+      await db
+        .update(user)
+        .set({ name: data.name })
+        .where(eq(user.id, currentUser.id));
+
+      revalidatePath("/", "layout");
+    }
 
     revalidate();
 

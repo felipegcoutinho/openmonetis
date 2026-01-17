@@ -2,6 +2,8 @@
 
 import { auth } from "@/lib/auth/config";
 import { db, schema } from "@/lib/db";
+import { pagadores } from "@/db/schema";
+import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
 import { eq, and, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -72,13 +74,26 @@ export async function updateNameAction(
     const validated = updateNameSchema.parse(data);
     const fullName = `${validated.firstName} ${validated.lastName}`;
 
+    // Atualizar nome do usuário
     await db
       .update(schema.user)
       .set({ name: fullName })
       .where(eq(schema.user.id, session.user.id));
 
+    // Sincronizar nome com o pagador admin
+    await db
+      .update(pagadores)
+      .set({ name: fullName })
+      .where(
+        and(
+          eq(pagadores.userId, session.user.id),
+          eq(pagadores.role, PAGADOR_ROLE_ADMIN)
+        )
+      );
+
     // Revalidar o layout do dashboard para atualizar a sidebar
     revalidatePath("/", "layout");
+    revalidatePath("/pagadores");
 
     return {
       success: true,
