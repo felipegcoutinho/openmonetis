@@ -14,12 +14,18 @@ import { toast } from "sonner";
 
 import { AnticipateInstallmentsDialog } from "../dialogs/anticipate-installments-dialog/anticipate-installments-dialog";
 import { AnticipationHistoryDialog } from "../dialogs/anticipate-installments-dialog/anticipation-history-dialog";
-import { BulkActionDialog, type BulkActionScope } from "../dialogs/bulk-action-dialog";
+import {
+  BulkActionDialog,
+  type BulkActionScope,
+} from "../dialogs/bulk-action-dialog";
 import { BulkImportDialog } from "../dialogs/bulk-import-dialog";
 import { LancamentoDetailsDialog } from "../dialogs/lancamento-details-dialog";
 import { LancamentoDialog } from "../dialogs/lancamento-dialog/lancamento-dialog";
 import { LancamentosTable } from "../table/lancamentos-table";
-import { MassAddDialog, type MassAddFormData } from "../dialogs/mass-add-dialog";
+import {
+  MassAddDialog,
+  type MassAddFormData,
+} from "../dialogs/mass-add-dialog";
 import type {
   ContaCartaoFilterOption,
   LancamentoFilterOption,
@@ -97,7 +103,7 @@ export function LancamentosPage({
     useState<LancamentoItem | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [settlementLoadingId, setSettlementLoadingId] = useState<string | null>(
-    null
+    null,
   );
   const [bulkEditOpen, setBulkEditOpen] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
@@ -125,17 +131,26 @@ export function LancamentosPage({
   const [selectedForAnticipation, setSelectedForAnticipation] =
     useState<LancamentoItem | null>(null);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
-  const [lancamentosToImport, setLancamentosToImport] = useState<LancamentoItem[]>([]);
+  const [lancamentosToImport, setLancamentosToImport] = useState<
+    LancamentoItem[]
+  >([]);
 
   const handleToggleSettlement = useCallback(async (item: LancamentoItem) => {
     if (item.paymentMethod === "Cartão de crédito") {
       toast.info(
-        "Pagamentos com cartão são conciliados automaticamente. Ajuste pelo cartão."
+        "Pagamentos com cartão são conciliados automaticamente. Ajuste pelo cartão.",
       );
       return;
     }
 
-    const supportedMethods = ["Pix", "Boleto", "Dinheiro", "Cartão de débito", "Pré-Pago | VR/VA", "Transferência bancária"];
+    const supportedMethods = [
+      "Pix",
+      "Boleto",
+      "Dinheiro",
+      "Cartão de débito",
+      "Pré-Pago | VR/VA",
+      "Transferência bancária",
+    ];
     if (!supportedMethods.includes(item.paymentMethod)) {
       return;
     }
@@ -203,7 +218,7 @@ export function LancamentosPage({
       setBulkDeleteOpen(false);
       setPendingDeleteData(null);
     },
-    [pendingDeleteData]
+    [pendingDeleteData],
   );
 
   const handleBulkEditRequest = useCallback(
@@ -230,7 +245,7 @@ export function LancamentosPage({
       setEditOpen(false);
       setBulkEditOpen(true);
     },
-    [selectedLancamento]
+    [selectedLancamento],
   );
 
   const handleBulkEdit = useCallback(
@@ -262,7 +277,7 @@ export function LancamentosPage({
       setBulkEditOpen(false);
       setPendingEditData(null);
     },
-    [pendingEditData]
+    [pendingEditData],
   );
 
   const handleMassAddSubmit = useCallback(async (data: MassAddFormData) => {
@@ -299,7 +314,12 @@ export function LancamentosPage({
     setPendingMultipleDeleteData([]);
   }, [pendingMultipleDeleteData]);
 
-  const handleCreate = useCallback(() => {
+  const [transactionTypeForCreate, setTransactionTypeForCreate] = useState<
+    "Despesa" | "Receita" | null
+  >(null);
+
+  const handleCreate = useCallback((type: "Despesa" | "Receita") => {
+    setTransactionTypeForCreate(type);
     setCreateOpen(true);
   }, []);
 
@@ -393,6 +413,7 @@ export function LancamentosPage({
           defaultPaymentMethod={defaultPaymentMethod}
           lockCartaoSelection={lockCartaoSelection}
           lockPaymentMethod={lockPaymentMethod}
+          defaultTransactionType={transactionTypeForCreate ?? undefined}
         />
       ) : null}
 
@@ -541,6 +562,7 @@ export function LancamentosPage({
           estabelecimentos={estabelecimentos}
           selectedPeriod={selectedPeriod}
           defaultPagadorId={defaultPagadorId}
+          defaultCartaoId={defaultCartaoId}
         />
       ) : null}
 
