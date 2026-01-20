@@ -2,8 +2,11 @@
 
 import { transferBetweenAccountsAction } from "@/app/(dashboard)/contas/actions";
 import type { AccountData } from "@/app/(dashboard)/contas/data";
+import { ContaCartaoSelectContent } from "@/components/lancamentos/select-items";
+import { PeriodPicker } from "@/components/period-picker";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -23,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useControlledState } from "@/hooks/use-controlled-state";
-import { formatDateForDb } from "@/lib/utils/date";
+import { getTodayDateString } from "@/lib/utils/date";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -56,7 +58,7 @@ export function TransferDialog({
   // Form state
   const [toAccountId, setToAccountId] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(formatDateForDb(new Date()));
+  const [date, setDate] = useState(getTodayDateString());
   const [period, setPeriod] = useState(currentPeriod);
 
   // Available destination accounts (exclude source account)
@@ -105,7 +107,7 @@ export function TransferDialog({
         // Reset form
         setToAccountId("");
         setAmount("");
-        setDate(formatDateForDb(new Date()));
+        setDate(getTodayDateString());
         setPeriod(currentPeriod);
         return;
       }
@@ -130,24 +132,20 @@ export function TransferDialog({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="transfer-date">Data da transferência</Label>
-              <Input
+              <DatePicker
                 id="transfer-date"
-                type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={setDate}
                 required
               />
             </div>
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="transfer-period">Período</Label>
-              <Input
-                id="transfer-period"
-                type="month"
+              <PeriodPicker
                 value={period}
-                onChange={(e) => setPeriod(e.target.value)}
-                placeholder="AAAA-MM"
-                required
+                onChange={setPeriod}
+                className="w-full"
               />
             </div>
 
@@ -164,12 +162,30 @@ export function TransferDialog({
 
             <div className="flex flex-col gap-2 sm:col-span-2">
               <Label htmlFor="from-account">Conta de origem</Label>
-              <Input
-                id="from-account"
-                value={fromAccount?.name || ""}
-                disabled
-                className="bg-muted"
-              />
+              <Select value={fromAccountId} disabled>
+                <SelectTrigger id="from-account" className="w-full">
+                  <SelectValue>
+                    {fromAccount && (
+                      <ContaCartaoSelectContent
+                        label={fromAccount.name}
+                        logo={fromAccount.logo}
+                        isCartao={false}
+                      />
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {fromAccount && (
+                    <SelectItem value={fromAccount.id}>
+                      <ContaCartaoSelectContent
+                        label={fromAccount.name}
+                        logo={fromAccount.logo}
+                        isCartao={false}
+                      />
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-2 sm:col-span-2">
@@ -182,12 +198,30 @@ export function TransferDialog({
               ) : (
                 <Select value={toAccountId} onValueChange={setToAccountId}>
                   <SelectTrigger id="to-account" className="w-full">
-                    <SelectValue placeholder="Selecione a conta de destino" />
+                    <SelectValue placeholder="Selecione a conta de destino">
+                      {toAccountId &&
+                        (() => {
+                          const selectedAccount = availableAccounts.find(
+                            (acc) => acc.id === toAccountId,
+                          );
+                          return selectedAccount ? (
+                            <ContaCartaoSelectContent
+                              label={selectedAccount.name}
+                              logo={selectedAccount.logo}
+                              isCartao={false}
+                            />
+                          ) : null;
+                        })()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="w-full">
                     {availableAccounts.map((account) => (
                       <SelectItem key={account.id} value={account.id}>
-                        {account.name} - {account.accountType}
+                        <ContaCartaoSelectContent
+                          label={account.name}
+                          logo={account.logo}
+                          isCartao={false}
+                        />
                       </SelectItem>
                     ))}
                   </SelectContent>
