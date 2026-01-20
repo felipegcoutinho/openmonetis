@@ -12,6 +12,7 @@ import {
 import { getIconComponent } from "@/lib/utils/icons";
 import { title_font } from "@/public/fonts/font_index";
 import { RiPriceTag3Line } from "@remixicon/react";
+import { Progress } from "../ui/progress";
 
 type TopCategoriesProps = {
   categories: TopEstabelecimentosData["topCategories"];
@@ -110,15 +111,7 @@ export function TopCategories({ categories }: TopCategoriesProps) {
 
                 {/* Progress bar */}
                 <div className="ml-12 mt-1.5">
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${percent}%`,
-                        backgroundColor: color,
-                      }}
-                    />
-                  </div>
+                  <Progress className="h-1.5" value={percent} />
                 </div>
               </div>
             );

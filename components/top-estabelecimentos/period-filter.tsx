@@ -27,7 +27,7 @@ export function PeriodFilterButtons({ currentFilter }: PeriodFilterProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">Período:</span>
+     
       <div className="flex items-center gap-1">
         {filterOptions.map((option) => (
           <Button

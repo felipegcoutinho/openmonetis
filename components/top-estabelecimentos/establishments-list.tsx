@@ -1,12 +1,13 @@
 "use client";
 
+import MoneyValues from "@/components/money-values";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import MoneyValues from "@/components/money-values";
 import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { TopEstabelecimentosData } from "@/lib/top-estabelecimentos/fetch-data";
 import { title_font } from "@/public/fonts/font_index";
 import { RiStore2Line } from "@remixicon/react";
+import { Progress } from "../ui/progress";
 
 type EstablishmentsListProps = {
   establishments: TopEstabelecimentosData["establishments"];
@@ -119,14 +120,10 @@ export function EstablishmentsList({
 
                 {/* Progress bar */}
                 <div className="ml-12 mt-1.5">
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary/50 rounded-full"
-                      style={{
-                        width: `${(establishment.count / maxCount) * 100}%`,
-                      }}
-                    />
-                  </div>
+                  <Progress
+                    className="h-1.5"
+                    value={(establishment.count / maxCount) * 100}
+                  />
                 </div>
               </div>
             );

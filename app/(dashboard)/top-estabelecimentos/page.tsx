@@ -3,6 +3,7 @@ import { HighlightsCards } from "@/components/top-estabelecimentos/highlights-ca
 import { PeriodFilterButtons } from "@/components/top-estabelecimentos/period-filter";
 import { SummaryCards } from "@/components/top-estabelecimentos/summary-cards";
 import { TopCategories } from "@/components/top-estabelecimentos/top-categories";
+import { Card } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/server";
 import {
   fetchTopEstabelecimentosData,
@@ -50,18 +51,13 @@ export default async function TopEstabelecimentosPage({
   );
 
   return (
-    <main className="@container/main flex flex-col gap-4 px-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Top Estabelecimentos
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Análise dos locais onde você mais compra • {data.periodLabel}
-          </p>
-        </div>
+    <main className="flex flex-col gap-4">
+      <Card className="p-3 flex-row justify-between items-center">
+        <span className="text-sm text-muted-foreground">
+          Selecione o período
+        </span>
         <PeriodFilterButtons currentFilter={periodFilter} />
-      </div>
+      </Card>
 
       <SummaryCards summary={data.summary} />
 
