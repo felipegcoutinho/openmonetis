@@ -413,6 +413,7 @@ export const mapLancamentosData = (rows: LancamentoRowWithRelations[]) =>
     categoriaId: item.categoriaId ?? null,
     categoriaName: item.categoria?.name ?? null,
     categoriaType: item.categoria?.type ?? null,
+    categoriaIcon: item.categoria?.icon ?? null,
     installmentCount: item.installmentCount ?? null,
     recurrenceCount: item.recurrenceCount ?? null,
     currentInstallment: item.currentInstallment ?? null,

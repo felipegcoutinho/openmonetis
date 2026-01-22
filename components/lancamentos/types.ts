@@ -21,6 +21,7 @@ export type LancamentoItem = {
   categoriaId: string | null;
   categoriaName: string | null;
   categoriaType: string | null;
+  categoriaIcon: string | null;
   installmentCount: number | null;
   recurrenceCount: number | null;
   currentInstallment: number | null;
