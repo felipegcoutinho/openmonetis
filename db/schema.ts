@@ -423,6 +423,97 @@ export const savedInsights = pgTable(
   }),
 );
 
+// ===================== OPENSHEETS COMPANION =====================
+
+export const apiTokens = pgTable(
+  "api_tokens",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(), // Ex: "Meu Samsung Galaxy"
+    tokenHash: text("token_hash").notNull(), // SHA-256 do token
+    tokenPrefix: text("token_prefix").notNull(), // Primeiros 8 chars (display)
+    lastUsedAt: timestamp("last_used_at", { mode: "date", withTimezone: true }),
+    lastUsedIp: text("last_used_ip"),
+    expiresAt: timestamp("expires_at", { mode: "date", withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { mode: "date", withTimezone: true }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index("api_tokens_user_id_idx").on(table.userId),
+    tokenHashIdx: uniqueIndex("api_tokens_token_hash_idx").on(table.tokenHash),
+  }),
+);
+
+export const inboxItems = pgTable(
+  "inbox_items",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    // Informações da fonte
+    sourceApp: text("source_app").notNull(), // Ex: "com.nu.production"
+    sourceAppName: text("source_app_name"), // Ex: "Nubank"
+    deviceId: text("device_id"), // Identificador do dispositivo
+
+    // Dados originais da notificação
+    originalTitle: text("original_title"),
+    originalText: text("original_text").notNull(),
+    notificationTimestamp: timestamp("notification_timestamp", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+
+    // Dados parseados (editáveis pelo usuário antes de processar)
+    parsedName: text("parsed_name"), // Nome do estabelecimento
+    parsedAmount: numeric("parsed_amount", { precision: 12, scale: 2 }),
+    parsedDate: date("parsed_date", { mode: "date" }),
+    parsedCardLastDigits: text("parsed_card_last_digits"), // Ex: "1234"
+    parsedTransactionType: text("parsed_transaction_type"), // Despesa, Receita
+
+    // Status de processamento
+    status: text("status").notNull().default("pending"), // pending, processed, discarded
+
+    // Referência ao lançamento criado (se processado)
+    lancamentoId: uuid("lancamento_id").references(() => lancamentos.id, {
+      onDelete: "set null",
+    }),
+
+    // Metadados de processamento
+    processedAt: timestamp("processed_at", { mode: "date", withTimezone: true }),
+    discardedAt: timestamp("discarded_at", { mode: "date", withTimezone: true }),
+    discardReason: text("discard_reason"),
+
+    // Timestamps
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    userIdStatusIdx: index("inbox_items_user_id_status_idx").on(
+      table.userId,
+      table.status,
+    ),
+    userIdCreatedAtIdx: index("inbox_items_user_id_created_at_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
+  }),
+);
+
 export const installmentAnticipations = pgTable(
   "installment_anticipations",
   {
@@ -562,6 +653,8 @@ export const userRelations = relations(user, ({ many, one }) => ({
   orcamentos: many(orcamentos),
   pagadores: many(pagadores),
   installmentAnticipations: many(installmentAnticipations),
+  apiTokens: many(apiTokens),
+  inboxItems: many(inboxItems),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -669,6 +762,24 @@ export const savedInsightsRelations = relations(savedInsights, ({ one }) => ({
   }),
 }));
 
+export const apiTokensRelations = relations(apiTokens, ({ one }) => ({
+  user: one(user, {
+    fields: [apiTokens.userId],
+    references: [user.id],
+  }),
+}));
+
+export const inboxItemsRelations = relations(inboxItems, ({ one }) => ({
+  user: one(user, {
+    fields: [inboxItems.userId],
+    references: [user.id],
+  }),
+  lancamento: one(lancamentos, {
+    fields: [inboxItems.lancamentoId],
+    references: [lancamentos.id],
+  }),
+}));
+
 export const lancamentosRelations = relations(lancamentos, ({ one }) => ({
   user: one(user, {
     fields: [lancamentos.userId],
@@ -736,3 +847,7 @@ export type SavedInsight = typeof savedInsights.$inferSelect;
 export type Lancamento = typeof lancamentos.$inferSelect;
 export type InstallmentAnticipation =
   typeof installmentAnticipations.$inferSelect;
+export type ApiToken = typeof apiTokens.$inferSelect;
+export type NewApiToken = typeof apiTokens.$inferInsert;
+export type InboxItem = typeof inboxItems.$inferSelect;
+export type NewInboxItem = typeof inboxItems.$inferInsert;
