@@ -216,6 +216,7 @@ export function extractBearerToken(authHeader: string | null): string | null {
 
 /**
  * Validate an API token and return the payload
+ * @deprecated Use validateHashToken for os_xxx tokens
  */
 export function validateApiToken(token: string): JwtPayload | null {
   const payload = verifyJwt(token);
@@ -223,4 +224,15 @@ export function validateApiToken(token: string): JwtPayload | null {
     return null;
   }
   return payload;
+}
+
+/**
+ * Validate a hash-based API token (os_xxx format)
+ * Returns the token hash for database lookup
+ */
+export function validateHashToken(token: string): { valid: boolean; tokenHash?: string } {
+  if (!token || !token.startsWith("os_")) {
+    return { valid: false };
+  }
+  return { valid: true, tokenHash: hashToken(token) };
 }

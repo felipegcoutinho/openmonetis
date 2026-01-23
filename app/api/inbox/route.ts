@@ -2,10 +2,10 @@
  * POST /api/inbox
  *
  * Recebe uma notificação do app Android.
- * Requer autenticação via API token.
+ * Requer autenticação via API token (formato os_xxx).
  */
 
-import { validateApiToken, extractBearerToken } from "@/lib/auth/api-token";
+import { extractBearerToken, hashToken } from "@/lib/auth/api-token";
 import { db } from "@/lib/db";
 import { apiTokens, inboxItems } from "@/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
@@ -48,34 +48,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validar JWT
-    const payload = validateApiToken(token);
-
-    if (!payload) {
+    // Validar token os_xxx via hash
+    if (!token.startsWith("os_")) {
       return NextResponse.json(
-        { error: "Token inválido ou expirado" },
+        { error: "Formato de token inválido" },
         { status: 401 }
       );
     }
 
-    // Verificar se token não foi revogado
+    const tokenHash = hashToken(token);
+
+    // Buscar token no banco
     const tokenRecord = await db.query.apiTokens.findFirst({
       where: and(
-        eq(apiTokens.id, payload.tokenId),
-        eq(apiTokens.userId, payload.sub),
+        eq(apiTokens.tokenHash, tokenHash),
         isNull(apiTokens.revokedAt)
       ),
     });
 
     if (!tokenRecord) {
       return NextResponse.json(
-        { error: "Token revogado ou não encontrado" },
+        { error: "Token inválido ou revogado" },
         { status: 401 }
       );
     }
 
     // Rate limiting
-    if (!checkRateLimit(payload.sub)) {
+    if (!checkRateLimit(tokenRecord.userId)) {
       return NextResponse.json(
         { error: "Limite de requisições excedido", retryAfter: 60 },
         { status: 429 }
@@ -90,10 +89,10 @@ export async function POST(request: Request) {
     const [inserted] = await db
       .insert(inboxItems)
       .values({
-        userId: payload.sub,
+        userId: tokenRecord.userId,
         sourceApp: data.sourceApp,
         sourceAppName: data.sourceAppName,
-        deviceId: data.deviceId || payload.deviceId,
+        deviceId: data.deviceId,
         originalTitle: data.originalTitle,
         originalText: data.originalText,
         notificationTimestamp: data.notificationTimestamp,
@@ -107,13 +106,17 @@ export async function POST(request: Request) {
       .returning({ id: inboxItems.id });
 
     // Atualizar último uso do token
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || null;
+
     await db
       .update(apiTokens)
       .set({
         lastUsedAt: new Date(),
-        lastUsedIp: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip"),
+        lastUsedIp: clientIp,
       })
-      .where(eq(apiTokens.id, payload.tokenId));
+      .where(eq(apiTokens.id, tokenRecord.id));
 
     return NextResponse.json(
       {

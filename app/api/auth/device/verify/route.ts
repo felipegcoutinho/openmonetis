@@ -3,9 +3,11 @@
  *
  * Valida se um token de API é válido.
  * Usado pelo app Android durante o setup.
+ *
+ * Aceita tokens no formato os_xxx (hash-based, sem expiração).
  */
 
-import { validateApiToken, extractBearerToken } from "@/lib/auth/api-token";
+import { extractBearerToken, hashToken } from "@/lib/auth/api-token";
 import { db } from "@/lib/db";
 import { apiTokens } from "@/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
@@ -24,47 +26,50 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validar JWT
-    const payload = validateApiToken(token);
-
-    if (!payload) {
+    // Validar token os_xxx via hash lookup
+    if (!token.startsWith("os_")) {
       return NextResponse.json(
-        { valid: false, error: "Token inválido ou expirado" },
+        { valid: false, error: "Formato de token inválido" },
         { status: 401 }
       );
     }
 
-    // Verificar se token não foi revogado
+    // Hash do token para buscar no DB
+    const tokenHash = hashToken(token);
+
+    // Buscar token no banco
     const tokenRecord = await db.query.apiTokens.findFirst({
       where: and(
-        eq(apiTokens.id, payload.tokenId),
-        eq(apiTokens.userId, payload.sub),
+        eq(apiTokens.tokenHash, tokenHash),
         isNull(apiTokens.revokedAt)
       ),
     });
 
     if (!tokenRecord) {
       return NextResponse.json(
-        { valid: false, error: "Token revogado ou não encontrado" },
+        { valid: false, error: "Token inválido ou revogado" },
         { status: 401 }
       );
     }
 
     // Atualizar último uso
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || null;
+
     await db
       .update(apiTokens)
       .set({
         lastUsedAt: new Date(),
-        lastUsedIp: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip"),
+        lastUsedIp: clientIp,
       })
-      .where(eq(apiTokens.id, payload.tokenId));
+      .where(eq(apiTokens.id, tokenRecord.id));
 
     return NextResponse.json({
       valid: true,
-      userId: payload.sub,
-      tokenId: payload.tokenId,
+      userId: tokenRecord.userId,
+      tokenId: tokenRecord.id,
       tokenName: tokenRecord.name,
-      expiresAt: new Date(payload.exp * 1000).toISOString(),
     });
   } catch (error) {
     console.error("[API] Error verifying device token:", error);
