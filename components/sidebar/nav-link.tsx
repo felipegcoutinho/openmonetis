@@ -8,6 +8,7 @@ import {
   RiFileChartLine,
   RiFundsLine,
   RiGroupLine,
+  RiInboxLine,
   RiNoCreditCardLine,
   RiPriceTag3Line,
   RiSettingsLine,
@@ -87,6 +88,11 @@ export function createSidebarNavData(pagadores: PagadorLike[]): SidebarNavData {
       {
         title: "Gestão Financeira",
         items: [
+          {
+            title: "Caixa de Entrada",
+            url: "/caixa-de-entrada",
+            icon: RiInboxLine,
+          },
           {
             title: "Lançamentos",
             url: "/lancamentos",

@@ -32,6 +32,7 @@ export const revalidateConfig = {
   pagadores: ["/pagadores"],
   anotacoes: ["/anotacoes", "/anotacoes/arquivadas"],
   lancamentos: ["/lancamentos", "/contas"],
+  inbox: ["/caixa-de-entrada", "/lancamentos", "/dashboard"],
 } as const;
 
 /**
