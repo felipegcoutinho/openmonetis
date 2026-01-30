@@ -130,10 +130,11 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 								</div>
 							) : (
 								<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-									{categoriesByType[type].map((category) => (
+									{categoriesByType[type].map((category, index) => (
 										<CategoryCard
 											key={category.id}
 											category={category}
+											colorIndex={index}
 											onEdit={handleEdit}
 											onRemove={handleRemoveRequest}
 										/>

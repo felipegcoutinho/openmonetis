@@ -184,12 +184,12 @@ export function createSidebarNavData(
 					},
 					{
 						title: "Tendências",
-						url: "/relatorios/categorias",
+						url: "/relatorios/tendencias",
 						icon: RiFileChartLine,
 					},
 					{
 						title: "Uso de Cartões",
-						url: "/relatorios/cartoes",
+						url: "/relatorios/uso-cartoes",
 						icon: RiBankCard2Line,
 					},
 				],

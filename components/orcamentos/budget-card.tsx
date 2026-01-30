@@ -1,7 +1,7 @@
 "use client";
 
 import { RiDeleteBin5Line, RiPencilLine } from "@remixicon/react";
-import { CategoryIcon } from "@/components/categorias/category-icon";
+import { CategoryIconBadge } from "@/components/categorias/category-icon-badge";
 import MoneyValues from "@/components/money-values";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +10,7 @@ import type { Budget } from "./types";
 
 interface BudgetCardProps {
 	budget: Budget;
+	colorIndex: number;
 	periodLabel: string;
 	onEdit: (budget: Budget) => void;
 	onRemove: (budget: Budget) => void;
@@ -28,6 +29,7 @@ const formatCategoryName = (budget: Budget) =>
 
 export function BudgetCard({
 	budget,
+	colorIndex,
 	periodLabel,
 	onEdit,
 	onRemove,
@@ -41,12 +43,12 @@ export function BudgetCard({
 		<Card className="flex h-full flex-col">
 			<CardContent className="flex h-full flex-col gap-4">
 				<div className="flex items-start gap-3">
-					<span className="flex size-10 shrink-0 items-center justify-center text-primary">
-						<CategoryIcon
-							name={budget.category?.icon ?? undefined}
-							className="size-6"
-						/>
-					</span>
+					<CategoryIconBadge
+						icon={budget.category?.icon ?? undefined}
+						name={formatCategoryName(budget)}
+						colorIndex={colorIndex}
+						size="lg"
+					/>
 					<div className="space-y-1">
 						<h3 className="text-base font-semibold leading-tight">
 							{formatCategoryName(budget)}

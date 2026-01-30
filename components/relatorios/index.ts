@@ -5,6 +5,7 @@ export { CategoryReportExport } from "./category-report-export";
 export { CategoryReportFilters } from "./category-report-filters";
 export { CategoryReportPage } from "./category-report-page";
 export { CategoryReportTable } from "./category-report-table";
+export { CategoryTable } from "./category-table";
 export type {
 	CategoryOption,
 	CategoryReportFiltersProps,

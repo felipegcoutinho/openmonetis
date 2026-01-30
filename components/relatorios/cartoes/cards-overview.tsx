@@ -67,7 +67,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 		const params = new URLSearchParams();
 		if (periodoParam) params.set("periodo", periodoParam);
 		params.set("cartao", cardId);
-		return `/relatorios/cartoes?${params.toString()}`;
+		return `/relatorios/uso-cartoes?${params.toString()}`;
 	};
 
 	const summaryCards = [
@@ -140,7 +140,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 											alt={card.name}
 											width={32}
 											height={32}
-											className="rounded object-contain"
+											className="rounded-sm object-contain"
 										/>
 									) : (
 										<RiBankCard2Line className="size-5 text-muted-foreground" />

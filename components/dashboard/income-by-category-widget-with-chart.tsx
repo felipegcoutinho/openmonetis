@@ -12,15 +12,10 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Pie, PieChart, Tooltip } from "recharts";
+import { CategoryIconBadge } from "@/components/categorias/category-icon-badge";
 import MoneyValues from "@/components/money-values";
 import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
 import type { IncomeByCategoryData } from "@/lib/dashboard/categories/income-by-category";
-import {
-	buildCategoryInitials,
-	getCategoryBgColor,
-	getCategoryColor,
-} from "@/lib/utils/category-colors";
-import { getIconComponent } from "@/lib/utils/icons";
 import { formatPeriodForUrl } from "@/lib/utils/period";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { WidgetEmptyState } from "../widget-empty-state";
@@ -162,12 +157,6 @@ export function IncomeByCategoryWidgetWithChart({
 			<TabsContent value="list" className="mt-0">
 				<div className="flex flex-col px-0">
 					{data.categories.map((category, index) => {
-						const IconComponent = category.categoryIcon
-							? getIconComponent(category.categoryIcon)
-							: null;
-						const initials = buildCategoryInitials(category.categoryName);
-						const color = getCategoryColor(index);
-						const bgColor = getCategoryBgColor(index);
 						const hasIncrease =
 							category.percentageChange !== null &&
 							category.percentageChange > 0;
@@ -192,21 +181,11 @@ export function IncomeByCategoryWidgetWithChart({
 							>
 								<div className="flex items-center justify-between gap-3">
 									<div className="flex min-w-0 flex-1 items-center gap-2">
-										<div
-											className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg"
-											style={{ backgroundColor: bgColor }}
-										>
-											{IconComponent ? (
-												<IconComponent className="size-4" style={{ color }} />
-											) : (
-												<span
-													className="text-xs font-semibold uppercase"
-													style={{ color }}
-												>
-													{initials}
-												</span>
-											)}
-										</div>
+										<CategoryIconBadge
+											icon={category.categoryIcon}
+											name={category.categoryName}
+											colorIndex={index}
+										/>
 
 										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">

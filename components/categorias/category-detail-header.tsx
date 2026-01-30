@@ -1,24 +1,10 @@
 import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react";
 import type { CategoryType } from "@/lib/categorias/constants";
 import { currencyFormatter } from "@/lib/lancamentos/formatting-helpers";
-import { getIconComponent } from "@/lib/utils/icons";
 import { cn } from "@/lib/utils/ui";
+import { CategoryIconBadge } from "./category-icon-badge";
 import { TypeBadge } from "../type-badge";
 import { Card } from "../ui/card";
-
-const buildInitials = (value: string) => {
-	const parts = value.trim().split(/\s+/).filter(Boolean);
-	if (parts.length === 0) {
-		return "CT";
-	}
-	if (parts.length === 1) {
-		const firstPart = parts[0];
-		return firstPart ? firstPart.slice(0, 2).toUpperCase() : "CT";
-	}
-	const firstChar = parts[0]?.[0] ?? "";
-	const secondChar = parts[1]?.[0] ?? "";
-	return `${firstChar}${secondChar}`.toUpperCase() || "CT";
-};
 
 type CategorySummary = {
 	id: string;
@@ -46,9 +32,6 @@ export function CategoryDetailHeader({
 	percentageChange,
 	transactionCount,
 }: CategoryDetailHeaderProps) {
-	const IconComponent = category.icon ? getIconComponent(category.icon) : null;
-	const initials = buildInitials(category.name);
-
 	const isIncrease =
 		typeof percentageChange === "number" && percentageChange > 0;
 	const isDecrease =
@@ -87,15 +70,12 @@ export function CategoryDetailHeader({
 		<Card className="px-4">
 			<div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 				<div className="flex items-start gap-3">
-					<span className="flex size-12 items-center justify-center rounded-xl bg-muted">
-						{IconComponent ? (
-							<IconComponent className="size-6" aria-hidden />
-						) : (
-							<span className="text-sm font-semibold uppercase text-muted-foreground">
-								{initials}
-							</span>
-						)}
-					</span>
+					<CategoryIconBadge
+						icon={category.icon}
+						name={category.name}
+						colorIndex={0}
+						size="lg"
+					/>
 					<div className="space-y-2">
 						<h1 className="text-xl font-semibold leading-tight">
 							{category.name}

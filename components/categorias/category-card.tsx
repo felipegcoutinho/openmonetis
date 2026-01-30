@@ -1,94 +1,103 @@
 "use client";
 
-import { RiDeleteBin5Line, RiMore2Fill, RiPencilLine } from "@remixicon/react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { TypeBadge } from "../type-badge";
-import { CategoryIcon } from "./category-icon";
+	RiDeleteBin5Line,
+	RiFileList2Line,
+	RiPencilLine,
+} from "@remixicon/react";
+import Link from "next/link";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils/ui";
+import { CategoryIconBadge } from "./category-icon-badge";
 import type { Category } from "./types";
 
 interface CategoryCardProps {
 	category: Category;
+	colorIndex: number;
 	onEdit: (category: Category) => void;
 	onRemove: (category: Category) => void;
 }
 
 export function CategoryCard({
 	category,
+	colorIndex,
 	onEdit,
 	onRemove,
 }: CategoryCardProps) {
-	// Categorias protegidas que não podem ser editadas ou removidas
 	const categoriasProtegidas = [
 		"Transferência interna",
 		"Saldo inicial",
 		"Pagamentos",
 	];
 	const isProtegida = categoriasProtegidas.includes(category.name);
-	const canEdit = !isProtegida;
-	const canRemove = !isProtegida;
+
+	const actions = [
+		{
+			label: "editar",
+			icon: <RiPencilLine className="size-4" aria-hidden />,
+			onClick: () => onEdit(category),
+			variant: "default" as const,
+			disabled: isProtegida,
+		},
+		{
+			label: "detalhes",
+			icon: <RiFileList2Line className="size-4" aria-hidden />,
+			href: `/categorias/${category.id}`,
+			variant: "default" as const,
+			disabled: false,
+		},
+		{
+			label: "remover",
+			icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
+			onClick: () => onRemove(category),
+			variant: "destructive" as const,
+			disabled: isProtegida,
+		},
+	].filter((action) => !action.disabled);
 
 	return (
-		<Card className="group py-2">
-			<CardContent className="p-2">
-				<div className="flex items-start justify-between gap-3">
-					<div className="flex items-start gap-2">
-						<span className="flex size-11 items-center justify-center text-primary">
-							<CategoryIcon name={category.icon} className="size-6" />
-						</span>
-						<div className="space-y-1">
-							<h3 className="text-base font-medium leading-tight">
-								<Link
-									href={`/categorias/${category.id}`}
-									className="underline-offset-4 hover:underline"
-								>
-									{category.name}
-								</Link>
-							</h3>
-							<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-								<TypeBadge type={category.type} />
-							</div>
-						</div>
-					</div>
-
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon-sm"
-								className="opacity-0 transition-opacity group-hover:opacity-100"
-							>
-								<RiMore2Fill className="size-4" />
-								<span className="sr-only">Abrir ações da categoria</span>
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem
-								onSelect={() => onEdit(category)}
-								disabled={!canEdit}
-							>
-								<RiPencilLine className="mr-2 size-4" />
-								Editar
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								variant="destructive"
-								onSelect={() => onRemove(category)}
-								disabled={!canRemove}
-							>
-								<RiDeleteBin5Line className="mr-2 size-4" />
-								Remover
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+		<Card className="flex h-full flex-col gap-0 py-3">
+			<CardContent className="flex flex-1 flex-col">
+				<div className="flex items-center gap-3">
+					<CategoryIconBadge
+						icon={category.icon}
+						name={category.name}
+						colorIndex={colorIndex}
+						size="md"
+					/>
+					<h3 className="leading-tight">{category.name}</h3>
 				</div>
 			</CardContent>
+
+			<CardFooter className="flex flex-wrap gap-3 px-6 pt-4 text-sm">
+				{actions.map(({ label, icon, onClick, href, variant }) => {
+					const className = cn(
+						"flex items-center gap-1 font-medium transition-opacity hover:opacity-80",
+						variant === "destructive" ? "text-destructive" : "text-primary",
+					);
+
+					if (href) {
+						return (
+							<Link key={label} href={href} className={className}>
+								{icon}
+								{label}
+							</Link>
+						);
+					}
+
+					return (
+						<button
+							key={label}
+							type="button"
+							onClick={onClick}
+							className={className}
+						>
+							{icon}
+							{label}
+						</button>
+					);
+				})}
+			</CardFooter>
 		</Card>
 	);
 }

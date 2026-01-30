@@ -129,10 +129,11 @@ export function BudgetsPage({
 
 				{hasBudgets ? (
 					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-						{budgets.map((budget) => (
+						{budgets.map((budget, index) => (
 							<BudgetCard
 								key={budget.id}
 								budget={budget}
+								colorIndex={index}
 								periodLabel={periodLabel}
 								onEdit={handleEdit}
 								onRemove={handleRemoveRequest}

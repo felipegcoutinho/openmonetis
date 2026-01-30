@@ -58,7 +58,7 @@ export default async function Page({ searchParams }: PageProps) {
 	if (!validation.isValid) {
 		// Redirect to default if validation fails
 		redirect(
-			`/relatorios/categorias?inicio=${defaultStartPeriod}&fim=${currentPeriod}`,
+			`/relatorios/tendencias?inicio=${defaultStartPeriod}&fim=${currentPeriod}`,
 		);
 	}
 
