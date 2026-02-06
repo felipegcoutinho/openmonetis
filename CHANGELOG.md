@@ -7,6 +7,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [1.3.1] - 2026-02-06
 
+### Adicionado
+
+- Calculadora arrastável via drag handle no header do dialog
+- Callback `onSelectValue` na calculadora para inserir valor diretamente no campo de lançamento
+
 ### Alterado
 
 - Unificadas páginas de itens ativos e arquivados em Cartões, Contas e Anotações com sistema de tabs (padrão Categorias)
