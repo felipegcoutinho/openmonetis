@@ -17,7 +17,6 @@ import {
 	ChartTooltip,
 } from "@/components/ui/chart";
 import type { CardDetailData } from "@/lib/relatorios/cartoes-report";
-import { title_font } from "@/public/fonts/font_index";
 
 type CardUsageChartProps = {
 	data: CardDetailData["monthlyUsage"];
@@ -82,9 +81,7 @@ export function CardUsageChart({ data, limit, card }: CardUsageChartProps) {
 		<Card>
 			<CardHeader className="pb-2">
 				<div className="flex items-center justify-between">
-					<CardTitle
-						className={`${title_font.className} flex items-center gap-1.5 text-base`}
-					>
+					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiBarChartBoxLine className="size-4 text-primary" />
 						Histórico de Uso
 					</CardTitle>

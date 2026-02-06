@@ -591,6 +591,17 @@ export const lancamentos = pgTable(
 			table.userId,
 			table.period,
 		),
+		// Índice composto userId + period + transactionType (cobre maioria das queries do dashboard)
+		userIdPeriodTypeIdx: index("lancamentos_user_id_period_type_idx").on(
+			table.userId,
+			table.period,
+			table.transactionType,
+		),
+		// Índice para queries por pagador + period (invoice/breakdown queries)
+		pagadorIdPeriodIdx: index("lancamentos_pagador_id_period_idx").on(
+			table.pagadorId,
+			table.period,
+		),
 		// Índice para queries ordenadas por data de compra
 		userIdPurchaseDateIdx: index("lancamentos_user_id_purchase_date_idx").on(
 			table.userId,

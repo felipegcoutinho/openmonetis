@@ -16,8 +16,12 @@ const ai_sans = localFont({
 	display: "swap",
 });
 
+const anthropic_sans = localFont({
+	src: "./anthropicSans.woff2",
+	display: "swap",
+});
+
 const main_font = ai_sans;
 const money_font = ai_sans;
-const title_font = ai_sans;
 
-export { main_font, money_font, title_font };
+export { main_font, money_font };

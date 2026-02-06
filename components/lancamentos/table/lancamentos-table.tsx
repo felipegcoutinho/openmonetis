@@ -72,7 +72,6 @@ import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { formatDate } from "@/lib/utils/date";
 import { getConditionIcon, getPaymentMethodIcon } from "@/lib/utils/icons";
 import { cn } from "@/lib/utils/ui";
-import { title_font } from "@/public/fonts/font_index";
 import { LancamentosExport } from "../lancamentos-export";
 import { EstabelecimentoLogo } from "../shared/estabelecimento-logo";
 import type {
@@ -928,7 +927,7 @@ export function LancamentosTable({
 						<>
 							<div className="overflow-x-auto">
 								<Table>
-									<TableHeader className={`${title_font.className}`}>
+									<TableHeader>
 										{table.getHeaderGroups().map((headerGroup) => (
 											<TableRow key={headerGroup.id}>
 												{headerGroup.headers.map((header) => (

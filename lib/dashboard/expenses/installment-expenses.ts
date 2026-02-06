@@ -1,12 +1,12 @@
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
-import { lancamentos, pagadores } from "@/db/schema";
+import { lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 export type InstallmentExpense = {
 	id: string;
@@ -28,6 +28,11 @@ export async function fetchInstallmentExpenses(
 	userId: string,
 	period: string,
 ): Promise<InstallmentExpensesData> {
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { expenses: [] };
+	}
+
 	const rows = await db
 		.select({
 			id: lancamentos.id,
@@ -41,7 +46,6 @@ export async function fetchInstallmentExpenses(
 			period: lancamentos.period,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.where(
 			and(
 				eq(lancamentos.userId, userId),
@@ -49,7 +53,7 @@ export async function fetchInstallmentExpenses(
 				eq(lancamentos.transactionType, "Despesa"),
 				eq(lancamentos.condition, "Parcelado"),
 				eq(lancamentos.isAnticipated, false),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
+				eq(lancamentos.pagadorId, adminPagadorId),
 				or(
 					isNull(lancamentos.note),
 					and(

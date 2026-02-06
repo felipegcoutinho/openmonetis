@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/tooltip";
 import type { CardDetailData } from "@/lib/relatorios/cartoes-report";
 import { cn } from "@/lib/utils";
-import { title_font } from "@/public/fonts/font_index";
 
 type CardInvoiceStatusProps = {
 	data: CardDetailData["invoiceStatus"];
@@ -75,9 +74,7 @@ export function CardInvoiceStatus({ data }: CardInvoiceStatusProps) {
 	return (
 		<Card>
 			<CardHeader className="pb-2">
-				<CardTitle
-					className={`${title_font.className} flex items-center gap-1.5 text-base`}
-				>
+				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiCalendarCheckLine className="size-4 text-primary" />
 					Faturas
 				</CardTitle>

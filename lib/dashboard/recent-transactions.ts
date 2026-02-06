@@ -1,12 +1,12 @@
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
-import { cartoes, contas, lancamentos, pagadores } from "@/db/schema";
+import { cartoes, contas, lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 export type RecentTransaction = {
 	id: string;
@@ -25,6 +25,11 @@ export async function fetchRecentTransactions(
 	userId: string,
 	period: string,
 ): Promise<RecentTransactionsData> {
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { transactions: [] };
+	}
+
 	const results = await db
 		.select({
 			id: lancamentos.id,
@@ -36,7 +41,6 @@ export async function fetchRecentTransactions(
 			note: lancamentos.note,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.leftJoin(cartoes, eq(lancamentos.cartaoId, cartoes.id))
 		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
 		.where(
@@ -44,7 +48,7 @@ export async function fetchRecentTransactions(
 				eq(lancamentos.userId, userId),
 				eq(lancamentos.period, period),
 				eq(lancamentos.transactionType, "Despesa"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
+				eq(lancamentos.pagadorId, adminPagadorId),
 				or(
 					isNull(lancamentos.note),
 					and(

@@ -6,7 +6,6 @@ import MoneyValues from "@/components/money-values";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { TopEstabelecimentosData } from "@/lib/top-estabelecimentos/fetch-data";
-import { title_font } from "@/public/fonts/font_index";
 import { Progress } from "../ui/progress";
 
 type TopCategoriesProps = {
@@ -18,9 +17,7 @@ export function TopCategories({ categories }: TopCategoriesProps) {
 		return (
 			<Card className="h-full">
 				<CardHeader className="pb-3">
-					<CardTitle
-						className={`${title_font.className} flex items-center gap-1.5 text-base`}
-					>
+					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiPriceTag3Line className="size-4 text-primary" />
 						Principais Categorias
 					</CardTitle>
@@ -41,9 +38,7 @@ export function TopCategories({ categories }: TopCategoriesProps) {
 	return (
 		<Card className="h-full">
 			<CardHeader className="pb-3">
-				<CardTitle
-					className={`${title_font.className} flex items-center gap-1.5 text-base`}
-				>
+				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiPriceTag3Line className="size-4 text-primary" />
 					Principais Categorias
 				</CardTitle>

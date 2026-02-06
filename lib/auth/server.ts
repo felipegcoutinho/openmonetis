@@ -1,6 +1,15 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { auth } from "@/lib/auth/config";
+
+/**
+ * Cached session fetch - deduplicates auth calls within a single request.
+ * Layout + page calling getUser() will only hit auth once.
+ */
+const getSessionCached = cache(async () => {
+	return auth.api.getSession({ headers: await headers() });
+});
 
 /**
  * Gets the current authenticated user
@@ -8,7 +17,7 @@ import { auth } from "@/lib/auth/config";
  * @throws Redirects to /login if user is not authenticated
  */
 export async function getUser() {
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getSessionCached();
 
 	if (!session?.user) {
 		redirect("/login");
@@ -23,7 +32,7 @@ export async function getUser() {
  * @throws Redirects to /login if user is not authenticated
  */
 export async function getUserId() {
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getSessionCached();
 
 	if (!session?.user) {
 		redirect("/login");
@@ -38,7 +47,7 @@ export async function getUserId() {
  * @throws Redirects to /login if user is not authenticated
  */
 export async function getUserSession() {
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getSessionCached();
 
 	if (!session?.user) {
 		redirect("/login");
@@ -53,5 +62,5 @@ export async function getUserSession() {
  * @note This function does not redirect if user is not authenticated
  */
 export async function getOptionalUserSession() {
-	return auth.api.getSession({ headers: await headers() });
+	return getSessionCached();
 }

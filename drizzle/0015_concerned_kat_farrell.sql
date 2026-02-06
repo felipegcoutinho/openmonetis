@@ -1,0 +1,2 @@
+CREATE INDEX "lancamentos_user_id_period_type_idx" ON "lancamentos" USING btree ("user_id","periodo","tipo_transacao");--> statement-breakpoint
+CREATE INDEX "lancamentos_pagador_id_period_idx" ON "lancamentos" USING btree ("pagador_id","periodo");

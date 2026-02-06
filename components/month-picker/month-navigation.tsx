@@ -89,7 +89,7 @@ export default function MonthNavigation() {
 
 				<div className="flex items-center">
 					<div
-						className="mx-1 space-x-1 capitalize font-bold"
+						className="mx-1 space-x-1 capitalize font-semibold"
 						aria-current={!isDifferentFromCurrent ? "date" : undefined}
 						aria-label={`Período selecionado: ${currentMonthLabel} de ${currentYear}`}
 					>

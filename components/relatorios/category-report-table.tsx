@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import type { CategoryReportData, CategoryReportItem } from "@/lib/relatorios/types";
+import type {
+	CategoryReportData,
+	CategoryReportItem,
+} from "@/lib/relatorios/types";
 import { CategoryTable } from "./category-table";
 
 interface CategoryReportTableProps {

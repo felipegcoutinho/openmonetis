@@ -1,9 +1,10 @@
 "use server";
 
 import { and, eq, lt, sql } from "drizzle-orm";
-import { cartoes, faturas, lancamentos, pagadores } from "@/db/schema";
+import { cartoes, faturas, lancamentos } from "@/db/schema";
 import { db } from "@/lib/db";
 import { INVOICE_PAYMENT_STATUS } from "@/lib/faturas";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 export type NotificationType = "overdue" | "due_soon";
 
@@ -138,6 +139,8 @@ export async function fetchDashboardNotifications(
 	const today = normalizeDate(new Date());
 	const DAYS_THRESHOLD = 5;
 
+	const adminPagadorId = await getAdminPagadorId(userId);
+
 	// Buscar faturas pendentes de períodos anteriores
 	// Apenas faturas com registro na tabela (períodos antigos devem ter sido finalizados)
 	const overdueInvoices = await db
@@ -210,7 +213,17 @@ export async function fetchDashboardNotifications(
 			faturas.paymentStatus,
 		);
 
-	// Buscar boletos não pagos
+	// Buscar boletos não pagos (usando pagadorId direto ao invés de JOIN)
+	const boletosConditions = [
+		eq(lancamentos.userId, userId),
+		eq(lancamentos.paymentMethod, PAYMENT_METHOD_BOLETO),
+		eq(lancamentos.isSettled, false),
+	];
+
+	if (adminPagadorId) {
+		boletosConditions.push(eq(lancamentos.pagadorId, adminPagadorId));
+	}
+
 	const boletosRows = await db
 		.select({
 			id: lancamentos.id,
@@ -220,15 +233,7 @@ export async function fetchDashboardNotifications(
 			period: lancamentos.period,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
-		.where(
-			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.paymentMethod, PAYMENT_METHOD_BOLETO),
-				eq(lancamentos.isSettled, false),
-				eq(pagadores.role, "admin"),
-			),
-		);
+		.where(and(...boletosConditions));
 
 	const notifications: DashboardNotification[] = [];
 

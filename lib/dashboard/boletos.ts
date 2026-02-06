@@ -1,9 +1,10 @@
 "use server";
 
 import { and, asc, eq } from "drizzle-orm";
-import { lancamentos, pagadores } from "@/db/schema";
+import { lancamentos } from "@/db/schema";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
 
@@ -51,6 +52,11 @@ export async function fetchDashboardBoletos(
 	userId: string,
 	period: string,
 ): Promise<DashboardBoletosSnapshot> {
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { boletos: [], totalPendingAmount: 0, pendingCount: 0 };
+	}
+
 	const rows = await db
 		.select({
 			id: lancamentos.id,
@@ -61,13 +67,12 @@ export async function fetchDashboardBoletos(
 			isSettled: lancamentos.isSettled,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.where(
 			and(
 				eq(lancamentos.userId, userId),
 				eq(lancamentos.period, period),
 				eq(lancamentos.paymentMethod, PAYMENT_METHOD_BOLETO),
-				eq(pagadores.role, "admin"),
+				eq(lancamentos.pagadorId, adminPagadorId),
 			),
 		)
 		.orderBy(

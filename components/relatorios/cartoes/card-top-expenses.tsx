@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { CardDetailData } from "@/lib/relatorios/cartoes-report";
-import { title_font } from "@/public/fonts/font_index";
 
 type CardTopExpensesProps = {
 	data: CardDetailData["topExpenses"];
@@ -18,9 +17,7 @@ export function CardTopExpenses({ data }: CardTopExpensesProps) {
 		return (
 			<Card className="h-full">
 				<CardHeader className="pb-3">
-					<CardTitle
-						className={`${title_font.className} flex items-center gap-1.5 text-base`}
-					>
+					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiShoppingBag3Line className="size-4 text-primary" />
 						Top 10 Gastos do Mês
 					</CardTitle>
@@ -43,9 +40,7 @@ export function CardTopExpenses({ data }: CardTopExpensesProps) {
 	return (
 		<Card className="h-full">
 			<CardHeader className="pb-3">
-				<CardTitle
-					className={`${title_font.className} flex items-center gap-1.5 text-base`}
-				>
+				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiShoppingBag3Line className="size-4 text-primary" />
 					Top 10 Gastos do Mês
 				</CardTitle>

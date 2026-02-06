@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { TopEstabelecimentosData } from "@/lib/top-estabelecimentos/fetch-data";
-import { title_font } from "@/public/fonts/font_index";
 import { Progress } from "../ui/progress";
 
 type EstablishmentsListProps = {
@@ -32,9 +31,7 @@ export function EstablishmentsList({
 		return (
 			<Card className="h-full">
 				<CardHeader className="pb-3">
-					<CardTitle
-						className={`${title_font.className} flex items-center gap-1.5 text-base`}
-					>
+					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiStore2Line className="size-4 text-primary" />
 						Top Estabelecimentos
 					</CardTitle>
@@ -55,9 +52,7 @@ export function EstablishmentsList({
 	return (
 		<Card className="h-full">
 			<CardHeader className="pb-3">
-				<CardTitle
-					className={`${title_font.className} flex items-center gap-1.5 text-base`}
-				>
+				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiStore2Line className="size-4 text-primary" />
 					Top Estabelecimentos por Frequência
 				</CardTitle>

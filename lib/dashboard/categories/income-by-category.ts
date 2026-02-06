@@ -1,17 +1,11 @@
-import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
-import {
-	categorias,
-	contas,
-	lancamentos,
-	orcamentos,
-	pagadores,
-} from "@/db/schema";
+import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { categorias, contas, lancamentos, orcamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 import { calculatePercentageChange } from "@/lib/utils/math";
 import { safeToNumber } from "@/lib/utils/number";
 import { getPreviousPeriod } from "@/lib/utils/period";
@@ -40,131 +34,130 @@ export async function fetchIncomeByCategory(
 ): Promise<IncomeByCategoryData> {
 	const previousPeriod = getPreviousPeriod(period);
 
-	// Busca receitas do período atual agrupadas por categoria
-	const currentPeriodRows = await db
-		.select({
-			categoryId: categorias.id,
-			categoryName: categorias.name,
-			categoryIcon: categorias.icon,
-			total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
-			budgetAmount: orcamentos.amount,
-		})
-		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
-		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
-		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
-		.leftJoin(
-			orcamentos,
-			and(
-				eq(orcamentos.categoriaId, categorias.id),
-				eq(orcamentos.period, period),
-				eq(orcamentos.userId, userId),
-			),
-		)
-		.where(
-			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, period),
-				eq(lancamentos.transactionType, "Receita"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
-				eq(categorias.type, "receita"),
-				or(
-					isNull(lancamentos.note),
-					sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
-				),
-				// Excluir saldos iniciais se a conta tiver o flag ativo
-				or(
-					ne(lancamentos.note, INITIAL_BALANCE_NOTE),
-					isNull(contas.excludeInitialBalanceFromIncome),
-					eq(contas.excludeInitialBalanceFromIncome, false),
-				),
-			),
-		)
-		.groupBy(
-			categorias.id,
-			categorias.name,
-			categorias.icon,
-			orcamentos.amount,
-		);
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { categories: [], currentTotal: 0, previousTotal: 0 };
+	}
 
-	// Busca receitas do período anterior agrupadas por categoria
-	const previousPeriodRows = await db
-		.select({
-			categoryId: categorias.id,
-			total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
-		})
-		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
-		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
-		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
-		.where(
-			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, previousPeriod),
-				eq(lancamentos.transactionType, "Receita"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
-				eq(categorias.type, "receita"),
-				or(
-					isNull(lancamentos.note),
-					sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
+	// Single query: GROUP BY categoriaId + period for both current and previous periods
+	const [rows, budgetRows] = await Promise.all([
+		db
+			.select({
+				categoryId: categorias.id,
+				categoryName: categorias.name,
+				categoryIcon: categorias.icon,
+				period: lancamentos.period,
+				total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
+			})
+			.from(lancamentos)
+			.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
+			.leftJoin(contas, eq(lancamentos.contaId, contas.id))
+			.where(
+				and(
+					eq(lancamentos.userId, userId),
+					eq(lancamentos.pagadorId, adminPagadorId),
+					inArray(lancamentos.period, [period, previousPeriod]),
+					eq(lancamentos.transactionType, "Receita"),
+					eq(categorias.type, "receita"),
+					or(
+						isNull(lancamentos.note),
+						sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
+					),
+					// Excluir saldos iniciais se a conta tiver o flag ativo
+					or(
+						ne(lancamentos.note, INITIAL_BALANCE_NOTE),
+						isNull(contas.excludeInitialBalanceFromIncome),
+						eq(contas.excludeInitialBalanceFromIncome, false),
+					),
 				),
-				// Excluir saldos iniciais se a conta tiver o flag ativo
-				or(
-					ne(lancamentos.note, INITIAL_BALANCE_NOTE),
-					isNull(contas.excludeInitialBalanceFromIncome),
-					eq(contas.excludeInitialBalanceFromIncome, false),
-				),
+			)
+			.groupBy(
+				categorias.id,
+				categorias.name,
+				categorias.icon,
+				lancamentos.period,
 			),
-		)
-		.groupBy(categorias.id);
+		db
+			.select({
+				categoriaId: orcamentos.categoriaId,
+				amount: orcamentos.amount,
+			})
+			.from(orcamentos)
+			.where(and(eq(orcamentos.userId, userId), eq(orcamentos.period, period))),
+	]);
 
-	// Cria um mapa do período anterior para busca rápida
-	const previousMap = new Map<string, number>();
-	let previousTotal = 0;
+	// Build budget lookup
+	const budgetMap = new Map<string, number>();
+	for (const row of budgetRows) {
+		if (row.categoriaId) {
+			budgetMap.set(row.categoriaId, safeToNumber(row.amount));
+		}
+	}
 
-	for (const row of previousPeriodRows) {
+	// Build category data from grouped results
+	const categoryMap = new Map<
+		string,
+		{
+			name: string;
+			icon: string | null;
+			current: number;
+			previous: number;
+		}
+	>();
+
+	for (const row of rows) {
+		const entry = categoryMap.get(row.categoryId) ?? {
+			name: row.categoryName,
+			icon: row.categoryIcon,
+			current: 0,
+			previous: 0,
+		};
+
 		const amount = Math.abs(safeToNumber(row.total));
-		previousMap.set(row.categoryId, amount);
-		previousTotal += amount;
+		if (row.period === period) {
+			entry.current = amount;
+		} else {
+			entry.previous = amount;
+		}
+		categoryMap.set(row.categoryId, entry);
 	}
 
-	// Calcula o total do período atual
+	// Calculate totals
 	let currentTotal = 0;
-	for (const row of currentPeriodRows) {
-		currentTotal += Math.abs(safeToNumber(row.total));
+	let previousTotal = 0;
+	for (const entry of categoryMap.values()) {
+		currentTotal += entry.current;
+		previousTotal += entry.previous;
 	}
 
-	// Monta os dados de cada categoria
-	const categories: CategoryIncomeItem[] = currentPeriodRows.map((row) => {
-		const currentAmount = Math.abs(safeToNumber(row.total));
-		const previousAmount = previousMap.get(row.categoryId) ?? 0;
+	// Build result
+	const categories: CategoryIncomeItem[] = [];
+	for (const [categoryId, entry] of categoryMap) {
 		const percentageChange = calculatePercentageChange(
-			currentAmount,
-			previousAmount,
+			entry.current,
+			entry.previous,
 		);
 		const percentageOfTotal =
-			currentTotal > 0 ? (currentAmount / currentTotal) * 100 : 0;
+			currentTotal > 0 ? (entry.current / currentTotal) * 100 : 0;
 
-		const budgetAmount = row.budgetAmount
-			? safeToNumber(row.budgetAmount)
-			: null;
+		const budgetAmount = budgetMap.get(categoryId) ?? null;
 		const budgetUsedPercentage =
 			budgetAmount && budgetAmount > 0
-				? (currentAmount / budgetAmount) * 100
+				? (entry.current / budgetAmount) * 100
 				: null;
 
-		return {
-			categoryId: row.categoryId,
-			categoryName: row.categoryName,
-			categoryIcon: row.categoryIcon,
-			currentAmount,
-			previousAmount,
+		categories.push({
+			categoryId,
+			categoryName: entry.name,
+			categoryIcon: entry.icon,
+			currentAmount: entry.current,
+			previousAmount: entry.previous,
 			percentageChange,
 			percentageOfTotal,
 			budgetAmount,
 			budgetUsedPercentage,
-		};
-	});
+		});
+	}
 
 	// Ordena por valor atual (maior para menor)
 	categories.sort((a, b) => b.currentAmount - a.currentAmount);

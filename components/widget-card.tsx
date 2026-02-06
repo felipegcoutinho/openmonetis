@@ -14,7 +14,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { title_font } from "@/public/fonts/font_index";
 import { Button } from "./ui/button";
 
 const OVERFLOW_THRESHOLD_PX = 16;
@@ -79,9 +78,7 @@ export default function WidgetCard({
 			<CardHeader className="border-b [.border-b]:pb-2">
 				<div className="flex w-full items-start justify-between">
 					<div>
-						<CardTitle
-							className={`${title_font.className} flex items-center gap-1`}
-						>
+						<CardTitle className="flex items-center gap-1">
 							<span className="text-primary">{icon}</span>
 							{title}
 						</CardTitle>

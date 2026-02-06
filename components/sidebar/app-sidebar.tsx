@@ -78,9 +78,6 @@ function LogoContent() {
 	const isCollapsed = state === "collapsed";
 
 	return (
-		<Logo
-			variant={isCollapsed ? "small" : "full"}
-			showVersion={!isCollapsed}
-		/>
+		<Logo variant={isCollapsed ? "small" : "full"} showVersion={!isCollapsed} />
 	);
 }

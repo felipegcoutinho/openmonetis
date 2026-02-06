@@ -1,18 +1,12 @@
 import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import {
-	cartoes,
-	categorias,
-	contas,
-	lancamentos,
-	pagadores,
-} from "@/db/schema";
+import { cartoes, categorias, contas, lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 export type CategoryOption = {
 	id: string;
@@ -51,6 +45,11 @@ export async function fetchPurchasesByCategory(
 	userId: string,
 	period: string,
 ): Promise<PurchasesByCategoryData> {
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { categories: [], transactionsByCategory: {} };
+	}
+
 	const transactionsRows = await db
 		.select({
 			id: lancamentos.id,
@@ -64,7 +63,6 @@ export async function fetchPurchasesByCategory(
 			accountLogo: contas.logo,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
 		.leftJoin(cartoes, eq(lancamentos.cartaoId, cartoes.id))
 		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
@@ -72,7 +70,7 @@ export async function fetchPurchasesByCategory(
 			and(
 				eq(lancamentos.userId, userId),
 				eq(lancamentos.period, period),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
+				eq(lancamentos.pagadorId, adminPagadorId),
 				inArray(categorias.type, ["despesa", "receita"]),
 				or(
 					isNull(lancamentos.note),

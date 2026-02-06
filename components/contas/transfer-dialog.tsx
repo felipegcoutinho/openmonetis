@@ -67,9 +67,7 @@ export function TransferDialog({
 	);
 
 	// Source account info
-	const fromAccount = accounts.find(
-		(account) => account.id === fromAccountId,
-	);
+	const fromAccount = accounts.find((account) => account.id === fromAccountId);
 
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();

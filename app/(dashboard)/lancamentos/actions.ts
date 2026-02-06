@@ -395,7 +395,10 @@ const buildShares = ({
 		) {
 			return [
 				{ pagadorId, amountCents: primarySplitAmountCents },
-				{ pagadorId: secondaryPagadorId, amountCents: secondarySplitAmountCents },
+				{
+					pagadorId: secondaryPagadorId,
+					amountCents: secondarySplitAmountCents,
+				},
 			];
 		}
 

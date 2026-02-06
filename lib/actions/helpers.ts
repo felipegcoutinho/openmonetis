@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { getUser } from "@/lib/auth/server";
 import type { ActionResult } from "./types";
@@ -35,14 +35,30 @@ export const revalidateConfig = {
 	inbox: ["/pre-lancamentos", "/lancamentos", "/dashboard"],
 } as const;
 
+/** Entities whose mutations should invalidate the dashboard cache */
+const DASHBOARD_ENTITIES: ReadonlySet<string> = new Set([
+	"lancamentos",
+	"contas",
+	"cartoes",
+	"orcamentos",
+	"pagadores",
+	"inbox",
+]);
+
 /**
- * Revalidates paths for a specific entity
+ * Revalidates paths for a specific entity.
+ * Also invalidates the dashboard "use cache" tag for financial entities.
  * @param entity - The entity type
  */
 export function revalidateForEntity(
 	entity: keyof typeof revalidateConfig,
 ): void {
 	revalidateConfig[entity].forEach((path) => revalidatePath(path));
+
+	// Invalidate dashboard cache for financial mutations
+	if (DASHBOARD_ENTITIES.has(entity)) {
+		revalidateTag("dashboard");
+	}
 }
 
 /**

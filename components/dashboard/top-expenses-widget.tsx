@@ -16,7 +16,8 @@ type TopExpensesWidgetProps = {
 	cardOnlyExpenses: TopExpensesData;
 };
 
-const formatTransactionDate = (date: Date) => {
+const formatTransactionDate = (date: Date | string) => {
+	const d = date instanceof Date ? date : new Date(date);
 	const formatter = new Intl.DateTimeFormat("pt-BR", {
 		weekday: "short",
 		day: "2-digit",
@@ -24,7 +25,7 @@ const formatTransactionDate = (date: Date) => {
 		timeZone: "UTC",
 	});
 
-	const formatted = formatter.format(date);
+	const formatted = formatter.format(d);
 	// Capitaliza a primeira letra do dia da semana
 	return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };

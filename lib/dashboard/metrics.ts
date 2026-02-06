@@ -2,6 +2,7 @@ import {
 	and,
 	asc,
 	eq,
+	gte,
 	ilike,
 	isNull,
 	lte,
@@ -10,15 +11,16 @@ import {
 	or,
 	sum,
 } from "drizzle-orm";
-import { contas, lancamentos, pagadores } from "@/db/schema";
+import { contas, lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 import { safeToNumber } from "@/lib/utils/number";
 import {
+	addMonthsToPeriod,
 	buildPeriodRange,
 	comparePeriods,
 	getPreviousPeriod,
@@ -80,6 +82,21 @@ export async function fetchDashboardCardMetrics(
 ): Promise<DashboardCardMetrics> {
 	const previousPeriod = getPreviousPeriod(period);
 
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return {
+			period,
+			previousPeriod,
+			receitas: { current: 0, previous: 0 },
+			despesas: { current: 0, previous: 0 },
+			balanco: { current: 0, previous: 0 },
+			previsto: { current: 0, previous: 0 },
+		};
+	}
+
+	// Limitar scan histórico a 24 meses para evitar scans progressivamente mais lentos
+	const startPeriod = addMonthsToPeriod(period, -24);
+
 	const rows = await db
 		.select({
 			period: lancamentos.period,
@@ -87,13 +104,13 @@ export async function fetchDashboardCardMetrics(
 			totalAmount: sum(lancamentos.amount).as("total"),
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
 		.where(
 			and(
 				eq(lancamentos.userId, userId),
+				eq(lancamentos.pagadorId, adminPagadorId),
+				gte(lancamentos.period, startPeriod),
 				lte(lancamentos.period, period),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
 				ne(lancamentos.transactionType, TRANSFERENCIA),
 				or(
 					isNull(lancamentos.note),
@@ -129,12 +146,12 @@ export async function fetchDashboardCardMetrics(
 	const earliestPeriod =
 		periodTotals.size > 0 ? Array.from(periodTotals.keys()).sort()[0] : period;
 
-	const startPeriod =
+	const startRangePeriod =
 		comparePeriods(earliestPeriod, previousPeriod) <= 0
 			? earliestPeriod
 			: previousPeriod;
 
-	const periodRange = buildPeriodRange(startPeriod, period);
+	const periodRange = buildPeriodRange(startRangePeriod, period);
 	const forecastByPeriod = new Map<string, number>();
 	let runningForecast = 0;
 

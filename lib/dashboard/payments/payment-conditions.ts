@@ -1,12 +1,12 @@
 import { and, eq, isNull, or, sql } from "drizzle-orm";
-import { lancamentos, pagadores } from "@/db/schema";
+import { lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 
 export type PaymentConditionSummary = {
 	condition: string;
@@ -23,6 +23,11 @@ export async function fetchPaymentConditions(
 	userId: string,
 	period: string,
 ): Promise<PaymentConditionsData> {
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { conditions: [] };
+	}
+
 	const rows = await db
 		.select({
 			condition: lancamentos.condition,
@@ -30,13 +35,12 @@ export async function fetchPaymentConditions(
 			transactions: sql<number>`count(${lancamentos.id})`,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.where(
 			and(
 				eq(lancamentos.userId, userId),
 				eq(lancamentos.period, period),
 				eq(lancamentos.transactionType, "Despesa"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
+				eq(lancamentos.pagadorId, adminPagadorId),
 				or(
 					isNull(lancamentos.note),
 					and(

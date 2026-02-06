@@ -14,7 +14,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import type { DashboardCardMetrics } from "@/lib/dashboard/metrics";
-import { title_font } from "@/public/fonts/font_index";
 import MoneyValues from "../money-values";
 
 type SectionCardsProps = {
@@ -61,9 +60,7 @@ const getPercentChange = (current: number, previous: number): string => {
 
 export function SectionCards({ metrics }: SectionCardsProps) {
 	return (
-		<div
-			className={`${title_font.className} *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4`}
-		>
+		<div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
 			{CARDS.map(({ label, key, icon: Icon }) => {
 				const metric = metrics[key];
 				const trend = getTrend(metric.current, metric.previous);

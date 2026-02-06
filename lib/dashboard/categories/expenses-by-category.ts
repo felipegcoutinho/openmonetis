@@ -1,9 +1,10 @@
-import { and, eq, isNull, or, sql } from "drizzle-orm";
-import { categorias, lancamentos, orcamentos, pagadores } from "@/db/schema";
+import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { categorias, lancamentos, orcamentos } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { calculatePercentageChange } from "@/lib/utils/math";
 import { getPreviousPeriod } from "@/lib/utils/period";
 
 export type CategoryExpenseItem = {
@@ -24,138 +25,129 @@ export type ExpensesByCategoryData = {
 	previousTotal: number;
 };
 
-const calculatePercentageChange = (
-	current: number,
-	previous: number,
-): number | null => {
-	const EPSILON = 0.01; // Considera valores menores que 1 centavo como zero
-
-	if (Math.abs(previous) < EPSILON) {
-		if (Math.abs(current) < EPSILON) return null;
-		return current > 0 ? 100 : -100;
-	}
-
-	const change = ((current - previous) / Math.abs(previous)) * 100;
-
-	// Protege contra valores absurdos (retorna null se > 1 milhão %)
-	return Number.isFinite(change) && Math.abs(change) < 1000000 ? change : null;
-};
-
 export async function fetchExpensesByCategory(
 	userId: string,
 	period: string,
 ): Promise<ExpensesByCategoryData> {
 	const previousPeriod = getPreviousPeriod(period);
 
-	// Busca despesas do período atual agrupadas por categoria
-	const currentPeriodRows = await db
-		.select({
-			categoryId: categorias.id,
-			categoryName: categorias.name,
-			categoryIcon: categorias.icon,
-			total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
-			budgetAmount: orcamentos.amount,
-		})
-		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
-		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
-		.leftJoin(
-			orcamentos,
-			and(
-				eq(orcamentos.categoriaId, categorias.id),
-				eq(orcamentos.period, period),
-				eq(orcamentos.userId, userId),
-			),
-		)
-		.where(
-			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, period),
-				eq(lancamentos.transactionType, "Despesa"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
-				eq(categorias.type, "despesa"),
-				or(
-					isNull(lancamentos.note),
-					sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { categories: [], currentTotal: 0, previousTotal: 0 };
+	}
+
+	// Single query: GROUP BY categoriaId + period for both current and previous periods
+	const [rows, budgetRows] = await Promise.all([
+		db
+			.select({
+				categoryId: categorias.id,
+				categoryName: categorias.name,
+				categoryIcon: categorias.icon,
+				period: lancamentos.period,
+				total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
+			})
+			.from(lancamentos)
+			.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
+			.where(
+				and(
+					eq(lancamentos.userId, userId),
+					eq(lancamentos.pagadorId, adminPagadorId),
+					inArray(lancamentos.period, [period, previousPeriod]),
+					eq(lancamentos.transactionType, "Despesa"),
+					eq(categorias.type, "despesa"),
+					or(
+						isNull(lancamentos.note),
+						sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
+					),
 				),
+			)
+			.groupBy(
+				categorias.id,
+				categorias.name,
+				categorias.icon,
+				lancamentos.period,
 			),
-		)
-		.groupBy(
-			categorias.id,
-			categorias.name,
-			categorias.icon,
-			orcamentos.amount,
-		);
+		db
+			.select({
+				categoriaId: orcamentos.categoriaId,
+				amount: orcamentos.amount,
+			})
+			.from(orcamentos)
+			.where(and(eq(orcamentos.userId, userId), eq(orcamentos.period, period))),
+	]);
 
-	// Busca despesas do período anterior agrupadas por categoria
-	const previousPeriodRows = await db
-		.select({
-			categoryId: categorias.id,
-			total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
-		})
-		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
-		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
-		.where(
-			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, previousPeriod),
-				eq(lancamentos.transactionType, "Despesa"),
-				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
-				eq(categorias.type, "despesa"),
-				or(
-					isNull(lancamentos.note),
-					sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
-				),
-			),
-		)
-		.groupBy(categorias.id);
+	// Build budget lookup
+	const budgetMap = new Map<string, number>();
+	for (const row of budgetRows) {
+		if (row.categoriaId) {
+			budgetMap.set(row.categoriaId, toNumber(row.amount));
+		}
+	}
 
-	// Cria um mapa do período anterior para busca rápida
-	const previousMap = new Map<string, number>();
-	let previousTotal = 0;
+	// Build category data from grouped results
+	const categoryMap = new Map<
+		string,
+		{
+			name: string;
+			icon: string | null;
+			current: number;
+			previous: number;
+		}
+	>();
 
-	for (const row of previousPeriodRows) {
+	for (const row of rows) {
+		const entry = categoryMap.get(row.categoryId) ?? {
+			name: row.categoryName,
+			icon: row.categoryIcon,
+			current: 0,
+			previous: 0,
+		};
+
 		const amount = Math.abs(toNumber(row.total));
-		previousMap.set(row.categoryId, amount);
-		previousTotal += amount;
+		if (row.period === period) {
+			entry.current = amount;
+		} else {
+			entry.previous = amount;
+		}
+		categoryMap.set(row.categoryId, entry);
 	}
 
-	// Calcula o total do período atual
+	// Calculate totals
 	let currentTotal = 0;
-	for (const row of currentPeriodRows) {
-		currentTotal += Math.abs(toNumber(row.total));
+	let previousTotal = 0;
+	for (const entry of categoryMap.values()) {
+		currentTotal += entry.current;
+		previousTotal += entry.previous;
 	}
 
-	// Monta os dados de cada categoria
-	const categories: CategoryExpenseItem[] = currentPeriodRows.map((row) => {
-		const currentAmount = Math.abs(toNumber(row.total));
-		const previousAmount = previousMap.get(row.categoryId) ?? 0;
+	// Build result
+	const categories: CategoryExpenseItem[] = [];
+	for (const [categoryId, entry] of categoryMap) {
 		const percentageChange = calculatePercentageChange(
-			currentAmount,
-			previousAmount,
+			entry.current,
+			entry.previous,
 		);
 		const percentageOfTotal =
-			currentTotal > 0 ? (currentAmount / currentTotal) * 100 : 0;
+			currentTotal > 0 ? (entry.current / currentTotal) * 100 : 0;
 
-		const budgetAmount = row.budgetAmount ? toNumber(row.budgetAmount) : null;
+		const budgetAmount = budgetMap.get(categoryId) ?? null;
 		const budgetUsedPercentage =
 			budgetAmount && budgetAmount > 0
-				? (currentAmount / budgetAmount) * 100
+				? (entry.current / budgetAmount) * 100
 				: null;
 
-		return {
-			categoryId: row.categoryId,
-			categoryName: row.categoryName,
-			categoryIcon: row.categoryIcon,
-			currentAmount,
-			previousAmount,
+		categories.push({
+			categoryId,
+			categoryName: entry.name,
+			categoryIcon: entry.icon,
+			currentAmount: entry.current,
+			previousAmount: entry.previous,
 			percentageChange,
 			percentageOfTotal,
 			budgetAmount,
 			budgetUsedPercentage,
-		};
-	});
+		});
+	}
 
 	// Ordena por valor atual (maior para menor)
 	categories.sort((a, b) => b.currentAmount - a.currentAmount);
