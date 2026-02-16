@@ -5,6 +5,28 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.5.2] - 2026-02-16
+
+### Alterado
+
+- Landing page reformulada: visual modernizado, melhor experiência mobile e novas seções
+- Hero section com gradient sutil e tipografia responsiva
+- Dashboard preview sem bordas para visual mais limpo
+- Seção "Funcionalidades" reorganizada em 2 blocos: 6 cards principais + 6 extras compactos
+- Seção "Como usar" com tabs Docker (Recomendado) vs Manual
+- Footer simplificado com 3 colunas (Projeto, Companion, descrição)
+- Métricas de destaque (widgets, self-hosted, stars, forks) entre hero e dashboard preview
+- Espaçamento e padding otimizados para mobile em todas as seções
+
+### Adicionado
+
+- Menu hamburger mobile com Sheet drawer (`components/landing/mobile-nav.tsx`)
+- Animações de fade-in no scroll via Intersection Observer (`components/landing/animate-on-scroll.tsx`)
+- Seção dedicada ao OpenMonetis Companion com screenshot do app, fluxo de captura e bancos suportados
+- Galeria "Conheça as telas" com screenshots de Lançamentos, Calendário e Cartões
+- Link "Conheça as telas" na navegação (desktop e mobile)
+- Componente de tabs para setup (`components/landing/setup-tabs.tsx`)
+
 ## [1.5.1] - 2026-02-16
 
 ### Alterado
