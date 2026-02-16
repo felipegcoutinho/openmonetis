@@ -21,6 +21,7 @@ import {
 	RiTimeLine,
 	RiWalletLine,
 } from "@remixicon/react";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatedThemeToggler } from "@/components/animated-theme-toggler";
@@ -32,6 +33,13 @@ import { getOptionalUserSession } from "@/lib/auth/server";
 
 export default async function Page() {
 	const session = await getOptionalUserSession();
+	const headersList = await headers();
+	const hostname = headersList.get("host")?.replace(/:\d+$/, "");
+	const publicDomain = process.env.PUBLIC_DOMAIN?.replace(
+		/^https?:\/\//,
+		"",
+	).replace(/:\d+$/, "");
+	const isPublicDomain = publicDomain && hostname === publicDomain;
 
 	return (
 		<div className="flex min-h-screen flex-col">
@@ -66,27 +74,28 @@ export default async function Page() {
 
 					<nav className="flex items-center gap-2 md:gap-4">
 						<AnimatedThemeToggler />
-						{session?.user ? (
-							<Link prefetch href="/dashboard">
-								<Button variant="outline" size="sm">
-									Dashboard
-								</Button>
-							</Link>
-						) : (
-							<>
-								<Link href="/login">
-									<Button variant="ghost" size="sm">
-										Entrar
+						{!isPublicDomain &&
+							(session?.user ? (
+								<Link prefetch href="/dashboard">
+									<Button variant="outline" size="sm">
+										Dashboard
 									</Button>
 								</Link>
-								<Link href="/signup">
-									<Button size="sm" className="gap-2">
-										Começar
-										<RiArrowRightSLine size={16} />
-									</Button>
-								</Link>
-							</>
-						)}
+							) : (
+								<>
+									<Link href="/login">
+										<Button variant="ghost" size="sm">
+											Entrar
+										</Button>
+									</Link>
+									<Link href="/signup">
+										<Button size="sm" className="gap-2">
+											Começar
+											<RiArrowRightSLine size={16} />
+										</Button>
+									</Link>
+								</>
+							))}
 					</nav>
 				</div>
 			</header>
@@ -124,7 +133,7 @@ export default async function Page() {
 
 						<div className="flex flex-col sm:flex-row gap-4 mt-4">
 							<Link
-								href="https://github.com/felipegcoutinho/opensheets-app"
+								href="https://github.com/felipegcoutinho/openmonetis"
 								target="_blank"
 							>
 								<Button size="lg" className="gap-2 w-full sm:w-auto">
@@ -133,7 +142,7 @@ export default async function Page() {
 								</Button>
 							</Link>
 							<Link
-								href="https://github.com/felipegcoutinho/opensheets-app#readme"
+								href="https://github.com/felipegcoutinho/openmonetis#readme"
 								target="_blank"
 							>
 								<Button
@@ -166,7 +175,7 @@ export default async function Page() {
 					<div className="mx-auto max-w-6xl">
 						<Image
 							src="/dashboard-preview-light.png"
-							alt="opensheets Dashboard Preview"
+							alt="openmonetis Dashboard Preview"
 							width={1920}
 							height={1080}
 							className="w-full h-auto dark:hidden"
@@ -174,7 +183,7 @@ export default async function Page() {
 						/>
 						<Image
 							src="/dashboard-preview-dark.png"
-							alt="opensheets Dashboard Preview"
+							alt="openmonetis Dashboard Preview"
 							width={1920}
 							height={1080}
 							className="w-full h-auto hidden dark:block"
@@ -581,7 +590,7 @@ export default async function Page() {
 											</h3>
 											<code className="text-sm bg-muted px-2 py-1 rounded">
 												git clone
-												https://github.com/felipegcoutinho/opensheets-app.git
+												https://github.com/felipegcoutinho/openmonetis.git
 											</code>
 										</div>
 									</div>
@@ -658,7 +667,7 @@ export default async function Page() {
 
 						<div className="mt-8 text-center">
 							<Link
-								href="https://github.com/felipegcoutinho/opensheets-app#-início-rápido"
+								href="https://github.com/felipegcoutinho/openmonetis#-início-rápido"
 								target="_blank"
 								className="text-sm text-primary hover:underline"
 							>
@@ -678,7 +687,7 @@ export default async function Page() {
 								Para quem funciona?
 							</h2>
 							<p className="text-lg text-muted-foreground">
-								O opensheets funciona melhor se você:
+								O openmonetis funciona melhor se você:
 							</p>
 						</div>
 
@@ -765,7 +774,7 @@ export default async function Page() {
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
 							<Link
-								href="https://github.com/felipegcoutinho/opensheets-app"
+								href="https://github.com/felipegcoutinho/openmonetis"
 								target="_blank"
 							>
 								<Button size="lg" className="gap-2 w-full sm:w-auto">
@@ -774,7 +783,7 @@ export default async function Page() {
 								</Button>
 							</Link>
 							<Link
-								href="https://github.com/felipegcoutinho/opensheets-app#-início-rápido"
+								href="https://github.com/felipegcoutinho/openmonetis#-início-rápido"
 								target="_blank"
 							>
 								<Button
@@ -808,7 +817,7 @@ export default async function Page() {
 								<ul className="space-y-3 text-sm text-muted-foreground">
 									<li>
 										<Link
-											href="https://github.com/felipegcoutinho/opensheets-app"
+											href="https://github.com/felipegcoutinho/openmonetis"
 											target="_blank"
 											className="hover:text-foreground transition-colors flex items-center gap-2"
 										>
@@ -818,7 +827,7 @@ export default async function Page() {
 									</li>
 									<li>
 										<Link
-											href="https://github.com/felipegcoutinho/opensheets-app#readme"
+											href="https://github.com/felipegcoutinho/openmonetis#readme"
 											target="_blank"
 											className="hover:text-foreground transition-colors"
 										>
@@ -827,7 +836,7 @@ export default async function Page() {
 									</li>
 									<li>
 										<Link
-											href="https://github.com/felipegcoutinho/opensheets-app/issues"
+											href="https://github.com/felipegcoutinho/openmonetis/issues"
 											target="_blank"
 											className="hover:text-foreground transition-colors"
 										>
@@ -850,8 +859,8 @@ export default async function Page() {
 
 						<div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
 							<p>
-								© {new Date().getFullYear()} opensheets. Projeto open source sob
-								licença MIT.
+								© {new Date().getFullYear()} openmonetis. Projeto open source
+								sob licença MIT.
 							</p>
 							<div className="flex items-center gap-2">
 								<RiShieldCheckLine size={16} className="text-primary" />

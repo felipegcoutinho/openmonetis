@@ -5,6 +5,20 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.5.1] - 2026-02-16
+
+### Alterado
+
+- Projeto renomeado de **OpenSheets** para **OpenMonetis** em todo o codebase (~40 arquivos): package.json, manifests, layouts, componentes, server actions, emails, Docker, docs e landing page
+- URLs do repositório atualizados de `opensheets-app` para `openmonetis`
+- Docker image renomeada para `felipegcoutinho/openmonetis`
+- Logo textual atualizado (`logo_text.png`)
+
+### Adicionado
+
+- Suporte a multi-domínio via `PUBLIC_DOMAIN`: domínio público serve apenas a landing page (sem botões de login/cadastro, rotas do app bloqueadas pelo middleware)
+- Variável de ambiente `PUBLIC_DOMAIN` no `.env.example` com documentação
+
 ## [1.5.0] - 2026-02-15
 
 ### Adicionado

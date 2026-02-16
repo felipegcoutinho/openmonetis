@@ -1,8 +1,8 @@
-# AI Coding Assistant Instructions for Opensheets
+# AI Coding Assistant Instructions for OpenMonetis
 
 ## Project Overview
 
-Opensheets is a self-hosted personal finance management application built with Next.js 16, TypeScript, PostgreSQL, and Drizzle ORM. It provides manual transaction tracking, account management, budgeting, and financial insights with a Portuguese interface.
+OpenMonetis is a self-hosted personal finance management application built with Next.js 16, TypeScript, PostgreSQL, and Drizzle ORM. It provides manual transaction tracking, account management, budgeting, and financial insights with a Portuguese interface.
 
 ## Architecture
 

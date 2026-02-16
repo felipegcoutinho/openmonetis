@@ -179,7 +179,7 @@ export function InboxPage({
 			<EmptyState
 				media={<RiInboxLine className="size-6 text-primary" />}
 				title={message}
-				description="As notificações capturadas pelo app OpenSheets Companion aparecerão aqui. Saiba mais em Ajustes > Companion."
+				description="As notificações capturadas pelo app OpenMonetis Companion aparecerão aqui. Saiba mais em Ajustes > Companion."
 			/>
 		</Card>
 	);

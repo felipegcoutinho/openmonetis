@@ -22,6 +22,21 @@ const PUBLIC_AUTH_ROUTES = ["/login", "/signup"];
 export default async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
+	// Multi-domain: block all routes except landing on public domain
+	// Normalize PUBLIC_DOMAIN: strip protocol and port if provided
+	const publicDomain = process.env.PUBLIC_DOMAIN?.replace(
+		/^https?:\/\//,
+		"",
+	).replace(/:\d+$/, "");
+	const hostname = request.headers.get("host")?.replace(/:\d+$/, "");
+
+	if (publicDomain && hostname === publicDomain) {
+		if (pathname !== "/") {
+			return NextResponse.redirect(new URL("/", request.url));
+		}
+		return NextResponse.next();
+	}
+
 	// Validate actual session, not just cookie existence
 	const session = await auth.api.getSession({
 		headers: request.headers,
@@ -49,6 +64,7 @@ export default async function proxy(request: NextRequest) {
 export const config = {
 	// Apply middleware to protected and auth routes
 	matcher: [
+		"/",
 		"/ajustes/:path*",
 		"/anotacoes/:path*",
 		"/calendario/:path*",

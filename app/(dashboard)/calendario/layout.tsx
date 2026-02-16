@@ -2,7 +2,7 @@ import { RiCalendarEventLine } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
-	title: "Calendário | Opensheets",
+	title: "Calendário | OpenMonetis",
 };
 
 export default function RootLayout({

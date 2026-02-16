@@ -292,7 +292,7 @@ const resolveUserLabel = (user: {
 	if (user?.email && user.email.trim().length > 0) {
 		return user.email;
 	}
-	return "Opensheets";
+	return "OpenMonetis";
 };
 
 type InitialCandidate = {

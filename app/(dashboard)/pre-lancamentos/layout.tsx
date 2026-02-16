@@ -2,7 +2,7 @@ import { RiInboxLine } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
-	title: "Pré-Lançamentos | Opensheets",
+	title: "Pré-Lançamentos | OpenMonetis",
 };
 
 export default function RootLayout({

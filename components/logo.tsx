@@ -17,7 +17,7 @@ export function Logo({
 		return (
 			<Image
 				src="/logo_small.png"
-				alt="Opensheets"
+				alt="OpenMonetis"
 				width={32}
 				height={32}
 				className={cn("object-contain", className)}
@@ -30,7 +30,7 @@ export function Logo({
 		<div className={cn("flex items-center gap-1.5 py-4", className)}>
 			<Image
 				src="/logo_small.png"
-				alt="Opensheets"
+				alt="OpenMonetis"
 				width={28}
 				height={28}
 				className="object-contain"
@@ -38,7 +38,7 @@ export function Logo({
 			/>
 			<Image
 				src="/logo_text.png"
-				alt="Opensheets"
+				alt="OpenMonetis"
 				width={100}
 				height={32}
 				className="object-contain dark:invert"

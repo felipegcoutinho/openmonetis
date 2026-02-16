@@ -100,7 +100,7 @@ const buildHtmlBody = ({
       </table>
 
       <p style="margin:0;font-size:12px;color:#94a3b8;">
-        Enviado automaticamente por ${userLabel} via Opensheets.
+        Enviado automaticamente por ${userLabel} via OpenMonetis.
       </p>
     </div>
   `;
@@ -119,7 +119,7 @@ export async function sendPagadorAutoEmails({
 
 	const resendApiKey = process.env.RESEND_API_KEY;
 	const resendFrom =
-		process.env.RESEND_FROM_EMAIL ?? "Opensheets <onboarding@resend.dev>";
+		process.env.RESEND_FROM_EMAIL ?? "OpenMonetis <onboarding@resend.dev>";
 
 	if (!resendApiKey) {
 		console.warn(

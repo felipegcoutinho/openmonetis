@@ -2,7 +2,7 @@ import { RiBankCard2Line } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
-	title: "Cartões | Opensheets",
+	title: "Cartões | OpenMonetis",
 };
 
 export default function RootLayout({

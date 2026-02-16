@@ -2,7 +2,7 @@ import { RiSparklingLine } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
-	title: "Insights | Opensheets",
+	title: "Insights | OpenMonetis",
 };
 
 export default function RootLayout({

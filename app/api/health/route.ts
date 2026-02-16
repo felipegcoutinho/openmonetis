@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 const APP_VERSION = "1.0.0";
 
 /**
- * Health check endpoint para Docker, monitoring e OpenSheets Companion
+ * Health check endpoint para Docker, monitoring e OpenMonetis Companion
  * GET /api/health
  *
  * Retorna status 200 se a aplicação está saudável
@@ -20,7 +20,7 @@ export async function GET() {
 		return NextResponse.json(
 			{
 				status: "ok",
-				name: "OpenSheets",
+				name: "OpenMonetis",
 				version: APP_VERSION,
 				timestamp: new Date().toISOString(),
 			},
@@ -33,7 +33,7 @@ export async function GET() {
 		return NextResponse.json(
 			{
 				status: "error",
-				name: "OpenSheets",
+				name: "OpenMonetis",
 				version: APP_VERSION,
 				timestamp: new Date().toISOString(),
 				message: "Database connection failed",

@@ -53,7 +53,7 @@ export default async function Page() {
 							<div>
 								<h2 className="text-lg font-bold mb-1">Preferências</h2>
 								<p className="text-sm text-muted-foreground mb-4">
-									Personalize sua experiência no Opensheets ajustando as
+									Personalize sua experiência no OpenMonetis ajustando as
 									configurações de acordo com suas necessidades.
 								</p>
 							</div>
@@ -78,7 +78,7 @@ export default async function Page() {
 							<div>
 								<h2 className="text-lg font-bold mb-1">Alterar nome</h2>
 								<p className="text-sm text-muted-foreground mb-4">
-									Atualize como seu nome aparece no Opensheets. Esse nome pode
+									Atualize como seu nome aparece no OpenMonetis. Esse nome pode
 									ser exibido em diferentes seções do app e em comunicações.
 								</p>
 							</div>

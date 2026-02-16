@@ -388,7 +388,7 @@ const buildSummaryHtml = ({
 
   <!-- Rodapé externo -->
   <p style="margin:16px 0 0 0;font-size:12.5px;color:#94a3b8;text-align:center;">
-    Este e-mail foi enviado automaticamente pelo <strong>Opensheets</strong>.
+    Este e-mail foi enviado automaticamente pelo <strong>OpenMonetis</strong>.
   </p>
 </div>
 
@@ -419,7 +419,7 @@ export async function sendPagadorSummaryAction(
 
 		const resendApiKey = process.env.RESEND_API_KEY;
 		const resendFrom =
-			process.env.RESEND_FROM_EMAIL ?? "Opensheets <onboarding@resend.dev>";
+			process.env.RESEND_FROM_EMAIL ?? "OpenMonetis <onboarding@resend.dev>";
 
 		if (!resendApiKey) {
 			return {

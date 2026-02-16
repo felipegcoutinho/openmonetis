@@ -7,8 +7,9 @@ import { allFontVariables } from "@/public/fonts/font_index";
 import "./globals.css";
 
 export const metadata: Metadata = {
-	title: "Opensheets",
-	description: "Finanças pessoais descomplicadas.",
+	title: "OpenMonetis | Suas finanças, do seu jeito",
+	description:
+		"Controle suas finanças pessoais de forma simples e transparente.",
 };
 
 export default function RootLayout({
@@ -19,7 +20,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={allFontVariables} suppressHydrationWarning>
 			<head>
-				<meta name="apple-mobile-web-app-title" content="Opensheets" />
+				<meta name="apple-mobile-web-app-title" content="OpenMonetis" />
 			</head>
 			<body className="antialiased" suppressHydrationWarning>
 				<ThemeProvider attribute="class" defaultTheme="light">

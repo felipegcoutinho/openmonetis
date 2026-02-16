@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE_NAME: opensheets
+  DOCKER_IMAGE_NAME: openmonetis
 
 jobs:
   build-and-push:

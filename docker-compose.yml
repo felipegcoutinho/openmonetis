@@ -1,5 +1,5 @@
 # Docker Compose para Next.js + PostgreSQL
-name: opensheets
+name: openmonetis
 
 # MODOS DE USO:
 # 1. Banco LOCAL (PostgreSQL em container):
@@ -22,13 +22,13 @@ services:
   # ============================================
   db:
     image: postgres:18-alpine
-    container_name: opensheets_postgres
+    container_name: openmonetis_postgres
     restart: unless-stopped
 
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-opensheets}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opensheets_dev_password}
-      POSTGRES_DB: ${POSTGRES_DB:-opensheets_db}
+      POSTGRES_USER: ${POSTGRES_USER:-openmonetis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openmonetis_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-openmonetis_db}
       # Configurações de performance
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
 
@@ -48,7 +48,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-opensheets} -d ${POSTGRES_DB:-opensheets_db}",
+          "pg_isready -U ${POSTGRES_USER:-openmonetis} -d ${POSTGRES_DB:-openmonetis_db}",
         ]
       interval: 10s
       timeout: 5s
@@ -56,7 +56,7 @@ services:
       start_period: 10s
 
     networks:
-      - opensheets_network
+      - openmonetis_network
 
     # Descomentar para ativar logs de queries (debug)
     # command: ["postgres", "-c", "log_statement=all"]
@@ -69,7 +69,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    container_name: opensheets_app
+    container_name: openmonetis_app
     restart: unless-stopped
 
     ports:
@@ -112,7 +112,7 @@ services:
         condition: service_healthy
 
     networks:
-      - opensheets_network
+      - openmonetis_network
 
     # Script de inicialização: roda migrations antes de iniciar o app
     # ATENÇÃO: Em produção, considere rodar migrations separadamente por segurança
@@ -149,13 +149,13 @@ services:
 # ============================================
 volumes:
   postgres_data:
-    name: opensheets_postgres_data
+    name: openmonetis_postgres_data
     driver: local
 
 # ============================================
 # Networks
 # ============================================
 networks:
-  opensheets_network:
-    name: opensheets_network
+  openmonetis_network:
+    name: openmonetis_network
     driver: bridge

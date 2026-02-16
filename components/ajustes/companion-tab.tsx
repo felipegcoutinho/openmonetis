@@ -39,7 +39,7 @@ const steps: {
 			<>
 				Baixe o APK no{" "}
 				<a
-					href="https://github.com/felipegcoutinho/opensheets-companion"
+					href="https://github.com/felipegcoutinho/openmonetis-companion"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="inline-flex items-center gap-0.5 text-primary hover:underline"
@@ -63,7 +63,7 @@ const steps: {
 	{
 		icon: RiShieldCheckLine,
 		title: "Pronto!",
-		description: "Notificações serão enviadas ao OpenSheets.",
+		description: "Notificações serão enviadas ao OpenMonetis.",
 	},
 ];
 
@@ -74,7 +74,7 @@ export function CompanionTab({ tokens }: CompanionTabProps) {
 				{/* Header */}
 				<div>
 					<div className="flex items-center gap-2 mb-1">
-						<h2 className="text-lg font-bold">OpenSheets Companion</h2>
+						<h2 className="text-lg font-bold">OpenMonetis Companion</h2>
 						<span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success dark:bg-success/10">
 							<RiAndroidLine className="h-3 w-3" />
 							Android

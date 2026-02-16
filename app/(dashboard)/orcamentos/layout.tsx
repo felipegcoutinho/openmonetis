@@ -2,7 +2,7 @@ import { RiFundsLine } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
-	title: "Anotações | Opensheets",
+	title: "Orçamentos | OpenMonetis",
 };
 
 export default function RootLayout({
