@@ -1,6 +1,11 @@
 "use client";
 
-import { RiAddCircleLine, RiFileCopyLine, RiFundsLine } from "@remixicon/react";
+import {
+	RiAddCircleLine,
+	RiArrowRightSLine,
+	RiFileCopyLine,
+	RiFundsLine,
+} from "@remixicon/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -105,26 +110,41 @@ export function BudgetsPage({
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<div className="flex justify-start gap-4">
-					<BudgetDialog
-						mode="create"
-						categories={categories}
-						defaultPeriod={selectedPeriod}
-						trigger={
-							<Button disabled={categories.length === 0}>
-								<RiAddCircleLine className="size-4" />
-								Novo orçamento
+				{/* No mobile: rolagem horizontal + seta + botões menores */}
+				<div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+					<div className="overflow-x-auto overflow-y-hidden scroll-smooth md:overflow-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+						<div className="flex w-max shrink-0 justify-start gap-3 py-1 md:w-full md:gap-4 md:py-0">
+							<BudgetDialog
+								mode="create"
+								categories={categories}
+								defaultPeriod={selectedPeriod}
+								trigger={
+									<Button
+										disabled={categories.length === 0}
+										className="h-8 shrink-0 px-3 text-xs md:h-9 md:px-4 md:text-sm"
+									>
+										<RiAddCircleLine className="size-4" />
+										Novo orçamento
+									</Button>
+								}
+							/>
+							<Button
+								variant="outline"
+								disabled={categories.length === 0}
+								onClick={() => setDuplicateOpen(true)}
+								className="h-8 shrink-0 px-3 text-xs md:h-9 md:px-4 md:text-sm"
+							>
+								<RiFileCopyLine className="size-4" />
+								Copiar orçamentos do último mês
 							</Button>
-						}
-					/>
-					<Button
-						variant="outline"
-						disabled={categories.length === 0}
-						onClick={() => setDuplicateOpen(true)}
+						</div>
+					</div>
+					<div
+						className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-gradient-to-l from-background to-transparent py-1 md:hidden"
+						aria-hidden
 					>
-						<RiFileCopyLine className="size-4" />
-						Copiar orçamentos do último mês
-					</Button>
+						<RiArrowRightSLine className="size-5 shrink-0 text-muted-foreground" />
+					</div>
 				</div>
 
 				{hasBudgets ? (

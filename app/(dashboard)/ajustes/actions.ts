@@ -70,6 +70,8 @@ const VALID_FONTS = [
 
 const updatePreferencesSchema = z.object({
 	disableMagnetlines: z.boolean(),
+	extratoNoteAsColumn: z.boolean(),
+	lancamentosColumnOrder: z.array(z.string()).nullable(),
 	systemFont: z.enum(VALID_FONTS).default("ai-sans"),
 	moneyFont: z.enum(VALID_FONTS).default("ai-sans"),
 });
@@ -417,6 +419,8 @@ export async function updatePreferencesAction(
 				.update(schema.preferenciasUsuario)
 				.set({
 					disableMagnetlines: validated.disableMagnetlines,
+					extratoNoteAsColumn: validated.extratoNoteAsColumn,
+					lancamentosColumnOrder: validated.lancamentosColumnOrder,
 					systemFont: validated.systemFont,
 					moneyFont: validated.moneyFont,
 					updatedAt: new Date(),
@@ -427,6 +431,8 @@ export async function updatePreferencesAction(
 			await db.insert(schema.preferenciasUsuario).values({
 				userId: session.user.id,
 				disableMagnetlines: validated.disableMagnetlines,
+				extratoNoteAsColumn: validated.extratoNoteAsColumn,
+				lancamentosColumnOrder: validated.lancamentosColumnOrder,
 				systemFont: validated.systemFont,
 				moneyFont: validated.moneyFont,
 			});

@@ -1,3 +1,4 @@
+import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { LancamentosPage } from "@/components/lancamentos/page/lancamentos-page";
 import MonthNavigation from "@/components/month-picker/month-navigation";
 import { getUserId } from "@/lib/auth/server";
@@ -31,7 +32,10 @@ export default async function Page({ searchParams }: PageProps) {
 
 	const searchFilters = extractLancamentoSearchFilters(resolvedSearchParams);
 
-	const filterSources = await fetchLancamentoFilterSources(userId);
+	const [filterSources, userPreferences] = await Promise.all([
+		fetchLancamentoFilterSources(userId),
+		fetchUserPreferences(userId),
+	]);
 
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const slugMaps = buildSlugMaps(sluggedFilters);
@@ -80,6 +84,8 @@ export default async function Page({ searchParams }: PageProps) {
 				contaCartaoFilterOptions={contaCartaoFilterOptions}
 				selectedPeriod={selectedPeriod}
 				estabelecimentos={estabelecimentos}
+				noteAsColumn={userPreferences?.extratoNoteAsColumn ?? false}
+				columnOrder={userPreferences?.lancamentosColumnOrder ?? null}
 			/>
 		</main>
 	);

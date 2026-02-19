@@ -7,6 +7,7 @@ import {
 	RiDashboardLine,
 	RiFileChartLine,
 	RiFundsLine,
+	RiPieChartLine,
 	RiGroupLine,
 	RiInboxLine,
 	RiPriceTag3Line,
@@ -159,6 +160,11 @@ export function createSidebarNavData(
 						title: "Tendências",
 						url: "/relatorios/tendencias",
 						icon: RiFileChartLine,
+					},
+					{
+						title: "Gastos por categoria",
+						url: "/relatorios/gastos-por-categoria",
+						icon: RiPieChartLine,
 					},
 					{
 						title: "Uso de Cartões",

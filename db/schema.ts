@@ -107,8 +107,10 @@ export const preferenciasUsuario = pgTable("preferencias_usuario", {
 		.unique()
 		.references(() => user.id, { onDelete: "cascade" }),
 	disableMagnetlines: boolean("disable_magnetlines").notNull().default(false),
+	extratoNoteAsColumn: boolean("extrato_note_as_column").notNull().default(false),
 	systemFont: text("system_font").notNull().default("ai-sans"),
 	moneyFont: text("money_font").notNull().default("ai-sans"),
+	lancamentosColumnOrder: jsonb("lancamentos_column_order").$type<string[] | null>(),
 	dashboardWidgets: jsonb("dashboard_widgets").$type<{
 		order: string[];
 		hidden: string[];

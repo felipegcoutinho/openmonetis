@@ -5,6 +5,30 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - 2026-02-18
+
+### Adicionado
+
+- Item "Gastos por categoria" no menu lateral (seção Análise), com link para `/relatorios/gastos-por-categoria`
+- Gráfico de pizza moderno (estilo donut) na página Gastos por categoria: fatias com espaçamento, labels de percentual nas fatias maiores, legenda ao lado
+- Fatias do gráfico e itens da legenda clicáveis — navegam para a página de detalhe da categoria no período selecionado
+- Preferência "Anotações em coluna" em Ajustes > Extrato e lançamentos: quando ativa, a anotação dos lançamentos aparece em coluna na tabela; quando inativa, permanece no balão (tooltip) no ícone
+- Preferência "Ordem das colunas" em Ajustes > Extrato e lançamentos: lista ordenável por arraste para definir a ordem das colunas na tabela do extrato e dos lançamentos (Estabelecimento, Transação, Valor, etc.); a linha inteira é arrastável
+- Coluna `extrato_note_as_column` e `lancamentos_column_order` na tabela `preferencias_usuario` (migrations 0017 e 0018)
+- Constantes e labels das colunas reordenáveis em `lib/lancamentos/column-order.ts`
+
+### Alterado
+
+- Tooltip do gráfico de pizza em Gastos por categoria oculto no mobile (evita informação flutuante em telas pequenas)
+- Header do dashboard fixo apenas no mobile (`fixed top-0` com `md:static`); conteúdo com `pt-12 md:pt-0` para não ficar sob o header
+- Abas da página Ajustes (Preferências, Companion, etc.): no mobile, rolagem horizontal com seta indicando mais opções à direita; scrollbar oculta
+- Botões "Novo orçamento" e "Copiar orçamentos do último mês": no mobile, rolagem horizontal  (`h-8`, `text-xs`)
+- Botões "Nova Receita", "Nova Despesa" e ícone de múltiplos lançamentos: no mobile, mesma rolagem horizontal + botões menores
+- Tabela de lançamentos aplica a ordem de colunas salva nas preferências (extrato, lançamentos, categoria, fatura, pagador)
+- Adicionado variavel no docker compose para manter o caminho do volume no compose up/down
+
+**Contribuições:** [Guilherme Bano](https://github.com/Gbano1)
+
 ## [1.5.2] - 2026-02-16
 
 ### Alterado
@@ -201,3 +225,4 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Atualização de dependências
 - Aplicada formatação no código
+

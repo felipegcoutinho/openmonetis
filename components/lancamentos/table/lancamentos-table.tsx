@@ -3,6 +3,7 @@ import {
 	RiAddCircleFill,
 	RiAddCircleLine,
 	RiArrowLeftRightLine,
+	RiArrowRightSLine,
 	RiChat1Line,
 	RiCheckLine,
 	RiDeleteBin5Line,
@@ -68,6 +69,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DEFAULT_LANCAMENTOS_COLUMN_ORDER } from "@/lib/lancamentos/column-order";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { formatDate } from "@/lib/utils/date";
 import { getConditionIcon, getPaymentMethodIcon } from "@/lib/utils/icons";
@@ -92,6 +94,7 @@ const resolveLogoSrc = (logo: string | null) => {
 
 type BuildColumnsArgs = {
 	currentUserId: string;
+	noteAsColumn: boolean;
 	onEdit?: (item: LancamentoItem) => void;
 	onCopy?: (item: LancamentoItem) => void;
 	onImport?: (item: LancamentoItem) => void;
@@ -106,6 +109,7 @@ type BuildColumnsArgs = {
 
 const buildColumns = ({
 	currentUserId,
+	noteAsColumn,
 	onEdit,
 	onCopy,
 	onImport,
@@ -269,7 +273,7 @@ const buildColumns = ({
 							</Tooltip>
 						)}
 
-						{hasNote ? (
+						{!noteAsColumn && hasNote ? (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<span className="inline-flex rounded-full p-1 hover:bg-muted/60">
@@ -493,6 +497,24 @@ const buildColumns = ({
 		},
 	];
 
+	if (noteAsColumn) {
+		const contaCartaoIndex = columns.findIndex((c) => c.id === "contaCartao");
+		const noteColumn: ColumnDef<LancamentoItem> = {
+			accessorKey: "note",
+			header: "Anotação",
+			cell: ({ row }) => {
+				const note = row.original.note;
+				if (!note?.trim()) return <span className="text-muted-foreground">—</span>;
+				return (
+					<span className="max-w-[200px] truncate whitespace-pre-line text-sm" title={note}>
+						{note}
+					</span>
+				);
+			},
+		};
+		columns.splice(contaCartaoIndex, 0, noteColumn);
+	}
+
 	if (showActions) {
 		columns.push({
 			id: "actions",
@@ -645,9 +667,51 @@ const buildColumns = ({
 	return columns;
 };
 
+const FIXED_START_IDS = ["select", "purchaseDate"];
+const FIXED_END_IDS = ["actions"];
+
+function getColumnId(col: ColumnDef<LancamentoItem>): string {
+	const c = col as { id?: string; accessorKey?: string };
+	return c.id ?? c.accessorKey ?? "";
+}
+
+function reorderColumnsByPreference<T>(
+	columns: ColumnDef<T>[],
+	orderPreference: string[] | null | undefined,
+): ColumnDef<T>[] {
+	if (!orderPreference || orderPreference.length === 0) return columns;
+
+	const order = orderPreference;
+	const fixedStart: ColumnDef<T>[] = [];
+	const reorderable: ColumnDef<T>[] = [];
+	const fixedEnd: ColumnDef<T>[] = [];
+
+	for (const col of columns) {
+		const id = getColumnId(col as ColumnDef<LancamentoItem>);
+		if (FIXED_START_IDS.includes(id)) fixedStart.push(col);
+		else if (FIXED_END_IDS.includes(id)) fixedEnd.push(col);
+		else reorderable.push(col);
+	}
+
+	const sorted = [...reorderable].sort((a, b) => {
+		const idA = getColumnId(a as ColumnDef<LancamentoItem>);
+		const idB = getColumnId(b as ColumnDef<LancamentoItem>);
+		const indexA = order.indexOf(idA);
+		const indexB = order.indexOf(idB);
+		if (indexA === -1 && indexB === -1) return 0;
+		if (indexA === -1) return 1;
+		if (indexB === -1) return -1;
+		return indexA - indexB;
+	});
+
+	return [...fixedStart, ...sorted, ...fixedEnd];
+}
+
 type LancamentosTableProps = {
 	data: LancamentoItem[];
 	currentUserId: string;
+	noteAsColumn?: boolean;
+	columnOrder?: string[] | null;
 	pagadorFilterOptions?: LancamentoFilterOption[];
 	categoriaFilterOptions?: LancamentoFilterOption[];
 	contaCartaoFilterOptions?: ContaCartaoFilterOption[];
@@ -672,6 +736,8 @@ type LancamentosTableProps = {
 export function LancamentosTable({
 	data,
 	currentUserId,
+	noteAsColumn = false,
+	columnOrder: columnOrderPreference = null,
 	pagadorFilterOptions = [],
 	categoriaFilterOptions = [],
 	contaCartaoFilterOptions = [],
@@ -704,23 +770,10 @@ export function LancamentosTable({
 	});
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-	const columns = useMemo(
-		() =>
-			buildColumns({
-				currentUserId,
-				onEdit,
-				onCopy,
-				onImport,
-				onConfirmDelete,
-				onViewDetails,
-				onToggleSettlement,
-				onAnticipate,
-				onViewAnticipationHistory,
-				isSettlementLoading: isSettlementLoading ?? (() => false),
-				showActions,
-			}),
-		[
+	const columns = useMemo(() => {
+		const built = buildColumns({
 			currentUserId,
+			noteAsColumn,
 			onEdit,
 			onCopy,
 			onImport,
@@ -729,10 +782,28 @@ export function LancamentosTable({
 			onToggleSettlement,
 			onAnticipate,
 			onViewAnticipationHistory,
-			isSettlementLoading,
+			isSettlementLoading: isSettlementLoading ?? (() => false),
 			showActions,
-		],
-	);
+		});
+		const order = columnOrderPreference?.length
+			? columnOrderPreference
+			: DEFAULT_LANCAMENTOS_COLUMN_ORDER;
+		return reorderColumnsByPreference(built, order);
+	}, [
+		currentUserId,
+		noteAsColumn,
+		columnOrderPreference,
+		onEdit,
+		onCopy,
+		onImport,
+		onConfirmDelete,
+		onViewDetails,
+		onToggleSettlement,
+		onAnticipate,
+		onViewAnticipationHistory,
+		isSettlementLoading,
+		showActions,
+	]);
 
 	const table = useReactTable({
 		data,
@@ -789,47 +860,57 @@ export function LancamentosTable({
 			{showTopControls ? (
 				<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 					{onCreate || onMassAdd ? (
-						<div className="flex gap-2">
-							{onCreate ? (
-								<>
-									<Button
-										onClick={() => onCreate("Receita")}
-										variant="outline"
-										className="w-full sm:w-auto"
-									>
-										<RiAddCircleLine className="size-4 text-success" />
-										Nova Receita
-									</Button>
-									<Button
-										onClick={() => onCreate("Despesa")}
-										variant="outline"
-										className="w-full sm:w-auto"
-									>
-										<RiAddCircleLine className="size-4 text-destructive" />
-										Nova Despesa
-									</Button>
-								</>
-							) : null}
-							{onMassAdd ? (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<Button
-											onClick={onMassAdd}
-											variant="outline"
-											size="icon"
-											className="shrink-0"
-										>
-											<RiAddCircleFill className="size-4" />
-											<span className="sr-only">
-												Adicionar múltiplos lançamentos
-											</span>
-										</Button>
-									</TooltipTrigger>
-									<TooltipContent>
-										<p>Adicionar múltiplos lançamentos</p>
-									</TooltipContent>
-								</Tooltip>
-							) : null}
+						<div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+							<div className="overflow-x-auto overflow-y-hidden scroll-smooth md:overflow-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+								<div className="flex w-max shrink-0 gap-2 py-1 md:w-full md:py-0">
+									{onCreate ? (
+										<>
+											<Button
+												onClick={() => onCreate("Receita")}
+												variant="outline"
+												className="h-8 shrink-0 px-3 text-xs sm:w-auto md:h-9 md:px-4 md:text-sm"
+											>
+												<RiAddCircleLine className="size-4 text-success" />
+												Nova Receita
+											</Button>
+											<Button
+												onClick={() => onCreate("Despesa")}
+												variant="outline"
+												className="h-8 shrink-0 px-3 text-xs sm:w-auto md:h-9 md:px-4 md:text-sm"
+											>
+												<RiAddCircleLine className="size-4 text-destructive" />
+												Nova Despesa
+											</Button>
+										</>
+									) : null}
+									{onMassAdd ? (
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													onClick={onMassAdd}
+													variant="outline"
+													size="icon"
+													className="size-8 shrink-0 md:size-9"
+												>
+													<RiAddCircleFill className="size-4" />
+													<span className="sr-only">
+														Adicionar múltiplos lançamentos
+													</span>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>Adicionar múltiplos lançamentos</p>
+											</TooltipContent>
+										</Tooltip>
+									) : null}
+								</div>
+							</div>
+							<div
+								className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-gradient-to-l from-background to-transparent py-1 md:hidden"
+								aria-hidden
+							>
+								<RiArrowRightSLine className="size-5 shrink-0 text-muted-foreground" />
+							</div>
 						</div>
 					) : (
 						<span className={showFilters ? "hidden sm:block" : ""} />
