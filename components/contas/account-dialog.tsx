@@ -152,7 +152,10 @@ export function AccountDialog({
 		currentName: formState.name,
 		onUpdate: (updates) => {
 			updateFields(updates);
-			setLogoDialogOpen(false);
+			// Delay closing to avoid race condition on mobile
+			requestAnimationFrame(() => {
+				setLogoDialogOpen(false);
+			});
 		},
 	});
 
@@ -205,11 +208,29 @@ export function AccountDialog({
 			: "Atualize as informações da conta selecionada.";
 	const submitLabel = mode === "create" ? "Salvar conta" : "Atualizar conta";
 
+	const handleMainDialogOpenChange = useCallback(
+		(open: boolean) => {
+			if (!open && logoDialogOpen) {
+				return;
+			}
+			setDialogOpen(open);
+		},
+		[logoDialogOpen, setDialogOpen],
+	);
+
 	return (
 		<>
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+			<Dialog open={dialogOpen} onOpenChange={handleMainDialogOpenChange}>
 				{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-				<DialogContent className="sm:max-w-xl">
+				<DialogContent
+					className="sm:max-w-xl"
+					onPointerDownOutside={(e) => {
+						if (logoDialogOpen) e.preventDefault();
+					}}
+					onInteractOutside={(e) => {
+						if (logoDialogOpen) e.preventDefault();
+					}}
+				>
 					<DialogHeader>
 						<DialogTitle>{title}</DialogTitle>
 						<DialogDescription>{description}</DialogDescription>
