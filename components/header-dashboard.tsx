@@ -7,6 +7,7 @@ import { AnimatedThemeToggler } from "./animated-theme-toggler";
 import LogoutButton from "./auth/logout-button";
 import { CalculatorDialogButton } from "./calculadora/calculator-dialog";
 import { PrivacyModeToggle } from "./privacy-mode-toggle";
+import { RefreshPageButton } from "./refresh-page-button";
 
 type SiteHeaderProps = {
 	notificationsSnapshot: DashboardNotificationsSnapshot;
@@ -25,6 +26,7 @@ export async function SiteHeader({ notificationsSnapshot }: SiteHeaderProps) {
 						totalCount={notificationsSnapshot.totalCount}
 					/>
 					<CalculatorDialogButton withTooltip />
+					<RefreshPageButton />
 					<PrivacyModeToggle />
 					<AnimatedThemeToggler />
 					<span className="text-muted-foreground">|</span>
