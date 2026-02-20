@@ -715,6 +715,7 @@ type LancamentosTableProps = {
 	pagadorFilterOptions?: LancamentoFilterOption[];
 	categoriaFilterOptions?: LancamentoFilterOption[];
 	contaCartaoFilterOptions?: ContaCartaoFilterOption[];
+	estabelecimentosOptions?: string[];
 	selectedPeriod?: string;
 	onCreate?: (type: "Despesa" | "Receita") => void;
 	onMassAdd?: () => void;
@@ -741,6 +742,7 @@ export function LancamentosTable({
 	pagadorFilterOptions = [],
 	categoriaFilterOptions = [],
 	contaCartaoFilterOptions = [],
+	estabelecimentosOptions = [],
 	selectedPeriod,
 	onCreate,
 	onMassAdd,
@@ -921,6 +923,7 @@ export function LancamentosTable({
 							pagadorOptions={pagadorFilterOptions}
 							categoriaOptions={categoriaFilterOptions}
 							contaCartaoOptions={contaCartaoFilterOptions}
+							estabelecimentosOptions={estabelecimentosOptions}
 							className="w-full lg:flex-1 lg:justify-end"
 							hideAdvancedFilters={hasOtherUserData}
 							exportButton={

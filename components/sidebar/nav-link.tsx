@@ -13,6 +13,7 @@ import {
 	RiPriceTag3Line,
 	RiSettings2Line,
 	RiSparklingLine,
+	RiStore2Line,
 	RiTodoLine,
 } from "@remixicon/react";
 
@@ -124,6 +125,11 @@ export function createSidebarNavData(
 						title: "Orçamentos",
 						url: "/orcamentos",
 						icon: RiFundsLine,
+					},
+					{
+						title: "Estabelecimentos",
+						url: "/estabelecimentos",
+						icon: RiStore2Line,
 					},
 				],
 			},

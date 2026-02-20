@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import MoneyValues from "@/components/money-values";
 import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
 import type { ExpensesByCategoryData } from "@/lib/dashboard/categories/expenses-by-category";
+import { getCategoryColor } from "@/lib/utils/category-colors";
 import { formatPeriodForUrl } from "@/lib/utils/period";
 import { WidgetEmptyState } from "../widget-empty-state";
 
@@ -51,24 +52,15 @@ export function ExpensesByCategoryWidgetWithChart({
 	const isMobile = useIsMobile();
 	const periodParam = formatPeriodForUrl(period);
 
-	// Configuração do chart com cores do CSS
+	// Configuração do chart com as mesmas cores dos ícones das categorias (getCategoryColor)
 	const chartConfig = useMemo(() => {
 		const config: ChartConfig = {};
-		const colors = [
-			"var(--chart-1)",
-			"var(--chart-2)",
-			"var(--chart-3)",
-			"var(--chart-4)",
-			"var(--chart-5)",
-			"var(--chart-1)",
-			"var(--chart-2)",
-		];
 
 		if (data.categories.length <= 7) {
 			data.categories.forEach((category, index) => {
 				config[category.categoryId] = {
 					label: category.categoryName,
-					color: colors[index % colors.length],
+					color: getCategoryColor(index),
 				};
 			});
 		} else {
@@ -77,12 +69,12 @@ export function ExpensesByCategoryWidgetWithChart({
 			top7.forEach((category, index) => {
 				config[category.categoryId] = {
 					label: category.categoryName,
-					color: colors[index % colors.length],
+					color: getCategoryColor(index),
 				};
 			});
 			config.outros = {
 				label: "Outros",
-				color: "var(--chart-6)",
+				color: getCategoryColor(7),
 			};
 		}
 

@@ -37,6 +37,7 @@ export type LancamentoSearchFilters = {
 	categoriaFilter: string | null;
 	contaCartaoFilter: string | null;
 	searchFilter: string | null;
+	estabelecimentoFilter: string | null;
 };
 
 type BaseSluggedOption = {
@@ -122,6 +123,7 @@ export const extractLancamentoSearchFilters = (
 	categoriaFilter: getSingleParam(params, "categoria"),
 	contaCartaoFilter: getSingleParam(params, "contaCartao"),
 	searchFilter: getSingleParam(params, "q"),
+	estabelecimentoFilter: getSingleParam(params, "estabelecimento"),
 });
 
 const normalizeLabel = (value: string | null | undefined) =>
@@ -366,6 +368,10 @@ export const buildLancamentoWhere = ({
 		if (!contaId && relatedCartaoId) {
 			where.push(eq(lancamentos.cartaoId, relatedCartaoId));
 		}
+	}
+
+	if (filters.estabelecimentoFilter?.trim()) {
+		where.push(eq(lancamentos.name, filters.estabelecimentoFilter.trim()));
 	}
 
 	const searchPattern = buildSearchPattern(filters.searchFilter);

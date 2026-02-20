@@ -5,6 +5,20 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.1] - 2026-02-18
+
+### Adicionado
+
+- Aba "Estabelecimentos" no menu lateral (Gestão Financeira): listagem de estabelecimentos com quantidade de lançamentos, criação de novos, exclusão (apenas quando não há lançamentos vinculados) e link "Ver vinculados" para lançamentos filtrados pelo estabelecimento
+- Tabela `estabelecimentos` (migration 0019) e sugestões de estabelecimento nos lançamentos passam a incluir nomes cadastrados nessa tabela
+- Filtro "Estabelecimento" no drawer de Filtros da página de lançamentos; parâmetro `estabelecimento` na URL para filtrar por nome
+
+### Alterado
+
+- Transferências entre contas: nome do estabelecimento passa a ser "Saída - Transf. entre contas" na saída e "Entrada - Transf. entre contas" na entrada e adicionando em anotação no formato "de {conta origem} -> {conta destino}"
+- Gráfico de pizza (Gastos por categoria): cores das fatias alinhadas às cores dos ícones das categorias na lista (paleta `getCategoryColor`)
+- ChartContainer (Recharts): renderização do gráfico apenas após montagem no cliente e uso de `minWidth`/`minHeight` no ResponsiveContainer para evitar aviso "width(-1) and height(-1)" no console
+
 ## [1.6.0] - 2026-02-18
 
 ### Adicionado
