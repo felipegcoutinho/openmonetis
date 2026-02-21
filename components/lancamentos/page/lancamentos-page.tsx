@@ -48,6 +48,8 @@ interface LancamentosPageProps {
 	selectedPeriod: string;
 	estabelecimentos: string[];
 	allowCreate?: boolean;
+	noteAsColumn?: boolean;
+	columnOrder?: string[] | null;
 	defaultCartaoId?: string | null;
 	defaultPaymentMethod?: string | null;
 	lockCartaoSelection?: boolean;
@@ -76,6 +78,8 @@ export function LancamentosPage({
 	selectedPeriod,
 	estabelecimentos,
 	allowCreate = true,
+	noteAsColumn = false,
+	columnOrder = null,
 	defaultCartaoId,
 	defaultPaymentMethod,
 	lockCartaoSelection,
@@ -377,9 +381,12 @@ export function LancamentosPage({
 			<LancamentosTable
 				data={lancamentos}
 				currentUserId={currentUserId}
+				noteAsColumn={noteAsColumn}
+				columnOrder={columnOrder}
 				pagadorFilterOptions={pagadorFilterOptions}
 				categoriaFilterOptions={categoriaFilterOptions}
 				contaCartaoFilterOptions={contaCartaoFilterOptions}
+				estabelecimentosOptions={estabelecimentos}
 				selectedPeriod={selectedPeriod}
 				onCreate={allowCreate ? handleCreate : undefined}
 				onMassAdd={allowCreate ? handleMassAdd : undefined}

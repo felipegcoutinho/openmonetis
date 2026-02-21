@@ -122,6 +122,7 @@ interface LancamentosFiltersProps {
 	pagadorOptions: LancamentoFilterOption[];
 	categoriaOptions: LancamentoFilterOption[];
 	contaCartaoOptions: ContaCartaoFilterOption[];
+	estabelecimentosOptions?: string[];
 	className?: string;
 	exportButton?: ReactNode;
 	hideAdvancedFilters?: boolean;
@@ -131,6 +132,7 @@ export function LancamentosFilters({
 	pagadorOptions,
 	categoriaOptions,
 	contaCartaoOptions,
+	estabelecimentosOptions = [],
 	className,
 	exportButton,
 	hideAdvancedFilters = false,
@@ -235,6 +237,16 @@ export function LancamentosFilters({
 			? contaCartaoOptions.find((option) => option.slug === contaCartaoValue)
 			: null;
 
+	const estabelecimentoParam = searchParams.get("estabelecimento");
+	const estabelecimentoOptionsForSelect = [
+		...(estabelecimentoParam &&
+		estabelecimentoParam.trim() &&
+		!estabelecimentosOptions.includes(estabelecimentoParam.trim())
+			? [estabelecimentoParam.trim()]
+			: []),
+		...estabelecimentosOptions,
+	];
+
 	const [categoriaOpen, setCategoriaOpen] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -244,7 +256,8 @@ export function LancamentosFilters({
 		searchParams.get("pagamento") ||
 		searchParams.get("pagador") ||
 		searchParams.get("categoria") ||
-		searchParams.get("contaCartao");
+		searchParams.get("contaCartao") ||
+		searchParams.get("estabelecimento");
 
 	const handleResetFilters = () => {
 		handleReset();
@@ -518,6 +531,45 @@ export function LancamentosFilters({
 									</SelectContent>
 								</Select>
 							</div>
+
+							{estabelecimentoOptionsForSelect.length > 0 ||
+							estabelecimentoParam?.trim() ? (
+								<div className="space-y-2">
+									<label className="text-sm font-medium">Estabelecimento</label>
+									<Select
+										value={
+											getParamValue("estabelecimento") || FILTER_EMPTY_VALUE
+										}
+										onValueChange={(value) =>
+											handleFilterChange(
+												"estabelecimento",
+												value === FILTER_EMPTY_VALUE ? null : value,
+											)
+										}
+										disabled={isPending}
+									>
+										<SelectTrigger
+											className="w-full text-sm border-dashed"
+											disabled={isPending}
+										>
+											<span className="truncate">
+												{getParamValue("estabelecimento") !== FILTER_EMPTY_VALUE &&
+												searchParams.get("estabelecimento")
+													? searchParams.get("estabelecimento")
+													: "Todos"}
+											</span>
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value={FILTER_EMPTY_VALUE}>Todos</SelectItem>
+											{estabelecimentoOptionsForSelect.map((name) => (
+												<SelectItem key={name} value={name}>
+													{name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+							) : null}
 						</div>
 
 						<DrawerFooter>

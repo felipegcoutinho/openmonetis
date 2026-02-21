@@ -158,7 +158,13 @@ export function LogoPickerDialog({
 								<button
 									type="button"
 									key={logo}
-									onClick={() => onSelect(logo)}
+									onClick={(e) => {
+										e.stopPropagation();
+										e.preventDefault();
+										onSelect(logo);
+									}}
+									onPointerDown={(e) => e.stopPropagation()}
+									onTouchStart={(e) => e.stopPropagation()}
 									className={cn(
 										"flex flex-col items-center gap-1 rounded-md bg-card p-2 text-center text-xs transition-all hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 										isActive &&

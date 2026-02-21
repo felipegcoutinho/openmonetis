@@ -1,3 +1,4 @@
+import { RiArrowRightSLine } from "@remixicon/react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -35,17 +36,28 @@ export default async function Page() {
 	return (
 		<div className="w-full">
 			<Tabs defaultValue="preferencias" className="w-full">
-				<TabsList>
-					<TabsTrigger value="preferencias">Preferências</TabsTrigger>
-					<TabsTrigger value="companion">Companion</TabsTrigger>
-					<TabsTrigger value="nome">Alterar nome</TabsTrigger>
-					<TabsTrigger value="senha">Alterar senha</TabsTrigger>
-					<TabsTrigger value="email">Alterar e-mail</TabsTrigger>
-					<TabsTrigger value="changelog">Changelog</TabsTrigger>
-					<TabsTrigger value="deletar" className="text-destructive">
-						Deletar conta
-					</TabsTrigger>
-				</TabsList>
+				{/* No mobile: rolagem horizontal + seta indicando mais opções à direita */}
+				<div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+					<div className="overflow-x-auto overflow-y-hidden scroll-smooth md:overflow-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+						<TabsList className="inline-flex w-max flex-nowrap md:w-full">
+							<TabsTrigger value="preferencias">Preferências</TabsTrigger>
+							<TabsTrigger value="companion">Companion</TabsTrigger>
+							<TabsTrigger value="nome">Alterar nome</TabsTrigger>
+							<TabsTrigger value="senha">Alterar senha</TabsTrigger>
+							<TabsTrigger value="email">Alterar e-mail</TabsTrigger>
+							<TabsTrigger value="changelog">Changelog</TabsTrigger>
+							<TabsTrigger value="deletar" className="text-destructive">
+								Deletar conta
+							</TabsTrigger>
+						</TabsList>
+					</div>
+					<div
+						className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-gradient-to-l from-background to-transparent md:hidden"
+						aria-hidden
+					>
+						<RiArrowRightSLine className="size-5 shrink-0 text-muted-foreground" />
+					</div>
+				</div>
 
 				<TabsContent value="preferencias" className="mt-4">
 					<Card className="p-6">
@@ -60,6 +72,12 @@ export default async function Page() {
 							<PreferencesForm
 								disableMagnetlines={
 									userPreferences?.disableMagnetlines ?? false
+								}
+								extratoNoteAsColumn={
+									userPreferences?.extratoNoteAsColumn ?? false
+								}
+								lancamentosColumnOrder={
+									userPreferences?.lancamentosColumnOrder ?? null
 								}
 								systemFont={userPreferences?.systemFont ?? "ai-sans"}
 								moneyFont={userPreferences?.moneyFont ?? "ai-sans"}
