@@ -25,6 +25,7 @@ export const revalidateConfig = {
 	cartoes: ["/cartoes", "/contas", "/lancamentos"],
 	contas: ["/contas", "/lancamentos"],
 	categorias: ["/categorias"],
+	estabelecimentos: ["/estabelecimentos", "/lancamentos"],
 	orcamentos: ["/orcamentos"],
 	pagadores: ["/pagadores"],
 	anotacoes: ["/anotacoes", "/anotacoes/arquivadas"],

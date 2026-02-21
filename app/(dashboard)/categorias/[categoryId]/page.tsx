@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
 import { CategoryDetailHeader } from "@/components/categorias/category-detail-header";
 import { LancamentosPage } from "@/components/lancamentos/page/lancamentos-page";
@@ -36,10 +37,11 @@ export default async function Page({ params, searchParams }: PageProps) {
 	const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
 	const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
-	const [detail, filterSources, estabelecimentos] = await Promise.all([
+	const [detail, filterSources, estabelecimentos, userPreferences] = await Promise.all([
 		fetchCategoryDetails(userId, categoryId, selectedPeriod),
 		fetchLancamentoFilterSources(userId),
 		getRecentEstablishmentsAction(),
+		fetchUserPreferences(userId),
 	]);
 
 	if (!detail) {
@@ -92,6 +94,8 @@ export default async function Page({ params, searchParams }: PageProps) {
 				selectedPeriod={detail.period}
 				estabelecimentos={estabelecimentos}
 				allowCreate={true}
+				noteAsColumn={userPreferences?.extratoNoteAsColumn ?? false}
+				columnOrder={userPreferences?.lancamentosColumnOrder ?? null}
 			/>
 		</main>
 	);

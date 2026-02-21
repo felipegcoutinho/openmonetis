@@ -1,5 +1,6 @@
 import { RiPencilLine } from "@remixicon/react";
 import { notFound } from "next/navigation";
+import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
 import { CardDialog } from "@/components/cartoes/card-dialog";
 import type { Card } from "@/components/cartoes/types";
@@ -51,12 +52,13 @@ export default async function Page({ params, searchParams }: PageProps) {
 		notFound();
 	}
 
-	const [filterSources, logoOptions, invoiceData, estabelecimentos] =
+	const [filterSources, logoOptions, invoiceData, estabelecimentos, userPreferences] =
 		await Promise.all([
 			fetchLancamentoFilterSources(userId),
 			loadLogoOptions(),
 			fetchInvoiceData(userId, cartaoId, selectedPeriod),
 			getRecentEstablishmentsAction(),
+			fetchUserPreferences(userId),
 		]);
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const slugMaps = buildSlugMaps(sluggedFilters);
@@ -182,6 +184,8 @@ export default async function Page({ params, searchParams }: PageProps) {
 					selectedPeriod={selectedPeriod}
 					estabelecimentos={estabelecimentos}
 					allowCreate
+					noteAsColumn={userPreferences?.extratoNoteAsColumn ?? false}
+					columnOrder={userPreferences?.lancamentosColumnOrder ?? null}
 					defaultCartaoId={card.id}
 					defaultPaymentMethod="Cartão de crédito"
 					lockCartaoSelection

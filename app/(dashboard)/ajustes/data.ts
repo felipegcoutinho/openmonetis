@@ -4,6 +4,8 @@ import { db, schema } from "@/lib/db";
 
 export interface UserPreferences {
 	disableMagnetlines: boolean;
+	extratoNoteAsColumn: boolean;
+	lancamentosColumnOrder: string[] | null;
 	systemFont: string;
 	moneyFont: string;
 }
@@ -32,6 +34,8 @@ export async function fetchUserPreferences(
 	const result = await db
 		.select({
 			disableMagnetlines: schema.preferenciasUsuario.disableMagnetlines,
+			extratoNoteAsColumn: schema.preferenciasUsuario.extratoNoteAsColumn,
+			lancamentosColumnOrder: schema.preferenciasUsuario.lancamentosColumnOrder,
 			systemFont: schema.preferenciasUsuario.systemFont,
 			moneyFont: schema.preferenciasUsuario.moneyFont,
 		})

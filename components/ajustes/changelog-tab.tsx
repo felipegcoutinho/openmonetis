@@ -1,6 +1,16 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { ChangelogVersion } from "@/lib/changelog/parse-changelog";
+
+/** Converte "[texto](url)" em link; texto simples fica como está */
+function parseContributorLine(content: string) {
+	const linkMatch = content.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+	if (linkMatch) {
+		return { label: linkMatch[1], url: linkMatch[2] };
+	}
+	return { label: content, url: null };
+}
 
 const sectionBadgeVariant: Record<
 	string,
@@ -46,6 +56,29 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 								</ul>
 							</div>
 						))}
+						{version.contributor && (
+							<div className="border-t pt-4 mt-4">
+								<span className="text-sm text-muted-foreground">
+									Contribuições:{" "}
+									{(() => {
+										const { label, url } = parseContributorLine(version.contributor);
+										if (url) {
+											return (
+												<Link
+													href={url}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="font-medium text-foreground underline underline-offset-2 hover:text-primary"
+												>
+													{label}
+												</Link>
+											);
+										}
+										return <span className="font-medium text-foreground">{label}</span>;
+									})()}
+								</span>
+							</div>
+						)}
 					</div>
 				</Card>
 			))}

@@ -4,6 +4,7 @@ import {
 	RiWallet3Line,
 } from "@remixicon/react";
 import { notFound } from "next/navigation";
+import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
 import { LancamentosPage as LancamentosSection } from "@/components/lancamentos/page/lancamentos-page";
 import type {
@@ -168,6 +169,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 		shareRows,
 		currentUserShare,
 		estabelecimentos,
+		userPreferences,
 	] = await Promise.all([
 		fetchPagadorLancamentos(filters),
 		fetchPagadorMonthlyBreakdown({
@@ -203,6 +205,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 		sharesPromise,
 		currentUserSharePromise,
 		getRecentEstablishmentsAction(),
+		fetchUserPreferences(userId),
 	]);
 
 	const mappedLancamentos = mapLancamentosData(lancamentoRows);
@@ -381,6 +384,8 @@ export default async function Page({ params, searchParams }: PageProps) {
 							selectedPeriod={selectedPeriod}
 							estabelecimentos={estabelecimentos}
 							allowCreate={canEdit}
+							noteAsColumn={userPreferences?.extratoNoteAsColumn ?? false}
+							columnOrder={userPreferences?.lancamentosColumnOrder ?? null}
 							importPagadorOptions={loggedUserOptionSets?.pagadorOptions}
 							importSplitPagadorOptions={
 								loggedUserOptionSets?.splitPagadorOptions

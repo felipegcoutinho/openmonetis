@@ -126,7 +126,10 @@ export function CardDialog({
 		currentName: formState.name,
 		onUpdate: (updates) => {
 			updateFields(updates);
-			setLogoDialogOpen(false);
+			// Delay closing to avoid race condition on mobile
+			requestAnimationFrame(() => {
+				setLogoDialogOpen(false);
+			});
 		},
 	});
 
@@ -188,11 +191,29 @@ export function CardDialog({
 			: "Atualize as informações do cartão selecionado.";
 	const submitLabel = mode === "create" ? "Salvar cartão" : "Atualizar cartão";
 
+	const handleMainDialogOpenChange = useCallback(
+		(open: boolean) => {
+			if (!open && logoDialogOpen) {
+				return;
+			}
+			setDialogOpen(open);
+		},
+		[logoDialogOpen, setDialogOpen],
+	);
+
 	return (
 		<>
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+			<Dialog open={dialogOpen} onOpenChange={handleMainDialogOpenChange}>
 				{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-				<DialogContent className="">
+				<DialogContent
+					className=""
+					onPointerDownOutside={(e) => {
+						if (logoDialogOpen) e.preventDefault();
+					}}
+					onInteractOutside={(e) => {
+						if (logoDialogOpen) e.preventDefault();
+					}}
+				>
 					<DialogHeader>
 						<DialogTitle>{title}</DialogTitle>
 						<DialogDescription>{description}</DialogDescription>

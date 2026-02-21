@@ -22,7 +22,8 @@ import { noteSchema, uuidSchema } from "@/lib/schemas/common";
 import {
 	TRANSFER_CATEGORY_NAME,
 	TRANSFER_CONDITION,
-	TRANSFER_ESTABLISHMENT,
+	TRANSFER_ESTABLISHMENT_ENTRADA,
+	TRANSFER_ESTABLISHMENT_SAIDA,
 	TRANSFER_PAYMENT_METHOD,
 } from "@/lib/transferencias/constants";
 import { formatDecimalForDbRequired } from "@/lib/utils/currency";
@@ -341,12 +342,14 @@ export async function transferBetweenAccountsAction(
 				);
 			}
 
+			const transferNote = `de ${fromAccount.name} -> ${toAccount.name}`;
+
 			// Create outgoing transaction (transfer from source account)
 			await tx.insert(lancamentos).values({
 				condition: TRANSFER_CONDITION,
-				name: `${TRANSFER_ESTABLISHMENT} → ${toAccount.name}`,
+				name: TRANSFER_ESTABLISHMENT_SAIDA,
 				paymentMethod: TRANSFER_PAYMENT_METHOD,
-				note: `Transferência para ${toAccount.name}`,
+				note: transferNote,
 				amount: formatDecimalForDbRequired(-Math.abs(data.amount)),
 				purchaseDate: data.date,
 				transactionType: "Transferência",
@@ -362,9 +365,9 @@ export async function transferBetweenAccountsAction(
 			// Create incoming transaction (transfer to destination account)
 			await tx.insert(lancamentos).values({
 				condition: TRANSFER_CONDITION,
-				name: `${TRANSFER_ESTABLISHMENT} ← ${fromAccount.name}`,
+				name: TRANSFER_ESTABLISHMENT_ENTRADA,
 				paymentMethod: TRANSFER_PAYMENT_METHOD,
-				note: `Transferência de ${fromAccount.name}`,
+				note: transferNote,
 				amount: formatDecimalForDbRequired(Math.abs(data.amount)),
 				purchaseDate: data.date,
 				transactionType: "Transferência",

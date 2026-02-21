@@ -1,5 +1,6 @@
 import { RiPencilLine } from "@remixicon/react";
 import { notFound } from "next/navigation";
+import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
 import { AccountDialog } from "@/components/contas/account-dialog";
 import { AccountStatementCard } from "@/components/contas/account-statement-card";
@@ -57,12 +58,13 @@ export default async function Page({ params, searchParams }: PageProps) {
 		notFound();
 	}
 
-	const [filterSources, logoOptions, accountSummary, estabelecimentos] =
+	const [filterSources, logoOptions, accountSummary, estabelecimentos, userPreferences] =
 		await Promise.all([
 			fetchLancamentoFilterSources(userId),
 			loadLogoOptions(),
 			fetchAccountSummary(userId, contaId, selectedPeriod),
 			getRecentEstablishmentsAction(),
+			fetchUserPreferences(userId),
 		]);
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const slugMaps = buildSlugMaps(sluggedFilters);
@@ -161,6 +163,8 @@ export default async function Page({ params, searchParams }: PageProps) {
 					selectedPeriod={selectedPeriod}
 					estabelecimentos={estabelecimentos}
 					allowCreate={false}
+					noteAsColumn={userPreferences?.extratoNoteAsColumn ?? false}
+					columnOrder={userPreferences?.lancamentosColumnOrder ?? null}
 				/>
 			</section>
 		</main>

@@ -10,6 +10,8 @@ export type ChangelogVersion = {
 	version: string;
 	date: string;
 	sections: ChangelogSection[];
+	/** Linha de contribuições/autor (pode conter markdown, ex: [Nome](url)) */
+	contributor?: string;
 };
 
 export function parseChangelog(): ChangelogVersion[] {
@@ -49,6 +51,13 @@ export function parseChangelog(): ChangelogVersion[] {
 		const itemMatch = line.match(/^- (.+)$/);
 		if (itemMatch && currentSection) {
 			currentSection.items.push(itemMatch[1]);
+			continue;
+		}
+
+		// **Contribuições:** ou **Autor:** com texto/link opcional
+		const contributorMatch = line.match(/^\*\*(?:Contribuições|Autor):\*\*\s*(.+)$/);
+		if (contributorMatch && currentVersion) {
+			currentVersion.contributor = contributorMatch[1].trim() || undefined;
 		}
 	}
 

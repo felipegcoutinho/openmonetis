@@ -29,6 +29,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-openmonetis}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openmonetis_dev_password}
       POSTGRES_DB: ${POSTGRES_DB:-openmonetis_db}
+      # Garante que os dados ficam no volume montado (evita perda após down/up)
+      PGDATA: /var/lib/postgresql/data
       # Configurações de performance
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
 
@@ -91,7 +93,7 @@ services:
 
       # Configurações de email (se usar)
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      EMAIL_FROM: ${EMAIL_FROM:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
 
       # Configurações de OAuth (se usar)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}

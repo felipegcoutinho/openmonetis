@@ -33,7 +33,7 @@ export function EstabelecimentoInput({
 	value,
 	onChange,
 	estabelecimentos = [],
-	placeholder = "Ex.: Padaria",
+	placeholder = "Ex.: Padaria, Transferência, Saldo inicial",
 	required = false,
 	maxLength = 20,
 }: EstabelecimentoInputProps) {
