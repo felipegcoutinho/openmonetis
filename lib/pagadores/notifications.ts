@@ -1,6 +1,7 @@
 import { inArray } from "drizzle-orm";
 import { Resend } from "resend";
 import { pagadores } from "@/db/schema";
+import { getResendFromEmail } from "@/lib/email/resend";
 import { db } from "@/lib/db";
 
 type ActionType = "created" | "deleted";
@@ -118,8 +119,7 @@ export async function sendPagadorAutoEmails({
 	}
 
 	const resendApiKey = process.env.RESEND_API_KEY;
-	const resendFrom =
-		process.env.RESEND_FROM_EMAIL ?? "OpenMonetis <onboarding@resend.dev>";
+	const resendFrom = getResendFromEmail();
 
 	if (!resendApiKey) {
 		console.warn(

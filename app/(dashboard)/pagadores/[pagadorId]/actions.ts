@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { z } from "zod";
 import { lancamentos, pagadores } from "@/db/schema";
+import { getResendFromEmail } from "@/lib/email/resend";
 import { getUser } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import {
@@ -418,8 +419,7 @@ export async function sendPagadorSummaryAction(
 		}
 
 		const resendApiKey = process.env.RESEND_API_KEY;
-		const resendFrom =
-			process.env.RESEND_FROM_EMAIL ?? "OpenMonetis <onboarding@resend.dev>";
+		const resendFrom = getResendFromEmail();
 
 		if (!resendApiKey) {
 			return {
