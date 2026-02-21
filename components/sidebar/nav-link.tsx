@@ -7,13 +7,11 @@ import {
 	RiDashboardLine,
 	RiFileChartLine,
 	RiFundsLine,
-	RiPieChartLine,
 	RiGroupLine,
 	RiInboxLine,
 	RiPriceTag3Line,
 	RiSettings2Line,
 	RiSparklingLine,
-	RiStore2Line,
 	RiTodoLine,
 } from "@remixicon/react";
 
@@ -126,11 +124,6 @@ export function createSidebarNavData(
 						url: "/orcamentos",
 						icon: RiFundsLine,
 					},
-					{
-						title: "Estabelecimentos",
-						url: "/estabelecimentos",
-						icon: RiStore2Line,
-					},
 				],
 			},
 			{
@@ -166,11 +159,6 @@ export function createSidebarNavData(
 						title: "Tendências",
 						url: "/relatorios/tendencias",
 						icon: RiFileChartLine,
-					},
-					{
-						title: "Gastos por categoria",
-						url: "/relatorios/gastos-por-categoria",
-						icon: RiPieChartLine,
 					},
 					{
 						title: "Uso de Cartões",

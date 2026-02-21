@@ -386,7 +386,6 @@ export function LancamentosPage({
 				pagadorFilterOptions={pagadorFilterOptions}
 				categoriaFilterOptions={categoriaFilterOptions}
 				contaCartaoFilterOptions={contaCartaoFilterOptions}
-				estabelecimentosOptions={estabelecimentos}
 				selectedPeriod={selectedPeriod}
 				onCreate={allowCreate ? handleCreate : undefined}
 				onMassAdd={allowCreate ? handleMassAdd : undefined}

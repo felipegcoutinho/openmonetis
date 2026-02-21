@@ -190,30 +190,6 @@ export const categorias = pgTable(
 	}),
 );
 
-export const estabelecimentos = pgTable(
-	"estabelecimentos",
-	{
-		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-		name: text("nome").notNull(),
-		userId: text("user_id")
-			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at", {
-			mode: "date",
-			withTimezone: true,
-		})
-			.notNull()
-			.defaultNow(),
-	},
-	(table) => ({
-		userIdIdx: index("estabelecimentos_user_id_idx").on(table.userId),
-		userIdNameUnique: uniqueIndex("estabelecimentos_user_id_nome_key").on(
-			table.userId,
-			table.name,
-		),
-	}),
-);
-
 export const pagadores = pgTable(
 	"pagadores",
 	{
@@ -659,7 +635,6 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	cartoes: many(cartoes),
 	categorias: many(categorias),
 	contas: many(contas),
-	estabelecimentos: many(estabelecimentos),
 	faturas: many(faturas),
 	lancamentos: many(lancamentos),
 	orcamentos: many(orcamentos),
@@ -700,16 +675,6 @@ export const categoriasRelations = relations(categorias, ({ one, many }) => ({
 	lancamentos: many(lancamentos),
 	orcamentos: many(orcamentos),
 }));
-
-export const estabelecimentosRelations = relations(
-	estabelecimentos,
-	({ one }) => ({
-		user: one(user, {
-			fields: [estabelecimentos.userId],
-			references: [user.id],
-		}),
-	}),
-);
 
 export const pagadoresRelations = relations(pagadores, ({ one, many }) => ({
 	user: one(user, {

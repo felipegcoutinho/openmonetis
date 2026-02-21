@@ -7,7 +7,6 @@ import {
 	cartoes,
 	categorias,
 	contas,
-	estabelecimentos,
 	lancamentos,
 	pagadores,
 } from "@/db/schema";
@@ -1640,64 +1639,43 @@ export async function deleteMultipleLancamentosAction(
 	}
 }
 
-// Get unique establishment names: from estabelecimentos table + last 3 months from lancamentos
+// Get unique establishment names from the last 3 months
 export async function getRecentEstablishmentsAction(): Promise<string[]> {
 	try {
 		const user = await getUser();
 
+		// Calculate date 3 months ago
 		const threeMonthsAgo = new Date();
 		threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-		const [estabelecimentosRows, lancamentosResults] = await Promise.all([
-			db.query.estabelecimentos.findMany({
-				columns: { name: true },
-				where: eq(estabelecimentos.userId, user.id),
-			}),
-			db
-				.select({ name: lancamentos.name })
-				.from(lancamentos)
-				.where(
-					and(
-						eq(lancamentos.userId, user.id),
-						gte(lancamentos.purchaseDate, threeMonthsAgo),
+		// Fetch establishment names from the last 3 months
+		const results = await db
+			.select({ name: lancamentos.name })
+			.from(lancamentos)
+			.where(
+				and(
+					eq(lancamentos.userId, user.id),
+					gte(lancamentos.purchaseDate, threeMonthsAgo),
+				),
+			)
+			.orderBy(desc(lancamentos.purchaseDate));
+
+		// Remove duplicates and filter empty names
+		const uniqueNames = Array.from(
+			new Set(
+				results
+					.map((r) => r.name)
+					.filter(
+						(name): name is string =>
+							name != null &&
+							name.trim().length > 0 &&
+							!name.toLowerCase().startsWith("pagamento fatura"),
 					),
-				)
-				.orderBy(desc(lancamentos.purchaseDate)),
-		]);
+			),
+		);
 
-		const fromTable = estabelecimentosRows
-			.map((r) => r.name)
-			.filter(
-				(name): name is string =>
-					name != null && name.trim().length > 0,
-			);
-		const fromLancamentos = lancamentosResults
-			.map((r) => r.name)
-			.filter(
-				(name): name is string =>
-					name != null &&
-					name.trim().length > 0 &&
-					!name.toLowerCase().startsWith("pagamento fatura"),
-			);
-
-		const seen = new Set<string>();
-		const unique: string[] = [];
-		for (const name of fromTable) {
-			const key = name.trim();
-			if (!seen.has(key)) {
-				seen.add(key);
-				unique.push(key);
-			}
-		}
-		for (const name of fromLancamentos) {
-			const key = name.trim();
-			if (!seen.has(key)) {
-				seen.add(key);
-				unique.push(key);
-			}
-		}
-
-		return unique.slice(0, 100);
+		// Return top 50 most recent unique establishments
+		return uniqueNames.slice(0, 100);
 	} catch (error) {
 		console.error("Error fetching recent establishments:", error);
 		return [];
