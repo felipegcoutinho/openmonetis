@@ -93,7 +93,7 @@ services:
 
       # Configurações de email (se usar)
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      EMAIL_FROM: ${EMAIL_FROM:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
 
       # Configurações de OAuth (se usar)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
