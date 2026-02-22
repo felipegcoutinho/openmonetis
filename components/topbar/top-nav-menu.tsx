@@ -40,12 +40,13 @@ type TopNavMenuProps = {
 	preLancamentosCount?: number;
 };
 
+// pl-3 pr-7: compensa os 16px da seta (ml-1 + size-3) dos triggers
 const linkBase =
-	"inline-flex h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors";
+	"inline-flex h-9 items-center justify-center rounded-md pl-3 pr-7 py-2 text-sm font-medium transition-colors";
 const linkIdle = "text-foreground/70 hover:text-foreground hover:underline";
 const linkActive = "text-primary";
 
-// NavigationMenuTrigger override: remove backgrounds, keep underline style, hide arrow
+// NavigationMenuTrigger override: remove backgrounds, keep underline style
 const triggerClass = [
 	"text-foreground/70!",
 	"bg-transparent!",
@@ -58,7 +59,6 @@ const triggerClass = [
 	"data-[state=open]:text-foreground!",
 	"data-[state=open]:underline!",
 	"px-3!",
-	"[&>svg]:hidden",
 ].join(" ");
 
 function SimpleNavLink({
