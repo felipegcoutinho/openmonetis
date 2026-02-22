@@ -57,14 +57,32 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 			icon: <RiInboxLine className="size-4" />,
 			badge: preLancamentosCount,
 		},
+		{
+			href: "/calendario",
+			label: "Calendário",
+			icon: <RiCalendarEventLine className="size-4" />,
+		},
 	];
 
-	const organizacaoItems: DropdownLinkItem[] = [
+	const financasItems: DropdownLinkItem[] = [
+		{
+			href: "/cartoes",
+			label: "Cartões",
+			icon: <RiBankCard2Line className="size-4" />,
+		},
+		{
+			href: "/contas",
+			label: "Contas",
+			icon: <RiBankLine className="size-4" />,
+		},
 		{
 			href: "/orcamentos",
 			label: "Orçamentos",
 			icon: <RiFundsLine className="size-4" />,
 		},
+	];
+
+	const organizacaoItems: DropdownLinkItem[] = [
 		{
 			href: "/pagadores",
 			label: "Pagadores",
@@ -120,15 +138,12 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 						</NavigationMenuItem>
 
 						<NavigationMenuItem>
-							<SimpleNavLink href="/calendario">Calendário</SimpleNavLink>
-						</NavigationMenuItem>
-
-						<NavigationMenuItem>
-							<SimpleNavLink href="/cartoes">Cartões</SimpleNavLink>
-						</NavigationMenuItem>
-
-						<NavigationMenuItem>
-							<SimpleNavLink href="/contas">Contas</SimpleNavLink>
+							<NavigationMenuTrigger className={triggerClass}>
+								Finanças
+							</NavigationMenuTrigger>
+							<NavigationMenuContent>
+								<DropdownLinkList items={financasItems} />
+							</NavigationMenuContent>
 						</NavigationMenuItem>
 
 						<NavigationMenuItem>
@@ -177,7 +192,7 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 							Dashboard
 						</MobileNavLink>
 
-						<MobileSectionLabel label="Financeiro" />
+						<MobileSectionLabel label="Lançamentos" />
 						<MobileNavLink
 							href="/lancamentos"
 							icon={<RiArrowLeftRightLine className="size-4" />}
@@ -200,6 +215,8 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 						>
 							Calendário
 						</MobileNavLink>
+
+						<MobileSectionLabel label="Finanças" />
 						<MobileNavLink
 							href="/cartoes"
 							icon={<RiBankCard2Line className="size-4" />}
@@ -214,8 +231,6 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 						>
 							Contas
 						</MobileNavLink>
-
-						<MobileSectionLabel label="Organização" />
 						<MobileNavLink
 							href="/orcamentos"
 							icon={<RiFundsLine className="size-4" />}
@@ -223,6 +238,8 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 						>
 							Orçamentos
 						</MobileNavLink>
+
+						<MobileSectionLabel label="Organização" />
 						<MobileNavLink
 							href="/pagadores"
 							icon={<RiGroupLine className="size-4" />}
