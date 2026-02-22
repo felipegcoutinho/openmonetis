@@ -32,8 +32,8 @@ export function MobileNavLink({
 			onClick={onClick}
 			className={cn(
 				"flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-				"text-card-foreground hover:bg-accent",
-				isActive && "bg-accent font-medium",
+				"text-muted-foreground hover:text-foreground hover:bg-accent",
+				isActive && "bg-primary/10 text-primary font-medium",
 			)}
 		>
 			<span className="text-muted-foreground shrink-0">{icon}</span>
