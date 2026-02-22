@@ -45,7 +45,7 @@ const linkBase =
 const linkIdle = "text-foreground/70 hover:text-foreground hover:underline";
 const linkActive = "text-primary";
 
-// NavigationMenuTrigger override: remove backgrounds, keep underline style
+// NavigationMenuTrigger override: remove backgrounds, keep underline style, hide arrow
 const triggerClass = [
 	"text-foreground/70!",
 	"bg-transparent!",
@@ -58,6 +58,7 @@ const triggerClass = [
 	"data-[state=open]:text-foreground!",
 	"data-[state=open]:underline!",
 	"px-3!",
+	"[&>svg]:hidden",
 ].join(" ");
 
 function SimpleNavLink({
