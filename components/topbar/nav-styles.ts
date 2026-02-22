@@ -1,6 +1,6 @@
 // Base para links diretos e triggers — pill arredondado
 export const linkBase =
-	"inline-flex h-8 items-center justify-center rounded-full px-3 text-sm font-medium transition-all";
+	"inline-flex h-8 items-center justify-center rounded-full px-3 text-sm font-medium transition-all lowercase";
 
 // Estado inativo: muted, hover suave sem underline
 export const linkIdle =
