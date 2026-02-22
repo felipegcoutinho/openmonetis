@@ -214,7 +214,7 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 		<>
 			{/* Desktop nav */}
 			<nav className="hidden md:flex items-center flex-1">
-				<NavigationMenu>
+				<NavigationMenu viewport={false}>
 					<NavigationMenuList className="gap-0">
 						<NavigationMenuItem>
 							<SimpleNavLink href="/dashboard">Dashboard</SimpleNavLink>
