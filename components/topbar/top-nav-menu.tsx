@@ -41,7 +41,7 @@ type TopNavMenuProps = {
 };
 
 const triggerClass =
-	"!bg-transparent !text-primary-foreground/90 hover:!bg-primary-foreground/15 hover:!text-primary-foreground focus:!bg-primary-foreground/15 focus:!text-primary-foreground data-[state=open]:!bg-primary-foreground/20 data-[state=open]:!text-primary-foreground";
+	"!bg-transparent !text-foreground/80 hover:!bg-foreground/10 hover:!text-foreground focus:!bg-foreground/10 focus:!text-foreground data-[state=open]:!bg-foreground/10 data-[state=open]:!text-foreground";
 
 function SimpleNavLink({
 	href,
@@ -61,8 +61,8 @@ function SimpleNavLink({
 			href={href}
 			className={cn(
 				"inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors",
-				"text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary-foreground/15",
-				isActive && "bg-primary-foreground/20 text-primary-foreground",
+				"text-foreground/80 hover:text-foreground hover:bg-foreground/10",
+				isActive && "bg-foreground/10 text-foreground",
 			)}
 		>
 			{children}
@@ -128,7 +128,7 @@ function MobileNavLink({
 			onClick={onClick}
 			className={cn(
 				"flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-				"text-foreground hover:bg-accent",
+				"text-card-foreground hover:bg-accent",
 				isActive && "bg-accent font-medium",
 			)}
 		>
@@ -268,7 +268,7 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 					<Button
 						variant="ghost"
 						size="icon"
-						className="md:hidden text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+						className="md:hidden text-foreground hover:bg-foreground/10 hover:text-foreground"
 					>
 						<RiMenuLine className="size-5" />
 						<span className="sr-only">Abrir menu</span>

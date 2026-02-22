@@ -36,7 +36,7 @@ export function TopbarUser({ user, pagadorAvatarUrl }: TopbarUserProps) {
 			<DropdownMenuTrigger asChild>
 				<button
 					type="button"
-					className="flex items-center rounded-full ring-2 ring-primary-foreground/40 hover:ring-primary-foreground/80 transition-all focus-visible:outline-none focus-visible:ring-primary-foreground"
+					className="flex items-center rounded-full ring-2 ring-foreground/30 hover:ring-foreground/60 transition-all focus-visible:outline-none focus-visible:ring-foreground"
 				>
 					<Image
 						src={avatarSrc}
