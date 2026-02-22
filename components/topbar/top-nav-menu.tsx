@@ -40,8 +40,25 @@ type TopNavMenuProps = {
 	preLancamentosCount?: number;
 };
 
-const triggerClass =
-	"!bg-transparent !text-foreground/80 hover:!bg-foreground/10 hover:!text-foreground focus:!bg-foreground/10 focus:!text-foreground data-[state=open]:!bg-foreground/10 data-[state=open]:!text-foreground";
+const linkBase =
+	"inline-flex h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors";
+const linkIdle = "text-foreground/70 hover:text-foreground hover:underline";
+const linkActive = "text-primary";
+
+// NavigationMenuTrigger override: remove backgrounds, keep underline style
+const triggerClass = [
+	"text-foreground/70!",
+	"bg-transparent!",
+	"hover:bg-transparent!",
+	"hover:text-foreground!",
+	"hover:underline!",
+	"focus:bg-transparent!",
+	"focus:text-foreground!",
+	"data-[state=open]:bg-transparent!",
+	"data-[state=open]:text-foreground!",
+	"data-[state=open]:underline!",
+	"px-3!",
+].join(" ");
 
 function SimpleNavLink({
 	href,
@@ -59,11 +76,7 @@ function SimpleNavLink({
 	return (
 		<Link
 			href={href}
-			className={cn(
-				"inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors",
-				"text-foreground/80 hover:text-foreground hover:bg-foreground/10",
-				isActive && "bg-foreground/10 text-foreground",
-			)}
+			className={cn(linkBase, isActive ? linkActive : linkIdle)}
 		>
 			{children}
 		</Link>
