@@ -26,4 +26,5 @@ export const triggerClass = [
 	"data-[state=open]:text-foreground!",
 	"data-[state=open]:bg-accent!",
 	"shadow-none!",
+	"lowercase!",
 ].join(" ");
