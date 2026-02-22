@@ -4,6 +4,8 @@
 
 @theme {
   --spacing-custom-height-1: 30rem;
+  --spacing-8xl: 88rem;  /* 1408px */
+  --spacing-9xl: 96rem;  /* 1536px */
 }
 
 :root {
