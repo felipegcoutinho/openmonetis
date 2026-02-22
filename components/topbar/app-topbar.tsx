@@ -29,63 +29,68 @@ export function AppTopbar({
 	notificationsSnapshot,
 }: AppTopbarProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 bg-primary flex h-14 shrink-0 items-center gap-3 px-4 shadow-md">
-			{/* Logo */}
-			<Link href="/dashboard" className="flex items-center gap-2 shrink-0 mr-1">
-				<Image
-					src="/logo_small.png"
-					alt="OpenMonetis"
-					width={28}
-					height={28}
-					className="object-contain"
-					priority
-				/>
-				<Image
-					src="/logo_text.png"
-					alt="OpenMonetis"
-					width={90}
-					height={28}
-					className="object-contain invert hidden sm:block"
-					priority
-				/>
-			</Link>
+		<header className="fixed top-0 left-0 right-0 z-50 bg-primary shadow-md h-14 shrink-0 flex items-center">
+			<div className="w-full max-w-8xl mx-auto px-4 flex items-center gap-3 h-full">
+				{/* Logo */}
+				<Link
+					href="/dashboard"
+					className="flex items-center gap-2 shrink-0 mr-1"
+				>
+					<Image
+						src="/logo_small.png"
+						alt="OpenMonetis"
+						width={28}
+						height={28}
+						className="object-contain"
+						priority
+					/>
+					<Image
+						src="/logo_text.png"
+						alt="OpenMonetis"
+						width={90}
+						height={28}
+						className="object-contain invert hidden sm:block"
+						priority
+					/>
+				</Link>
 
-			{/* Navigation */}
-			<TopNavMenu preLancamentosCount={preLancamentosCount} />
+				{/* Navigation */}
+				<TopNavMenu preLancamentosCount={preLancamentosCount} />
 
-			{/* Right-side actions — CSS vars overridden so icons render light on primary bg */}
-			<div
-				className="ml-auto flex items-center gap-1"
-				style={
-					{
-						"--foreground": "var(--primary-foreground)",
-						"--muted-foreground":
-							"color-mix(in oklch, var(--primary-foreground) 70%, transparent)",
-						"--accent":
-							"color-mix(in oklch, var(--primary-foreground) 15%, transparent)",
-						"--accent-foreground": "var(--primary-foreground)",
-						"--border":
-							"color-mix(in oklch, var(--primary-foreground) 30%, transparent)",
-					} as React.CSSProperties
-				}
-			>
-				<NotificationBell
-					notifications={notificationsSnapshot.notifications}
-					totalCount={notificationsSnapshot.totalCount}
-				/>
-				<CalculatorDialogButton withTooltip />
-				<RefreshPageButton />
-				<PrivacyModeToggle />
-				<AnimatedThemeToggler />
-				<span
-					aria-hidden
-					className="h-5 w-px bg-primary-foreground/30 mx-1 hidden sm:block"
-				/>
-				<FeedbackDialog />
+				{/* Right-side actions — CSS vars overridden so icons render light on primary bg */}
+				<div
+					className="ml-auto flex items-center gap-1"
+					style={
+						{
+							"--foreground": "var(--primary-foreground)",
+							"--muted-foreground":
+								"color-mix(in oklch, var(--primary-foreground) 70%, transparent)",
+							"--accent":
+								"color-mix(in oklch, var(--primary-foreground) 15%, transparent)",
+							"--accent-foreground": "var(--primary-foreground)",
+							"--border":
+								"color-mix(in oklch, var(--primary-foreground) 30%, transparent)",
+						} as React.CSSProperties
+					}
+				>
+					<NotificationBell
+						notifications={notificationsSnapshot.notifications}
+						totalCount={notificationsSnapshot.totalCount}
+					/>
+					<CalculatorDialogButton withTooltip />
+					<RefreshPageButton />
+					<PrivacyModeToggle />
+					<AnimatedThemeToggler />
+					<span
+						aria-hidden
+						className="h-5 w-px bg-primary-foreground/30 mx-1 hidden sm:block"
+					/>
+					<FeedbackDialog />
+				</div>
+
+				{/* User avatar — outside the var-override div so dropdown stays normal */}
+				<TopbarUser user={user} pagadorAvatarUrl={pagadorAvatarUrl} />
 			</div>
-
-			{/* User avatar — outside the var-override div so dropdown stays normal */}
-			<TopbarUser user={user} pagadorAvatarUrl={pagadorAvatarUrl} />
 		</header>
 	);
 }
