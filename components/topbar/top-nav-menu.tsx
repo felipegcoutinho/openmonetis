@@ -15,10 +15,7 @@ import {
 	RiSparklingLine,
 	RiTodoLine,
 } from "@remixicon/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	NavigationMenu,
@@ -34,135 +31,15 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils/ui";
+import type { DropdownLinkItem } from "./dropdown-link-list";
+import { DropdownLinkList } from "./dropdown-link-list";
+import { MobileNavLink, MobileSectionLabel } from "./mobile-nav-link";
+import { triggerClass } from "./nav-styles";
+import { SimpleNavLink } from "./simple-nav-link";
 
 type TopNavMenuProps = {
 	preLancamentosCount?: number;
 };
-
-const linkBase =
-	"inline-flex h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors";
-const linkIdle = "text-foreground hover:text-foreground hover:underline";
-const linkActive = "text-primary";
-
-// NavigationMenuTrigger override: remove backgrounds, keep underline style
-const triggerClass = [
-	"text-foreground!",
-	"bg-transparent!",
-	"hover:bg-transparent!",
-	"hover:text-foreground!",
-	"hover:underline!",
-	"focus:bg-transparent!",
-	"focus:text-foreground!",
-	"data-[state=open]:bg-transparent!",
-	"data-[state=open]:text-foreground!",
-	"data-[state=open]:underline!",
-	"px-3!",
-].join(" ");
-
-function SimpleNavLink({
-	href,
-	children,
-}: {
-	href: string;
-	children: React.ReactNode;
-}) {
-	const pathname = usePathname();
-	const isActive =
-		href === "/dashboard"
-			? pathname === href
-			: pathname === href || pathname.startsWith(`${href}/`);
-
-	return (
-		<Link
-			href={href}
-			className={cn(linkBase, isActive ? linkActive : linkIdle)}
-		>
-			{children}
-		</Link>
-	);
-}
-
-type DropdownLinkItem = {
-	href: string;
-	label: string;
-	icon: React.ReactNode;
-	badge?: number;
-};
-
-function DropdownLinkList({ items }: { items: DropdownLinkItem[] }) {
-	return (
-		<ul className="grid w-48 gap-0.5 p-2">
-			{items.map((item) => (
-				<li key={item.href}>
-					<Link
-						href={item.href}
-						className="flex items-center gap-2.5 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-					>
-						<span className="text-muted-foreground shrink-0">{item.icon}</span>
-						<span className="flex-1">{item.label}</span>
-						{item.badge && item.badge > 0 ? (
-							<Badge
-								variant="secondary"
-								className="text-[10px] px-1.5 py-0 h-4 min-w-4 ml-auto"
-							>
-								{item.badge}
-							</Badge>
-						) : null}
-					</Link>
-				</li>
-			))}
-		</ul>
-	);
-}
-
-function MobileNavLink({
-	href,
-	icon,
-	children,
-	onClick,
-	badge,
-}: {
-	href: string;
-	icon: React.ReactNode;
-	children: React.ReactNode;
-	onClick?: () => void;
-	badge?: number;
-}) {
-	const pathname = usePathname();
-	const isActive =
-		href === "/dashboard"
-			? pathname === href
-			: pathname === href || pathname.startsWith(`${href}/`);
-
-	return (
-		<Link
-			href={href}
-			onClick={onClick}
-			className={cn(
-				"flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-				"text-card-foreground hover:bg-accent",
-				isActive && "bg-accent font-medium",
-			)}
-		>
-			<span className="text-muted-foreground shrink-0">{icon}</span>
-			<span className="flex-1">{children}</span>
-			{badge && badge > 0 ? (
-				<Badge variant="secondary" className="text-xs px-1.5 py-0">
-					{badge}
-				</Badge>
-			) : null}
-		</Link>
-	);
-}
-
-function MobileSectionLabel({ label }: { label: string }) {
-	return (
-		<p className="mt-3 mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-			{label}
-		</p>
-	);
-}
 
 export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 	const [sheetOpen, setSheetOpen] = useState(false);

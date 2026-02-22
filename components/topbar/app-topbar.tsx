@@ -29,7 +29,7 @@ export function AppTopbar({
 	notificationsSnapshot,
 }: AppTopbarProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 bg-card h-14 shrink-0 flex items-center border-b">
+		<header className="fixed top-0 left-0 right-0 z-50 bg-card h-14 shrink-0 flex items-center">
 			<div className="w-full max-w-8xl mx-auto px-4 flex items-center gap-3 h-full">
 				{/* Logo */}
 				<Link
