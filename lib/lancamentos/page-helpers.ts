@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, eq, ilike, isNotNull, or } from "drizzle-orm";
+import { and, eq, gte, ilike, isNotNull, lte, or } from "drizzle-orm";
 import type { SelectOption } from "@/components/lancamentos/types";
 import {
 	cartoes,
@@ -385,6 +385,95 @@ export const buildLancamentoWhere = ({
 	return where;
 };
 
+/**
+* Cria condições WHERE para faturas de cartão de crédito: por intervalo de datas de compra
+* (ciclo definido pelo dia de fechamento), não por período. Use na página da fatura para que
+* as transações sejam classificadas no mês de faturamento correto.
+ */
+export const buildLancamentoWhereForInvoice = ({
+	userId,
+	cardId,
+	invoiceStart,
+	invoiceEnd,
+	filters,
+	slugMaps,
+	pagadorId,
+}: {
+	userId: string;
+	cardId: string;
+	invoiceStart: Date;
+	invoiceEnd: Date;
+	filters: LancamentoSearchFilters;
+	slugMaps: SlugMaps;
+	pagadorId?: string;
+}): SQL[] => {
+	const where: SQL[] = [
+		eq(lancamentos.userId, userId),
+		eq(lancamentos.cartaoId, cardId),
+		gte(lancamentos.purchaseDate, invoiceStart),
+		lte(lancamentos.purchaseDate, invoiceEnd),
+	];
+
+	if (pagadorId) {
+		where.push(eq(lancamentos.pagadorId, pagadorId));
+	}
+
+	if (isValidTransaction(filters.transactionFilter)) {
+		where.push(eq(lancamentos.transactionType, filters.transactionFilter));
+	}
+
+	if (isValidCondition(filters.conditionFilter)) {
+		where.push(eq(lancamentos.condition, filters.conditionFilter));
+	}
+
+	if (isValidPaymentMethod(filters.paymentFilter)) {
+		where.push(eq(lancamentos.paymentMethod, filters.paymentFilter));
+	}
+
+	if (!pagadorId && filters.pagadorFilter) {
+		const id = slugMaps.pagador.get(filters.pagadorFilter);
+		if (id) {
+			where.push(eq(lancamentos.pagadorId, id));
+		}
+	}
+
+	if (filters.categoriaFilter) {
+		const id = slugMaps.categoria.get(filters.categoriaFilter);
+		if (id) {
+			where.push(eq(lancamentos.categoriaId, id));
+		}
+	}
+
+	if (filters.contaCartaoFilter) {
+		const contaId = slugMaps.conta.get(filters.contaCartaoFilter);
+		const relatedCartaoId = contaId
+			? null
+			: slugMaps.cartao.get(filters.contaCartaoFilter);
+		if (contaId) {
+			where.push(eq(lancamentos.contaId, contaId));
+		}
+		if (!contaId && relatedCartaoId) {
+			where.push(eq(lancamentos.cartaoId, relatedCartaoId));
+		}
+	}
+
+	const searchPattern = buildSearchPattern(filters.searchFilter);
+	if (searchPattern) {
+		where.push(
+			or(
+				ilike(lancamentos.name, searchPattern),
+				ilike(lancamentos.note, searchPattern),
+				ilike(lancamentos.paymentMethod, searchPattern),
+				ilike(lancamentos.condition, searchPattern),
+				and(isNotNull(contas.name), ilike(contas.name, searchPattern)),
+				and(isNotNull(cartoes.name), ilike(cartoes.name, searchPattern)),
+			)!,
+		);
+	}
+
+	return where;
+};
+
 type LancamentoRowWithRelations = typeof lancamentos.$inferSelect & {
 	pagador?: PagadorRow | null;
 	conta?: ContaRow | null;
@@ -398,6 +487,9 @@ export const mapLancamentosData = (rows: LancamentoRowWithRelations[]) =>
 		userId: item.userId,
 		name: item.name,
 		purchaseDate: item.purchaseDate?.toISOString() ?? new Date().toISOString(),
+		originalPurchaseDate: item.originalPurchaseDate
+			? item.originalPurchaseDate.toISOString()
+			: null,
 		period: item.period ?? "",
 		transactionType: item.transactionType,
 		amount: Number(item.amount ?? 0),

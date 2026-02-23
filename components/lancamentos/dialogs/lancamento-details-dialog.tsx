@@ -61,7 +61,9 @@ export function LancamentoDetailsDialog({
 								#{lancamento.id}
 							</DialogTitle>
 							<CardDescription>
-								{formatDate(lancamento.purchaseDate)}
+								{formatDate(
+									lancamento.originalPurchaseDate ?? lancamento.purchaseDate,
+								)}
 							</CardDescription>
 						</div>
 					</CardHeader>
@@ -144,7 +146,8 @@ export function LancamentoDetailsDialog({
 									<li className="mt-4">
 										<InstallmentTimeline
 											purchaseDate={parseLocalDateString(
-												lancamento.purchaseDate,
+												lancamento.originalPurchaseDate ??
+													lancamento.purchaseDate,
 											)}
 											currentInstallment={parcelaAtual}
 											totalInstallments={totalParcelas}

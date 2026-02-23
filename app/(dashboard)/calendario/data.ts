@@ -13,6 +13,7 @@ import {
 	mapLancamentosData,
 } from "@/lib/lancamentos/page-helpers";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getInvoiceDateRange } from "@/lib/utils/period";
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
 const TRANSACTION_TYPE_TRANSFERENCIA = "Transferência";
@@ -58,6 +59,14 @@ export const fetchCalendarData = async ({
 	const rangeStartKey = toDateKey(rangeStart);
 	const rangeEndKey = toDateKey(rangeEnd);
 
+	// Hoje (YYYY-MM-DD): recorrente no cartão só entra no total/evento quando a data da ocorrência já passou
+	const today = new Date();
+	const todayKey = toDateKey(today);
+
+	// Intervalo ampliado para incluir compras que entram na fatura do mês (ciclo por dia de fechamento)
+	const extendedStart = new Date(Date.UTC(year, monthIndex - 1, 1));
+	const extendedEnd = new Date(Date.UTC(year, monthIndex + 1, 31));
+
 	const [lancamentoRows, cardRows, filterSources] = await Promise.all([
 		db.query.lancamentos.findMany({
 			where: and(
@@ -75,9 +84,10 @@ export const fetchCalendarData = async ({
 						gte(lancamentos.dueDate, rangeStart),
 						lte(lancamentos.dueDate, rangeEnd),
 					),
-					// Lançamentos de cartão do período (para calcular totais de vencimento)
+					// Lançamentos de cartão no intervalo ampliado (para totais por ciclo de fatura)
 					and(
-						eq(lancamentos.period, period),
+						gte(lancamentos.purchaseDate, extendedStart),
+						lte(lancamentos.purchaseDate, extendedEnd),
 						ne(lancamentos.paymentMethod, PAYMENT_METHOD_BOLETO),
 					),
 				),
@@ -98,20 +108,46 @@ export const fetchCalendarData = async ({
 	const lancamentosData = mapLancamentosData(lancamentoRows);
 	const events: CalendarEvent[] = [];
 
+	// Total por cartão: soma por ciclo de fatura (data de compra no intervalo da fatura do mês)
 	const cardTotals = new Map<string, number>();
-	for (const item of lancamentosData) {
-		if (
-			!item.cartaoId ||
-			item.period !== period ||
-			item.pagadorRole !== PAGADOR_ROLE_ADMIN
-		) {
-			continue;
-		}
-		const amount = Math.abs(item.amount ?? 0);
-		cardTotals.set(
-			item.cartaoId,
-			(cardTotals.get(item.cartaoId) ?? 0) + amount,
+	for (const card of cardRows) {
+		const closingDayNum = Math.min(
+			31,
+			Math.max(1, Number.parseInt(card.closingDay ?? "1", 10) || 1),
 		);
+		const { start: invoiceStart, end: invoiceEnd } = getInvoiceDateRange(
+			period,
+			closingDayNum,
+		);
+		const invoiceStartKey = toDateKey(invoiceStart);
+		const invoiceEndKey = toDateKey(invoiceEnd);
+
+		let total = 0;
+		for (const item of lancamentosData) {
+			if (
+				item.cartaoId !== card.id ||
+				item.pagadorRole !== PAGADOR_ROLE_ADMIN
+			) {
+				continue;
+			}
+			const purchaseKey = item.purchaseDate.slice(0, 10);
+			// Recorrente: só soma ao total do cartão quando o dia da cobrança já passou
+			if (
+				item.condition === "Recorrente" &&
+				purchaseKey > todayKey
+			) {
+				continue;
+			}
+			if (
+				purchaseKey >= invoiceStartKey &&
+				purchaseKey <= invoiceEndKey
+			) {
+				total += Math.abs(item.amount ?? 0);
+			}
+		}
+		if (total > 0) {
+			cardTotals.set(card.id, total);
+		}
 	}
 
 	for (const item of lancamentosData) {

@@ -1,10 +1,11 @@
 "use server";
 
-import { and, eq, lt, sql } from "drizzle-orm";
+import { and, eq, gte, lt, lte, sql } from "drizzle-orm";
 import { cartoes, faturas, lancamentos } from "@/db/schema";
 import { db } from "@/lib/db";
 import { INVOICE_PAYMENT_STATUS } from "@/lib/faturas";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { getInvoiceDateRange } from "@/lib/utils/period";
 
 export type NotificationType = "overdue" | "due_soon";
 
@@ -141,25 +142,15 @@ export async function fetchDashboardNotifications(
 
 	const adminPagadorId = await getAdminPagadorId(userId);
 
-	// Buscar faturas pendentes de períodos anteriores
-	// Apenas faturas com registro na tabela (períodos antigos devem ter sido finalizados)
-	const overdueInvoices = await db
+	// Buscar faturas pendentes de períodos anteriores (total calculado por ciclo de fechamento)
+	const overdueInvoicesRows = await db
 		.select({
 			invoiceId: faturas.id,
 			cardId: cartoes.id,
 			cardName: cartoes.name,
 			dueDay: cartoes.dueDay,
+			closingDay: cartoes.closingDay,
 			period: faturas.period,
-			totalAmount: sql<number | null>`
-        COALESCE(
-          (SELECT SUM(${lancamentos.amount})
-           FROM ${lancamentos}
-           WHERE ${lancamentos.cartaoId} = ${cartoes.id}
-             AND ${lancamentos.period} = ${faturas.period}
-             AND ${lancamentos.userId} = ${faturas.userId}),
-          0
-        )
-      `,
 		})
 		.from(faturas)
 		.innerJoin(cartoes, eq(faturas.cartaoId, cartoes.id))
@@ -171,20 +162,43 @@ export async function fetchDashboardNotifications(
 			),
 		);
 
-	// Buscar faturas do período atual
-	// Usa LEFT JOIN para incluir cartões com lançamentos mesmo sem registro em faturas
-	const currentInvoices = await db
+	const overdueInvoices = await Promise.all(
+		overdueInvoicesRows.map(async (row) => {
+			const closingDayNum = Math.min(
+				31,
+				Math.max(1, Number.parseInt(row.closingDay ?? "1", 10) || 1),
+			);
+			const { start, end } = getInvoiceDateRange(row.period, closingDayNum);
+			const [sumRow] = await db
+				.select({
+					total: sql<number>`COALESCE(SUM(${lancamentos.amount}), 0)`,
+				})
+				.from(lancamentos)
+				.where(
+					and(
+						eq(lancamentos.userId, userId),
+						eq(lancamentos.cartaoId, row.cardId),
+						gte(lancamentos.purchaseDate, start),
+						lte(lancamentos.purchaseDate, end),
+					),
+				);
+			return {
+				...row,
+				totalAmount: Number(sumRow?.total ?? 0),
+			};
+		}),
+	);
+
+	// Buscar faturas do período atual (total por ciclo de fechamento)
+	const currentInvoicesRows = await db
 		.select({
 			invoiceId: faturas.id,
 			cardId: cartoes.id,
 			cardName: cartoes.name,
 			dueDay: cartoes.dueDay,
+			closingDay: cartoes.closingDay,
 			period: sql<string>`COALESCE(${faturas.period}, ${currentPeriod})`,
 			paymentStatus: faturas.paymentStatus,
-			totalAmount: sql<number | null>`
-        COALESCE(SUM(${lancamentos.amount}), 0)
-      `,
-			transactionCount: sql<number | null>`COUNT(${lancamentos.id})`,
 		})
 		.from(cartoes)
 		.leftJoin(
@@ -195,23 +209,38 @@ export async function fetchDashboardNotifications(
 				eq(faturas.period, currentPeriod),
 			),
 		)
-		.leftJoin(
-			lancamentos,
-			and(
-				eq(lancamentos.cartaoId, cartoes.id),
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, currentPeriod),
-			),
-		)
-		.where(eq(cartoes.userId, userId))
-		.groupBy(
-			faturas.id,
-			cartoes.id,
-			cartoes.name,
-			cartoes.dueDay,
-			faturas.period,
-			faturas.paymentStatus,
-		);
+		.where(eq(cartoes.userId, userId));
+
+	const currentInvoices = await Promise.all(
+		currentInvoicesRows.map(async (row) => {
+			const period = row.period ?? currentPeriod;
+			const closingDayNum = Math.min(
+				31,
+				Math.max(1, Number.parseInt(row.closingDay ?? "1", 10) || 1),
+			);
+			const { start, end } = getInvoiceDateRange(period, closingDayNum);
+			const [sumRow] = await db
+				.select({
+					total: sql<number>`COALESCE(SUM(${lancamentos.amount}), 0)`,
+					transactionCount: sql<number>`COUNT(${lancamentos.id})`,
+				})
+				.from(lancamentos)
+				.where(
+					and(
+						eq(lancamentos.userId, userId),
+						eq(lancamentos.cartaoId, row.cardId),
+						gte(lancamentos.purchaseDate, start),
+						lte(lancamentos.purchaseDate, end),
+					),
+				);
+			return {
+				...row,
+				period,
+				totalAmount: Number(sumRow?.total ?? 0),
+				transactionCount: Number(sumRow?.transactionCount ?? 0),
+			};
+		}),
+	);
 
 	// Buscar boletos não pagos (usando pagadorId direto ao invés de JOIN)
 	const boletosConditions = [

@@ -202,12 +202,12 @@ export function applyFieldDependencies(
 ): Partial<LancamentoFormState> {
 	const updates: Partial<LancamentoFormState> = {};
 
-	// Removed automatic period update when purchase date changes
-	// if (key === "purchaseDate" && typeof value === "string") {
-	//   if (!periodDirty) {
-	//     updates.period = derivePeriodFromDate(value);
-	//   }
-	// }
+	// Ao alterar a data da transação, o período é definido automaticamente
+	if (key === "purchaseDate" && typeof value === "string") {
+		if (!_periodDirty) {
+			updates.period = derivePeriodFromDate(value);
+		}
+	}
 
 	// When condition changes, clear irrelevant fields
 	if (key === "condition" && typeof value === "string") {

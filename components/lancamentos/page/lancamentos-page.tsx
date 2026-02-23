@@ -296,6 +296,17 @@ export function LancamentosPage({
 	}, []);
 
 	const handleMultipleBulkDelete = useCallback((items: LancamentoItem[]) => {
+		// Se todos os selecionados são da mesma série (parcelado/recorrente), abrir dialog de escopo
+		const withSeries = items.filter((i) => i.seriesId);
+		const sameSeries =
+			withSeries.length > 0 &&
+			withSeries.length === items.length &&
+			withSeries.every((i) => i.seriesId === withSeries[0]?.seriesId);
+		if (sameSeries && withSeries[0]) {
+			setPendingDeleteData(withSeries[0]);
+			setBulkDeleteOpen(true);
+			return;
+		}
 		setPendingMultipleDeleteData(items);
 		setMultipleBulkDeleteOpen(true);
 	}, []);

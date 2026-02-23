@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import type { Conta } from "@/db/schema";
 import { getUserId } from "@/lib/auth/server";
 import {
-	buildLancamentoWhere,
+	buildLancamentoWhereForInvoice,
 	buildOptionSets,
 	buildSluggedFilters,
 	buildSlugMaps,
@@ -22,7 +22,7 @@ import {
 	type ResolvedSearchParams,
 } from "@/lib/lancamentos/page-helpers";
 import { loadLogoOptions } from "@/lib/logo/options";
-import { parsePeriodParam } from "@/lib/utils/period";
+import { getInvoiceDateRange, parsePeriodParam } from "@/lib/utils/period";
 import { fetchCardData, fetchCardLancamentos, fetchInvoiceData } from "./data";
 
 type PageSearchParams = Promise<ResolvedSearchParams>;
@@ -52,23 +52,38 @@ export default async function Page({ params, searchParams }: PageProps) {
 		notFound();
 	}
 
+	const closingDayNum = Math.min(
+		31,
+		Math.max(1, Number.parseInt(card.closingDay, 10) || 1),
+	);
+	const { start: invoiceStart, end: invoiceEnd } = getInvoiceDateRange(
+		selectedPeriod,
+		closingDayNum,
+	);
+
 	const [filterSources, logoOptions, invoiceData, estabelecimentos, userPreferences] =
 		await Promise.all([
 			fetchLancamentoFilterSources(userId),
 			loadLogoOptions(),
-			fetchInvoiceData(userId, cartaoId, selectedPeriod),
+			fetchInvoiceData(
+				userId,
+				cartaoId,
+				selectedPeriod,
+				card.closingDay,
+			),
 			getRecentEstablishmentsAction(),
 			fetchUserPreferences(userId),
 		]);
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const slugMaps = buildSlugMaps(sluggedFilters);
 
-	const filters = buildLancamentoWhere({
+	const filters = buildLancamentoWhereForInvoice({
 		userId,
-		period: selectedPeriod,
+		cardId: card.id,
+		invoiceStart,
+		invoiceEnd,
 		filters: searchFilters,
 		slugMaps,
-		cardId: card.id,
 	});
 
 	const lancamentoRows = await fetchCardLancamentos(filters);

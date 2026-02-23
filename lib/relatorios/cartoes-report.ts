@@ -1,4 +1,4 @@
-import { and, eq, gte, ilike, inArray, lte, not, sum } from "drizzle-orm";
+import { and, eq, gte, ilike, inArray, lte, ne, not, or, sql, sum } from "drizzle-orm";
 import {
 	cartoes,
 	categorias,
@@ -97,7 +97,7 @@ export async function fetchCartoesReportData(
 
 	const cardIds = allCards.map((c) => c.id);
 
-	// Fetch current period usage by card
+	// Fetch current period usage by card (recorrente só conta quando a data da ocorrência já passou)
 	const currentUsageData = await db
 		.select({
 			cartaoId: lancamentos.cartaoId,
@@ -112,6 +112,10 @@ export async function fetchCartoesReportData(
 				eq(pagadores.role, PAGADOR_ROLE_ADMIN),
 				eq(lancamentos.transactionType, DESPESA),
 				inArray(lancamentos.cartaoId, cardIds),
+				or(
+					ne(lancamentos.condition, "Recorrente"),
+					sql`${lancamentos.purchaseDate} <= current_date`,
+				),
 			),
 		)
 		.groupBy(lancamentos.cartaoId);

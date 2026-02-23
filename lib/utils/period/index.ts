@@ -327,6 +327,27 @@ export function formatMonthLabel(period: string): string {
 // DATE DERIVATION
 // ============================================================================
 
+// ============================================================================
+// INTERVALO DE DATAS DA FATURA POR DIA DE FECHAMENTO
+// ============================================================================
+
+/**
+ * Retorna o intervalo de datas de compra que pertencem à fatura do período.
+ * Ex.: fatura de março com fechamento no dia 9 → compras de 10/fev a 9/mar.
+ * @param period Período da fatura (YYYY-MM), ex. "2026-03"
+ * @param closingDay Dia do fechamento do cartão (1-31)
+ */
+export function getInvoiceDateRange(
+	period: string,
+	closingDay: number,
+): { start: Date; end: Date } {
+	const { year, month } = parsePeriod(period);
+	// Fatura do mês M com fechamento no dia D: compras de (D+1) do mês M-1 até D do mês M
+	const start = new Date(year, month - 2, closingDay + 1);
+	const end = new Date(year, month - 1, closingDay);
+	return { start, end };
+}
+
 /**
  * Derives a period (YYYY-MM) from a date string or current date
  * @example

@@ -70,7 +70,9 @@ export function LancamentosExport({
 
 			lancamentos.forEach((lancamento) => {
 				const row = [
-					formatDate(lancamento.purchaseDate),
+					formatDate(
+						lancamento.originalPurchaseDate ?? lancamento.purchaseDate,
+					),
 					lancamento.name,
 					lancamento.transactionType,
 					lancamento.condition,
@@ -128,7 +130,9 @@ export function LancamentosExport({
 
 			lancamentos.forEach((lancamento) => {
 				const row = [
-					formatDate(lancamento.purchaseDate),
+					formatDate(
+						lancamento.originalPurchaseDate ?? lancamento.purchaseDate,
+					),
 					lancamento.name,
 					lancamento.transactionType,
 					lancamento.condition,
@@ -215,7 +219,9 @@ export function LancamentosExport({
 			];
 
 			const body = lancamentos.map((lancamento) => [
-				formatDate(lancamento.purchaseDate),
+				formatDate(
+					lancamento.originalPurchaseDate ?? lancamento.purchaseDate,
+				),
 				lancamento.name,
 				lancamento.transactionType,
 				lancamento.condition,

@@ -167,6 +167,7 @@ const buildColumns = ({
 				const {
 					name,
 					purchaseDate,
+					originalPurchaseDate,
 					installmentCount,
 					currentInstallment,
 					paymentMethod,
@@ -180,6 +181,9 @@ const buildColumns = ({
 					currentInstallment && installmentCount
 						? `${currentInstallment} de ${installmentCount}`
 						: null;
+
+				// Parcelado: exibir data real da compra; caso contrário a data do lançamento
+				const displayDate = originalPurchaseDate ?? purchaseDate;
 
 				const isBoleto = paymentMethod === "Boleto" && dueDate;
 				const dueDateLabel =
@@ -195,7 +199,7 @@ const buildColumns = ({
 						<EstabelecimentoLogo name={name} size={28} />
 						<span className="flex flex-col">
 							<span className="text-[11px] text-muted-foreground">
-								{formatDate(purchaseDate)}
+								{formatDate(displayDate)}
 							</span>
 							<Tooltip>
 								<TooltipTrigger asChild>

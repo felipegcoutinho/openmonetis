@@ -42,47 +42,45 @@ export function BulkActionDialog({
 	};
 
 	const seriesLabel =
-		seriesType === "installment" ? "parcelamento" : "recorrência";
-	const actionLabel = actionType === "edit" ? "editar" : "remover";
+		seriesType === "installment" ? "parcelado" : "recorrente";
+	const actionLabel = actionType === "edit" ? "Editar" : "Remover";
 
 	const getDescription = () => {
 		if (seriesType === "installment" && currentNumber && totalCount) {
-			return `Este lançamento faz parte de um ${seriesLabel} (${currentNumber}/${totalCount}). Escolha o que deseja ${actionLabel}:`;
+			return `Este lançamento faz parte de um parcelamento (${currentNumber}/${totalCount}). Escolha o que deseja ${actionLabel.toLowerCase()}:`;
 		}
-		return `Este lançamento faz parte de uma ${seriesLabel}. Escolha o que deseja ${actionLabel}:`;
+		if (seriesType === "recurring" && currentNumber && totalCount) {
+			return `Este lançamento faz parte de uma recorrência (${currentNumber}/${totalCount}). Escolha o que deseja ${actionLabel.toLowerCase()}:`;
+		}
+		return `Este lançamento faz parte de um ${seriesLabel}. Escolha o que deseja ${actionLabel.toLowerCase()}:`;
 	};
 
 	const getCurrentLabel = () => {
-		if (seriesType === "installment" && currentNumber) {
-			return `Apenas esta parcela (${currentNumber}/${totalCount})`;
+		if (seriesType === "installment") {
+			return "Apenas esta parcela";
 		}
-		return "Apenas este lançamento";
+		return "Apenas esta dívida recorrente";
 	};
 
 	const getFutureLabel = () => {
-		if (seriesType === "installment" && currentNumber && totalCount) {
-			const remaining = totalCount - currentNumber + 1;
-			return `Esta e as próximas parcelas (${remaining} ${
-				remaining === 1 ? "parcela" : "parcelas"
-			})`;
+		if (seriesType === "installment") {
+			return "Esta e as próximas parcelas";
 		}
-		return "Este e os próximos lançamentos";
+		return "Esta e as próximas recorrentes";
 	};
 
 	const getAllLabel = () => {
-		if (seriesType === "installment" && totalCount) {
-			return `Todas as parcelas (${totalCount} ${
-				totalCount === 1 ? "parcela" : "parcelas"
-			})`;
+		if (seriesType === "installment") {
+			return "Todas as parcelas";
 		}
-		return `Todos os lançamentos da ${seriesLabel}`;
+		return "Todos os lançamentos recorrentes";
 	};
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle className="capitalize">
+					<DialogTitle>
 						{actionLabel} {seriesLabel}
 					</DialogTitle>
 					<DialogDescription>{getDescription()}</DialogDescription>

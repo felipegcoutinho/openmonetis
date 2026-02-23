@@ -31,7 +31,8 @@ import {
 } from "@/lib/pagadores/notifications";
 import { noteSchema, uuidSchema } from "@/lib/schemas/common";
 import { formatDecimalForDbRequired } from "@/lib/utils/currency";
-import { getTodayDate, parseLocalDateString } from "@/lib/utils/date";
+import { addMonthsToDate, getTodayDate, parseLocalDateString } from "@/lib/utils/date";
+import { addMonthsToPeriod } from "@/lib/utils/period";
 
 // ============================================================================
 // Authorization Validation Functions
@@ -353,40 +354,6 @@ const splitAmount = (totalCents: number, parts: number) => {
 	);
 };
 
-const addMonthsToPeriod = (period: string, offset: number) => {
-	const [yearStr, monthStr] = period.split("-");
-	const baseYear = Number(yearStr);
-	const baseMonth = Number(monthStr);
-
-	if (!baseYear || !baseMonth) {
-		throw new Error("Período inválido.");
-	}
-
-	const date = new Date(baseYear, baseMonth - 1, 1);
-	date.setMonth(date.getMonth() + offset);
-
-	const nextYear = date.getFullYear();
-	const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
-	return `${nextYear}-${nextMonth}`;
-};
-
-const addMonthsToDate = (value: Date, offset: number) => {
-	const result = new Date(value);
-	const originalDay = result.getDate();
-
-	result.setDate(1);
-	result.setMonth(result.getMonth() + offset);
-
-	const lastDay = new Date(
-		result.getFullYear(),
-		result.getMonth() + 1,
-		0,
-	).getDate();
-
-	result.setDate(Math.min(originalDay, lastDay));
-	return result;
-};
-
 type Share = {
 	pagadorId: string | null;
 	amountCents: number;
@@ -506,6 +473,7 @@ const buildLancamentoRecords = ({
 			installment += 1
 		) {
 			const installmentPeriod = addMonthsToPeriod(period, installment);
+			const installmentPurchaseDate = addMonthsToDate(purchaseDate, installment);
 			const installmentDueDate = dueDate
 				? addMonthsToDate(dueDate, installment)
 				: null;
@@ -517,7 +485,8 @@ const buildLancamentoRecords = ({
 					...basePayload,
 					amount: centsToDecimalString(amountCents * amountSign),
 					pagadorId: share.pagadorId,
-					purchaseDate: purchaseDate,
+					purchaseDate: installmentPurchaseDate,
+					originalPurchaseDate: purchaseDate,
 					period: installmentPeriod,
 					isSettled: settled,
 					installmentCount: installmentTotal,
@@ -640,7 +609,12 @@ export async function createLancamentoAction(
 			}
 		}
 
-		const period = resolvePeriod(data.purchaseDate, data.period);
+		// Para Parcelado, o período base é sempre o mês da compra (evita que o período
+		// selecionado na tela, ex. fatura de março, faça todas as parcelas caírem no mesmo mês).
+		const period =
+			data.condition === "Parcelado"
+				? resolvePeriod(data.purchaseDate, undefined)
+				: resolvePeriod(data.purchaseDate, data.period);
 		const purchaseDate = parseLocalDateString(data.purchaseDate);
 		const dueDate = data.dueDate ? parseLocalDateString(data.dueDate) : null;
 		const shouldSetBoletoPaymentDate =

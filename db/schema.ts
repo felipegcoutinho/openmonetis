@@ -547,6 +547,7 @@ export const lancamentos = pgTable(
 		note: text("anotacao"),
 		amount: numeric("valor", { precision: 12, scale: 2 }).notNull(),
 		purchaseDate: date("data_compra", { mode: "date" }).notNull(),
+		originalPurchaseDate: date("data_compra_original", { mode: "date" }),
 		transactionType: text("tipo_transacao").notNull(),
 		installmentCount: smallint("qtde_parcela"),
 		period: text("periodo").notNull(),

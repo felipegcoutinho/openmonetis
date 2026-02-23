@@ -5,6 +5,25 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.4] - 2026-02-23
+
+### Adicionado
+
+- Coluna `data_compra_original` (originalPurchaseDate) para guarda a data real da compra; na lista, no detalhe e na exportação (CSV, XLSX, PDF) exibe essa data em vez da data efetiva da parcela
+- Migração `0019_add_original_purchase_date.sql` para criação da coluna
+
+### Alterado
+- Preenchimento automatico ao selecionar um data fora do mês atual
+- Despesa parcelada: cada parcela passa a ficar no mês correto (exemplo: ao ter um fatura fechada do dia 9 compra após esse data são marcada como fatura do mês seguite); período base sempre derivado da data da compra; uso de `addMonthsToPeriod` e `addMonthsToDate` de `lib/utils/period` e `lib/utils/date`
+- Pop-up criado para remover lançamento ao clicar em "remover" ou "remover selecionados" para parcelado e recorrente:  
+Parcelado: "Apenas esta parcela", "Esta e as próximas parcelas", "Todas as parcelas";   
+Recorrente: "Apenas esta dívida recorrente", "Esta e as próximas recorrentes", "Todos os lançamentos recorrentes"  
+Remover selecionados: quando todos os itens selecionados são da mesma série (parcelado ou recorrente), abre o dialog de escopo com as 3 opções em vez do comfirmação simples
+- Despesa recorrente no cartão de crédito: só consome o limite do cartão quando a data da ocorrência já passou (ex.: assinatura cobrada todo dia 10 só entra no limite após o dia 10 de cada mês); mesma regra no calendário (total por cartão) e no relatório de cartões (uso do período atual)
+- Relatório de cartões: uso do período atual considera apenas ocorrências recorrentes cuja data já passou
+
+**Contribuições:** [Guilherme Bano](https://github.com/Gbano1)
+
 ## [1.6.3] - 2026-02-19
 
 ### Corrigido
@@ -16,11 +35,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - `.env.example`: `RESEND_FROM_EMAIL` com valor entre aspas e comentário para uso em Docker/produção
 - `docker-compose.yml`: env do app passa `RESEND_FROM_EMAIL` (em vez de `EMAIL_FROM`) para o container, alinhado ao nome usado pela aplicação
 
+**Contribuições:** [Guilherme Bano](https://github.com/Gbano1)
+
 ## [1.6.2] - 2026-02-19
 
 ### Corrigido
 
 - Bug no mobile onde, ao selecionar um logo no diálogo de criação de conta/cartão, o diálogo principal fechava inesperadamente: adicionado `stopPropagation` nos eventos de click/touch dos botões de logo e delay com `requestAnimationFrame` antes de fechar o seletor de logo
+
+**Contribuições:** [Guilherme Bano](https://github.com/Gbano1)
 
 ## [1.6.1] - 2026-02-18
 
@@ -28,6 +51,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Transferências entre contas: nome do estabelecimento passa a ser "Saída - Transf. entre contas" na saída e "Entrada - Transf. entre contas" na entrada e adicionando em anotação no formato "de {conta origem} -> {conta destino}"
 - ChartContainer (Recharts): renderização do gráfico apenas após montagem no cliente e uso de `minWidth`/`minHeight` no ResponsiveContainer para evitar aviso "width(-1) and height(-1)" no console
+
+**Contribuições:** [Guilherme Bano](https://github.com/Gbano1)
 
 ## [1.6.0] - 2026-02-18
 

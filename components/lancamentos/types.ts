@@ -3,6 +3,8 @@ export type LancamentoItem = {
 	userId: string;
 	name: string;
 	purchaseDate: string;
+	/** Data real da compra (parcelado); quando preenchida, exibir em vez de purchaseDate na lista */
+	originalPurchaseDate: string | null;
 	period: string;
 	transactionType: string;
 	amount: number;

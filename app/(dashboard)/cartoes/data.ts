@@ -1,4 +1,4 @@
-import { and, eq, ilike, isNull, not, or, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, ne, not, or, sql } from "drizzle-orm";
 import { cartoes, contas, lancamentos } from "@/db/schema";
 import { db } from "@/lib/db";
 import { loadLogoOptions } from "@/lib/logo/options";
@@ -72,6 +72,11 @@ export async function fetchCardsForUser(userId: string): Promise<{
 				and(
 					eq(lancamentos.userId, userId),
 					or(isNull(lancamentos.isSettled), eq(lancamentos.isSettled, false)),
+					// Recorrente no cartão: só consome limite quando a data da ocorrência já passou
+					or(
+						ne(lancamentos.condition, "Recorrente"),
+						sql`${lancamentos.purchaseDate} <= current_date`,
+					),
 				),
 			)
 			.groupBy(lancamentos.cartaoId),
@@ -164,6 +169,10 @@ export async function fetchInativosForUser(userId: string): Promise<{
 				and(
 					eq(lancamentos.userId, userId),
 					or(isNull(lancamentos.isSettled), eq(lancamentos.isSettled, false)),
+					or(
+						ne(lancamentos.condition, "Recorrente"),
+						sql`${lancamentos.purchaseDate} <= current_date`,
+					),
 				),
 			)
 			.groupBy(lancamentos.cartaoId),
