@@ -11,6 +11,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Coluna `data_compra_original` (originalPurchaseDate) para guarda a data real da compra; na lista, no detalhe e na exportação (CSV, XLSX, PDF) exibe essa data em vez da data efetiva da parcela
 - Migração `0019_add_original_purchase_date.sql` para criação da coluna
+- **Patch de migração 1.6.3 → 1.6.4:** script `scripts/migrate-parcelado-164.ts` para corrigir lançamentos parcelados já existentes (define `originalPurchaseDate` e ajusta `purchaseDate` de cada parcela para o mês correto). **Quem atualizou de 1.6.3 para 1.6.4 deve rodar uma vez:** `pnpm db:migrate-parcelado-164` (ou `pnpm tsx scripts/migrate-parcelado-164.ts`). Requer `DATABASE_URL` no `.env`. **Com Docker:** após `docker compose up`, rode no host: `docker exec openmonetis_app pnpm exec tsx scripts/migrate-parcelado-164.ts` (o container já recebe `DATABASE_URL` do compose).
 
 ### Alterado
 - Preenchimento automatico ao selecionar um data fora do mês atual

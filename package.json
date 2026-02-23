@@ -14,6 +14,7 @@
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
 		"db:enableExtensions": "tsx scripts/postgres/enable-extensions.ts",
+		"db:migrate-parcelado-164": "tsx scripts/migrate-parcelado-164.ts",
 		"db:studio": "drizzle-kit studio",
 		"docker:up": "docker compose up --build",
 		"docker:up:db": "docker compose up -d db",

@@ -69,6 +69,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/db ./db
 
+# Copiar scripts e lib para rodar patch de migração (ex.: db:migrate-parcelado-164) no container
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /app/lib ./lib
+
 # Copiar node_modules para ter drizzle-kit disponível para migrations
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
