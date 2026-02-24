@@ -2,7 +2,6 @@ import { RiArrowRightSLine } from "@remixicon/react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { ChangelogTab } from "@/components/ajustes/changelog-tab";
 import { CompanionTab } from "@/components/ajustes/companion-tab";
 import { DeleteAccountForm } from "@/components/ajustes/delete-account-form";
 import { PreferencesForm } from "@/components/ajustes/preferences-form";
@@ -12,8 +11,6 @@ import { UpdatePasswordForm } from "@/components/ajustes/update-password-form";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/lib/auth/config";
-import { parseChangelog } from "@/lib/changelog/parse-changelog";
-
 import { fetchAjustesPageData } from "./data";
 
 export default async function Page() {
@@ -31,8 +28,6 @@ export default async function Page() {
 	const { authProvider, userPreferences, userApiTokens } =
 		await fetchAjustesPageData(session.user.id);
 
-	const changelogVersions = parseChangelog();
-
 	return (
 		<div className="w-full">
 			<Tabs defaultValue="preferencias" className="w-full">
@@ -45,14 +40,13 @@ export default async function Page() {
 							<TabsTrigger value="nome">Alterar nome</TabsTrigger>
 							<TabsTrigger value="senha">Alterar senha</TabsTrigger>
 							<TabsTrigger value="email">Alterar e-mail</TabsTrigger>
-							<TabsTrigger value="changelog">Changelog</TabsTrigger>
 							<TabsTrigger value="deletar" className="text-destructive">
 								Deletar conta
 							</TabsTrigger>
 						</TabsList>
 					</div>
 					<div
-						className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-gradient-to-l from-background to-transparent md:hidden"
+						className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-linear-to-l from-background to-transparent md:hidden"
 						aria-hidden
 					>
 						<RiArrowRightSLine className="size-5 shrink-0 text-muted-foreground" />
@@ -137,10 +131,6 @@ export default async function Page() {
 							/>
 						</div>
 					</Card>
-				</TabsContent>
-
-				<TabsContent value="changelog" className="mt-4">
-					<ChangelogTab versions={changelogVersions} />
 				</TabsContent>
 
 				<TabsContent value="deletar" className="mt-4">

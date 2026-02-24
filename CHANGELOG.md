@@ -5,26 +5,28 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [1.7.0] - 2026-02-24
+## [1.7.1] - 2026-02-24
 
 ### Adicionado
 
-- **Topbar de navegação** como experimento: substitui o header fixo por uma topbar com backdrop blur (`bg-card/80`), agrupando os links de navegação em 5 grupos lógicos (Dashboard, Lançamentos, Cartões, Relatórios, Ferramentas)
-- **Dropdown "Ferramentas"** na topbar: consolida calculadora e modo privacidade em um único menu (`components/topbar/ferramentas-dropdown.tsx`)
-- **NotificationBell expandida**: passa a exibir notificações de orçamentos estourados e pré-lançamentos pendentes além das notificações gerais, com seções separadas por tipo e contagem agregada
+- Topbar de navegação substituindo o header fixo: backdrop blur, links agrupados em 5 seções (Dashboard, Lançamentos, Cartões, Relatórios, Ferramentas)
+- Dropdown Ferramentas na topbar consolidando calculadora e modo privacidade
+- Sino de notificações expandido: exibe orçamentos estourados e pré-lançamentos pendentes com seções separadas e contagem agregada
+- Página dedicada de changelog em `/changelog`
+- Link para o changelog no menu do usuário com versão exibida ao lado
 
 ### Alterado
 
-- **Logo** refatorado com variante `compact` usada na topbar
-- **TopbarUser**: incorpora o botão de logout (antes em `logout-button.tsx` separado)
-- **Topbar**: links em lowercase; layout centralizado em `max-w-8xl`; `radix-ui ^1.4.3` adicionado como dependência
-- **Gráfico de relatório de categorias** (`category-report-chart`): refatoração interna
+- Logo refatorado com variante compacta para uso na topbar
+- Menu do usuário incorpora o botão de logout e link para ajustes
+- Links da topbar em lowercase; layout centralizado em max-w-8xl
+- Data no changelog exibida no formato dd/mm/aaaa
 
 ### Removido
 
-- `components/header-dashboard.tsx` — substituído pela topbar
-- `components/auth/logout-button.tsx` — lógica incorporada ao `TopbarUser`
-- `components/privacy-mode-toggle.tsx` — movido para o `FerramentasDropdown`
+- Header lateral substituído pela topbar
+- Aba Changelog removida de Ajustes (agora é página própria)
+- Componentes separados de logout e modo privacidade (incorporados à topbar)
 
 ## [1.6.3] - 2026-02-19
 

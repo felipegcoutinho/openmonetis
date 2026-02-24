@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	RiHistoryLine,
 	RiLogoutCircleLine,
 	RiMessageLine,
 	RiSettings2Line,
@@ -23,6 +24,7 @@ import { authClient } from "@/lib/auth/client";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { cn } from "@/lib/utils/ui";
 import { version } from "@/package.json";
+import { Badge } from "../ui/badge";
 
 const itemClass =
 	"flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent";
@@ -100,6 +102,15 @@ export function TopbarUser({ user, pagadorAvatarUrl }: TopbarUserProps) {
 							Ajustes
 						</Link>
 
+						<Link
+							href="/changelog"
+							className={cn(itemClass, "text-foreground")}
+						>
+							<RiHistoryLine className="size-4 text-muted-foreground shrink-0" />
+							<span className="flex-1">Changelog</span>
+							<Badge variant="secondary">v{version}</Badge>
+						</Link>
+
 						<DialogTrigger asChild>
 							<button
 								type="button"
@@ -131,12 +142,6 @@ export function TopbarUser({ user, pagadorAvatarUrl }: TopbarUserProps) {
 							)}
 							{logoutLoading ? "Saindo..." : "Sair"}
 						</button>
-					</div>
-					<DropdownMenuSeparator />
-					<div className="px-3 py-1.5">
-						<span className="text-[10px] font-mono text-muted-foreground/40 select-none">
-							Versão {version}
-						</span>
 					</div>
 				</DropdownMenuContent>
 			</DropdownMenu>

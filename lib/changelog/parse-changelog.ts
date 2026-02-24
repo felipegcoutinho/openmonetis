@@ -29,9 +29,10 @@ export function parseChangelog(): ChangelogVersion[] {
 			if (currentSection && currentVersion) {
 				currentVersion.sections.push(currentSection);
 			}
+			const [y, m, d] = versionMatch[2].split("-");
 			currentVersion = {
 				version: versionMatch[1],
-				date: versionMatch[2],
+				date: d && m && y ? `${d}/${m}/${y}` : versionMatch[2],
 				sections: [],
 			};
 			versions.push(currentVersion);
