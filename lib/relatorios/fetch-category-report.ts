@@ -1,9 +1,9 @@
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { categorias, lancamentos, pagadores } from "@/db/schema";
+import { categorias, lancamentos } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/lib/accounts/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
-import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 import type {
 	CategoryReportData,
 	CategoryReportFilters,
@@ -28,11 +28,16 @@ export async function fetchCategoryReport(
 	// Generate all periods in the range
 	const periods = generatePeriodRange(startPeriod, endPeriod);
 
+	const adminPagadorId = await getAdminPagadorId(userId);
+	if (!adminPagadorId) {
+		return { categories: [], periods, totals: new Map(), grandTotal: 0 };
+	}
+
 	// Build WHERE conditions
 	const whereConditions = [
 		eq(lancamentos.userId, userId),
+		eq(lancamentos.pagadorId, adminPagadorId),
 		inArray(lancamentos.period, periods),
-		eq(pagadores.role, PAGADOR_ROLE_ADMIN),
 		or(eq(categorias.type, "despesa"), eq(categorias.type, "receita")),
 		or(
 			isNull(lancamentos.note),
@@ -56,7 +61,6 @@ export async function fetchCategoryReport(
 			total: sql<number>`coalesce(sum(${lancamentos.amount}), 0)`,
 		})
 		.from(lancamentos)
-		.innerJoin(pagadores, eq(lancamentos.pagadorId, pagadores.id))
 		.innerJoin(categorias, eq(lancamentos.categoriaId, categorias.id))
 		.where(and(...whereConditions))
 		.groupBy(

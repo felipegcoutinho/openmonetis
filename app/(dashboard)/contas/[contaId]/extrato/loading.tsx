@@ -20,7 +20,7 @@ export default function ExtratoLoading() {
 
 			{/* Seção de lançamentos */}
 			<section className="flex flex-col gap-4">
-				<div className="space-y-6">
+				<div className="space-y-6 pt-4">
 					{/* Header */}
 					<div className="flex items-center justify-between">
 						<Skeleton className="h-8 w-48 rounded-2xl bg-foreground/10" />

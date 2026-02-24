@@ -42,7 +42,7 @@ export default function PagadorDetailsLoading() {
 			</div>
 
 			{/* Tabs */}
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4">
 				<div className="flex gap-2 border-b">
 					<Skeleton className="h-10 w-32 rounded-t-2xl bg-foreground/10" />
 					<Skeleton className="h-10 w-32 rounded-t-2xl bg-foreground/10" />

@@ -14,7 +14,7 @@ export default function LancamentosLoading() {
 			{/* Month Picker placeholder */}
 			<div className="h-[60px] animate-pulse rounded-2xl bg-foreground/10" />
 
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4">
 				{/* Header com título e botão */}
 				<div className="flex items-center justify-between">
 					<Skeleton className="h-8 w-48 rounded-2xl bg-foreground/10" />

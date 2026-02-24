@@ -45,7 +45,10 @@ export function RefreshPageButton({
 					{...props}
 				>
 					<RiRefreshLine
-						className={cn("size-4 transition-transform duration-200", isPending && "animate-spin")}
+						className={cn(
+							"size-4 transition-transform duration-200",
+							isPending && "animate-spin",
+						)}
 						aria-hidden
 					/>
 				</button>

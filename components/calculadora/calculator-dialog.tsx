@@ -31,7 +31,7 @@ type CalculatorDialogButtonProps = {
 	onSelectValue?: (value: string) => void;
 };
 
-function CalculatorDialogContent({
+export function CalculatorDialogContent({
 	open,
 	onSelectValue,
 }: {

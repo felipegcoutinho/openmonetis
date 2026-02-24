@@ -10,7 +10,7 @@ export default function OrcamentosLoading() {
 			{/* Month Picker placeholder */}
 			<div className="h-[60px] animate-pulse rounded-2xl bg-foreground/10" />
 
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4">
 				{/* Header */}
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">

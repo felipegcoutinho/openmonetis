@@ -270,7 +270,7 @@ export function InvoiceSummaryCard({
 										alt={`Bandeira ${cardBrand}`}
 										width={32}
 										height={32}
-										className="h-5 w-auto rounded-full"
+										className="h-5 w-auto rounded"
 									/>
 									<span className="truncate">{cardBrand}</span>
 								</div>

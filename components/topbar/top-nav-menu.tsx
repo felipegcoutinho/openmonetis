@@ -33,33 +33,32 @@ import {
 } from "@/components/ui/sheet";
 import type { DropdownLinkItem } from "./dropdown-link-list";
 import { DropdownLinkList } from "./dropdown-link-list";
+import {
+	FerramentasDropdownContent,
+	MobileFerramentasItems,
+} from "./ferramentas-dropdown";
 import { MobileNavLink, MobileSectionLabel } from "./mobile-nav-link";
 import { triggerClass } from "./nav-styles";
 import { SimpleNavLink } from "./simple-nav-link";
 
-type TopNavMenuProps = {
-	preLancamentosCount?: number;
-};
-
-export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
+export function TopNavMenu() {
 	const [sheetOpen, setSheetOpen] = useState(false);
 	const close = () => setSheetOpen(false);
 
 	const lancamentosItems: DropdownLinkItem[] = [
 		{
 			href: "/lancamentos",
-			label: "Lançamentos",
+			label: "lançamentos",
 			icon: <RiArrowLeftRightLine className="size-4" />,
 		},
 		{
 			href: "/pre-lancamentos",
-			label: "Pré-Lançamentos",
+			label: "pré-lançamentos",
 			icon: <RiInboxLine className="size-4" />,
-			badge: preLancamentosCount,
 		},
 		{
 			href: "/calendario",
-			label: "Calendário",
+			label: "calendário",
 			icon: <RiCalendarEventLine className="size-4" />,
 		},
 	];
@@ -67,17 +66,17 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 	const financasItems: DropdownLinkItem[] = [
 		{
 			href: "/cartoes",
-			label: "Cartões",
+			label: "cartões",
 			icon: <RiBankCard2Line className="size-4" />,
 		},
 		{
 			href: "/contas",
-			label: "Contas",
+			label: "contas",
 			icon: <RiBankLine className="size-4" />,
 		},
 		{
 			href: "/orcamentos",
-			label: "Orçamentos",
+			label: "orçamentos",
 			icon: <RiFundsLine className="size-4" />,
 		},
 	];
@@ -85,17 +84,17 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 	const organizacaoItems: DropdownLinkItem[] = [
 		{
 			href: "/pagadores",
-			label: "Pagadores",
+			label: "pagadores",
 			icon: <RiGroupLine className="size-4" />,
 		},
 		{
 			href: "/categorias",
-			label: "Categorias",
+			label: "categorias",
 			icon: <RiPriceTag3Line className="size-4" />,
 		},
 		{
 			href: "/anotacoes",
-			label: "Anotações",
+			label: "anotações",
 			icon: <RiTodoLine className="size-4" />,
 		},
 	];
@@ -103,17 +102,17 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 	const analiseItems: DropdownLinkItem[] = [
 		{
 			href: "/insights",
-			label: "Insights",
+			label: "insights",
 			icon: <RiSparklingLine className="size-4" />,
 		},
 		{
 			href: "/relatorios/tendencias",
-			label: "Tendências",
+			label: "tendências",
 			icon: <RiFileChartLine className="size-4" />,
 		},
 		{
 			href: "/relatorios/uso-cartoes",
-			label: "Uso de Cartões",
+			label: "uso de cartões",
 			icon: <RiBankCard2Line className="size-4" />,
 		},
 	];
@@ -157,10 +156,19 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 
 						<NavigationMenuItem>
 							<NavigationMenuTrigger className={triggerClass}>
-								Análise
+								Relatórios
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
 								<DropdownLinkList items={analiseItems} />
+							</NavigationMenuContent>
+						</NavigationMenuItem>
+
+						<NavigationMenuItem>
+							<NavigationMenuTrigger className={triggerClass}>
+								Ferramentas
+							</NavigationMenuTrigger>
+							<NavigationMenuContent>
+								<FerramentasDropdownContent />
 							</NavigationMenuContent>
 						</NavigationMenuItem>
 					</NavigationMenuList>
@@ -198,22 +206,21 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 							icon={<RiArrowLeftRightLine className="size-4" />}
 							onClick={close}
 						>
-							Lançamentos
+							lançamentos
 						</MobileNavLink>
 						<MobileNavLink
 							href="/pre-lancamentos"
 							icon={<RiInboxLine className="size-4" />}
 							onClick={close}
-							badge={preLancamentosCount}
 						>
-							Pré-Lançamentos
+							pré-lançamentos
 						</MobileNavLink>
 						<MobileNavLink
 							href="/calendario"
 							icon={<RiCalendarEventLine className="size-4" />}
 							onClick={close}
 						>
-							Calendário
+							calendário
 						</MobileNavLink>
 
 						<MobileSectionLabel label="Finanças" />
@@ -222,21 +229,21 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 							icon={<RiBankCard2Line className="size-4" />}
 							onClick={close}
 						>
-							Cartões
+							cartões
 						</MobileNavLink>
 						<MobileNavLink
 							href="/contas"
 							icon={<RiBankLine className="size-4" />}
 							onClick={close}
 						>
-							Contas
+							contas
 						</MobileNavLink>
 						<MobileNavLink
 							href="/orcamentos"
 							icon={<RiFundsLine className="size-4" />}
 							onClick={close}
 						>
-							Orçamentos
+							orçamentos
 						</MobileNavLink>
 
 						<MobileSectionLabel label="Organização" />
@@ -245,21 +252,21 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 							icon={<RiGroupLine className="size-4" />}
 							onClick={close}
 						>
-							Pagadores
+							pagadores
 						</MobileNavLink>
 						<MobileNavLink
 							href="/categorias"
 							icon={<RiPriceTag3Line className="size-4" />}
 							onClick={close}
 						>
-							Categorias
+							categorias
 						</MobileNavLink>
 						<MobileNavLink
 							href="/anotacoes"
 							icon={<RiTodoLine className="size-4" />}
 							onClick={close}
 						>
-							Anotações
+							anotações
 						</MobileNavLink>
 
 						<MobileSectionLabel label="Análise" />
@@ -268,22 +275,25 @@ export function TopNavMenu({ preLancamentosCount = 0 }: TopNavMenuProps) {
 							icon={<RiSparklingLine className="size-4" />}
 							onClick={close}
 						>
-							Insights
+							insights
 						</MobileNavLink>
 						<MobileNavLink
 							href="/relatorios/tendencias"
 							icon={<RiFileChartLine className="size-4" />}
 							onClick={close}
 						>
-							Tendências
+							tendências
 						</MobileNavLink>
 						<MobileNavLink
 							href="/relatorios/uso-cartoes"
 							icon={<RiBankCard2Line className="size-4" />}
 							onClick={close}
 						>
-							Uso de Cartões
+							uso de cartões
 						</MobileNavLink>
+
+						<MobileSectionLabel label="Ferramentas" />
+						<MobileFerramentasItems onClose={close} />
 					</nav>
 				</SheetContent>
 			</Sheet>

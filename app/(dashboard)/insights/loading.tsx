@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function InsightsLoading() {
 	return (
 		<main className="flex flex-col gap-6">
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4">
 				{/* Header */}
 				<div className="space-y-2">
 					<Skeleton className="h-10 w-64 rounded-2xl bg-foreground/10" />

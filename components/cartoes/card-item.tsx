@@ -158,7 +158,7 @@ export function CardItem({
 	);
 
 	return (
-		<Card className="flex p-6 h-[300px] w-[440px]">
+		<Card className="flex flex-col p-6 w-full">
 			<CardHeader className="space-y-2 px-0 pb-0">
 				<div className="flex items-start justify-between gap-2">
 					<div className="flex flex-1 items-center gap-2">
@@ -209,14 +209,14 @@ export function CardItem({
 					</div>
 
 					{brandAsset ? (
-						<div className="flex items-center justify-center rounded-lg py-1">
+						<div className="flex items-center justify-center py-1">
 							<Image
 								src={brandAsset}
 								alt={`Bandeira ${brand}`}
-								width={42}
-								height={42}
+								width={36}
+								height={36}
 								className={cn(
-									"h-6 w-auto rounded-full",
+									"h-5 w-auto rounded",
 									isInactive && "grayscale opacity-40",
 								)}
 							/>

@@ -46,7 +46,7 @@ export function PaymentMethodSection({
 	return (
 		<>
 			{!isUpdateMode ? (
-				<div className="flex w-full flex-col gap-2 md:flex-row">
+				<div className="flex w-full flex-col gap-2 md:flex-row mt-3">
 					<div
 						className={cn(
 							"space-y-1 w-full",

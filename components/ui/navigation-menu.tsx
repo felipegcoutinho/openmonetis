@@ -1,4 +1,4 @@
-import { RiArrowDownBoxFill } from "@remixicon/react";
+import { RiArrowDropDownLine } from "@remixicon/react";
 import { cva } from "class-variance-authority";
 import { NavigationMenu as NavigationMenuPrimitive } from "radix-ui";
 import type * as React from "react";
@@ -73,8 +73,8 @@ function NavigationMenuTrigger({
 			{...props}
 		>
 			{children}{" "}
-			<RiArrowDownBoxFill
-				className="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"
+			<RiArrowDropDownLine
+				className="relative top-px ml-1 size-4 text-primary transition duration-300 group-data-[state=open]:rotate-180"
 				aria-hidden="true"
 			/>
 		</NavigationMenuPrimitive.Trigger>

@@ -11,7 +11,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<section className="space-y-6 px-6">
+		<section className="space-y-6 pt-4">
 			<PageDescription
 				icon={<RiFundsLine />}
 				title="Orçamentos"

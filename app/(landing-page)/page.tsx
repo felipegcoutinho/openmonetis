@@ -155,40 +155,38 @@ export default async function Page() {
 		<div className="flex min-h-screen flex-col">
 			{/* Navigation */}
 			<header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-				<div className="container flex h-16 items-center justify-between">
-					<div className="flex items-center">
-						<Logo />
-					</div>
+				<div className="max-w-8xl mx-auto px-4 flex h-14 items-center justify-between">
+					<Logo variant="compact" />
 
 					{/* Center Navigation Links */}
 					<nav className="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
 						<a
 							href="#telas"
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
 						>
 							Conheça as telas
 						</a>
 						<a
 							href="#funcionalidades"
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
 						>
 							Funcionalidades
 						</a>
 						<a
 							href="#companion"
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
 						>
 							Companion
 						</a>
 						<a
 							href="#stack"
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
 						>
 							Stack
 						</a>
 						<a
 							href="#como-usar"
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
 						>
 							Como usar
 						</a>
@@ -231,7 +229,7 @@ export default async function Page() {
 				{/* Background gradient */}
 				<div className="pointer-events-none absolute inset-0 bg-linear-to-b from-primary/5 via-transparent to-transparent" />
 
-				<div className="container relative">
+				<div className="max-w-8xl mx-auto px-4 relative">
 					<div className="mx-auto flex max-w-5xl flex-col items-center text-center gap-5 md:gap-6">
 						<Logo variant="small" className="h-12 w-12 mb-1" />
 
@@ -304,7 +302,7 @@ export default async function Page() {
 
 			{/* Metrics Bar */}
 			<section className="py-8 md:py-12 border-y">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-4xl">
 						<div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
 							<div className="flex flex-col items-center text-center gap-1.5">
@@ -350,7 +348,7 @@ export default async function Page() {
 
 			{/* Dashboard Preview Section */}
 			<section className="py-6 md:py-16">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-6xl">
 						<AnimateOnScroll>
 							<div>
@@ -378,7 +376,7 @@ export default async function Page() {
 
 			{/* Screenshots Gallery Section */}
 			<section id="telas" className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-6xl">
 						<AnimateOnScroll>
 							<div className="text-center mb-8 md:mb-12">
@@ -430,7 +428,7 @@ export default async function Page() {
 
 			{/* Features Section */}
 			<section id="funcionalidades" className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-5xl">
 						<AnimateOnScroll>
 							<div className="text-center mb-8 md:mb-12">
@@ -512,7 +510,7 @@ export default async function Page() {
 
 			{/* Companion Section */}
 			<section id="companion" className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-5xl">
 						<AnimateOnScroll>
 							<div className="grid gap-8 md:gap-12 md:grid-cols-2 items-center">
@@ -625,7 +623,7 @@ export default async function Page() {
 
 			{/* Tech Stack Section */}
 			<section id="stack" className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-5xl">
 						<AnimateOnScroll>
 							<div className="text-center mb-8 md:mb-12">
@@ -748,7 +746,7 @@ export default async function Page() {
 
 			{/* How to run Section */}
 			<section id="como-usar" className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-3xl">
 						<AnimateOnScroll>
 							<div className="text-center mb-8 md:mb-12">
@@ -783,7 +781,7 @@ export default async function Page() {
 
 			{/* Who is this for Section */}
 			<section className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-3xl">
 						<AnimateOnScroll>
 							<div className="text-center mb-8 md:mb-12">
@@ -882,7 +880,7 @@ export default async function Page() {
 
 			{/* CTA Section */}
 			<section className="py-12 md:py-24">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<AnimateOnScroll>
 						<div className="mx-auto max-w-3xl text-center px-4 sm:px-0">
 							<h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 md:mb-4">
@@ -924,11 +922,11 @@ export default async function Page() {
 
 			{/* Footer */}
 			<footer className="border-t py-8 md:py-12 mt-auto">
-				<div className="container">
+				<div className="max-w-8xl mx-auto px-4">
 					<div className="mx-auto max-w-5xl">
 						<div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
 							<div className="sm:col-span-2 md:col-span-1">
-								<Logo />
+								<Logo variant="compact" />
 								<p className="text-sm text-muted-foreground mt-3 md:mt-4">
 									Projeto pessoal de gestão financeira. Open source e
 									self-hosted.

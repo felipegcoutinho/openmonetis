@@ -125,7 +125,7 @@ export function CardsPage({
 		}
 
 		return (
-			<div className="flex flex-wrap gap-4">
+			<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
 				{list.map((card) => (
 					<CardItem
 						key={card.id}

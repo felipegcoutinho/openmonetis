@@ -5,6 +5,27 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.0] - 2026-02-24
+
+### Adicionado
+
+- **Topbar de navegação** como experimento: substitui o header fixo por uma topbar com backdrop blur (`bg-card/80`), agrupando os links de navegação em 5 grupos lógicos (Dashboard, Lançamentos, Cartões, Relatórios, Ferramentas)
+- **Dropdown "Ferramentas"** na topbar: consolida calculadora e modo privacidade em um único menu (`components/topbar/ferramentas-dropdown.tsx`)
+- **NotificationBell expandida**: passa a exibir notificações de orçamentos estourados e pré-lançamentos pendentes além das notificações gerais, com seções separadas por tipo e contagem agregada
+
+### Alterado
+
+- **Logo** refatorado com variante `compact` usada na topbar
+- **TopbarUser**: incorpora o botão de logout (antes em `logout-button.tsx` separado)
+- **Topbar**: links em lowercase; layout centralizado em `max-w-8xl`; `radix-ui ^1.4.3` adicionado como dependência
+- **Gráfico de relatório de categorias** (`category-report-chart`): refatoração interna
+
+### Removido
+
+- `components/header-dashboard.tsx` — substituído pela topbar
+- `components/auth/logout-button.tsx` — lógica incorporada ao `TopbarUser`
+- `components/privacy-mode-toggle.tsx` — movido para o `FerramentasDropdown`
+
 ## [1.6.3] - 2026-02-19
 
 ### Corrigido

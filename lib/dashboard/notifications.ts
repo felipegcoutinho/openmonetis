@@ -1,7 +1,13 @@
 "use server";
 
-import { and, eq, lt, sql } from "drizzle-orm";
-import { cartoes, faturas, lancamentos } from "@/db/schema";
+import { and, eq, lt, ne, sql } from "drizzle-orm";
+import {
+	cartoes,
+	categorias,
+	faturas,
+	lancamentos,
+	orcamentos,
+} from "@/db/schema";
 import { db } from "@/lib/db";
 import { INVOICE_PAYMENT_STATUS } from "@/lib/faturas";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
@@ -16,15 +22,28 @@ export type DashboardNotification = {
 	status: NotificationType;
 	amount: number;
 	period?: string;
-	showAmount: boolean; // Controla se o valor deve ser exibido no card
+	showAmount: boolean;
+};
+
+export type BudgetStatus = "exceeded" | "critical";
+
+export type BudgetNotification = {
+	id: string;
+	categoryName: string;
+	budgetAmount: number;
+	spentAmount: number;
+	usedPercentage: number;
+	status: BudgetStatus;
 };
 
 export type DashboardNotificationsSnapshot = {
 	notifications: DashboardNotification[];
 	totalCount: number;
+	budgetNotifications: BudgetNotification[];
 };
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
+const BUDGET_CRITICAL_THRESHOLD = 80;
 
 /**
  * Calcula a data de vencimento de uma fatura baseado no período e dia de vencimento
@@ -97,13 +116,11 @@ function parseUTCDate(dateString: string): Date {
 function isOverdue(dueDate: string, today: Date): boolean {
 	const due = parseUTCDate(dueDate);
 	const dueNormalized = normalizeDate(due);
-
 	return dueNormalized < today;
 }
 
 /**
  * Verifica se uma data vence nos próximos X dias (incluindo hoje)
- * Exemplo: Se hoje é dia 4 e daysThreshold = 5, retorna true para datas de 4 a 8
  */
 function isDueWithinDays(
 	dueDate: string,
@@ -112,25 +129,21 @@ function isDueWithinDays(
 ): boolean {
 	const due = parseUTCDate(dueDate);
 	const dueNormalized = normalizeDate(due);
-
-	// Data limite: hoje + daysThreshold dias (em UTC)
 	const limitDate = new Date(today);
 	limitDate.setUTCDate(limitDate.getUTCDate() + daysThreshold);
-
-	// Vence se está entre hoje (inclusive) e a data limite (inclusive)
 	return dueNormalized >= today && dueNormalized <= limitDate;
 }
 
+function toNum(value: unknown): number {
+	if (typeof value === "number") return value;
+	return Number(value) || 0;
+}
+
 /**
- * Busca todas as notificações do dashboard
- *
- * Regras:
- * - Períodos anteriores: TODOS os não pagos (sempre status "atrasado")
- * - Período atual: Itens atrasados + os que vencem nos próximos dias (sem mostrar valor)
- *
- * Status:
- * - "overdue": vencimento antes do dia atual (ou qualquer período anterior)
- * - "due_soon": vencimento no dia atual ou nos próximos dias
+ * Busca todas as notificações do dashboard:
+ * - Faturas de cartão atrasadas ou com vencimento próximo
+ * - Boletos não pagos atrasados ou com vencimento próximo
+ * - Orçamentos excedidos (≥ 100%) ou críticos (≥ 80%)
  */
 export async function fetchDashboardNotifications(
 	userId: string,
@@ -141,8 +154,7 @@ export async function fetchDashboardNotifications(
 
 	const adminPagadorId = await getAdminPagadorId(userId);
 
-	// Buscar faturas pendentes de períodos anteriores
-	// Apenas faturas com registro na tabela (períodos antigos devem ter sido finalizados)
+	// --- Faturas atrasadas (períodos anteriores) ---
 	const overdueInvoices = await db
 		.select({
 			invoiceId: faturas.id,
@@ -171,8 +183,7 @@ export async function fetchDashboardNotifications(
 			),
 		);
 
-	// Buscar faturas do período atual
-	// Usa LEFT JOIN para incluir cartões com lançamentos mesmo sem registro em faturas
+	// --- Faturas do período atual ---
 	const currentInvoices = await db
 		.select({
 			invoiceId: faturas.id,
@@ -213,13 +224,12 @@ export async function fetchDashboardNotifications(
 			faturas.paymentStatus,
 		);
 
-	// Buscar boletos não pagos (usando pagadorId direto ao invés de JOIN)
+	// --- Boletos não pagos ---
 	const boletosConditions = [
 		eq(lancamentos.userId, userId),
 		eq(lancamentos.paymentMethod, PAYMENT_METHOD_BOLETO),
 		eq(lancamentos.isSettled, false),
 	];
-
 	if (adminPagadorId) {
 		boletosConditions.push(eq(lancamentos.pagadorId, adminPagadorId));
 	}
@@ -235,18 +245,44 @@ export async function fetchDashboardNotifications(
 		.from(lancamentos)
 		.where(and(...boletosConditions));
 
+	// --- Orçamentos do período atual ---
+	const budgetJoinConditions = [
+		eq(lancamentos.categoriaId, orcamentos.categoriaId),
+		eq(lancamentos.userId, orcamentos.userId),
+		eq(lancamentos.period, orcamentos.period),
+		eq(lancamentos.transactionType, "Despesa"),
+		ne(lancamentos.condition, "cancelado"),
+	];
+	if (adminPagadorId) {
+		budgetJoinConditions.push(eq(lancamentos.pagadorId, adminPagadorId));
+	}
+
+	const budgetRows = await db
+		.select({
+			orcamentoId: orcamentos.id,
+			budgetAmount: orcamentos.amount,
+			categoriaName: categorias.name,
+			spentAmount: sql<number>`COALESCE(SUM(ABS(${lancamentos.amount})), 0)`,
+		})
+		.from(orcamentos)
+		.innerJoin(categorias, eq(orcamentos.categoriaId, categorias.id))
+		.leftJoin(lancamentos, and(...budgetJoinConditions))
+		.where(
+			and(eq(orcamentos.userId, userId), eq(orcamentos.period, currentPeriod)),
+		)
+		.groupBy(orcamentos.id, orcamentos.amount, categorias.name);
+
+	// =====================
+	// Processar notificações
+	// =====================
+
 	const notifications: DashboardNotification[] = [];
 
-	// Processar faturas atrasadas (períodos anteriores)
+	// Faturas atrasadas (períodos anteriores)
 	for (const invoice of overdueInvoices) {
 		if (!invoice.period || !invoice.dueDay) continue;
-
 		const dueDate = calculateDueDate(invoice.period, invoice.dueDay);
-		const amount =
-			typeof invoice.totalAmount === "number"
-				? invoice.totalAmount
-				: Number(invoice.totalAmount) || 0;
-
+		const amount = toNum(invoice.totalAmount);
 		const notificationId = invoice.invoiceId
 			? `invoice-${invoice.invoiceId}`
 			: `invoice-${invoice.cardId}-${invoice.period}`;
@@ -259,43 +295,28 @@ export async function fetchDashboardNotifications(
 			status: "overdue",
 			amount: Math.abs(amount),
 			period: invoice.period,
-			showAmount: true, // Mostrar valor para itens de períodos anteriores
+			showAmount: true,
 		});
 	}
 
-	// Processar faturas do período atual (atrasadas + vencimento iminente)
+	// Faturas do período atual
 	for (const invoice of currentInvoices) {
 		if (!invoice.period || !invoice.dueDay) continue;
-
-		const amount =
-			typeof invoice.totalAmount === "number"
-				? invoice.totalAmount
-				: Number(invoice.totalAmount) || 0;
-
-		const transactionCount =
-			typeof invoice.transactionCount === "number"
-				? invoice.transactionCount
-				: Number(invoice.transactionCount) || 0;
-
+		const amount = toNum(invoice.totalAmount);
+		const transactionCount = toNum(invoice.transactionCount);
 		const paymentStatus =
 			invoice.paymentStatus ?? INVOICE_PAYMENT_STATUS.PENDING;
 
-		// Ignora se não tem lançamentos e não tem registro de fatura
 		const shouldInclude =
 			transactionCount > 0 ||
 			Math.abs(amount) > 0 ||
 			invoice.invoiceId !== null;
-
 		if (!shouldInclude) continue;
-
-		// Ignora se já foi paga
 		if (paymentStatus === INVOICE_PAYMENT_STATUS.PAID) continue;
 
 		const dueDate = calculateDueDate(invoice.period, invoice.dueDay);
-
 		const invoiceIsOverdue = isOverdue(dueDate, today);
 		const invoiceIsDueSoon = isDueWithinDays(dueDate, today, DAYS_THRESHOLD);
-
 		if (!invoiceIsOverdue && !invoiceIsDueSoon) continue;
 
 		const notificationId = invoice.invoiceId
@@ -314,11 +335,9 @@ export async function fetchDashboardNotifications(
 		});
 	}
 
-	// Processar boletos
+	// Boletos
 	for (const boleto of boletosRows) {
 		if (!boleto.dueDate) continue;
-
-		// Converter para string no formato YYYY-MM-DD (UTC)
 		const dueDate =
 			boleto.dueDate instanceof Date
 				? `${boleto.dueDate.getUTCFullYear()}-${String(boleto.dueDate.getUTCMonth() + 1).padStart(2, "0")}-${String(boleto.dueDate.getUTCDate()).padStart(2, "0")}`
@@ -326,17 +345,11 @@ export async function fetchDashboardNotifications(
 
 		const boletoIsOverdue = isOverdue(dueDate, today);
 		const boletoIsDueSoon = isDueWithinDays(dueDate, today, DAYS_THRESHOLD);
-
 		const isOldPeriod = boleto.period < currentPeriod;
 		const isCurrentPeriod = boleto.period === currentPeriod;
+		const amount = toNum(boleto.amount);
 
-		// Período anterior: incluir todos (sempre atrasado)
 		if (isOldPeriod) {
-			const amount =
-				typeof boleto.amount === "number"
-					? boleto.amount
-					: Number(boleto.amount) || 0;
-
 			notifications.push({
 				id: `boleto-${boleto.id}`,
 				type: "boleto",
@@ -345,24 +358,15 @@ export async function fetchDashboardNotifications(
 				status: "overdue",
 				amount: Math.abs(amount),
 				period: boleto.period,
-				showAmount: true, // Mostrar valor para períodos anteriores
+				showAmount: true,
 			});
-		}
-
-		// Período atual: incluir atrasados e os que vencem em breve (sem valor)
-		else if (isCurrentPeriod && (boletoIsOverdue || boletoIsDueSoon)) {
-			const status: NotificationType = boletoIsOverdue ? "overdue" : "due_soon";
-			const amount =
-				typeof boleto.amount === "number"
-					? boleto.amount
-					: Number(boleto.amount) || 0;
-
+		} else if (isCurrentPeriod && (boletoIsOverdue || boletoIsDueSoon)) {
 			notifications.push({
 				id: `boleto-${boleto.id}`,
 				type: "boleto",
 				name: boleto.name,
 				dueDate,
-				status,
+				status: boletoIsOverdue ? "overdue" : "due_soon",
 				amount: Math.abs(amount),
 				period: boleto.period,
 				showAmount: boletoIsOverdue,
@@ -377,8 +381,37 @@ export async function fetchDashboardNotifications(
 		return a.dueDate.localeCompare(b.dueDate);
 	});
 
+	// Orçamentos excedidos e críticos
+	const budgetNotifications: BudgetNotification[] = [];
+
+	for (const row of budgetRows) {
+		const budgetAmount = toNum(row.budgetAmount);
+		const spentAmount = toNum(row.spentAmount);
+		if (budgetAmount <= 0) continue;
+
+		const usedPercentage = (spentAmount / budgetAmount) * 100;
+		if (usedPercentage < BUDGET_CRITICAL_THRESHOLD) continue;
+
+		budgetNotifications.push({
+			id: `budget-${row.orcamentoId}`,
+			categoryName: row.categoriaName,
+			budgetAmount,
+			spentAmount,
+			usedPercentage,
+			status: usedPercentage >= 100 ? "exceeded" : "critical",
+		});
+	}
+
+	// Excedidos primeiro, depois por percentual decrescente
+	budgetNotifications.sort((a, b) => {
+		if (a.status === "exceeded" && b.status !== "exceeded") return -1;
+		if (a.status !== "exceeded" && b.status === "exceeded") return 1;
+		return b.usedPercentage - a.usedPercentage;
+	});
+
 	return {
 		notifications,
 		totalCount: notifications.length,
+		budgetNotifications,
 	};
 }

@@ -36,7 +36,7 @@ export default async function Page({ searchParams }: PageProps) {
 	const { disableMagnetlines, dashboardWidgets } = preferences;
 
 	return (
-		<main className="flex flex-col gap-4 px-6">
+		<main className="flex flex-col gap-4">
 			<DashboardWelcome
 				name={user.name}
 				disableMagnetlines={disableMagnetlines}

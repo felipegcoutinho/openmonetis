@@ -1,6 +1,5 @@
 "use client";
 
-import { main_font } from "@/public/fonts/font_index";
 import MagnetLines from "../magnet-lines";
 import { Card } from "../ui/card";
 
@@ -54,9 +53,7 @@ export function DashboardWelcome({
 	const greeting = getGreeting();
 
 	return (
-		<Card
-			className={`${main_font.className} relative px-6 py-12 bg-welcome-banner border-none shadow-none overflow-hidden`}
-		>
+		<Card className="relative px-6 py-12 bg-welcome-banner overflow-hidden">
 			<div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
 				<MagnetLines
 					rows={8}

@@ -64,13 +64,73 @@ const feedbackCategories = [
 	},
 ];
 
-export function FeedbackDialog() {
-	const [open, setOpen] = useState(false);
-
+export function FeedbackDialogBody({ onClose }: { onClose?: () => void }) {
 	const handleCategoryClick = (url: string) => {
 		window.open(url, "_blank", "noopener,noreferrer");
-		setOpen(false);
+		onClose?.();
 	};
+
+	return (
+		<DialogContent className="sm:max-w-[500px]">
+			<DialogHeader>
+				<DialogTitle className="flex items-center gap-2">
+					<RiMessageLine className="h-5 w-5" />
+					Enviar Feedback
+				</DialogTitle>
+				<DialogDescription>
+					Sua opinião é muito importante! Escolha o tipo de feedback que
+					deseja compartilhar.
+				</DialogDescription>
+			</DialogHeader>
+
+			<div className="grid gap-3 py-4">
+				{feedbackCategories.map((item) => {
+					const Icon = item.icon;
+					return (
+						<button
+							key={item.id}
+							onClick={() => handleCategoryClick(item.url)}
+							className={cn(
+								"flex items-start gap-3 p-4 rounded-lg border transition-all",
+								"hover:border-primary hover:bg-accent/50",
+								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+							)}
+						>
+							<div
+								className={cn(
+									"flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+									"bg-muted",
+								)}
+							>
+								<Icon className={cn("h-5 w-5", item.color)} />
+							</div>
+							<div className="flex-1 text-left space-y-1">
+								<h3 className="font-semibold text-sm flex items-center gap-2">
+									{item.title}
+									<RiExternalLinkLine className="h-3.5 w-3.5 text-muted-foreground" />
+								</h3>
+								<p className="text-sm text-muted-foreground">
+									{item.description}
+								</p>
+							</div>
+						</button>
+					);
+				})}
+			</div>
+
+			<div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground">
+				<RiExternalLinkLine className="h-4 w-4 shrink-0 mt-0.5" />
+				<p>
+					Você será redirecionado para o GitHub Discussions onde poderá
+					escrever seu feedback. É necessário ter uma conta no GitHub.
+				</p>
+			</div>
+		</DialogContent>
+	);
+}
+
+export function FeedbackDialog() {
+	const [open, setOpen] = useState(false);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -93,62 +153,7 @@ export function FeedbackDialog() {
 				</TooltipTrigger>
 				<TooltipContent>Enviar Feedback</TooltipContent>
 			</Tooltip>
-
-			<DialogContent className="sm:max-w-[500px]">
-				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2">
-						<RiMessageLine className="h-5 w-5" />
-						Enviar Feedback
-					</DialogTitle>
-					<DialogDescription>
-						Sua opinião é muito importante! Escolha o tipo de feedback que
-						deseja compartilhar.
-					</DialogDescription>
-				</DialogHeader>
-
-				<div className="grid gap-3 py-4">
-					{feedbackCategories.map((item) => {
-						const Icon = item.icon;
-						return (
-							<button
-								key={item.id}
-								onClick={() => handleCategoryClick(item.url)}
-								className={cn(
-									"flex items-start gap-3 p-4 rounded-lg border transition-all",
-									"hover:border-primary hover:bg-accent/50",
-									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-								)}
-							>
-								<div
-									className={cn(
-										"flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-										"bg-muted",
-									)}
-								>
-									<Icon className={cn("h-5 w-5", item.color)} />
-								</div>
-								<div className="flex-1 text-left space-y-1">
-									<h3 className="font-semibold text-sm flex items-center gap-2">
-										{item.title}
-										<RiExternalLinkLine className="h-3.5 w-3.5 text-muted-foreground" />
-									</h3>
-									<p className="text-sm text-muted-foreground">
-										{item.description}
-									</p>
-								</div>
-							</button>
-						);
-					})}
-				</div>
-
-				<div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground">
-					<RiExternalLinkLine className="h-4 w-4 shrink-0 mt-0.5" />
-					<p>
-						Você será redirecionado para o GitHub Discussions onde poderá
-						escrever seu feedback. É necessário ter uma conta no GitHub.
-					</p>
-				</div>
-			</DialogContent>
+			<FeedbackDialogBody onClose={() => setOpen(false)} />
 		</Dialog>
 	);
 }

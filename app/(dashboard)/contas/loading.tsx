@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function ContasLoading() {
 	return (
 		<main className="flex flex-col gap-6">
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4">
 				{/* Header */}
 				<div className="flex items-center justify-between">
 					<Skeleton className="h-8 w-32 rounded-2xl bg-foreground/10" />

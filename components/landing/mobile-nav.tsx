@@ -41,9 +41,9 @@ export function MobileNav({ isPublicDomain, isLoggedIn }: MobileNavProps) {
 
 			<Sheet open={open} onOpenChange={setOpen}>
 				<SheetContent side="right" className="w-72">
-					<SheetHeader>
-						<SheetTitle>
-							<Logo />
+					<SheetHeader className="border-b pb-4">
+						<SheetTitle asChild>
+							<Logo variant="compact" />
 						</SheetTitle>
 					</SheetHeader>
 

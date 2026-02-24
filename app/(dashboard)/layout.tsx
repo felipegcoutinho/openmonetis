@@ -61,7 +61,7 @@ export default async function DashboardLayout({
 				/>
 				<div className="flex flex-1 flex-col pt-14">
 					<div className="@container/main flex flex-1 flex-col gap-2">
-						<div className="flex flex-col gap-4 py-4 md:gap-6 w-full max-w-8xl mx-auto px-4">
+						<div className="flex flex-col gap-4 py-5 md:gap-6 w-full max-w-8xl mx-auto px-4">
 							{children}
 						</div>
 					</div>

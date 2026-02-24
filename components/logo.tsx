@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils/ui";
 import { version } from "@/package.json";
 
 interface LogoProps {
-	variant?: "full" | "small";
+	variant?: "full" | "small" | "compact";
 	className?: string;
 	showVersion?: boolean;
 }
@@ -13,6 +13,29 @@ export function Logo({
 	className,
 	showVersion = false,
 }: LogoProps) {
+	if (variant === "compact") {
+		return (
+			<div className={cn("flex items-center gap-1", className)}>
+				<Image
+					src="/logo_small.png"
+					alt="OpenMonetis"
+					width={32}
+					height={32}
+					className="object-contain"
+					priority
+				/>
+				<Image
+					src="/logo_text.png"
+					alt="OpenMonetis"
+					width={110}
+					height={32}
+					className="object-contain dark:invert hidden sm:block"
+					priority
+				/>
+			</div>
+		);
+	}
+
 	if (variant === "small") {
 		return (
 			<Image
@@ -45,8 +68,8 @@ export function Logo({
 				priority
 			/>
 			{showVersion && (
-				<span className="text-[10px] font-medium text-muted-foreground">
-					v{version}
+				<span className="text-[9px] font-medium text-muted-foreground">
+					{version}
 				</span>
 			)}
 		</div>

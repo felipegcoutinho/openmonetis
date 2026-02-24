@@ -25,7 +25,7 @@ export default function RootLayout({
 			<head>
 				<meta name="apple-mobile-web-app-title" content="OpenMonetis" />
 			</head>
-			<body className="antialiased" suppressHydrationWarning>
+			<body className="subpixel-antialiased" suppressHydrationWarning>
 				<ThemeProvider attribute="class" defaultTheme="light">
 					{children}
 					<Toaster position="top-right" />
