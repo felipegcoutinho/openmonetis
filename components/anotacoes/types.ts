@@ -22,3 +22,8 @@ export interface NoteFormValues {
 	type: NoteType;
 	tasks?: Task[];
 }
+
+/** Ordena tarefas: pendentes primeiro, concluídas por último. */
+export function sortTasksByStatus(tasks: Task[]): Task[] {
+	return [...tasks].sort((a, b) => Number(a.completed) - Number(b.completed));
+}

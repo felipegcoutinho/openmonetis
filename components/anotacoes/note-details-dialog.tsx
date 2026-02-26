@@ -14,7 +14,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Card } from "../ui/card";
-import type { Note } from "./types";
+import { type Note, sortTasksByStatus } from "./types";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
 	dateStyle: "long",
@@ -51,6 +51,7 @@ export function NoteDetailsDialog({
 
 	const isTask = note.type === "tarefa";
 	const tasks = note.tasks || [];
+	const sortedTasks = useMemo(() => sortTasksByStatus(tasks), [tasks]);
 	const completedCount = tasks.filter((t) => t.completed).length;
 	const totalCount = tasks.length;
 
@@ -71,7 +72,7 @@ export function NoteDetailsDialog({
 
 				{isTask ? (
 					<div className="max-h-[320px] overflow-auto space-y-3">
-						{tasks.map((task) => (
+						{sortedTasks.map((task) => (
 							<Card
 								key={task.id}
 								className="flex gap-3 p-3 flex-row items-center"

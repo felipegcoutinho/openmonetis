@@ -4,6 +4,7 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react";
 import {
 	type ReactNode,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 	useTransition,
@@ -29,8 +30,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useControlledState } from "@/hooks/use-controlled-state";
 import { useFormState } from "@/hooks/use-form-state";
-import { Card } from "../ui/card";
-import type { Note, NoteFormValues, Task } from "./types";
+import {
+	type Note,
+	type NoteFormValues,
+	sortTasksByStatus,
+	type Task,
+} from "./types";
 
 type NoteDialogMode = "create" | "update";
 interface NoteDialogProps {
@@ -94,16 +99,16 @@ export function NoteDialog({
 	}, [dialogOpen, note, setFormState]);
 
 	const title = mode === "create" ? "Nova anotação" : "Editar anotação";
-	const description =
-		mode === "create"
-			? "Escolha entre uma nota simples ou uma lista de tarefas."
-			: "Altere o título e/ou conteúdo desta anotação.";
-	const submitLabel =
-		mode === "create" ? "Salvar anotação" : "Atualizar anotação";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const titleCount = formState.title.length;
 	const descCount = formState.description.length;
 	const isNote = formState.type === "nota";
+
+	const sortedTasks = useMemo(
+		() => sortTasksByStatus(formState.tasks || []),
+		[formState.tasks],
+	);
 
 	const onlySpaces =
 		normalize(formState.title).length === 0 ||
@@ -222,198 +227,139 @@ export function NoteDialog({
 			<DialogContent className="max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
-					<DialogDescription>{description}</DialogDescription>
+					<DialogDescription className="sr-only">
+						{mode === "create"
+							? "Criar nova anotação"
+							: "Editar anotação existente"}
+					</DialogDescription>
 				</DialogHeader>
 
 				<form
-					className="space-y-4"
+					className="space-y-3"
 					onSubmit={handleSubmit}
 					onKeyDown={handleKeyDown}
 					noValidate
 				>
-					{/* Seletor de Tipo - apenas no modo de criação */}
 					{mode === "create" && (
-						<div className="space-y-3">
-							<label className="text-sm font-medium text-foreground">
-								Tipo de anotação
-							</label>
-							<RadioGroup
-								value={formState.type}
-								onValueChange={(value) =>
-									updateField("type", value as "nota" | "tarefa")
-								}
-								disabled={isPending}
-								className="flex gap-4"
-							>
-								<div className="flex items-center gap-2">
-									<RadioGroupItem value="nota" id="tipo-nota" />
-									<label
-										htmlFor="tipo-nota"
-										className="text-sm cursor-pointer select-none"
-									>
-										Nota
-									</label>
-								</div>
-								<div className="flex items-center gap-2">
-									<RadioGroupItem value="tarefa" id="tipo-tarefa" />
-									<label
-										htmlFor="tipo-tarefa"
-										className="text-sm cursor-pointer select-none"
-									>
-										Tarefas
-									</label>
-								</div>
-							</RadioGroup>
-						</div>
+						<RadioGroup
+							value={formState.type}
+							onValueChange={(value) =>
+								updateField("type", value as "nota" | "tarefa")
+							}
+							disabled={isPending}
+							className="flex gap-4"
+						>
+							<div className="flex items-center gap-2">
+								<RadioGroupItem value="nota" id="tipo-nota" />
+								<label
+									htmlFor="tipo-nota"
+									className="text-sm cursor-pointer select-none"
+								>
+									Nota
+								</label>
+							</div>
+							<div className="flex items-center gap-2">
+								<RadioGroupItem value="tarefa" id="tipo-tarefa" />
+								<label
+									htmlFor="tipo-tarefa"
+									className="text-sm cursor-pointer select-none"
+								>
+									Tarefas
+								</label>
+							</div>
+						</RadioGroup>
 					)}
 
-					{/* Título */}
-					<div className="space-y-2">
-						<label
-							htmlFor="note-title"
-							className="text-sm font-medium text-foreground"
-						>
-							Título
-						</label>
-						<Input
-							id="note-title"
-							ref={titleRef}
-							value={formState.title}
-							onChange={(e) => updateField("title", e.target.value)}
-							placeholder={
-								isNote ? "Ex.: Revisar metas do mês" : "Ex.: Tarefas da semana"
-							}
-							maxLength={MAX_TITLE}
+					<Input
+						id="note-title"
+						ref={titleRef}
+						value={formState.title}
+						onChange={(e) => updateField("title", e.target.value)}
+						placeholder="Título"
+						maxLength={MAX_TITLE}
+						disabled={isPending}
+						required
+					/>
+
+					{isNote && (
+						<Textarea
+							id="note-description"
+							className="field-sizing-fixed"
+							ref={descRef}
+							value={formState.description}
+							onChange={(e) => updateField("description", e.target.value)}
+							placeholder="Escreva sua anotação..."
+							rows={5}
+							maxLength={MAX_DESC}
 							disabled={isPending}
-							aria-describedby="note-title-help"
 							required
 						/>
-						<p
-							id="note-title-help"
-							className="text-xs text-muted-foreground"
-							aria-live="polite"
-						>
-							Até {MAX_TITLE} caracteres. Restantes:{" "}
-							{Math.max(0, MAX_TITLE - titleCount)}.
-						</p>
-					</div>
-
-					{/* Conteúdo - apenas para Notas */}
-					{isNote && (
-						<div className="space-y-2">
-							<label
-								htmlFor="note-description"
-								className="text-sm font-medium text-foreground"
-							>
-								Conteúdo
-							</label>
-							<Textarea
-								id="note-description"
-								className="field-sizing-fixed"
-								ref={descRef}
-								value={formState.description}
-								onChange={(e) => updateField("description", e.target.value)}
-								placeholder="Detalhe sua anotação..."
-								rows={6}
-								maxLength={MAX_DESC}
-								disabled={isPending}
-								aria-describedby="note-desc-help"
-								required
-							/>
-							<p
-								id="note-desc-help"
-								className="text-xs text-muted-foreground"
-								aria-live="polite"
-							>
-								Até {MAX_DESC} caracteres. Restantes:{" "}
-								{Math.max(0, MAX_DESC - descCount)}.
-							</p>
-						</div>
 					)}
 
-					{/* Lista de Tarefas - apenas para Tarefas */}
 					{!isNote && (
-						<div className="space-y-4">
-							<div className="space-y-2">
-								<label
-									htmlFor="new-task-input"
-									className="text-sm font-medium text-foreground"
+						<div className="space-y-2">
+							<div className="flex gap-2">
+								<Input
+									id="new-task-input"
+									ref={newTaskRef}
+									value={newTaskText}
+									onChange={(e) => setNewTaskText(e.target.value)}
+									placeholder="Nova tarefa..."
+									disabled={isPending}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") {
+											e.preventDefault();
+											handleAddTask();
+										}
+									}}
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={handleAddTask}
+									disabled={isPending || !normalize(newTaskText)}
+									className="shrink-0"
 								>
-									Adicionar tarefa
-								</label>
-								<div className="flex gap-2">
-									<Input
-										id="new-task-input"
-										ref={newTaskRef}
-										value={newTaskText}
-										onChange={(e) => setNewTaskText(e.target.value)}
-										placeholder="Ex.: Comprar ingredientes para o jantar"
-										disabled={isPending}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") {
-												e.preventDefault();
-												handleAddTask();
-											}
-										}}
-									/>
-									<Button
-										type="button"
-										onClick={handleAddTask}
-										disabled={isPending || !normalize(newTaskText)}
-										className="shrink-0"
-									>
-										<RiAddLine className="h-4 w-4" />
-									</Button>
-								</div>
-								<p className="text-xs text-muted-foreground">
-									Pressione Enter ou clique no botão + para adicionar
-								</p>
+									<RiAddLine className="h-4 w-4" />
+								</Button>
 							</div>
 
-							{/* Lista de tarefas existentes */}
-							{formState.tasks && formState.tasks.length > 0 && (
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-foreground">
-										Tarefas ({formState.tasks.length})
-									</label>
-									<div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
-										{formState.tasks.map((task) => (
-											<Card
-												key={task.id}
-												className="flex items-center gap-3 px-3 py-2 flex-row mt-1"
+							{sortedTasks.length > 0 && (
+								<div className="space-y-1 max-h-[240px] overflow-y-auto pr-1">
+									{sortedTasks.map((task) => (
+										<div
+											key={task.id}
+											className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-muted/50"
+										>
+											<Checkbox
+												className="data-[state=checked]:bg-success data-[state=checked]:border-success"
+												checked={task.completed}
+												onCheckedChange={() => handleToggleTask(task.id)}
+												disabled={isPending}
+												aria-label={`Marcar "${task.text}" como ${
+													task.completed ? "não concluída" : "concluída"
+												}`}
+											/>
+											<span
+												className={`flex-1 text-sm wrap-break-word ${
+													task.completed
+														? "text-muted-foreground line-through"
+														: "text-foreground"
+												}`}
 											>
-												<Checkbox
-													className="data-[state=checked]:bg-success data-[state=checked]:border-success"
-													checked={task.completed}
-													onCheckedChange={() => handleToggleTask(task.id)}
-													disabled={isPending}
-													aria-label={`Marcar tarefa "${task.text}" como ${
-														task.completed ? "não concluída" : "concluída"
-													}`}
-												/>
-												<span
-													className={`flex-1 text-sm wrap-break-word ${
-														task.completed
-															? "text-muted-foreground"
-															: "text-foreground"
-													}`}
-												>
-													{task.text}
-												</span>
-												<Button
-													type="button"
-													variant="ghost"
-													size="sm"
-													onClick={() => handleRemoveTask(task.id)}
-													disabled={isPending}
-													className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive"
-													aria-label={`Remover tarefa "${task.text}"`}
-												>
-													<RiDeleteBinLine className="h-4 w-4" />
-												</Button>
-											</Card>
-										))}
-									</div>
+												{task.text}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleRemoveTask(task.id)}
+												disabled={isPending}
+												className="shrink-0 text-muted-foreground/50 hover:text-destructive transition-colors"
+												aria-label={`Remover "${task.text}"`}
+											>
+												<RiDeleteBinLine className="h-3.5 w-3.5" />
+											</button>
+										</div>
+									))}
 								</div>
 							)}
 						</div>

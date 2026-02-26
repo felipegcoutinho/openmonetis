@@ -11,7 +11,7 @@ import {
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import type { Note } from "./types";
+import { type Note, sortTasksByStatus } from "./types";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
 	dateStyle: "medium",
@@ -47,6 +47,7 @@ export function NoteCard({
 
 	const isTask = note.type === "tarefa";
 	const tasks = note.tasks || [];
+	const sortedTasks = useMemo(() => sortTasksByStatus(tasks), [tasks]);
 	const completedCount = tasks.filter((t) => t.completed).length;
 	const totalCount = tasks.length;
 
@@ -82,7 +83,7 @@ export function NoteCard({
 	].filter((action) => typeof action.onClick === "function");
 
 	return (
-		<Card className="flex h-[300px] w-[440px] flex-col gap-0">
+		<Card className="flex h-[300px] w-full flex-col gap-0">
 			<CardContent className="flex min-h-0 flex-1 flex-col gap-4">
 				<div className="flex shrink-0 items-start justify-between gap-3">
 					<div className="flex flex-col gap-2">
@@ -99,7 +100,7 @@ export function NoteCard({
 
 				{isTask ? (
 					<div className="min-h-0 flex-1 space-y-2 overflow-hidden">
-						{tasks.slice(0, 5).map((task) => (
+						{sortedTasks.slice(0, 5).map((task) => (
 							<div key={task.id} className="flex items-start gap-2 text-sm">
 								<div
 									className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
