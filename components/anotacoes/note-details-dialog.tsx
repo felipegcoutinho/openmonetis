@@ -45,13 +45,14 @@ export function NoteDetailsDialog({
 		};
 	}, [note]);
 
+	const tasks = note?.tasks || [];
+	const sortedTasks = useMemo(() => sortTasksByStatus(tasks), [tasks]);
+
 	if (!note) {
 		return null;
 	}
 
 	const isTask = note.type === "tarefa";
-	const tasks = note.tasks || [];
-	const sortedTasks = useMemo(() => sortTasksByStatus(tasks), [tasks]);
 	const completedCount = tasks.filter((t) => t.completed).length;
 	const totalCount = tasks.length;
 

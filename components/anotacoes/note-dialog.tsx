@@ -26,6 +26,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useControlledState } from "@/hooks/use-controlled-state";
@@ -76,7 +77,6 @@ export function NoteDialog({
 	const descRef = useRef<HTMLTextAreaElement>(null);
 	const newTaskRef = useRef<HTMLInputElement>(null);
 
-	// Use controlled state hook for dialog open state
 	const [dialogOpen, setDialogOpen] = useControlledState(
 		open,
 		false,
@@ -85,7 +85,6 @@ export function NoteDialog({
 
 	const initialState = buildInitialValues(note);
 
-	// Use form state hook for form management
 	const { formState, updateField, setFormState } =
 		useFormState<NoteFormValues>(initialState);
 
@@ -98,7 +97,11 @@ export function NoteDialog({
 		}
 	}, [dialogOpen, note, setFormState]);
 
-	const title = mode === "create" ? "Nova anotação" : "Editar anotação";
+	const dialogTitle = mode === "create" ? "Nova anotação" : "Editar anotação";
+	const description =
+		mode === "create"
+			? "Crie uma nota simples ou uma lista de tarefas."
+			: "Altere o conteúdo desta anotação.";
 	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const titleCount = formState.title.length;
@@ -224,104 +227,114 @@ export function NoteDialog({
 	return (
 		<Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
 			{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-			<DialogContent className="max-h-[90vh] overflow-y-auto">
+			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-					<DialogDescription className="sr-only">
-						{mode === "create"
-							? "Criar nova anotação"
-							: "Editar anotação existente"}
-					</DialogDescription>
+					<DialogTitle>{dialogTitle}</DialogTitle>
+					<DialogDescription>{description}</DialogDescription>
 				</DialogHeader>
 
 				<form
-					className="space-y-3"
+					className="space-y-3 -mx-6 max-h-[80vh] overflow-y-auto px-6 pb-1"
 					onSubmit={handleSubmit}
 					onKeyDown={handleKeyDown}
 					noValidate
 				>
 					{mode === "create" && (
-						<RadioGroup
-							value={formState.type}
-							onValueChange={(value) =>
-								updateField("type", value as "nota" | "tarefa")
-							}
-							disabled={isPending}
-							className="flex gap-4"
-						>
-							<div className="flex items-center gap-2">
-								<RadioGroupItem value="nota" id="tipo-nota" />
-								<label
-									htmlFor="tipo-nota"
-									className="text-sm cursor-pointer select-none"
-								>
-									Nota
-								</label>
-							</div>
-							<div className="flex items-center gap-2">
-								<RadioGroupItem value="tarefa" id="tipo-tarefa" />
-								<label
-									htmlFor="tipo-tarefa"
-									className="text-sm cursor-pointer select-none"
-								>
-									Tarefas
-								</label>
-							</div>
-						</RadioGroup>
+						<div className="space-y-1">
+							<Label>Tipo de anotação</Label>
+							<RadioGroup
+								value={formState.type}
+								onValueChange={(value) =>
+									updateField("type", value as "nota" | "tarefa")
+								}
+								disabled={isPending}
+								className="flex gap-4"
+							>
+								<div className="flex items-center gap-2">
+									<RadioGroupItem value="nota" id="tipo-nota" />
+									<Label
+										htmlFor="tipo-nota"
+										className="font-normal cursor-pointer"
+									>
+										Nota
+									</Label>
+								</div>
+								<div className="flex items-center gap-2">
+									<RadioGroupItem value="tarefa" id="tipo-tarefa" />
+									<Label
+										htmlFor="tipo-tarefa"
+										className="font-normal cursor-pointer"
+									>
+										Tarefas
+									</Label>
+								</div>
+							</RadioGroup>
+						</div>
 					)}
 
-					<Input
-						id="note-title"
-						ref={titleRef}
-						value={formState.title}
-						onChange={(e) => updateField("title", e.target.value)}
-						placeholder="Título"
-						maxLength={MAX_TITLE}
-						disabled={isPending}
-						required
-					/>
-
-					{isNote && (
-						<Textarea
-							id="note-description"
-							className="field-sizing-fixed"
-							ref={descRef}
-							value={formState.description}
-							onChange={(e) => updateField("description", e.target.value)}
-							placeholder="Escreva sua anotação..."
-							rows={5}
-							maxLength={MAX_DESC}
+					<div className="space-y-1">
+						<Label htmlFor="note-title">Título</Label>
+						<Input
+							id="note-title"
+							ref={titleRef}
+							value={formState.title}
+							onChange={(e) => updateField("title", e.target.value)}
+							placeholder={
+								isNote ? "Ex.: Revisar metas do mês" : "Ex.: Tarefas da semana"
+							}
+							maxLength={MAX_TITLE}
 							disabled={isPending}
 							required
 						/>
+					</div>
+
+					{isNote && (
+						<div className="space-y-1">
+							<Label htmlFor="note-description">Conteúdo</Label>
+							<Textarea
+								id="note-description"
+								className="field-sizing-fixed"
+								ref={descRef}
+								value={formState.description}
+								onChange={(e) => updateField("description", e.target.value)}
+								placeholder="Detalhe sua anotação..."
+								rows={5}
+								maxLength={MAX_DESC}
+								disabled={isPending}
+								required
+							/>
+						</div>
 					)}
 
 					{!isNote && (
 						<div className="space-y-2">
-							<div className="flex gap-2">
-								<Input
-									id="new-task-input"
-									ref={newTaskRef}
-									value={newTaskText}
-									onChange={(e) => setNewTaskText(e.target.value)}
-									placeholder="Nova tarefa..."
-									disabled={isPending}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											e.preventDefault();
-											handleAddTask();
-										}
-									}}
-								/>
-								<Button
-									type="button"
-									variant="outline"
-									onClick={handleAddTask}
-									disabled={isPending || !normalize(newTaskText)}
-									className="shrink-0"
-								>
-									<RiAddLine className="h-4 w-4" />
-								</Button>
+							<div className="space-y-1">
+								<Label htmlFor="new-task-input">Adicionar tarefa</Label>
+								<div className="flex gap-2">
+									<Input
+										id="new-task-input"
+										ref={newTaskRef}
+										value={newTaskText}
+										onChange={(e) => setNewTaskText(e.target.value)}
+										placeholder="Nova tarefa..."
+										disabled={isPending}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												e.preventDefault();
+												handleAddTask();
+											}
+										}}
+									/>
+									<Button
+										type="button"
+										variant="outline"
+										onClick={handleAddTask}
+										disabled={isPending || !normalize(newTaskText)}
+										className="shrink-0"
+									>
+										<RiAddLine className="h-4 w-4" />
+									</Button>
+								</div>
 							</div>
 
 							{sortedTasks.length > 0 && (
@@ -370,21 +383,33 @@ export function NoteDialog({
 							{errorMessage}
 						</p>
 					) : null}
-
-					<DialogFooter>
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => handleOpenChange(false)}
-							disabled={isPending}
-						>
-							Cancelar
-						</Button>
-						<Button type="submit" disabled={disableSubmit}>
-							{isPending ? "Salvando..." : submitLabel}
-						</Button>
-					</DialogFooter>
 				</form>
+
+				<DialogFooter>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => handleOpenChange(false)}
+						disabled={isPending}
+					>
+						Cancelar
+					</Button>
+					<Button
+						type="submit"
+						disabled={disableSubmit}
+						onClick={(e) => {
+							const form = (
+								e.currentTarget.closest("[role=dialog]") as HTMLElement
+							)?.querySelector("form");
+							if (form) {
+								e.preventDefault();
+								form.requestSubmit();
+							}
+						}}
+					>
+						{isPending ? "Salvando..." : submitLabel}
+					</Button>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
