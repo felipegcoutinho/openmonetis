@@ -37,12 +37,13 @@ export default async function Page({ params, searchParams }: PageProps) {
 	const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
 	const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
-	const [detail, filterSources, estabelecimentos, userPreferences] = await Promise.all([
-		fetchCategoryDetails(userId, categoryId, selectedPeriod),
-		fetchLancamentoFilterSources(userId),
-		getRecentEstablishmentsAction(),
-		fetchUserPreferences(userId),
-	]);
+	const [detail, filterSources, estabelecimentos, userPreferences] =
+		await Promise.all([
+			fetchCategoryDetails(userId, categoryId, selectedPeriod),
+			fetchLancamentoFilterSources(userId),
+			getRecentEstablishmentsAction(),
+			fetchUserPreferences(userId),
+		]);
 
 	if (!detail) {
 		notFound();

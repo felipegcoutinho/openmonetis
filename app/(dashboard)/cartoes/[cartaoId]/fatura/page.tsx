@@ -52,14 +52,19 @@ export default async function Page({ params, searchParams }: PageProps) {
 		notFound();
 	}
 
-	const [filterSources, logoOptions, invoiceData, estabelecimentos, userPreferences] =
-		await Promise.all([
-			fetchLancamentoFilterSources(userId),
-			loadLogoOptions(),
-			fetchInvoiceData(userId, cartaoId, selectedPeriod),
-			getRecentEstablishmentsAction(),
-			fetchUserPreferences(userId),
-		]);
+	const [
+		filterSources,
+		logoOptions,
+		invoiceData,
+		estabelecimentos,
+		userPreferences,
+	] = await Promise.all([
+		fetchLancamentoFilterSources(userId),
+		loadLogoOptions(),
+		fetchInvoiceData(userId, cartaoId, selectedPeriod),
+		getRecentEstablishmentsAction(),
+		fetchUserPreferences(userId),
+	]);
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const slugMaps = buildSlugMaps(sluggedFilters);
 
