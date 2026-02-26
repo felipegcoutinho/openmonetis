@@ -311,7 +311,7 @@ export function PagadorDialog({
 						<p className="text-sm text-destructive">{errorMessage}</p>
 					) : null}
 
-					<DialogFooter className="gap-3">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

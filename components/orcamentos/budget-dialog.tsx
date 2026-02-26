@@ -88,7 +88,7 @@ export function BudgetDialog({
 			setFormState(initialState);
 			setErrorMessage(null);
 		}
-	}, [dialogOpen, setFormState, budget, defaultPeriod]);
+	}, [dialogOpen, setFormState, initialState]);
 
 	// Clear error when dialog closes
 	useEffect(() => {
@@ -180,7 +180,7 @@ export function BudgetDialog({
 							Cadastre pelo menos uma categoria de despesa para criar um
 							orçamento.
 						</div>
-						<DialogFooter className="gap-3">
+						<DialogFooter>
 							<Button
 								type="button"
 								variant="outline"
@@ -242,7 +242,7 @@ export function BudgetDialog({
 							</p>
 						) : null}
 
-						<DialogFooter className="gap-3">
+						<DialogFooter>
 							<Button
 								type="button"
 								variant="outline"

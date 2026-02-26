@@ -185,9 +185,7 @@ export function LancamentoDetailsDialog({
 
 						<DialogFooter>
 							<DialogClose asChild>
-								<Button className="w-full" type="button">
-									Entendi
-								</Button>
+								<Button type="button">Entendi</Button>
 							</DialogClose>
 						</DialogFooter>
 					</CardContent>

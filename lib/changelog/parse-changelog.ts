@@ -56,7 +56,9 @@ export function parseChangelog(): ChangelogVersion[] {
 		}
 
 		// **Contribuições:** ou **Autor:** com texto/link opcional
-		const contributorMatch = line.match(/^\*\*(?:Contribuições|Autor):\*\*\s*(.+)$/);
+		const contributorMatch = line.match(
+			/^\*\*(?:Contribuições|Autor):\*\*\s*(.+)$/,
+		);
 		if (contributorMatch && currentVersion) {
 			currentVersion.contributor = contributorMatch[1].trim() || undefined;
 		}

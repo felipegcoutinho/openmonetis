@@ -230,7 +230,7 @@ export function TransferDialog({
 						<p className="text-sm text-destructive">{errorMessage}</p>
 					)}
 
-					<DialogFooter className="gap-3">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

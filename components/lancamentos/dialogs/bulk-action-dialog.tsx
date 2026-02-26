@@ -140,7 +140,7 @@ export function BulkActionDialog({
 					</div>
 				</RadioGroup>
 
-				<DialogFooter className="gap-2">
+				<DialogFooter>
 					<Button
 						type="button"
 						variant="outline"

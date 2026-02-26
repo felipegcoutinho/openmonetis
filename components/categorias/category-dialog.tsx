@@ -85,7 +85,7 @@ export function CategoryDialog({
 			setFormState(initialState);
 			setErrorMessage(null);
 		}
-	}, [dialogOpen, setFormState, category, defaultType]);
+	}, [dialogOpen, setFormState, initialState]);
 
 	// Clear error when dialog closes
 	useEffect(() => {
@@ -156,7 +156,7 @@ export function CategoryDialog({
 						<p className="text-sm text-destructive">{errorMessage}</p>
 					)}
 
-					<DialogFooter className="gap-3">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

@@ -194,7 +194,7 @@ export function EventModal({ open, day, onClose, onCreate }: EventModalProps) {
 					)}
 				</div>
 
-				<DialogFooter className="flex justify-end gap-2">
+				<DialogFooter>
 					<Button variant="outline" onClick={onClose}>
 						Cancelar
 					</Button>

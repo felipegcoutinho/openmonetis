@@ -394,7 +394,7 @@ export function AnticipateInstallmentsDialog({
 						</div>
 					)}
 
-					<DialogFooter className="gap-3">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

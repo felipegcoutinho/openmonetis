@@ -1,15 +1,20 @@
 "use client";
 
 import {
-	DndContext,
 	closestCenter,
+	DndContext,
 	type DragEndEvent,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+	arrayMove,
+	SortableContext,
+	useSortable,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { RiDragMove2Line } from "@remixicon/react";
 import { useRouter } from "next/navigation";
@@ -69,7 +74,10 @@ function SortableColumnItem({ id }: { id: string }) {
 			{...attributes}
 			{...listeners}
 		>
-			<RiDragMove2Line className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+			<RiDragMove2Line
+				className="size-4 shrink-0 text-muted-foreground"
+				aria-hidden
+			/>
 			<span>{label}</span>
 		</div>
 	);
@@ -86,8 +94,9 @@ export function PreferencesForm({
 	const [isPending, startTransition] = useTransition();
 	const [magnetlinesDisabled, setMagnetlinesDisabled] =
 		useState(disableMagnetlines);
-	const [extratoNoteAsColumn, setExtratoNoteAsColumn] =
-		useState(initialExtratoNoteAsColumn);
+	const [extratoNoteAsColumn, setExtratoNoteAsColumn] = useState(
+		initialExtratoNoteAsColumn,
+	);
 	const [columnOrder, setColumnOrder] = useState<string[]>(
 		initialColumnOrder && initialColumnOrder.length > 0
 			? initialColumnOrder
@@ -232,7 +241,8 @@ export function PreferencesForm({
 				<div>
 					<h3 className="text-base font-semibold">Extrato e lançamentos</h3>
 					<p className="text-sm text-muted-foreground">
-						Como exibir anotações e a ordem das colunas na tabela de movimentações.
+						Como exibir anotações e a ordem das colunas na tabela de
+						movimentações.
 					</p>
 				</div>
 
@@ -242,7 +252,9 @@ export function PreferencesForm({
 							Anotações em coluna
 						</Label>
 						<p className="text-sm text-muted-foreground">
-							Quando ativo, as anotações aparecem em uma coluna na tabela. Quando desativado, aparecem em um balão ao passar o mouse no ícone.
+							Quando ativo, as anotações aparecem em uma coluna na tabela.
+							Quando desativado, aparecem em um balão ao passar o mouse no
+							ícone.
 						</p>
 					</div>
 					<Switch
@@ -256,7 +268,8 @@ export function PreferencesForm({
 				<div className="space-y-2 max-w-md">
 					<Label className="text-base">Ordem das colunas</Label>
 					<p className="text-sm text-muted-foreground">
-						Arraste os itens para definir a ordem em que as colunas aparecem na tabela do extrato e dos lançamentos.
+						Arraste os itens para definir a ordem em que as colunas aparecem na
+						tabela do extrato e dos lançamentos.
 					</p>
 					<DndContext
 						sensors={sensors}

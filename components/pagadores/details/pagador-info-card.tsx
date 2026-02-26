@@ -421,7 +421,7 @@ export function PagadorInfoCard({
 							</div>
 						</div>
 
-						<DialogFooter className="gap-2">
+						<DialogFooter>
 							<Button
 								type="button"
 								variant="outline"

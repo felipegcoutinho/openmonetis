@@ -14,7 +14,6 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils/ui";
 
 interface ConfirmActionDialogProps {
 	trigger?: React.ReactNode;
@@ -87,19 +86,13 @@ export function ConfirmActionDialog({
 					) : null}
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel
-						disabled={isPending || disabled}
-						className="w-full sm:w-auto"
-					>
+					<AlertDialogCancel disabled={isPending || disabled}>
 						{cancelLabel}
 					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleConfirm}
 						disabled={isPending || disabled}
-						className={cn(
-							buttonVariants({ variant: confirmVariant }),
-							"w-full sm:w-auto",
-						)}
+						className={buttonVariants({ variant: confirmVariant })}
 					>
 						{isPending ? resolvedPendingLabel : confirmLabel}
 					</AlertDialogAction>

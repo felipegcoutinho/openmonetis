@@ -1,8 +1,8 @@
 import { inArray } from "drizzle-orm";
 import { Resend } from "resend";
 import { pagadores } from "@/db/schema";
-import { getResendFromEmail } from "@/lib/email/resend";
 import { db } from "@/lib/db";
+import { getResendFromEmail } from "@/lib/email/resend";
 
 type ActionType = "created" | "deleted";
 

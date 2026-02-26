@@ -111,7 +111,7 @@ export function DeleteAccountForm() {
 						</div>
 					</div>
 
-					<DialogFooter className="sm:justify-end">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

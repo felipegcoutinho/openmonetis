@@ -59,9 +59,10 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 						{version.contributor && (
 							<div className="border-t pt-4 mt-4">
 								<span className="text-sm text-muted-foreground">
-									Contribuições:{" "}
-									{(() => {
-										const { label, url } = parseContributorLine(version.contributor);
+									Contribuições: {(() => {
+										const { label, url } = parseContributorLine(
+											version.contributor,
+										);
 										if (url) {
 											return (
 												<Link
@@ -74,7 +75,11 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 												</Link>
 											);
 										}
-										return <span className="font-medium text-foreground">{label}</span>;
+										return (
+											<span className="font-medium text-foreground">
+												{label}
+											</span>
+										);
 									})()}
 								</span>
 							</div>

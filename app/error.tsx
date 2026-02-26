@@ -14,7 +14,7 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 
-export default function Error({
+export default function ErrorComponent({
 	error,
 	reset,
 }: {

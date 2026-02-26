@@ -5,9 +5,9 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { z } from "zod";
 import { lancamentos, pagadores } from "@/db/schema";
-import { getResendFromEmail } from "@/lib/email/resend";
 import { getUser } from "@/lib/auth/server";
 import { db } from "@/lib/db";
+import { getResendFromEmail } from "@/lib/email/resend";
 import {
 	fetchPagadorBoletoStats,
 	fetchPagadorCardUsage,

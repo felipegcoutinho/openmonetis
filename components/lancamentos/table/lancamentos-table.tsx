@@ -504,9 +504,13 @@ const buildColumns = ({
 			header: "Anotação",
 			cell: ({ row }) => {
 				const note = row.original.note;
-				if (!note?.trim()) return <span className="text-muted-foreground">—</span>;
+				if (!note?.trim())
+					return <span className="text-muted-foreground">—</span>;
 				return (
-					<span className="max-w-[200px] truncate whitespace-pre-line text-sm" title={note}>
+					<span
+						className="max-w-[200px] truncate whitespace-pre-line text-sm"
+						title={note}
+					>
 						{note}
 					</span>
 				);

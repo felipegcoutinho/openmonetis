@@ -112,9 +112,7 @@ export function InboxDetailsDialog({
 
 				<DialogFooter>
 					<DialogClose asChild>
-						<Button className="w-full mt-2" type="button">
-							Entendi
-						</Button>
+						<Button type="button">Entendi</Button>
 					</DialogClose>
 				</DialogFooter>
 			</DialogContent>
