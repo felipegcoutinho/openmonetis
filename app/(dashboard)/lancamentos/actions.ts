@@ -7,7 +7,6 @@ import {
 	cartoes,
 	categorias,
 	contas,
-	faturas,
 	lancamentos,
 	pagadores,
 } from "@/db/schema";
@@ -33,7 +32,6 @@ import {
 import { noteSchema, uuidSchema } from "@/lib/schemas/common";
 import { formatDecimalForDbRequired } from "@/lib/utils/currency";
 import { getTodayDate, parseLocalDateString } from "@/lib/utils/date";
-import { getNextPeriod } from "@/lib/utils/period";
 
 // ============================================================================
 // Authorization Validation Functions
@@ -1638,59 +1636,6 @@ export async function deleteMultipleLancamentosAction(
 		};
 	} catch (error) {
 		return handleActionError(error);
-	}
-}
-
-// Check fatura payment status and card closing day for the given period
-export async function checkFaturaStatusAction(
-	cartaoId: string,
-	period: string,
-): Promise<{
-	shouldSuggestNext: boolean;
-	isPaid: boolean;
-	isAfterClosing: boolean;
-	closingDay: string | null;
-	cardName: string;
-	nextPeriod: string;
-} | null> {
-	try {
-		const user = await getUser();
-
-		const cartao = await db.query.cartoes.findFirst({
-			where: and(eq(cartoes.id, cartaoId), eq(cartoes.userId, user.id)),
-			columns: { id: true, name: true, closingDay: true },
-		});
-
-		if (!cartao) return null;
-
-		const fatura = await db.query.faturas.findFirst({
-			where: and(
-				eq(faturas.cartaoId, cartaoId),
-				eq(faturas.userId, user.id),
-				eq(faturas.period, period),
-			),
-			columns: { paymentStatus: true },
-		});
-
-		const isPaid = fatura?.paymentStatus === "pago";
-		const today = new Date();
-		const currentPeriod = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-		const closingDayNum = Number.parseInt(cartao.closingDay ?? "", 10);
-		const isAfterClosing =
-			period === currentPeriod &&
-			!Number.isNaN(closingDayNum) &&
-			today.getDate() > closingDayNum;
-
-		return {
-			shouldSuggestNext: isPaid || isAfterClosing,
-			isPaid,
-			isAfterClosing,
-			closingDay: cartao.closingDay,
-			cardName: cartao.name,
-			nextPeriod: getNextPeriod(period),
-		};
-	} catch {
-		return null;
 	}
 }
 

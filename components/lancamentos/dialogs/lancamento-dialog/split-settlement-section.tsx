@@ -10,7 +10,7 @@ export function SplitAndSettlementSection({
 	showSettledToggle,
 }: SplitAndSettlementSectionProps) {
 	return (
-		<div className="flex w-full flex-col gap-2 py-2 md:flex-row">
+		<div className="flex w-full flex-col gap-2 md:flex-row">
 			<div
 				className={cn(
 					"space-y-1",

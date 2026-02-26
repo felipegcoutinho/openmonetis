@@ -2,7 +2,6 @@
 
 import { RiCalculatorLine } from "@remixicon/react";
 import { CalculatorDialogButton } from "@/components/calculadora/calculator-dialog";
-import { PeriodPicker } from "@/components/period-picker";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
@@ -15,39 +14,28 @@ export function BasicFieldsSection({
 	estabelecimentos,
 }: Omit<BasicFieldsSectionProps, "monthOptions">) {
 	return (
-		<>
-			<div className="flex w-full flex-col gap-2 md:flex-row">
-				<div className="w-1/2 space-y-1">
-					<Label htmlFor="purchaseDate">Data da transação</Label>
-					<DatePicker
-						id="purchaseDate"
-						value={formState.purchaseDate}
-						onChange={(value) => onFieldChange("purchaseDate", value)}
-						placeholder="Data da transação"
-						required
-					/>
-				</div>
-
-				<div className="w-1/2 space-y-1">
-					<Label htmlFor="period">Período</Label>
-					<PeriodPicker
-						value={formState.period}
-						onChange={(value) => onFieldChange("period", value)}
-						className="w-full"
-					/>
-				</div>
+		<div className="space-y-3">
+			<div className="space-y-1">
+				<Label htmlFor="name">Estabelecimento</Label>
+				<EstabelecimentoInput
+					id="name"
+					value={formState.name}
+					onChange={(value) => onFieldChange("name", value)}
+					estabelecimentos={estabelecimentos}
+					placeholder="Ex.: Restaurante do Zé"
+					maxLength={20}
+					required
+				/>
 			</div>
 
 			<div className="flex w-full flex-col gap-2 md:flex-row">
 				<div className="w-1/2 space-y-1">
-					<Label htmlFor="name">Estabelecimento</Label>
-					<EstabelecimentoInput
-						id="name"
-						value={formState.name}
-						onChange={(value) => onFieldChange("name", value)}
-						estabelecimentos={estabelecimentos}
-						placeholder="Ex.: Padaria"
-						maxLength={20}
+					<Label htmlFor="purchaseDate">Data</Label>
+					<DatePicker
+						id="purchaseDate"
+						value={formState.purchaseDate}
+						onChange={(value) => onFieldChange("purchaseDate", value)}
+						placeholder="Data"
 						required
 					/>
 				</div>
@@ -74,6 +62,6 @@ export function BasicFieldsSection({
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

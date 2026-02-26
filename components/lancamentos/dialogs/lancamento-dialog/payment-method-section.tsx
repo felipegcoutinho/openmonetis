@@ -1,6 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
+import { MonthPicker } from "@/components/ui/monthpicker";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	Select,
 	SelectContent,
@@ -9,12 +16,59 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
+import { displayPeriod } from "@/lib/utils/period";
 import { cn } from "@/lib/utils/ui";
 import {
 	ContaCartaoSelectContent,
 	PaymentMethodSelectContent,
 } from "../../select-items";
 import type { PaymentMethodSectionProps } from "./lancamento-dialog-types";
+
+function periodToDate(period: string): Date {
+	const [year, month] = period.split("-").map(Number);
+	return new Date(year, month - 1, 1);
+}
+
+function dateToPeriod(date: Date): string {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	return `${year}-${month}`;
+}
+
+function InlinePeriodPicker({
+	period,
+	onPeriodChange,
+}: {
+	period: string;
+	onPeriodChange: (value: string) => void;
+}) {
+	const [open, setOpen] = useState(false);
+
+	return (
+		<div className="ml-1">
+			<span className="text-xs text-muted-foreground">Fatura de </span>
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<button
+						type="button"
+						className="text-xs text-primary underline-offset-2 hover:underline cursor-pointer lowercase"
+					>
+						{displayPeriod(period)}
+					</button>
+				</PopoverTrigger>
+				<PopoverContent className="w-auto p-0" align="start">
+					<MonthPicker
+						selectedMonth={periodToDate(period)}
+						onMonthSelect={(date) => {
+							onPeriodChange(dateToPeriod(date));
+							setOpen(false);
+						}}
+					/>
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
+}
 
 export function PaymentMethodSection({
 	formState,
@@ -46,7 +100,7 @@ export function PaymentMethodSection({
 	return (
 		<>
 			{!isUpdateMode ? (
-				<div className="flex w-full flex-col gap-2 md:flex-row mt-3">
+				<div className="flex w-full flex-col gap-2 md:flex-row">
 					<div
 						className={cn(
 							"space-y-1 w-full",
@@ -131,6 +185,12 @@ export function PaymentMethodSection({
 									)}
 								</SelectContent>
 							</Select>
+							{formState.cartaoId ? (
+								<InlinePeriodPicker
+									period={formState.period}
+									onPeriodChange={(value) => onFieldChange("period", value)}
+								/>
+							) : null}
 						</div>
 					) : null}
 
@@ -239,6 +299,12 @@ export function PaymentMethodSection({
 									)}
 								</SelectContent>
 							</Select>
+							{formState.cartaoId ? (
+								<InlinePeriodPicker
+									period={formState.period}
+									onPeriodChange={(value) => onFieldChange("period", value)}
+								/>
+							) : null}
 						</div>
 					) : null}
 

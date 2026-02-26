@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import {
 	Select,
@@ -32,13 +32,16 @@ export function ConditionSection({
 		return Number.isNaN(value) || value <= 0 ? null : value;
 	}, [formState.amount]);
 
-	const getInstallmentLabel = (count: number) => {
-		if (amount) {
-			const installmentValue = amount / count;
-			return `${count}x de R$ ${formatCurrency(installmentValue)}`;
-		}
-		return `${count}x`;
-	};
+	const getInstallmentLabel = useCallback(
+		(count: number) => {
+			if (amount) {
+				const installmentValue = amount / count;
+				return `${count}x de R$ ${formatCurrency(installmentValue)}`;
+			}
+			return `${count}x`;
+		},
+		[amount],
+	);
 
 	const _getRecurrenceLabel = (count: number) => {
 		return `${count} meses`;

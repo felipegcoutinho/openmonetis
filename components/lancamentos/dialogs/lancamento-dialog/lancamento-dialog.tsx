@@ -1,19 +1,23 @@
 "use client";
+import { RiAddLine } from "@remixicon/react";
 import {
 	useCallback,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 	useTransition,
 } from "react";
 import { toast } from "sonner";
 import {
-	checkFaturaStatusAction,
 	createLancamentoAction,
 	updateLancamentoAction,
 } from "@/app/(dashboard)/lancamentos/actions";
 import { Button } from "@/components/ui/button";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
 	Dialog,
 	DialogContent,
@@ -32,10 +36,6 @@ import {
 	applyFieldDependencies,
 	buildLancamentoInitialState,
 } from "@/lib/lancamentos/form-helpers";
-import {
-	type FaturaWarning,
-	FaturaWarningDialog,
-} from "../fatura-warning-dialog";
 import { BasicFieldsSection } from "./basic-fields-section";
 import { BoletoFieldsSection } from "./boleto-fields-section";
 import { CategorySection } from "./category-section";
@@ -93,13 +93,8 @@ export function LancamentoDialog({
 			isImporting,
 		}),
 	);
-	const [periodDirty, setPeriodDirty] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const [faturaWarning, setFaturaWarning] = useState<FaturaWarning | null>(
-		null,
-	);
-	const lastCheckedRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (dialogOpen) {
@@ -120,11 +115,6 @@ export function LancamentoDialog({
 				),
 			);
 			setErrorMessage(null);
-			setPeriodDirty(false);
-			setFaturaWarning(null);
-			lastCheckedRef.current = null;
-		} else {
-			setFaturaWarning(null);
 		}
 	}, [
 		dialogOpen,
@@ -138,40 +128,6 @@ export function LancamentoDialog({
 		defaultAmount,
 		defaultTransactionType,
 		isImporting,
-	]);
-
-	useEffect(() => {
-		if (mode !== "create") return;
-		if (!dialogOpen) return;
-		if (formState.paymentMethod !== "Cartão de crédito") return;
-		if (!formState.cartaoId) return;
-
-		const checkKey = `${formState.cartaoId}:${formState.period}`;
-		if (checkKey === lastCheckedRef.current) return;
-		lastCheckedRef.current = checkKey;
-
-		checkFaturaStatusAction(formState.cartaoId, formState.period).then(
-			(result) => {
-				if (result?.shouldSuggestNext) {
-					setFaturaWarning({
-						nextPeriod: result.nextPeriod,
-						cardName: result.cardName,
-						isPaid: result.isPaid,
-						isAfterClosing: result.isAfterClosing,
-						closingDay: result.closingDay,
-						currentPeriod: formState.period,
-					});
-				} else {
-					setFaturaWarning(null);
-				}
-			},
-		);
-	}, [
-		mode,
-		dialogOpen,
-		formState.paymentMethod,
-		formState.cartaoId,
-		formState.period,
 	]);
 
 	const primaryPagador = formState.pagadorId;
@@ -194,19 +150,27 @@ export function LancamentoDialog({
 		return Number.isNaN(parsed) ? 0 : Math.abs(parsed);
 	}, [formState.amount]);
 
+	const getCardInfo = useCallback(
+		(cartaoId: string | undefined) => {
+			if (!cartaoId) return null;
+			const card = cartaoOptions.find((opt) => opt.value === cartaoId);
+			if (!card) return null;
+			return {
+				closingDay: card.closingDay ?? null,
+				dueDay: card.dueDay ?? null,
+			};
+		},
+		[cartaoOptions],
+	);
+
 	const handleFieldChange = useCallback(
 		<Key extends keyof FormState>(key: Key, value: FormState[Key]) => {
-			if (key === "period") {
-				setPeriodDirty(true);
-			}
-
 			setFormState((prev) => {
-				const dependencies = applyFieldDependencies(
-					key,
-					value,
-					prev,
-					periodDirty,
-				);
+				const effectiveCartaoId =
+					key === "cartaoId" ? (value as string) : prev.cartaoId;
+				const cardInfo = getCardInfo(effectiveCartaoId);
+
+				const dependencies = applyFieldDependencies(key, value, prev, cardInfo);
 
 				return {
 					...prev,
@@ -215,7 +179,7 @@ export function LancamentoDialog({
 				};
 			});
 		},
-		[periodDirty],
+		[getCardInfo],
 	);
 
 	const handleSubmit = useCallback(
@@ -440,114 +404,115 @@ export function LancamentoDialog({
 	const disableCartaoSelect = Boolean(lockCartaoSelection && mode === "create");
 
 	return (
-		<>
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-				<DialogContent className="sm:max-w-xl p-6 sm:px-8">
-					<DialogHeader>
-						<DialogTitle>{title}</DialogTitle>
-						<DialogDescription>{description}</DialogDescription>
-					</DialogHeader>
+		<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+			{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>{title}</DialogTitle>
+					<DialogDescription>{description}</DialogDescription>
+				</DialogHeader>
 
-					<form
-						className="space-y-2 -mx-6 max-h-[80vh] overflow-y-auto px-6 pb-1"
-						onSubmit={handleSubmit}
-						noValidate
+				<form
+					className="space-y-3 -mx-6 max-h-[80vh] overflow-y-auto px-6 pb-1"
+					onSubmit={handleSubmit}
+					noValidate
+				>
+					<BasicFieldsSection
+						formState={formState}
+						onFieldChange={handleFieldChange}
+						estabelecimentos={estabelecimentos}
+					/>
+
+					<CategorySection
+						formState={formState}
+						onFieldChange={handleFieldChange}
+						categoriaOptions={categoriaOptions}
+						categoriaGroups={categoriaGroups}
+						isUpdateMode={isUpdateMode}
+						hideTransactionType={
+							Boolean(isNewWithType) && !forceShowTransactionType
+						}
+					/>
+
+					{!isUpdateMode ? (
+						<SplitAndSettlementSection
+							formState={formState}
+							onFieldChange={handleFieldChange}
+							showSettledToggle={showSettledToggle}
+						/>
+					) : null}
+
+					<PagadorSection
+						formState={formState}
+						onFieldChange={handleFieldChange}
+						pagadorOptions={pagadorOptions}
+						secondaryPagadorOptions={secondaryPagadorOptions}
+						totalAmount={totalAmount}
+					/>
+
+					<PaymentMethodSection
+						formState={formState}
+						onFieldChange={handleFieldChange}
+						contaOptions={contaOptions}
+						cartaoOptions={cartaoOptions}
+						isUpdateMode={isUpdateMode}
+						disablePaymentMethod={disablePaymentMethod}
+						disableCartaoSelect={disableCartaoSelect}
+					/>
+
+					{showDueDate ? (
+						<BoletoFieldsSection
+							formState={formState}
+							onFieldChange={handleFieldChange}
+							showPaymentDate={showPaymentDate}
+						/>
+					) : null}
+
+					<Collapsible
+						defaultOpen={
+							formState.condition !== "À vista" || formState.note.length > 0
+						}
 					>
-						<BasicFieldsSection
-							formState={formState}
-							onFieldChange={handleFieldChange}
-							estabelecimentos={estabelecimentos}
-						/>
+						<CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer [&[data-state=open]>svg]:rotate-180 mt-4">
+							<RiAddLine className="text-primary size-4 transition-transform duration-200" />
+							Condições e anotações
+						</CollapsibleTrigger>
+						<CollapsibleContent className="space-y-3 pt-3">
+							{!isUpdateMode ? (
+								<ConditionSection
+									formState={formState}
+									onFieldChange={handleFieldChange}
+									showInstallments={showInstallments}
+									showRecurrence={showRecurrence}
+								/>
+							) : null}
 
-						<CategorySection
-							formState={formState}
-							onFieldChange={handleFieldChange}
-							categoriaOptions={categoriaOptions}
-							categoriaGroups={categoriaGroups}
-							isUpdateMode={isUpdateMode}
-							hideTransactionType={
-								Boolean(isNewWithType) && !forceShowTransactionType
-							}
-						/>
-
-						{!isUpdateMode ? (
-							<SplitAndSettlementSection
+							<NoteSection
 								formState={formState}
 								onFieldChange={handleFieldChange}
-								showSettledToggle={showSettledToggle}
 							/>
-						) : null}
+						</CollapsibleContent>
+					</Collapsible>
 
-						<PagadorSection
-							formState={formState}
-							onFieldChange={handleFieldChange}
-							pagadorOptions={pagadorOptions}
-							secondaryPagadorOptions={secondaryPagadorOptions}
-							totalAmount={totalAmount}
-						/>
+					{errorMessage ? (
+						<p className="text-sm text-destructive">{errorMessage}</p>
+					) : null}
 
-						<PaymentMethodSection
-							formState={formState}
-							onFieldChange={handleFieldChange}
-							contaOptions={contaOptions}
-							cartaoOptions={cartaoOptions}
-							isUpdateMode={isUpdateMode}
-							disablePaymentMethod={disablePaymentMethod}
-							disableCartaoSelect={disableCartaoSelect}
-						/>
-
-						{showDueDate ? (
-							<BoletoFieldsSection
-								formState={formState}
-								onFieldChange={handleFieldChange}
-								showPaymentDate={showPaymentDate}
-							/>
-						) : null}
-
-						{!isUpdateMode ? (
-							<ConditionSection
-								formState={formState}
-								onFieldChange={handleFieldChange}
-								showInstallments={showInstallments}
-								showRecurrence={showRecurrence}
-							/>
-						) : null}
-
-						<NoteSection
-							formState={formState}
-							onFieldChange={handleFieldChange}
-						/>
-
-						{errorMessage ? (
-							<p className="text-sm text-destructive">{errorMessage}</p>
-						) : null}
-
-						<DialogFooter className="gap-3">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setDialogOpen(false)}
-								disabled={isPending}
-							>
-								Cancelar
-							</Button>
-							<Button type="submit" disabled={isPending}>
-								{isPending ? "Salvando..." : submitLabel}
-							</Button>
-						</DialogFooter>
-					</form>
-				</DialogContent>
-			</Dialog>
-
-			<FaturaWarningDialog
-				warning={faturaWarning}
-				onConfirm={(nextPeriod) => {
-					handleFieldChange("period", nextPeriod);
-					setFaturaWarning(null);
-				}}
-				onCancel={() => setFaturaWarning(null)}
-			/>
-		</>
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setDialogOpen(false)}
+							disabled={isPending}
+						>
+							Cancelar
+						</Button>
+						<Button type="submit" disabled={isPending}>
+							{isPending ? "Salvando..." : submitLabel}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 }

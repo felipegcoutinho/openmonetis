@@ -1,11 +1,63 @@
 import type { LancamentoItem } from "@/components/lancamentos/types";
 import { getTodayDateString } from "@/lib/utils/date";
-import { derivePeriodFromDate } from "@/lib/utils/period";
+import { derivePeriodFromDate, getNextPeriod } from "@/lib/utils/period";
 import {
 	LANCAMENTO_CONDITIONS,
 	LANCAMENTO_PAYMENT_METHODS,
 	LANCAMENTO_TRANSACTION_TYPES,
 } from "./constants";
+
+/**
+ * Derives the fatura period for a credit card purchase based on closing day
+ * and due day. The period represents the month the fatura is due (vencimento).
+ *
+ * Steps:
+ * 1. If purchase day > closing day → the purchase missed this month's closing,
+ *    so it enters the NEXT month's billing cycle (+1 month from purchase).
+ * 2. Then, if dueDay < closingDay, the due date falls in the month AFTER the
+ *    closing month (e.g., closes 22nd, due 1st → closes Mar/22, due Apr/1),
+ *    so we add another +1 month.
+ *
+ * @example
+ * // Card closes day 22, due day 1 (dueDay < closingDay → +1 extra)
+ * deriveCreditCardPeriod("2026-02-25", "22", "1")  // "2026-04" (missed Feb closing → Mar cycle → due Apr)
+ * deriveCreditCardPeriod("2026-02-15", "22", "1")  // "2026-03" (in Feb cycle → due Mar)
+ *
+ * // Card closes day 5, due day 15 (dueDay >= closingDay → no extra)
+ * deriveCreditCardPeriod("2026-02-10", "5", "15")  // "2026-03" (missed Feb closing → Mar cycle → due Mar)
+ * deriveCreditCardPeriod("2026-02-03", "5", "15")  // "2026-02" (in Feb cycle → due Feb)
+ */
+export function deriveCreditCardPeriod(
+	purchaseDate: string,
+	closingDay: string | null | undefined,
+	dueDay?: string | null | undefined,
+): string {
+	const basePeriod = derivePeriodFromDate(purchaseDate);
+	if (!closingDay) return basePeriod;
+
+	const closingDayNum = Number.parseInt(closingDay, 10);
+	if (Number.isNaN(closingDayNum)) return basePeriod;
+
+	const dayPart = purchaseDate.split("-")[2];
+	const purchaseDayNum = Number.parseInt(dayPart ?? "1", 10);
+
+	// Start with the purchase month as the billing cycle
+	let period = basePeriod;
+
+	// If purchase is after closing day, it enters the next billing cycle
+	if (purchaseDayNum > closingDayNum) {
+		period = getNextPeriod(period);
+	}
+
+	// If due day < closing day, the due date falls in the month after closing
+	// (e.g., closes 22nd, due 1st → closing in March means due in April)
+	const dueDayNum = Number.parseInt(dueDay ?? "", 10);
+	if (!Number.isNaN(dueDayNum) && dueDayNum < closingDayNum) {
+		period = getNextPeriod(period);
+	}
+
+	return period;
+}
 
 /**
  * Split type for dividing transactions between payers
@@ -198,16 +250,44 @@ export function applyFieldDependencies(
 	key: keyof LancamentoFormState,
 	value: LancamentoFormState[keyof LancamentoFormState],
 	currentState: LancamentoFormState,
-	_periodDirty: boolean,
+	cardInfo?: { closingDay: string | null; dueDay: string | null } | null,
 ): Partial<LancamentoFormState> {
 	const updates: Partial<LancamentoFormState> = {};
 
-	// Removed automatic period update when purchase date changes
-	// if (key === "purchaseDate" && typeof value === "string") {
-	//   if (!periodDirty) {
-	//     updates.period = derivePeriodFromDate(value);
-	//   }
-	// }
+	// Auto-derive period from purchaseDate
+	if (key === "purchaseDate" && typeof value === "string" && value) {
+		const method = currentState.paymentMethod;
+		if (method === "Cartão de crédito") {
+			updates.period = deriveCreditCardPeriod(
+				value,
+				cardInfo?.closingDay,
+				cardInfo?.dueDay,
+			);
+		} else if (method !== "Boleto") {
+			updates.period = derivePeriodFromDate(value);
+		}
+	}
+
+	// Auto-derive period from dueDate when payment method is boleto
+	if (key === "dueDate" && typeof value === "string" && value) {
+		if (currentState.paymentMethod === "Boleto") {
+			updates.period = derivePeriodFromDate(value);
+		}
+	}
+
+	// Auto-derive period when cartaoId changes (credit card selected)
+	if (
+		key === "cartaoId" &&
+		currentState.paymentMethod === "Cartão de crédito"
+	) {
+		if (typeof value === "string" && value && currentState.purchaseDate) {
+			updates.period = deriveCreditCardPeriod(
+				currentState.purchaseDate,
+				cardInfo?.closingDay,
+				cardInfo?.dueDay,
+			);
+		}
+	}
 
 	// When condition changes, clear irrelevant fields
 	if (key === "condition" && typeof value === "string") {
@@ -227,6 +307,27 @@ export function applyFieldDependencies(
 		} else {
 			updates.cartaoId = undefined;
 			updates.isSettled = currentState.isSettled ?? true;
+		}
+
+		// Re-derive period based on new payment method
+		if (value === "Cartão de crédito") {
+			if (
+				currentState.purchaseDate &&
+				currentState.cartaoId &&
+				cardInfo?.closingDay
+			) {
+				updates.period = deriveCreditCardPeriod(
+					currentState.purchaseDate,
+					cardInfo.closingDay,
+					cardInfo.dueDay,
+				);
+			} else if (currentState.purchaseDate) {
+				updates.period = derivePeriodFromDate(currentState.purchaseDate);
+			}
+		} else if (value === "Boleto" && currentState.dueDate) {
+			updates.period = derivePeriodFromDate(currentState.dueDate);
+		} else if (currentState.purchaseDate) {
+			updates.period = derivePeriodFromDate(currentState.purchaseDate);
 		}
 
 		// Clear boleto-specific fields if not boleto

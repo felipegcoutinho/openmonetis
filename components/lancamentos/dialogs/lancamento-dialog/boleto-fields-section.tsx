@@ -14,7 +14,7 @@ export function BoletoFieldsSection({
 		<div className="flex w-full flex-col gap-2 md:flex-row">
 			<div
 				className={cn(
-					"space-y-2 w-full",
+					"space-y-1 w-full",
 					showPaymentDate ? "md:w-1/2" : "md:w-full",
 				)}
 			>

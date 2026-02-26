@@ -46,6 +46,8 @@ export type SelectOption = {
 	logo?: string | null;
 	icon?: string | null;
 	accountType?: string | null;
+	closingDay?: string | null;
+	dueDay?: string | null;
 };
 
 export type LancamentoFilterOption = {
