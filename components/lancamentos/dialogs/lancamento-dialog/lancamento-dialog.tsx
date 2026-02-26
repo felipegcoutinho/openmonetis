@@ -35,6 +35,7 @@ import {
 import {
 	applyFieldDependencies,
 	buildLancamentoInitialState,
+	deriveCreditCardPeriod,
 } from "@/lib/lancamentos/form-helpers";
 import { BasicFieldsSection } from "./basic-fields-section";
 import { BoletoFieldsSection } from "./boleto-fields-section";
@@ -98,22 +99,40 @@ export function LancamentoDialog({
 
 	useEffect(() => {
 		if (dialogOpen) {
-			setFormState(
-				buildLancamentoInitialState(
-					lancamento,
-					defaultPagadorId,
-					defaultPeriod,
-					{
-						defaultCartaoId,
-						defaultPaymentMethod,
-						defaultPurchaseDate,
-						defaultName,
-						defaultAmount,
-						defaultTransactionType,
-						isImporting,
-					},
-				),
+			const initial = buildLancamentoInitialState(
+				lancamento,
+				defaultPagadorId,
+				defaultPeriod,
+				{
+					defaultCartaoId,
+					defaultPaymentMethod,
+					defaultPurchaseDate,
+					defaultName,
+					defaultAmount,
+					defaultTransactionType,
+					isImporting,
+				},
 			);
+
+			// Derive credit card period on open when cartaoId is pre-filled
+			if (
+				initial.paymentMethod === "Cartão de crédito" &&
+				initial.cartaoId &&
+				initial.purchaseDate
+			) {
+				const card = cartaoOptions.find(
+					(opt) => opt.value === initial.cartaoId,
+				);
+				if (card?.closingDay) {
+					initial.period = deriveCreditCardPeriod(
+						initial.purchaseDate,
+						card.closingDay,
+						card.dueDay,
+					);
+				}
+			}
+
+			setFormState(initial);
 			setErrorMessage(null);
 		}
 	}, [
@@ -128,6 +147,7 @@ export function LancamentoDialog({
 		defaultAmount,
 		defaultTransactionType,
 		isImporting,
+		cartaoOptions,
 	]);
 
 	const primaryPagador = formState.pagadorId;
