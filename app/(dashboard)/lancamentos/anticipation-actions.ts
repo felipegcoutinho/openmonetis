@@ -178,7 +178,7 @@ export async function createInstallmentAnticipationAction(
 				: totalAmount - discount; // Receita: 1000 - 20 = 980
 
 		// 3. Pegar dados da primeira parcela para referência
-		const firstInstallment = installments[0]!;
+		const firstInstallment = installments[0];
 
 		// 4. Criar lançamento e antecipação em transação
 		await db.transaction(async (tx) => {

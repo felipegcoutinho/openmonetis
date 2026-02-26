@@ -88,7 +88,7 @@ export async function fetchPagadorLancamentos(filters: SQL[]) {
 		.orderBy(desc(lancamentos.purchaseDate), desc(lancamentos.createdAt));
 
 	// Transformar resultado para o formato esperado
-	return lancamentoRows.map((row: any) => ({
+	return lancamentoRows.map((row: Record<string, unknown>) => ({
 		...row.lancamento,
 		pagador: row.pagador,
 		conta: row.conta,

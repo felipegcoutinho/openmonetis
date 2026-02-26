@@ -591,7 +591,7 @@ export function LancamentosPage({
 				<AnticipateInstallmentsDialog
 					open={anticipateOpen}
 					onOpenChange={setAnticipateOpen}
-					seriesId={selectedForAnticipation.seriesId!}
+					seriesId={selectedForAnticipation.seriesId as string}
 					lancamentoName={selectedForAnticipation.name}
 					categorias={categoriaOptions.map((c) => ({
 						id: c.value,
@@ -610,7 +610,7 @@ export function LancamentosPage({
 				<AnticipationHistoryDialog
 					open={anticipationHistoryOpen}
 					onOpenChange={setAnticipationHistoryOpen}
-					seriesId={selectedForAnticipation.seriesId!}
+					seriesId={selectedForAnticipation.seriesId as string}
 					lancamentoName={selectedForAnticipation.name}
 					onViewLancamento={(lancamentoId) => {
 						const lancamento = lancamentos.find((l) => l.id === lancamentoId);

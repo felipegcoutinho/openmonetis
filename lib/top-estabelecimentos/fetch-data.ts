@@ -164,7 +164,8 @@ export async function fetchTopEstabelecimentosData(
 						c.establishmentName === est.name && c.categoriaId,
 				)
 				.map((c: CategoryByEstRow) => ({
-					name: categoryMap.get(c.categoriaId!)?.name || "Sem categoria",
+					name:
+						categoryMap.get(c.categoriaId as string)?.name || "Sem categoria",
 					count: Number(c.count) || 0,
 				}))
 				.sort(
@@ -222,9 +223,9 @@ export async function fetchTopEstabelecimentosData(
 	const topCategories: TopCategoryData[] = topCategoriesData
 		.filter((c: TopCategoryRow) => c.categoriaId)
 		.map((cat: TopCategoryRow) => {
-			const catInfo = categoryMap.get(cat.categoriaId!);
+			const catInfo = categoryMap.get(cat.categoriaId as string);
 			return {
-				id: cat.categoriaId!,
+				id: cat.categoriaId as string,
 				name: catInfo?.name || "Sem categoria",
 				icon: catInfo?.icon || null,
 				totalAmount: Math.abs(safeToNumber(cat.totalAmount)),

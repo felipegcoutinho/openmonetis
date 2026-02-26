@@ -98,7 +98,8 @@ export async function fetchCategoryReport(
 			});
 		}
 
-		const categoryItem = categoryMap.get(categoryId)!;
+		const categoryItem = categoryMap.get(categoryId);
+		if (!categoryItem) continue;
 
 		// Add monthly data (will calculate percentage later)
 		categoryItem.monthlyData.set(period, {
@@ -122,7 +123,8 @@ export async function fetchCategoryReport(
 
 		for (let i = 0; i < sortedPeriods.length; i++) {
 			const period = sortedPeriods[i];
-			const monthlyData = categoryItem.monthlyData.get(period)!;
+			const monthlyData = categoryItem.monthlyData.get(period);
+			if (!monthlyData) continue;
 
 			if (i > 0) {
 				// Get previous period data

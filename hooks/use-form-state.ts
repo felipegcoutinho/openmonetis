@@ -16,7 +16,9 @@ import { useState } from "react";
  * updateField('name', 'John');
  * ```
  */
-export function useFormState<T extends Record<string, any>>(initialValues: T) {
+export function useFormState<T extends Record<string, unknown>>(
+	initialValues: T,
+) {
 	const [formState, setFormState] = useState<T>(initialValues);
 
 	/**

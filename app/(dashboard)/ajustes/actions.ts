@@ -184,7 +184,7 @@ export async function updatePasswordAction(
 				success: true,
 				message: "Senha atualizada com sucesso",
 			};
-		} catch (authError: any) {
+		} catch (authError) {
 			console.error("Erro na API do Better Auth:", authError);
 
 			// Verificar se o erro é de senha incorreta

@@ -258,7 +258,7 @@ export async function duplicatePreviousMonthBudgetsAction(
 				amount: b.amount,
 				period: data.period,
 				userId: user.id,
-				categoriaId: b.categoriaId!,
+				categoriaId: b.categoriaId as string,
 			})),
 		);
 

@@ -599,7 +599,7 @@ export async function generateInsightsAction(
 		const aggregatedData = await aggregateMonthData(user.id, period);
 
 		// Selecionar provider
-		let model;
+		let model: ReturnType<typeof google>;
 
 		// Se o modelo tem "/" é OpenRouter (formato: provider/model)
 		if (isOpenRouterFormat && !selectedModel) {

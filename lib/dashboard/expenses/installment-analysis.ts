@@ -127,9 +127,9 @@ export async function fetchInstallmentAnalysis(
 		};
 
 		if (seriesMap.has(row.seriesId)) {
-			const group = seriesMap.get(row.seriesId)!;
-			group.pendingInstallments.push(installmentDetail);
-			group.totalPendingAmount += amount;
+			const group = seriesMap.get(row.seriesId);
+			group?.pendingInstallments.push(installmentDetail);
+			if (group) group.totalPendingAmount += amount;
 		} else {
 			seriesMap.set(row.seriesId, {
 				seriesId: row.seriesId,

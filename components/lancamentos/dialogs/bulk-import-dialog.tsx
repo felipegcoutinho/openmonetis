@@ -163,7 +163,7 @@ export function BulkImportDialog({
 								: undefined,
 					};
 
-					const result = await createLancamentoAction(payload as any);
+					const result = await createLancamentoAction(payload);
 
 					if (result.success) {
 						successCount++;
@@ -360,7 +360,7 @@ export function BulkImportDialog({
 						</div>
 					)}
 
-					<DialogFooter className="gap-3">
+					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"

@@ -123,12 +123,16 @@ export async function fetchCategoryChartData(
 			});
 		}
 
-		categoryMap.get(categoryId)!.dataByPeriod.set(period, amount);
+		categoryMap.get(categoryId)?.dataByPeriod.set(period, amount);
 	}
 
 	const chartData = periods.map((period) => {
 		const [year, month] = period.split("-");
-		const date = new Date(Number.parseInt(year, 10), Number.parseInt(month, 10) - 1, 1);
+		const date = new Date(
+			Number.parseInt(year, 10),
+			Number.parseInt(month, 10) - 1,
+			1,
+		);
 		const monthLabel = format(date, "MMM", { locale: ptBR }).toUpperCase();
 
 		const dataPoint: { month: string; [key: string]: number | string } = {
@@ -144,7 +148,11 @@ export async function fetchCategoryChartData(
 
 	const months = periods.map((period) => {
 		const [year, month] = period.split("-");
-		const date = new Date(Number.parseInt(year, 10), Number.parseInt(month, 10) - 1, 1);
+		const date = new Date(
+			Number.parseInt(year, 10),
+			Number.parseInt(month, 10) - 1,
+			1,
+		);
 		return format(date, "MMM", { locale: ptBR }).toUpperCase();
 	});
 

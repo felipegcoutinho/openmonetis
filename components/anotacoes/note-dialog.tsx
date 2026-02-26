@@ -192,7 +192,7 @@ export function NoteDialog({
 		}
 
 		startTransition(async () => {
-			let result;
+			let result: { success: boolean; message?: string; error?: string };
 			if (mode === "create") {
 				result = await createNoteAction(payload);
 			} else {
