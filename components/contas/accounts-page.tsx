@@ -133,7 +133,7 @@ export function AccountsPage({
 		}
 
 		return (
-			<div className="flex flex-wrap gap-4">
+			<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
 				{list.map((account) => {
 					const logoSrc = resolveLogoSrc(account.logo);
 

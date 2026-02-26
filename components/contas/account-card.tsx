@@ -71,7 +71,7 @@ export function AccountCard({
 	].filter((action) => typeof action.onClick === "function");
 
 	return (
-		<Card className={cn("h-full w-96 gap-0", className)}>
+		<Card className={cn("h-full w-full gap-0", className)}>
 			<CardContent className="flex flex-1 flex-col gap-4">
 				<div className="flex items-center gap-2">
 					{icon ? (
