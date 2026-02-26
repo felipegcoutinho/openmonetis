@@ -34,7 +34,7 @@ export function NoteCard({
 	onArquivar,
 	isArquivadas = false,
 }: NoteCardProps) {
-	const { formattedDate, displayTitle } = useMemo(() => {
+	const { displayTitle } = useMemo(() => {
 		const resolvedTitle = note.title.trim().length
 			? note.title
 			: "Anotação sem título";

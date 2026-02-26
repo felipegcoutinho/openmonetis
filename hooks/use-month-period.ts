@@ -18,7 +18,7 @@ export function useMonthPeriod() {
 	const now = new Date();
 	const currentYear = now.getFullYear();
 	const currentMonthName = MONTH_NAMES[now.getMonth()];
-	const optionsMeses = [...MONTH_NAMES];
+	const optionsMeses = useMemo(() => [...MONTH_NAMES], []);
 
 	const defaultMonth = currentMonthName;
 	const defaultYear = currentYear.toString();

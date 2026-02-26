@@ -6,7 +6,13 @@ import {
 	RiFilter3Line,
 } from "@remixicon/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { type ReactNode, useEffect, useState, useTransition } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useState,
+	useTransition,
+} from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -143,21 +149,24 @@ export function LancamentosFilters({
 	const getParamValue = (key: string) =>
 		searchParams.get(key) ?? FILTER_EMPTY_VALUE;
 
-	const handleFilterChange = (key: string, value: string | null) => {
-		const nextParams = new URLSearchParams(searchParams.toString());
+	const handleFilterChange = useCallback(
+		(key: string, value: string | null) => {
+			const nextParams = new URLSearchParams(searchParams.toString());
 
-		if (value && value !== FILTER_EMPTY_VALUE) {
-			nextParams.set(key, value);
-		} else {
-			nextParams.delete(key);
-		}
+			if (value && value !== FILTER_EMPTY_VALUE) {
+				nextParams.set(key, value);
+			} else {
+				nextParams.delete(key);
+			}
 
-		startTransition(() => {
-			router.replace(`${pathname}?${nextParams.toString()}`, {
-				scroll: false,
+			startTransition(() => {
+				router.replace(`${pathname}?${nextParams.toString()}`, {
+					scroll: false,
+				});
 			});
-		});
-	};
+		},
+		[searchParams, pathname, router],
+	);
 
 	const [searchValue, setSearchValue] = useState(searchParams.get("q") ?? "");
 	const currentSearchParam = searchParams.get("q") ?? "";

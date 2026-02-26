@@ -52,24 +52,27 @@ export function InboxPage({
 	const [discardOpen, setDiscardOpen] = useState(false);
 	const [itemToDiscard, setItemToDiscard] = useState<InboxItem | null>(null);
 
-	const sortByTimestamp = (list: InboxItem[]) =>
-		[...list].sort(
-			(a, b) =>
-				new Date(b.notificationTimestamp).getTime() -
-				new Date(a.notificationTimestamp).getTime(),
-		);
+	const sortByTimestamp = useCallback(
+		(list: InboxItem[]) =>
+			[...list].sort(
+				(a, b) =>
+					new Date(b.notificationTimestamp).getTime() -
+					new Date(a.notificationTimestamp).getTime(),
+			),
+		[],
+	);
 
 	const sortedPending = useMemo(
 		() => sortByTimestamp(pendingItems),
-		[pendingItems],
+		[pendingItems, sortByTimestamp],
 	);
 	const sortedProcessed = useMemo(
 		() => sortByTimestamp(processedItems),
-		[processedItems],
+		[processedItems, sortByTimestamp],
 	);
 	const sortedDiscarded = useMemo(
 		() => sortByTimestamp(discardedItems),
-		[discardedItems],
+		[discardedItems, sortByTimestamp],
 	);
 
 	const handleProcessOpenChange = useCallback((open: boolean) => {

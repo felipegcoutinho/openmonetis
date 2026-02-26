@@ -30,12 +30,8 @@ const MagnetLines: React.FC<MagnetLinesProps> = ({
 }) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
-	// Se magnetlines estiver desabilitado, não renderiza nada
-	if (disabled) {
-		return null;
-	}
-
 	useEffect(() => {
+		if (disabled) return;
 		const container = containerRef.current;
 		if (!container) return;
 
@@ -72,7 +68,12 @@ const MagnetLines: React.FC<MagnetLinesProps> = ({
 		return () => {
 			window.removeEventListener("pointermove", handlePointerMove);
 		};
-	}, []);
+	}, [disabled]);
+
+	// Se magnetlines estiver desabilitado, não renderiza nada
+	if (disabled) {
+		return null;
+	}
 
 	const total = rows * columns;
 	const spans = Array.from({ length: total }, (_, i) => (
