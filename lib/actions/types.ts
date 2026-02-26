@@ -6,16 +6,6 @@ export type ActionResult<TData = void> =
 	| { success: false; error: string };
 
 /**
- * Success result helper
- */
-export function successResult<TData = void>(
-	message: string,
-	data?: TData,
-): ActionResult<TData> {
-	return { success: true, message, data };
-}
-
-/**
  * Error result helper
  */
 export function errorResult(error: string): ActionResult {

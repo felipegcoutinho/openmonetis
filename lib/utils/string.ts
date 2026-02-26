@@ -24,15 +24,6 @@ export function normalizeFilePath(path: string | null | undefined): string {
 }
 
 /**
- * Normalizes whitespace in string (replaces multiple spaces with single space)
- * @param value - String to normalize
- * @returns String with normalized whitespace
- */
-export function normalizeWhitespace(value: string): string {
-	return value.replace(/\s+/g, " ").trim();
-}
-
-/**
  * Normalizes icon input - trims and returns null if empty
  * @param icon - Icon string to normalize
  * @returns Trimmed icon string or null

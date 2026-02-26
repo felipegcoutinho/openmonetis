@@ -14,6 +14,3 @@ export const inboxItemSchema = z.object({
 export const inboxBatchSchema = z.object({
 	items: z.array(inboxItemSchema).min(1).max(50),
 });
-
-export type InboxItemInput = z.infer<typeof inboxItemSchema>;
-export type InboxBatchInput = z.infer<typeof inboxBatchSchema>;

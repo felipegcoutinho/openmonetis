@@ -6,7 +6,8 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatCurrency, formatPercentageChange } from "@/lib/relatorios/utils";
+import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
+import { formatPercentageChange } from "@/lib/relatorios/utils";
 import { cn } from "@/lib/utils/ui";
 
 interface CategoryCellProps {

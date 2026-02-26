@@ -17,22 +17,5 @@ export interface InboxItem {
 	updatedAt: Date;
 }
 
-export interface ProcessInboxInput {
-	inboxItemId: string;
-	name: string;
-	amount: number;
-	purchaseDate: string;
-	condition: string;
-	paymentMethod: string;
-	categoriaId: string;
-	contaId?: string;
-	cartaoId?: string;
-	note?: string;
-}
-
-export interface DiscardInboxInput {
-	inboxItemId: string;
-}
-
 // Re-export the lancamentos SelectOption for use in inbox components
 export type SelectOption = LancamentoSelectOption;

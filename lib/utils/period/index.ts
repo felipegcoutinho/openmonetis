@@ -29,8 +29,6 @@ export const MONTH_NAMES = [
 	"dezembro",
 ] as const;
 
-export type MonthName = (typeof MONTH_NAMES)[number];
-
 // ============================================================================
 // CORE PARSING & FORMATTING (YYYY-MM format)
 // ============================================================================
@@ -61,20 +59,6 @@ export function parsePeriod(period: string): { year: number; month: number } {
  */
 export function formatPeriod(year: number, month: number): string {
 	return `${year}-${String(month).padStart(2, "0")}`;
-}
-
-/**
- * Validates if period string is valid
- * @param period - Period string to validate
- * @returns True if valid, false otherwise
- */
-export function isPeriodValid(period: string): boolean {
-	try {
-		parsePeriod(period);
-		return true;
-	} catch {
-		return false;
-	}
 }
 
 // ============================================================================
@@ -137,22 +121,6 @@ export function addMonthsToPeriod(period: string, offset: number): string {
 	const nextMonth = date.getMonth() + 1;
 
 	return formatPeriod(nextYear, nextMonth);
-}
-
-/**
- * Gets the last N periods including the current one
- * @param current - Current period in YYYY-MM format
- * @param length - Number of periods to return
- * @returns Array of period strings
- */
-export function getLastPeriods(current: string, length: number): string[] {
-	const periods: string[] = [];
-
-	for (let offset = length - 1; offset >= 0; offset -= 1) {
-		periods.push(addMonthsToPeriod(current, -offset));
-	}
-
-	return periods;
 }
 
 // ============================================================================

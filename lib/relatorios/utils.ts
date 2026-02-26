@@ -1,4 +1,3 @@
-import { currencyFormatter } from "@/lib/lancamentos/formatting-helpers";
 import { calculatePercentageChange } from "@/lib/utils/math";
 import { buildPeriodRange, MONTH_NAMES, parsePeriod } from "@/lib/utils/period";
 import type { DateRangeValidation } from "./types";
@@ -93,17 +92,6 @@ export function validateDateRange(
 					: "Formato de período inválido. Use YYYY-MM",
 		};
 	}
-}
-
-/**
- * Formats a number as Brazilian currency (R$ X.XXX,XX)
- * Uses the shared currencyFormatter from formatting-helpers
- *
- * @param value - Numeric value to format
- * @returns Formatted currency string
- */
-export function formatCurrency(value: number): string {
-	return currencyFormatter.format(value);
 }
 
 /**

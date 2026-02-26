@@ -12,8 +12,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
 import type { CategoryReportItem } from "@/lib/relatorios/types";
-import { formatCurrency, formatPeriodLabel } from "@/lib/relatorios/utils";
+import { formatPeriodLabel } from "@/lib/relatorios/utils";
 import { formatPeriodForUrl } from "@/lib/utils/period";
 import DotIcon from "../dot-icon";
 import { Card } from "../ui/card";

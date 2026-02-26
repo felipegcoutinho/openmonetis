@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { CategoryIconBadge } from "@/components/categorias/category-icon-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
 import type {
 	CategoryReportData,
 	CategoryReportItem,
 } from "@/lib/relatorios/types";
-import { formatCurrency, formatPeriodLabel } from "@/lib/relatorios/utils";
+import { formatPeriodLabel } from "@/lib/relatorios/utils";
 import { formatPeriodForUrl } from "@/lib/utils/period";
 import { CategoryCell } from "./category-cell";
 

@@ -62,57 +62,6 @@ export function parseLocalDateString(dateString: string): Date {
 }
 
 /**
- * Gets today's date in UTC
- * @returns Date object set to today at midnight UTC
- */
-export function getTodayUTC(): Date {
-	const now = new Date();
-	const year = now.getUTCFullYear();
-	const month = now.getUTCMonth();
-	const day = now.getUTCDate();
-
-	return new Date(Date.UTC(year, month, day));
-}
-
-/**
- * Gets today's date in local timezone
- * @returns Date object set to today at midnight local time
- */
-export function getTodayLocal(): Date {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = now.getMonth();
-	const day = now.getDate();
-
-	return new Date(year, month, day);
-}
-
-/**
- * Gets today's period in YYYY-MM format (UTC)
- * @returns Period string
- */
-export function getTodayPeriodUTC(): string {
-	const now = new Date();
-	const year = now.getUTCFullYear();
-	const month = now.getUTCMonth();
-
-	return `${year}-${String(month + 1).padStart(2, "0")}`;
-}
-
-/**
- * Formats date as YYYY-MM-DD string
- * @param date - Date to format
- * @returns Formatted date string
- */
-export function formatDateForDb(date: Date): string {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-
-	return `${year}-${month}-${day}`;
-}
-
-/**
  * Gets today's date as YYYY-MM-DD string
  * @returns Formatted date string
  */
@@ -222,28 +171,6 @@ export function getGreeting(date: Date = new Date()): string {
 	if (hour >= 5 && hour < 12) return "Bom dia";
 	if (hour >= 12 && hour < 18) return "Boa tarde";
 	return "Boa noite";
-}
-
-// ============================================================================
-// DATE INFORMATION
-// ============================================================================
-
-/**
- * Gets information about a date
- * @param date - Date to analyze (defaults to now)
- * @returns Object with date information
- */
-export function getDateInfo(date: Date = new Date()) {
-	return {
-		date,
-		year: date.getFullYear(),
-		month: date.getMonth() + 1,
-		monthName: MONTH_NAMES[date.getMonth()],
-		day: date.getDate(),
-		weekday: WEEKDAY_NAMES[date.getDay()],
-		friendlyDisplay: friendlyDate(date),
-		greeting: getGreeting(date),
-	};
 }
 
 // Re-export MONTH_NAMES for convenience

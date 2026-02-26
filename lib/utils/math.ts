@@ -24,28 +24,3 @@ export function calculatePercentageChange(
 	// Protege contra valores absurdos (retorna null se > 1 milhão %)
 	return Number.isFinite(change) && Math.abs(change) < 1000000 ? change : null;
 }
-
-/**
- * Calculates percentage of part relative to total
- * @param part - Part value
- * @param total - Total value
- * @returns Percentage (0-100)
- */
-export function calculatePercentage(part: number, total: number): number {
-	if (total === 0) {
-		return 0;
-	}
-
-	return (part / total) * 100;
-}
-
-/**
- * Rounds number to specified decimal places
- * @param value - Value to round
- * @param decimals - Number of decimal places (default 2)
- * @returns Rounded number
- */
-export function roundToDecimals(value: number, decimals: number = 2): number {
-	const multiplier = 10 ** decimals;
-	return Math.round(value * multiplier) / multiplier;
-}

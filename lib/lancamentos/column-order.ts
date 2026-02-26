@@ -14,8 +14,6 @@ export const LANCAMENTOS_REORDERABLE_COLUMN_IDS = [
 	"contaCartao",
 ] as const;
 
-export type LancamentosColumnId = (typeof LANCAMENTOS_REORDERABLE_COLUMN_IDS)[number];
-
 export const LANCAMENTOS_COLUMN_LABELS: Record<string, string> = {
 	name: "Estabelecimento",
 	transactionType: "Transação",

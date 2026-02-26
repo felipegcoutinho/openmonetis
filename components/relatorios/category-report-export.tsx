@@ -18,9 +18,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
 import type { CategoryReportData } from "@/lib/relatorios/types";
 import {
-	formatCurrency,
 	formatPercentageChange,
 	formatPeriodLabel,
 } from "@/lib/relatorios/utils";

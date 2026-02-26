@@ -145,14 +145,6 @@ export function generateTokenId(): string {
 }
 
 /**
- * Generate a random API token with prefix
- */
-export function generateApiToken(): string {
-	const randomPart = crypto.randomBytes(32).toString("base64url");
-	return `os_${randomPart}`;
-}
-
-/**
  * Hash a token using SHA-256
  */
 export function hashToken(token: string): string {
@@ -234,18 +226,6 @@ export function extractBearerToken(authHeader: string | null): string | null {
 	if (!authHeader) return null;
 	const match = authHeader.match(/^Bearer\s+(.+)$/i);
 	return match ? match[1] : null;
-}
-
-/**
- * Validate an API token and return the payload
- * @deprecated Use validateHashToken for os_xxx tokens
- */
-export function validateApiToken(token: string): JwtPayload | null {
-	const payload = verifyJwt(token);
-	if (!payload || payload.type !== "api_access") {
-		return null;
-	}
-	return payload;
 }
 
 /**
