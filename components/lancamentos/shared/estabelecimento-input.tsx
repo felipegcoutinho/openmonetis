@@ -1,6 +1,6 @@
 "use client";
 
-import { RiCheckLine, RiSearchLine } from "@remixicon/react";
+import { RiSearchLine } from "@remixicon/react";
 import * as React from "react";
 
 import {
@@ -16,7 +16,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils/ui";
 
 export interface EstabelecimentoInputProps {
 	id?: string;
@@ -78,11 +77,6 @@ export function EstabelecimentoInput({
 						required={required}
 						maxLength={maxLength}
 						autoComplete="off"
-						onFocus={() => {
-							if (estabelecimentos.length > 0) {
-								setOpen(true);
-							}
-						}}
 					/>
 					{estabelecimentos.length > 0 && (
 						<RiSearchLine className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
@@ -106,17 +100,13 @@ export function EstabelecimentoInput({
 										key={item}
 										value={item}
 										onSelect={() => handleSelect(item)}
-										className="cursor-pointer gap-1"
+										className="cursor-pointer"
 									>
-										<RiCheckLine
-											className={cn(
-												"size-4 shrink-0",
-												value === item
-													? "opacity-100  text-success"
-													: "opacity-5",
-											)}
-										/>
-										<span className="truncate flex-1">{item}</span>
+										<span
+											className={`truncate flex-1 ${value === item ? "font-semibold" : ""}`}
+										>
+											{item}
+										</span>
 									</CommandItem>
 								))}
 							</CommandGroup>
