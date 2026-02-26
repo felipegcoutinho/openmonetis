@@ -5,6 +5,29 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.2] - 2026-02-26
+
+### Alterado
+
+- Dialogs padronizados: padding maior (p-10), largura max-w-xl, botões do footer com largura igual (flex-1)
+- Lançamento dialog simplificado: período da fatura calculado automaticamente a partir da data de compra + dia de fechamento do cartão via `deriveCreditCardPeriod()`
+- Seção "Condições e anotações" colapsável no lançamento dialog
+- Mass-add dialog: campo unificado conta/cartão com parsing por prefixo, period picker apenas para cartão de crédito
+- PeriodPicker removido dos campos básicos; substituído por InlinePeriodPicker inline no cartão de crédito
+
+### Corrigido
+
+- Non-null assertions (!) substituídas por type assertions ou optional chaining com guards em 15+ arquivos
+- `any` substituído por `unknown` ou tipos explícitos (use-form-state, pagadores/data, ajustes/actions, insights/actions)
+- Hooks com dependências exaustivas: magnet-lines (useEffect antes de early return), lancamentos-filters (useCallback), inbox-page (useCallback + deps)
+- `Error` component renomeado para `ErrorComponent` evitando shadowing do global
+
+### Removido
+
+- 6 componentes não utilizados: dashboard-grid, expenses/income-by-category widgets, installment analysis panels, fatura-warning-dialog
+- 20+ funções/tipos não utilizados: successResult, generateApiToken, validateApiToken, getTodayUTC/Local, calculatePercentage, roundToDecimals, safeParseInt/Float, isPeriodValid, getLastPeriods, entre outros
+- FaturaWarningDialog e checkFaturaStatusAction (substituídos por derivação automática de período)
+
 ## [1.7.1] - 2026-02-24
 
 ### Adicionado
