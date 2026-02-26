@@ -78,8 +78,8 @@ export function FeedbackDialogBody({ onClose }: { onClose?: () => void }) {
 					Enviar Feedback
 				</DialogTitle>
 				<DialogDescription>
-					Sua opinião é muito importante! Escolha o tipo de feedback que
-					deseja compartilhar.
+					Sua opinião é muito importante! Escolha o tipo de feedback que deseja
+					compartilhar.
 				</DialogDescription>
 			</DialogHeader>
 
@@ -121,8 +121,8 @@ export function FeedbackDialogBody({ onClose }: { onClose?: () => void }) {
 			<div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground">
 				<RiExternalLinkLine className="h-4 w-4 shrink-0 mt-0.5" />
 				<p>
-					Você será redirecionado para o GitHub Discussions onde poderá
-					escrever seu feedback. É necessário ter uma conta no GitHub.
+					Você será redirecionado para o GitHub Discussions onde poderá escrever
+					seu feedback. É necessário ter uma conta no GitHub.
 				</p>
 			</div>
 		</DialogContent>

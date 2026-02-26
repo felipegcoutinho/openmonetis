@@ -14,7 +14,7 @@ export default function RootLayout({
 		<section className="space-y-6 pt-4">
 			<PageDescription
 				icon={<RiTodoLine />}
-				title="Notas"
+				title="Anotações"
 				subtitle="Gerencie suas anotações e mantenha o controle sobre suas ideias e tarefas."
 			/>
 			{children}
