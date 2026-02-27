@@ -1,6 +1,6 @@
 import { FontProvider } from "@/components/font-provider";
+import { AppNavbar } from "@/components/navbar/app-navbar";
 import { PrivacyProvider } from "@/components/privacy-provider";
-import { AppTopbar } from "@/components/topbar/app-topbar";
 import { getUserSession } from "@/lib/auth/server";
 import { fetchDashboardNotifications } from "@/lib/dashboard/notifications";
 import { fetchPagadoresWithAccess } from "@/lib/pagadores/access";
@@ -53,7 +53,7 @@ export default async function DashboardLayout({
 			moneyFont={fontPrefs.moneyFont}
 		>
 			<PrivacyProvider>
-				<AppTopbar
+				<AppNavbar
 					user={{ ...session.user, image: session.user.image ?? null }}
 					pagadorAvatarUrl={adminPagador?.avatarUrl ?? null}
 					preLancamentosCount={preLancamentosCount}

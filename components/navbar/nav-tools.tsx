@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils/ui";
 const itemClass =
 	"flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-accent transition-colors cursor-pointer";
 
-export function FerramentasDropdownContent() {
+export function NavToolsDropdown() {
 	const { privacyMode, toggle } = usePrivacyMode();
 	const [calcOpen, setCalcOpen] = useState(false);
 
@@ -54,13 +54,11 @@ export function FerramentasDropdownContent() {
 	);
 }
 
-type MobileFerramentasItemsProps = {
+type MobileToolsProps = {
 	onClose: () => void;
 };
 
-export function MobileFerramentasItems({
-	onClose,
-}: MobileFerramentasItemsProps) {
+export function MobileTools({ onClose }: MobileToolsProps) {
 	const { privacyMode, toggle } = usePrivacyMode();
 	const [calcOpen, setCalcOpen] = useState(false);
 

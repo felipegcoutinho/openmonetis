@@ -4,10 +4,10 @@ import { NotificationBell } from "@/components/notificacoes/notification-bell";
 import { RefreshPageButton } from "@/components/refresh-page-button";
 import type { DashboardNotificationsSnapshot } from "@/lib/dashboard/notifications";
 import { Logo } from "../logo";
-import { TopNavMenu } from "./top-nav-menu";
-import { TopbarUser } from "./topbar-user";
+import { NavMenu } from "./nav-menu";
+import { NavbarUser } from "./navbar-user";
 
-type AppTopbarProps = {
+type AppNavbarProps = {
 	user: {
 		id: string;
 		name: string;
@@ -19,14 +19,14 @@ type AppTopbarProps = {
 	notificationsSnapshot: DashboardNotificationsSnapshot;
 };
 
-export function AppTopbar({
+export function AppNavbar({
 	user,
 	pagadorAvatarUrl,
 	preLancamentosCount = 0,
 	notificationsSnapshot,
-}: AppTopbarProps) {
+}: AppNavbarProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 h-15 shrink-0 flex items-center bg-card/80 backdrop-blur-md supports-backdrop-filter:bg-card/70">
+		<header className="fixed top-0 left-0 right-0 z-50 h-15 shrink-0 flex items-center bg-card backdrop-blur-lg supports-backdrop-filter:bg-card/60">
 			<div className="w-full max-w-8xl mx-auto px-4 flex items-center gap-4 h-full">
 				{/* Logo */}
 				<Link href="/dashboard" className="shrink-0 mr-1">
@@ -34,7 +34,7 @@ export function AppTopbar({
 				</Link>
 
 				{/* Navigation */}
-				<TopNavMenu />
+				<NavMenu />
 
 				{/* Right-side actions */}
 				<div className="ml-auto flex items-center gap-2">
@@ -49,7 +49,7 @@ export function AppTopbar({
 				</div>
 
 				{/* User avatar */}
-				<TopbarUser user={user} pagadorAvatarUrl={pagadorAvatarUrl} />
+				<NavbarUser user={user} pagadorAvatarUrl={pagadorAvatarUrl} />
 			</div>
 		</header>
 	);

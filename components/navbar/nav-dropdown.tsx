@@ -1,24 +1,21 @@
-import Link from "next/link";
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import type { NavItem } from "./nav-items";
+import { NavLink } from "./nav-link";
 
-export type DropdownLinkItem = {
-	href: string;
-	label: string;
-	icon: React.ReactNode;
-	badge?: number;
+type NavDropdownProps = {
+	items: NavItem[];
 };
 
-type DropdownLinkListProps = {
-	items: DropdownLinkItem[];
-};
-
-export function DropdownLinkList({ items }: DropdownLinkListProps) {
+export function NavDropdown({ items }: NavDropdownProps) {
 	return (
 		<ul className="grid w-48 gap-0.5 p-2">
 			{items.map((item) => (
 				<li key={item.href}>
-					<Link
+					<NavLink
 						href={item.href}
+						preservePeriod={item.preservePeriod}
 						className="flex items-center gap-2.5 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-accent transition-colors"
 					>
 						<span className="text-muted-foreground shrink-0">{item.icon}</span>
@@ -31,7 +28,7 @@ export function DropdownLinkList({ items }: DropdownLinkListProps) {
 								{item.badge}
 							</Badge>
 						) : null}
-					</Link>
+					</NavLink>
 				</li>
 			))}
 		</ul>

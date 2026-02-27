@@ -29,7 +29,7 @@ import { Badge } from "../ui/badge";
 const itemClass =
 	"flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent";
 
-type TopbarUserProps = {
+type NavbarUserProps = {
 	user: {
 		id: string;
 		name: string;
@@ -39,7 +39,7 @@ type TopbarUserProps = {
 	pagadorAvatarUrl: string | null;
 };
 
-export function TopbarUser({ user, pagadorAvatarUrl }: TopbarUserProps) {
+export function NavbarUser({ user, pagadorAvatarUrl }: NavbarUserProps) {
 	const router = useRouter();
 	const [logoutLoading, setLogoutLoading] = useState(false);
 	const [feedbackOpen, setFeedbackOpen] = useState(false);

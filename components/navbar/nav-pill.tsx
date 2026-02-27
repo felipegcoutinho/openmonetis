@@ -1,28 +1,31 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/ui";
+import { NavLink } from "./nav-link";
 import { linkActive, linkBase, linkIdle } from "./nav-styles";
 
-type SimpleNavLinkProps = {
+type NavPillProps = {
 	href: string;
+	preservePeriod?: boolean;
 	children: React.ReactNode;
 };
 
-export function SimpleNavLink({ href, children }: SimpleNavLinkProps) {
+export function NavPill({ href, preservePeriod, children }: NavPillProps) {
 	const pathname = usePathname();
+
 	const isActive =
 		href === "/dashboard"
 			? pathname === href
 			: pathname === href || pathname.startsWith(`${href}/`);
 
 	return (
-		<Link
+		<NavLink
 			href={href}
+			preservePeriod={preservePeriod}
 			className={cn(linkBase, isActive ? linkActive : linkIdle)}
 		>
 			{children}
-		</Link>
+		</NavLink>
 	);
 }

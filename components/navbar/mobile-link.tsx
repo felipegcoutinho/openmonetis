@@ -1,34 +1,38 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/ui";
+import { NavLink } from "./nav-link";
 
-type MobileNavLinkProps = {
+type MobileLinkProps = {
 	href: string;
 	icon: React.ReactNode;
 	children: React.ReactNode;
 	onClick?: () => void;
 	badge?: number;
+	preservePeriod?: boolean;
 };
 
-export function MobileNavLink({
+export function MobileLink({
 	href,
 	icon,
 	children,
 	onClick,
 	badge,
-}: MobileNavLinkProps) {
+	preservePeriod,
+}: MobileLinkProps) {
 	const pathname = usePathname();
+
 	const isActive =
 		href === "/dashboard"
 			? pathname === href
 			: pathname === href || pathname.startsWith(`${href}/`);
 
 	return (
-		<Link
+		<NavLink
 			href={href}
+			preservePeriod={preservePeriod}
 			onClick={onClick}
 			className={cn(
 				"flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
@@ -43,7 +47,7 @@ export function MobileNavLink({
 					{badge}
 				</Badge>
 			) : null}
-		</Link>
+		</NavLink>
 	);
 }
 
