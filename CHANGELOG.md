@@ -5,6 +5,17 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.3] - 2026-02-27
+
+### Adicionado
+
+- Prop `compact` no DatePicker para formato abreviado "28 fev" (sem "de" e sem ano)
+
+### Alterado
+
+- Modal de múltiplos lançamentos reformulado: selects de conta e cartão separados por forma de pagamento, InlinePeriodPicker ao selecionar cartão de crédito, grid full-width, DatePicker compacto
+- Opção "Boleto" removida das formas de pagamento no modal de múltiplos lançamentos
+
 ## [1.7.2] - 2026-02-26
 
 ### Alterado
