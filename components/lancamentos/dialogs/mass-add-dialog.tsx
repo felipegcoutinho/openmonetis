@@ -3,7 +3,6 @@
 import { RiAddLine, RiDeleteBinLine } from "@remixicon/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { PeriodPicker } from "@/components/period-picker";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -16,6 +15,12 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { MonthPicker } from "@/components/ui/monthpicker";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	Select,
 	SelectContent,
@@ -30,6 +35,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { groupAndSortCategorias } from "@/lib/lancamentos/categoria-helpers";
 import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
 import { getTodayDateString } from "@/lib/utils/date";
+import { displayPeriod } from "@/lib/utils/period";
 import type { SelectOption } from "../../types";
 import {
 	CategoriaSelectContent,
@@ -39,6 +45,57 @@ import {
 	TransactionTypeSelectContent,
 } from "../select-items";
 import { EstabelecimentoInput } from "../shared/estabelecimento-input";
+
+/** Payment methods sem Boleto para este modal */
+const MASS_ADD_PAYMENT_METHODS = LANCAMENTO_PAYMENT_METHODS.filter(
+	(m) => m !== "Boleto",
+);
+
+function periodToDate(period: string): Date {
+	const [year, month] = period.split("-").map(Number);
+	return new Date(year, month - 1, 1);
+}
+
+function dateToPeriod(date: Date): string {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	return `${year}-${month}`;
+}
+
+function InlinePeriodPicker({
+	period,
+	onPeriodChange,
+}: {
+	period: string;
+	onPeriodChange: (value: string) => void;
+}) {
+	const [open, setOpen] = useState(false);
+
+	return (
+		<div className="-mt-1">
+			<span className="text-xs text-muted-foreground">Fatura de </span>
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<button
+						type="button"
+						className="text-xs text-primary underline-offset-2 hover:underline cursor-pointer lowercase"
+					>
+						{displayPeriod(period)}
+					</button>
+				</PopoverTrigger>
+				<PopoverContent className="w-auto p-0" align="start">
+					<MonthPicker
+						selectedMonth={periodToDate(period)}
+						onMonthSelect={(date) => {
+							onPeriodChange(dateToPeriod(date));
+							setOpen(false);
+						}}
+					/>
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
+}
 
 interface MassAddDialogProps {
 	open: boolean;
@@ -102,22 +159,15 @@ export function MassAddDialog({
 		LANCAMENTO_PAYMENT_METHODS[0],
 	);
 	const [period, setPeriod] = useState<string>(selectedPeriod);
-	// Formato: "conta:uuid" ou "cartao:uuid"
-	const [contaCartaoId, setContaCartaoId] = useState<string | undefined>(
-		defaultCartaoId ? `cartao:${defaultCartaoId}` : undefined,
+	const [contaId, setContaId] = useState<string | undefined>(undefined);
+	const [cartaoId, setCartaoId] = useState<string | undefined>(
+		defaultCartaoId ?? undefined,
 	);
 
 	// Quando defaultCartaoId está definido, exibe apenas o cartão específico
 	const isLockedToCartao = !!defaultCartaoId;
 
-	// Deriva contaId e cartaoId do valor selecionado
-	const isCartaoSelected = contaCartaoId?.startsWith("cartao:");
-	const contaId = contaCartaoId?.startsWith("conta:")
-		? contaCartaoId.replace("conta:", "")
-		: undefined;
-	const cartaoId = contaCartaoId?.startsWith("cartao:")
-		? contaCartaoId.replace("cartao:", "")
-		: undefined;
+	const isCartaoSelected = paymentMethod === "Cartão de crédito";
 
 	// Transaction rows
 	const [transactions, setTransactions] = useState<TransactionRow[]>([
@@ -173,8 +223,12 @@ export function MassAddDialog({
 
 	const handleSubmit = async () => {
 		// Validate conta/cartao selection
-		if (!contaCartaoId) {
-			toast.error("Selecione uma conta ou cartão para continuar");
+		if (isCartaoSelected && !cartaoId) {
+			toast.error("Selecione um cartão para continuar");
+			return;
+		}
+		if (!isCartaoSelected && !contaId) {
+			toast.error("Selecione uma conta para continuar");
 			return;
 		}
 
@@ -194,11 +248,11 @@ export function MassAddDialog({
 		const formData: MassAddFormData = {
 			fixedFields: {
 				transactionType,
-				paymentMethod: isCartaoSelected ? "Cartão de crédito" : paymentMethod,
+				paymentMethod,
 				condition: "À vista",
 				period,
-				contaId: contaId,
-				cartaoId: cartaoId,
+				contaId,
+				cartaoId,
 			},
 			transactions: transactions.map((t) => ({
 				purchaseDate: t.purchaseDate,
@@ -217,9 +271,8 @@ export function MassAddDialog({
 			setTransactionType("Despesa");
 			setPaymentMethod(LANCAMENTO_PAYMENT_METHODS[0]);
 			setPeriod(selectedPeriod);
-			setContaCartaoId(
-				defaultCartaoId ? `cartao:${defaultCartaoId}` : undefined,
-			);
+			setContaId(undefined);
+			setCartaoId(defaultCartaoId ?? undefined);
 			setTransactions([
 				{
 					id: crypto.randomUUID(),
@@ -237,9 +290,6 @@ export function MassAddDialog({
 		}
 	};
 
-	// Show period picker only for credit card
-	const showPeriodPicker = isCartaoSelected;
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:px-8">
@@ -252,11 +302,11 @@ export function MassAddDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-6">
+				<div className="space-y-4">
 					{/* Fixed Fields Section */}
 					<div className="space-y-4">
 						<h3 className="text-sm font-semibold">Valores Padrão</h3>
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+						<div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
 							{/* Transaction Type */}
 							<div className="space-y-2">
 								<Label htmlFor="transaction-type">Tipo de Transação</Label>
@@ -291,9 +341,9 @@ export function MassAddDialog({
 										setPaymentMethod(value);
 										// Reset conta/cartao when changing payment method
 										if (value === "Cartão de crédito") {
-											setContaCartaoId(undefined);
+											setContaId(undefined);
 										} else {
-											setContaCartaoId(undefined);
+											setCartaoId(undefined);
 										}
 									}}
 								>
@@ -305,7 +355,7 @@ export function MassAddDialog({
 										</SelectValue>
 									</SelectTrigger>
 									<SelectContent>
-										{LANCAMENTO_PAYMENT_METHODS.map((method) => (
+										{MASS_ADD_PAYMENT_METHODS.map((method) => (
 											<SelectItem key={method} value={method}>
 												<PaymentMethodSelectContent label={method} />
 											</SelectItem>
@@ -314,33 +364,19 @@ export function MassAddDialog({
 								</Select>
 							</div>
 
-							{/* Period - only for credit card */}
-							{showPeriodPicker ? (
+							{/* Cartão (only for credit card) */}
+							{isCartaoSelected ? (
 								<div className="space-y-2">
-									<Label htmlFor="period">Fatura</Label>
-									<PeriodPicker
-										value={period}
-										onChange={setPeriod}
-										className="w-full truncate"
-									/>
-								</div>
-							) : null}
-
-							{/* Conta/Cartao */}
-							<div className="space-y-2">
-								<Label htmlFor="conta-cartao">
-									{isLockedToCartao ? "Cartão" : "Conta/Cartão"}
-								</Label>
-								<Select
-									value={contaCartaoId}
-									onValueChange={setContaCartaoId}
-									disabled={isLockedToCartao}
-								>
-									<SelectTrigger id="conta-cartao" className="w-full">
-										<SelectValue placeholder="Selecione">
-											{contaCartaoId &&
-												(() => {
-													if (isCartaoSelected) {
+									<Label htmlFor="cartao">Cartão</Label>
+									<Select
+										value={cartaoId}
+										onValueChange={setCartaoId}
+										disabled={isLockedToCartao}
+									>
+										<SelectTrigger id="cartao" className="w-full">
+											<SelectValue placeholder="Selecione">
+												{cartaoId &&
+													(() => {
 														const selectedOption = cartaoOptions.find(
 															(opt) => opt.value === cartaoId,
 														);
@@ -351,7 +387,53 @@ export function MassAddDialog({
 																isCartao={true}
 															/>
 														) : null;
-													} else {
+													})()}
+											</SelectValue>
+										</SelectTrigger>
+										<SelectContent>
+											{cartaoOptions.length === 0 ? (
+												<div className="px-2 py-6 text-center">
+													<p className="text-sm text-muted-foreground">
+														Nenhum cartão cadastrado
+													</p>
+												</div>
+											) : (
+												cartaoOptions
+													.filter(
+														(option) =>
+															!isLockedToCartao ||
+															option.value === defaultCartaoId,
+													)
+													.map((option) => (
+														<SelectItem key={option.value} value={option.value}>
+															<ContaCartaoSelectContent
+																label={option.label}
+																logo={option.logo}
+																isCartao={true}
+															/>
+														</SelectItem>
+													))
+											)}
+										</SelectContent>
+									</Select>
+									{cartaoId ? (
+										<InlinePeriodPicker
+											period={period}
+											onPeriodChange={setPeriod}
+										/>
+									) : null}
+								</div>
+							) : null}
+
+							{/* Conta (for non-credit-card methods) */}
+							{!isCartaoSelected ? (
+								<div className="space-y-2">
+									<Label htmlFor="conta">Conta</Label>
+									<Select value={contaId} onValueChange={setContaId}>
+										<SelectTrigger id="conta" className="w-full">
+											<SelectValue placeholder="Selecione">
+												{contaId &&
+													(() => {
 														const selectedOption = contaOptions.find(
 															(opt) => opt.value === contaId,
 														);
@@ -362,56 +444,31 @@ export function MassAddDialog({
 																isCartao={false}
 															/>
 														) : null;
-													}
-												})()}
-										</SelectValue>
-									</SelectTrigger>
-									<SelectContent>
-										{cartaoOptions.length > 0 && (
-											<SelectGroup>
-												{!isLockedToCartao && (
-													<SelectLabel>Cartões</SelectLabel>
-												)}
-												{cartaoOptions
-													.filter(
-														(option) =>
-															!isLockedToCartao ||
-															option.value === defaultCartaoId,
-													)
-													.map((option) => (
-														<SelectItem
-															key={option.value}
-															value={`cartao:${option.value}`}
-														>
-															<ContaCartaoSelectContent
-																label={option.label}
-																logo={option.logo}
-																isCartao={true}
-															/>
-														</SelectItem>
-													))}
-											</SelectGroup>
-										)}
-										{!isLockedToCartao && contaOptions.length > 0 && (
-											<SelectGroup>
-												<SelectLabel>Contas</SelectLabel>
-												{contaOptions.map((option) => (
-													<SelectItem
-														key={option.value}
-														value={`conta:${option.value}`}
-													>
+													})()}
+											</SelectValue>
+										</SelectTrigger>
+										<SelectContent>
+											{contaOptions.length === 0 ? (
+												<div className="px-2 py-6 text-center">
+													<p className="text-sm text-muted-foreground">
+														Nenhuma conta cadastrada
+													</p>
+												</div>
+											) : (
+												contaOptions.map((option) => (
+													<SelectItem key={option.value} value={option.value}>
 														<ContaCartaoSelectContent
 															label={option.label}
 															logo={option.logo}
 															isCartao={false}
 														/>
 													</SelectItem>
-												))}
-											</SelectGroup>
-										)}
-									</SelectContent>
-								</Select>
-							</div>
+												))
+											)}
+										</SelectContent>
+									</Select>
+								</div>
+							) : null}
 						</div>
 					</div>
 
@@ -428,7 +485,7 @@ export function MassAddDialog({
 									className="grid gap-2 border-b pb-3 border-dashed last:border-0"
 								>
 									<div className="flex gap-2 w-full">
-										<div className="w-full">
+										<div className="w-24 shrink-0">
 											<Label
 												htmlFor={`date-${transaction.id}`}
 												className="sr-only"
@@ -446,7 +503,7 @@ export function MassAddDialog({
 													)
 												}
 												placeholder="Data"
-												className="w-32 truncate"
+												compact
 												required
 											/>
 										</div>
