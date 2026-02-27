@@ -227,17 +227,3 @@ export function extractBearerToken(authHeader: string | null): string | null {
 	const match = authHeader.match(/^Bearer\s+(.+)$/i);
 	return match ? match[1] : null;
 }
-
-/**
- * Validate a hash-based API token (os_xxx format)
- * Returns the token hash for database lookup
- */
-export function validateHashToken(token: string): {
-	valid: boolean;
-	tokenHash?: string;
-} {
-	if (!token || !token.startsWith("os_")) {
-		return { valid: false };
-	}
-	return { valid: true, tokenHash: hashToken(token) };
-}

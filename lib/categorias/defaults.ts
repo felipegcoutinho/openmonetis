@@ -3,7 +3,7 @@ import { categorias } from "@/db/schema";
 import type { CategoryType } from "@/lib/categorias/constants";
 import { db } from "@/lib/db";
 
-export type DefaultCategory = {
+type DefaultCategory = {
 	name: string;
 	type: CategoryType;
 	icon: string | null;

@@ -8,21 +8,12 @@ import {
 	RiQuestionLine,
 	RiStarLine,
 } from "@remixicon/react";
-import { useState } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
 import {
-	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const GITHUB_REPO_BASE = "https://github.com/felipegcoutinho/openmonetis";
@@ -126,34 +117,5 @@ export function FeedbackDialogBody({ onClose }: { onClose?: () => void }) {
 				</p>
 			</div>
 		</DialogContent>
-	);
-}
-
-export function FeedbackDialog() {
-	const [open, setOpen] = useState(false);
-
-	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<DialogTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className={cn(
-								buttonVariants({ variant: "ghost", size: "icon-sm" }),
-								"group relative text-muted-foreground transition-all duration-200",
-								"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
-								"data-[state=open]:bg-accent/60 data-[state=open]:text-foreground border",
-							)}
-						>
-							<RiMessageLine className="h-5 w-5" />
-						</Button>
-					</DialogTrigger>
-				</TooltipTrigger>
-				<TooltipContent>Enviar Feedback</TooltipContent>
-			</Tooltip>
-			<FeedbackDialogBody onClose={() => setOpen(false)} />
-		</Dialog>
 	);
 }

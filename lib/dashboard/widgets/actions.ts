@@ -68,20 +68,3 @@ export async function resetWidgetPreferences(): Promise<{
 		return { success: false, error: "Erro ao resetar preferências" };
 	}
 }
-
-export async function getWidgetPreferences(): Promise<WidgetPreferences | null> {
-	try {
-		const user = await getUser();
-
-		const result = await db
-			.select({ dashboardWidgets: schema.preferenciasUsuario.dashboardWidgets })
-			.from(schema.preferenciasUsuario)
-			.where(eq(schema.preferenciasUsuario.userId, user.id))
-			.limit(1);
-
-		return result[0]?.dashboardWidgets ?? null;
-	} catch (error) {
-		console.error("Error getting widget preferences:", error);
-		return null;
-	}
-}

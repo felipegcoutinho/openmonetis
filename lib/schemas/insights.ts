@@ -64,6 +64,4 @@ export const InsightsResponseSchema = z.object({
 /**
  * TypeScript types derived from schemas
  */
-export type InsightItem = z.infer<typeof InsightItemSchema>;
-export type InsightCategory = z.infer<typeof InsightCategorySchema>;
 export type InsightsResponse = z.infer<typeof InsightsResponseSchema>;

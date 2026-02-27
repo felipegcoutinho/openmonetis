@@ -49,18 +49,3 @@ export type CreateAnticipationInput = {
 export type CancelAnticipationInput = {
 	anticipationId: string;
 };
-
-/**
- * Resumo de antecipação para exibição
- */
-export type AnticipationSummary = {
-	id: string;
-	totalAmount: string;
-	installmentCount: number;
-	anticipationPeriod: string;
-	anticipationDate: Date;
-	note: string | null;
-	isSettled: boolean;
-	lancamentoId: string;
-	anticipatedInstallments: string[];
-};

@@ -86,17 +86,3 @@ export async function getPagadorAccess(userId: string, pagadorId: string) {
 
 	return { pagador, canEdit: false, share };
 }
-
-export async function userCanEditPagador(userId: string, pagadorId: string) {
-	const pagadorRow = await db.query.pagadores.findFirst({
-		columns: { id: true },
-		where: and(eq(pagadores.id, pagadorId), eq(pagadores.userId, userId)),
-	});
-
-	return Boolean(pagadorRow);
-}
-
-export async function userHasPagadorAccess(userId: string, pagadorId: string) {
-	const access = await getPagadorAccess(userId, pagadorId);
-	return Boolean(access);
-}

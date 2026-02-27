@@ -2,15 +2,6 @@ import type { CalendarDay, CalendarEvent } from "@/components/calendario/types";
 
 export const formatDateKey = (date: Date) => date.toISOString().slice(0, 10);
 
-export const parseDateKey = (value: string) => {
-	const [yearStr, monthStr, dayStr] = value.split("-");
-	const year = Number.parseInt(yearStr ?? "", 10);
-	const month = Number.parseInt(monthStr ?? "", 10);
-	const day = Number.parseInt(dayStr ?? "", 10);
-
-	return new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1));
-};
-
 const getWeekdayIndex = (date: Date) => {
 	const day = date.getUTCDay(); // 0 (domingo) - 6 (sábado)
 	// Ajusta para segunda-feira como primeiro dia

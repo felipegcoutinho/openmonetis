@@ -3,8 +3,6 @@ import type {
 	SelectOption,
 } from "@/components/lancamentos/types";
 
-export type CalendarEventType = "lancamento" | "boleto" | "cartao";
-
 export type CalendarEvent =
 	| {
 			id: string;
