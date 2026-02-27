@@ -13,9 +13,19 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils/ui";
 
-function formatDate(date: Date | undefined): string {
+function formatDate(date: Date | undefined, compact = false): string {
 	if (!date) {
 		return "";
+	}
+
+	if (compact) {
+		return date
+			.toLocaleDateString("pt-BR", {
+				day: "numeric",
+				month: "short",
+			})
+			.replace(".", "")
+			.replace(" de ", " ");
 	}
 
 	return date.toLocaleDateString("pt-BR", {
@@ -70,6 +80,8 @@ export interface DatePickerProps {
 	required?: boolean;
 	disabled?: boolean;
 	className?: string;
+	/** Show compact format like "10 mar" instead of "10 de março de 2025" */
+	compact?: boolean;
 }
 
 export function DatePicker({
@@ -80,6 +92,7 @@ export function DatePicker({
 	required = false,
 	disabled = false,
 	className,
+	compact = false,
 }: DatePickerProps) {
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(() =>
@@ -89,7 +102,7 @@ export function DatePicker({
 		parseYYYYMMDD(value),
 	);
 	const [displayValue, setDisplayValue] = React.useState(() =>
-		formatDate(parseYYYYMMDD(value)),
+		formatDate(parseYYYYMMDD(value), compact),
 	);
 
 	// Sincronizar quando value externo mudar
@@ -97,8 +110,8 @@ export function DatePicker({
 		const newDate = parseYYYYMMDD(value);
 		setDate(newDate);
 		setMonth(newDate);
-		setDisplayValue(formatDate(newDate));
-	}, [value]);
+		setDisplayValue(formatDate(newDate, compact));
+	}, [value, compact]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const inputValue = e.target.value;
@@ -121,7 +134,7 @@ export function DatePicker({
 
 	const handleCalendarSelect = (selectedDate: Date | undefined) => {
 		setDate(selectedDate);
-		setDisplayValue(formatDate(selectedDate));
+		setDisplayValue(formatDate(selectedDate, compact));
 		onChange?.(dateToYYYYMMDD(selectedDate));
 		setOpen(false);
 	};
