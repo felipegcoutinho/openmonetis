@@ -3,7 +3,6 @@ import {
 	RiAddCircleFill,
 	RiAddCircleLine,
 	RiArrowLeftRightLine,
-	RiArrowRightSLine,
 	RiChat1Line,
 	RiCheckLine,
 	RiDeleteBin5Line,
@@ -864,57 +863,45 @@ export function LancamentosTable({
 			{showTopControls ? (
 				<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 					{onCreate || onMassAdd ? (
-						<div className="relative -mx-6 px-6 md:mx-0 md:px-0">
-							<div className="overflow-x-auto overflow-y-hidden scroll-smooth md:overflow-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-								<div className="flex w-max shrink-0 gap-2 py-1 md:w-full md:py-0">
-									{onCreate ? (
-										<>
-											<Button
-												onClick={() => onCreate("Receita")}
-												variant="outline"
-												className="h-8 shrink-0 px-3 text-xs sm:w-auto md:h-9 md:px-4 md:text-sm"
-											>
-												<RiAddCircleLine className="size-4 text-success" />
-												Nova Receita
-											</Button>
-											<Button
-												onClick={() => onCreate("Despesa")}
-												variant="outline"
-												className="h-8 shrink-0 px-3 text-xs sm:w-auto md:h-9 md:px-4 md:text-sm"
-											>
-												<RiAddCircleLine className="size-4 text-destructive" />
-												Nova Despesa
-											</Button>
-										</>
-									) : null}
-									{onMassAdd ? (
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													onClick={onMassAdd}
-													variant="outline"
-													size="icon"
-													className="size-8 shrink-0 md:size-9"
-												>
-													<RiAddCircleFill className="size-4" />
-													<span className="sr-only">
-														Adicionar múltiplos lançamentos
-													</span>
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>
-												<p>Adicionar múltiplos lançamentos</p>
-											</TooltipContent>
-										</Tooltip>
-									) : null}
-								</div>
-							</div>
-							<div
-								className="pointer-events-none absolute right-0 top-0 hidden h-9 w-10 items-center justify-end bg-gradient-to-l from-background to-transparent py-1 md:hidden"
-								aria-hidden
-							>
-								<RiArrowRightSLine className="size-5 shrink-0 text-muted-foreground" />
-							</div>
+						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+							{onCreate ? (
+								<>
+									<Button
+										onClick={() => onCreate("Receita")}
+										className="w-full sm:w-auto"
+									>
+										<RiAddCircleLine className="size-4" />
+										Nova Receita
+									</Button>
+									<Button
+										onClick={() => onCreate("Despesa")}
+										className="w-full sm:w-auto"
+									>
+										<RiAddCircleLine className="size-4" />
+										Nova Despesa
+									</Button>
+								</>
+							) : null}
+							{onMassAdd ? (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											onClick={onMassAdd}
+											variant="outline"
+											size="icon"
+											className="hidden size-9 sm:inline-flex"
+										>
+											<RiAddCircleFill className="size-4" />
+											<span className="sr-only">
+												Adicionar múltiplos lançamentos
+											</span>
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Adicionar múltiplos lançamentos</p>
+									</TooltipContent>
+								</Tooltip>
+							) : null}
 						</div>
 					) : (
 						<span className={showFilters ? "hidden sm:block" : ""} />

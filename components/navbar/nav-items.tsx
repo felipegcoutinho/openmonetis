@@ -18,6 +18,7 @@ export type NavItem = {
 	icon: React.ReactNode;
 	badge?: number;
 	preservePeriod?: boolean;
+	hideOnMobile?: boolean;
 };
 
 export type NavSection = {
@@ -44,6 +45,7 @@ export const NAV_SECTIONS: NavSection[] = [
 				href: "/calendario",
 				label: "calendário",
 				icon: <RiCalendarEventLine className="size-4" />,
+				hideOnMobile: true,
 			},
 		],
 	},

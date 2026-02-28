@@ -95,12 +95,12 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<div className="flex justify-start">
+				<div className="flex">
 					<CategoryDialog
 						mode="create"
 						defaultType={activeType}
 						trigger={
-							<Button>
+							<Button className="w-full sm:w-auto">
 								<RiAddCircleLine className="size-4" />
 								Nova categoria
 							</Button>

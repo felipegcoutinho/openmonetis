@@ -1,16 +1,20 @@
 import { DashboardGridSkeleton } from "@/components/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * Loading state para a página do dashboard
- * Usa skeleton fiel ao layout final para evitar layout shift
+ * Estrutura: Welcome Banner → Month Picker → Section Cards → Widget Grid
  */
 export default function DashboardLoading() {
 	return (
-		<main className="flex flex-col gap-6 px-6">
-			{/* Month Picker placeholder */}
-			<div className="h-[60px] animate-pulse rounded-2xl bg-foreground/10" />
+		<main className="flex flex-col gap-4">
+			{/* Welcome Banner skeleton */}
+			<Skeleton className="h-[104px] w-full rounded-xl bg-foreground/10" />
 
-			{/* Dashboard content skeleton */}
+			{/* Month Picker skeleton */}
+			<Skeleton className="h-[56px] w-full rounded-xl bg-foreground/10" />
+
+			{/* Dashboard content skeleton (Section Cards + Widget Grid) */}
 			<DashboardGridSkeleton />
 		</main>
 	);

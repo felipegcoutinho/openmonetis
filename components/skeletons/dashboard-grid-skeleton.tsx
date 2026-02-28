@@ -11,9 +11,9 @@ export function DashboardGridSkeleton() {
 			{/* Section Cards no topo */}
 			<SectionCardsSkeleton />
 
-			{/* Grid de widgets */}
-			<div className="grid grid-cols-1 gap-4 @3xl/main:grid-cols-2 @7xl/main:grid-cols-3">
-				{Array.from({ length: 12 }).map((_, i) => (
+			{/* Grid de widgets - mesmos breakpoints do dashboard real */}
+			<div className="grid grid-cols-1 gap-3 @4xl/main:grid-cols-2 @6xl/main:grid-cols-3">
+				{Array.from({ length: 9 }).map((_, i) => (
 					<WidgetSkeleton key={i} />
 				))}
 			</div>

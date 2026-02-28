@@ -31,7 +31,7 @@ export function NavMenu() {
 	return (
 		<>
 			{/* Desktop */}
-			<nav className="hidden md:flex items-center flex-1">
+			<nav className="hidden md:flex items-center justify-center flex-1">
 				<NavigationMenu viewport={false}>
 					<NavigationMenuList className="gap-0">
 						<NavigationMenuItem>
@@ -63,13 +63,13 @@ export function NavMenu() {
 				</NavigationMenu>
 			</nav>
 
-			{/* Mobile */}
+			{/* Mobile - order-[-1] places hamburger before logo visually */}
 			<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
 				<SheetTrigger asChild>
 					<Button
 						variant="ghost"
 						size="icon"
-						className="md:hidden text-foreground hover:bg-foreground/10 hover:text-foreground"
+						className="-order-1 md:hidden text-foreground hover:bg-foreground/10 hover:text-foreground"
 					>
 						<RiMenuLine className="size-5" />
 						<span className="sr-only">Abrir menu</span>
@@ -86,26 +86,32 @@ export function NavMenu() {
 							onClick={close}
 							preservePeriod
 						>
-							Dashboard
+							dashboard
 						</MobileLink>
 
-						{NAV_SECTIONS.map((section) => (
-							<div key={section.label}>
-								<MobileSectionLabel label={section.label} />
-								{section.items.map((item) => (
-									<MobileLink
-										key={item.href}
-										href={item.href}
-										icon={item.icon}
-										onClick={close}
-										badge={item.badge}
-										preservePeriod={item.preservePeriod}
-									>
-										{item.label}
-									</MobileLink>
-								))}
-							</div>
-						))}
+						{NAV_SECTIONS.map((section) => {
+							const mobileItems = section.items.filter(
+								(item) => !item.hideOnMobile,
+							);
+							if (mobileItems.length === 0) return null;
+							return (
+								<div key={section.label}>
+									<MobileSectionLabel label={section.label} />
+									{mobileItems.map((item) => (
+										<MobileLink
+											key={item.href}
+											href={item.href}
+											icon={item.icon}
+											onClick={close}
+											badge={item.badge}
+											preservePeriod={item.preservePeriod}
+										>
+											{item.label}
+										</MobileLink>
+									))}
+								</div>
+							);
+						})}
 
 						<MobileSectionLabel label="Ferramentas" />
 						<MobileTools onClose={close} />

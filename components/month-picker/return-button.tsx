@@ -10,13 +10,13 @@ interface ReturnButtonProps {
 export default function ReturnButton({ disabled, onClick }: ReturnButtonProps) {
 	return (
 		<Button
-			className="w-32 h-6 rounded-sm lowercase"
+			className="w-max h-6 lowercase"
 			size="sm"
 			disabled={disabled}
 			onClick={onClick}
 			aria-label="Retornar para o mês atual"
 		>
-			Ir para Mês Atual
+			Mês Atual
 		</Button>
 	);
 }

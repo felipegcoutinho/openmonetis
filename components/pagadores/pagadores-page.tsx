@@ -131,7 +131,7 @@ export function PagadoresPage({
 						mode="create"
 						avatarOptions={avatarOptions}
 						trigger={
-							<Button>
+							<Button className="w-full sm:w-auto">
 								<RiAddCircleLine className="size-4" />
 								Novo pagador
 							</Button>
@@ -139,14 +139,14 @@ export function PagadoresPage({
 					/>
 					<form
 						onSubmit={handleJoinByCode}
-						className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"
+						className="flex w-full flex-row items-center justify-center gap-2 sm:w-auto"
 					>
 						<Input
 							placeholder="Código de Compartilhamento"
 							value={shareCodeInput}
 							onChange={(event) => setShareCodeInput(event.target.value)}
 							disabled={joinPending}
-							className="w-56 border-dashed"
+							className="w-full sm:w-56 border-dashed"
 						/>
 						<Button type="submit" disabled={joinPending}>
 							{joinPending ? "Adicionando..." : "Adicionar por código"}

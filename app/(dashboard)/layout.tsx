@@ -59,7 +59,8 @@ export default async function DashboardLayout({
 					preLancamentosCount={preLancamentosCount}
 					notificationsSnapshot={notificationsSnapshot}
 				/>
-				<div className="flex flex-1 flex-col pt-14">
+				<div className="relative flex flex-1 flex-col pt-16">
+					<div className="pointer-events-none absolute inset-0 bg-linear-to-b from-primary/5 via-transparent to-transparent" />
 					<div className="@container/main flex flex-1 flex-col gap-2">
 						<div className="flex flex-col gap-4 py-5 md:gap-6 w-full max-w-8xl mx-auto px-4">
 							{children}

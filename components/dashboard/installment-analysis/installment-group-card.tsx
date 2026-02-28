@@ -75,24 +75,22 @@ export function InstallmentGroupCard({
 					/>
 
 					<div className="min-w-0 flex-1">
-						<div className="flex items-start justify-between">
-							<div className="min-w-0 flex-1">
-								<div className="flex gap-1 items-center">
-									{group.cartaoLogo && (
-										<img
-											src={`/logos/${group.cartaoLogo}`}
-											alt={group.cartaoName}
-											className="h-6 w-auto object-contain rounded"
-										/>
-									)}
-									<span className="font-medium">{group.name}</span>|
-									<span className="text-xs text-muted-foreground">
-										{group.cartaoName}
-									</span>
-								</div>
+						<div className="flex flex-col gap-1">
+							<div className="flex gap-1 items-center flex-wrap">
+								{group.cartaoLogo && (
+									<img
+										src={`/logos/${group.cartaoLogo}`}
+										alt={group.cartaoName}
+										className="h-6 w-auto object-contain rounded"
+									/>
+								)}
+								<span className="font-medium truncate">{group.name}</span>
+								<span className="text-xs text-muted-foreground">
+									| {group.cartaoName}
+								</span>
 							</div>
 
-							<div className="shrink-0 flex items-center gap-3">
+							<div className="flex items-center gap-3 flex-wrap">
 								<div className="flex items-center gap-1">
 									<span className="text-xs text-muted-foreground">Total:</span>
 									<MoneyValues
@@ -114,11 +112,11 @@ export function InstallmentGroupCard({
 
 						{/* Progress bar */}
 						<div className="mt-3">
-							<div className="mb-2 flex items-center px-1 justify-between text-xs text-muted-foreground">
+							<div className="mb-2 flex flex-wrap items-center px-1 justify-between gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
 								<span>
 									{group.paidInstallments} de {group.totalInstallments} pagas
 								</span>
-								<div className="flex items-center gap-2">
+								<div className="flex items-center gap-2 flex-wrap">
 									<span>
 										{unpaidCount} {unpaidCount === 1 ? "pendente" : "pendentes"}
 									</span>
@@ -159,7 +157,7 @@ export function InstallmentGroupCard({
 
 				{/* Lista de parcelas expandida */}
 				{isExpanded && (
-					<div className="px-8 mt-2 flex flex-col gap-2">
+					<div className="px-2 sm:px-8 mt-2 flex flex-col gap-2">
 						{group.pendingInstallments.map((installment) => {
 							const isSelected = selectedInstallments.has(installment.id);
 							const isPaid = installment.isSettled;
