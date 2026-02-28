@@ -1,4 +1,4 @@
-import { RiFundsLine } from "@remixicon/react";
+import { RiBarChart2Line } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
@@ -13,7 +13,7 @@ export default function RootLayout({
 	return (
 		<section className="space-y-6 pt-4">
 			<PageDescription
-				icon={<RiFundsLine />}
+				icon={<RiBarChart2Line />}
 				title="Orçamentos"
 				subtitle="Gerencie seus orçamentos mensais por categorias. Acompanhe o progresso do seu orçamento e faça ajustes conforme necessário."
 			/>

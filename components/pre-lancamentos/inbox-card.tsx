@@ -36,6 +36,7 @@ interface InboxCardProps {
 	onProcess?: (item: InboxItem) => void;
 	onDiscard?: (item: InboxItem) => void;
 	onViewDetails?: (item: InboxItem) => void;
+	onDelete?: (item: InboxItem) => void;
 }
 
 function resolveLogoPath(logo: string): string {
@@ -77,6 +78,7 @@ export function InboxCard({
 	onProcess,
 	onDiscard,
 	onViewDetails,
+	onDelete,
 }: InboxCardProps) {
 	const matchedLogo = useMemo(
 		() =>
@@ -201,6 +203,16 @@ export function InboxCard({
 						<span className="text-xs text-muted-foreground">
 							{formattedStatusDate}
 						</span>
+					)}
+					{onDelete && (
+						<Button
+							variant="ghost"
+							size="icon-sm"
+							className="ml-auto text-muted-foreground hover:text-destructive"
+							onClick={() => onDelete(item)}
+						>
+							<RiDeleteBinLine className="size-4" />
+						</Button>
 					)}
 				</CardFooter>
 			) : (

@@ -343,3 +343,34 @@
 [data-slot="dialog-content"][data-state="closed"] {
   animation: dialog-out 0.15s ease-in;
 }
+
+/* Overdue blink: alternates two stacked labels with a smooth crossfade */
+@keyframes blink-in {
+  0%, 40%  { opacity: 1; }
+  50%, 90% { opacity: 0; }
+  100%     { opacity: 1; }
+}
+
+@keyframes blink-out {
+  0%, 40%  { opacity: 0; }
+  50%, 90% { opacity: 1; }
+  100%     { opacity: 0; }
+}
+
+.overdue-blink {
+  position: relative;
+  display: inline-flex;
+}
+
+.overdue-blink-primary {
+  animation: blink-in 6s ease-in-out infinite;
+}
+
+.overdue-blink-secondary {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  animation: blink-out 6s ease-in-out infinite;
+}

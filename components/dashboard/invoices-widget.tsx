@@ -5,6 +5,7 @@ import {
 	RiCheckboxCircleLine,
 	RiExternalLinkLine,
 	RiLoader4Line,
+	RiMoneyDollarCircleLine,
 } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -87,12 +88,14 @@ const parseDueDate = (period: string, dueDay: string) => {
 	) {
 		return {
 			label: `Vence dia ${dueDay}`,
+			date: null,
 		};
 	}
 
 	const date = new Date(Date.UTC(year, month - 1, dayNumber));
 	return {
 		label: `Vence em ${DUE_DATE_FORMATTER.format(date)}`,
+		date,
 	};
 };
 
@@ -251,6 +254,8 @@ export function InvoicesWidget({ invoices }: InvoicesWidgetProps) {
 							const dueInfo = parseDueDate(invoice.period, invoice.dueDay);
 							const isPaid =
 								invoice.paymentStatus === INVOICE_PAYMENT_STATUS.PAID;
+							const isOverdue =
+								!isPaid && dueInfo.date !== null && dueInfo.date < new Date();
 							const paymentInfo = formatPaymentDate(invoice.paidAt);
 
 							return (
@@ -381,6 +386,15 @@ export function InvoicesWidget({ invoices }: InvoicesWidgetProps) {
 													<span className="text-success flex items-center gap-1">
 														<RiCheckboxCircleFill className="size-3" /> Pago
 													</span>
+												) : isOverdue ? (
+													<span className="overdue-blink">
+														<span className="overdue-blink-primary text-destructive">
+															Atrasado
+														</span>
+														<span className="overdue-blink-secondary">
+															Pagar
+														</span>
+													</span>
 												) : (
 													<span>Pagar</span>
 												)}
@@ -445,7 +459,7 @@ export function InvoicesWidget({ invoices }: InvoicesWidgetProps) {
 						</div>
 					) : (
 						<>
-							<DialogHeader className="gap-3">
+							<DialogHeader>
 								<DialogTitle>Confirmar pagamento</DialogTitle>
 								<DialogDescription>
 									Revise os dados antes de confirmar. Vamos registrar a fatura
@@ -454,72 +468,83 @@ export function InvoicesWidget({ invoices }: InvoicesWidgetProps) {
 							</DialogHeader>
 
 							{selectedInvoice ? (
-								<div className="flex flex-col gap-4">
-									<div className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/50 p-3">
-										<div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-background">
-											{selectedLogo ? (
-												<Image
-													src={selectedLogo}
-													alt={`Logo do cartão ${selectedInvoice.cardName}`}
-													width={48}
-													height={48}
-													className="h-full w-full object-contain"
-												/>
-											) : (
-												<span className="text-sm font-semibold uppercase text-muted-foreground">
-													{buildInitials(selectedInvoice.cardName)}
-												</span>
-											)}
-										</div>
-										<div>
-											<p className="text-sm text-muted-foreground">Cartão</p>
-											<p className="text-base font-semibold text-foreground">
-												{selectedInvoice.cardName}
-											</p>
-											{selectedInvoice.paymentStatus !==
-											INVOICE_PAYMENT_STATUS.PAID ? (
-												<p className="text-xs text-muted-foreground">
-													{
-														parseDueDate(
-															selectedInvoice.period,
-															selectedInvoice.dueDay,
-														).label
-													}
-												</p>
-											) : null}
-											{selectedInvoice.paymentStatus ===
-												INVOICE_PAYMENT_STATUS.PAID && selectedPaymentInfo ? (
-												<p className="text-xs text-success">
-													{selectedPaymentInfo.label}
-												</p>
-											) : null}
+								<div className="space-y-4">
+									<div className="rounded-lg border p-4">
+										<div className="flex items-center justify-between">
+											<div className="flex items-center gap-3">
+												<div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+													{selectedLogo ? (
+														<Image
+															src={selectedLogo}
+															alt={`Logo do cartão ${selectedInvoice.cardName}`}
+															width={40}
+															height={40}
+															className="h-full w-full object-contain"
+														/>
+													) : (
+														<span className="text-xs font-semibold uppercase text-primary">
+															{buildInitials(selectedInvoice.cardName)}
+														</span>
+													)}
+												</div>
+												<div>
+													<p className="text-sm font-medium text-muted-foreground">
+														Cartão
+													</p>
+													<p className="text-lg font-bold text-foreground">
+														{selectedInvoice.cardName}
+													</p>
+												</div>
+											</div>
+											<div className="text-right">
+												{selectedInvoice.paymentStatus !==
+												INVOICE_PAYMENT_STATUS.PAID ? (
+													<p className="text-sm text-muted-foreground">
+														{
+															parseDueDate(
+																selectedInvoice.period,
+																selectedInvoice.dueDay,
+															).label
+														}
+													</p>
+												) : null}
+												{selectedInvoice.paymentStatus ===
+													INVOICE_PAYMENT_STATUS.PAID && selectedPaymentInfo ? (
+													<p className="text-sm text-success">
+														{selectedPaymentInfo.label}
+													</p>
+												) : null}
+											</div>
 										</div>
 									</div>
 
-									<div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-1">
-										<div className="rounded border border-border/60 px-3 items-center py-2 flex justify-between">
-											<span className="text-xs uppercase text-muted-foreground/80">
-												Valor da fatura
-											</span>
+									<div className="grid gap-3 sm:grid-cols-2">
+										<div className="rounded-lg border p-3">
+											<div className="mb-2 flex items-center gap-2 text-muted-foreground">
+												<RiMoneyDollarCircleLine className="size-4" />
+												<span className="text-xs font-semibold uppercase">
+													Valor da Fatura
+												</span>
+											</div>
 											<MoneyValues
 												amount={Math.abs(selectedInvoice.totalAmount)}
-												className="text-lg"
+												className="text-lg font-bold"
 											/>
 										</div>
-										<div className="rounded border border-border/60 px-3 py-2 flex justify-between items-center">
-											<span className="text-xs uppercase text-muted-foreground/80">
-												Status atual
-											</span>
-											<span className="block text-sm">
-												<Badge
-													variant={getStatusBadgeVariant(
-														INVOICE_STATUS_LABEL[selectedInvoice.paymentStatus],
-													)}
-													className="text-xs"
-												>
-													{INVOICE_STATUS_LABEL[selectedInvoice.paymentStatus]}
-												</Badge>
-											</span>
+										<div className="rounded-lg border p-3">
+											<div className="mb-2 flex items-center gap-2 text-muted-foreground">
+												<RiCheckboxCircleLine className="size-4" />
+												<span className="text-xs font-semibold uppercase">
+													Status
+												</span>
+											</div>
+											<Badge
+												variant={getStatusBadgeVariant(
+													INVOICE_STATUS_LABEL[selectedInvoice.paymentStatus],
+												)}
+											>
+												{INVOICE_STATUS_LABEL[selectedInvoice.paymentStatus]}
+											</Badge>
 										</div>
 									</div>
 								</div>

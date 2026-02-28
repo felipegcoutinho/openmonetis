@@ -1,4 +1,4 @@
-import { RiInboxLine } from "@remixicon/react";
+import { RiAtLine } from "@remixicon/react";
 import PageDescription from "@/components/page-description";
 
 export const metadata = {
@@ -13,7 +13,7 @@ export default function RootLayout({
 	return (
 		<section className="space-y-6 pt-4">
 			<PageDescription
-				icon={<RiInboxLine />}
+				icon={<RiAtLine />}
 				title="Pré-Lançamentos"
 				subtitle="Notificações capturadas pelo Companion"
 			/>

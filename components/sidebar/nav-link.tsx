@@ -1,6 +1,7 @@
 import {
 	type RemixiconComponentType,
 	RiArrowLeftRightLine,
+	RiAtLine,
 	RiBankCard2Line,
 	RiBankLine,
 	RiCalendarEventLine,
@@ -8,7 +9,6 @@ import {
 	RiFileChartLine,
 	RiFundsLine,
 	RiGroupLine,
-	RiInboxLine,
 	RiPriceTag3Line,
 	RiSettings2Line,
 	RiSparklingLine,
@@ -98,7 +98,7 @@ export function createSidebarNavData(
 								title: "Pré-Lançamentos",
 								url: "/pre-lancamentos",
 								key: "pre-lancamentos",
-								icon: RiInboxLine,
+								icon: RiAtLine,
 								badge:
 									preLancamentosCount > 0 ? preLancamentosCount : undefined,
 							},

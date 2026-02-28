@@ -21,6 +21,14 @@ const bulkDiscardSchema = z.object({
 	inboxItemIds: z.array(z.string().uuid()).min(1, "Selecione ao menos um item"),
 });
 
+const deleteInboxSchema = z.object({
+	inboxItemId: z.string().uuid("ID do item inválido"),
+});
+
+const bulkDeleteInboxSchema = z.object({
+	status: z.enum(["processed", "discarded"]),
+});
+
 function revalidateInbox() {
 	revalidatePath("/pre-lancamentos");
 	revalidatePath("/lancamentos");
@@ -152,6 +160,81 @@ export async function bulkDiscardInboxItemsAction(
 		return {
 			success: true,
 			message: `${data.inboxItemIds.length} item(s) descartado(s).`,
+		};
+	} catch (error) {
+		return handleActionError(error);
+	}
+}
+
+export async function deleteInboxItemAction(
+	input: z.infer<typeof deleteInboxSchema>,
+): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = deleteInboxSchema.parse(input);
+
+		const [item] = await db
+			.select({ status: preLancamentos.status })
+			.from(preLancamentos)
+			.where(
+				and(
+					eq(preLancamentos.id, data.inboxItemId),
+					eq(preLancamentos.userId, user.id),
+				),
+			)
+			.limit(1);
+
+		if (!item) {
+			return { success: false, error: "Item não encontrado." };
+		}
+
+		if (item.status === "pending") {
+			return {
+				success: false,
+				error: "Não é possível excluir itens pendentes.",
+			};
+		}
+
+		await db
+			.delete(preLancamentos)
+			.where(
+				and(
+					eq(preLancamentos.id, data.inboxItemId),
+					eq(preLancamentos.userId, user.id),
+				),
+			);
+
+		revalidateInbox();
+
+		return { success: true, message: "Item excluído." };
+	} catch (error) {
+		return handleActionError(error);
+	}
+}
+
+export async function bulkDeleteInboxItemsAction(
+	input: z.infer<typeof bulkDeleteInboxSchema>,
+): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = bulkDeleteInboxSchema.parse(input);
+
+		const result = await db
+			.delete(preLancamentos)
+			.where(
+				and(
+					eq(preLancamentos.userId, user.id),
+					eq(preLancamentos.status, data.status),
+				),
+			)
+			.returning({ id: preLancamentos.id });
+
+		revalidateInbox();
+
+		const count = result.length;
+		return {
+			success: true,
+			message: `${count} item(s) excluído(s).`,
 		};
 	} catch (error) {
 		return handleActionError(error);

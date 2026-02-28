@@ -1,15 +1,18 @@
 "use client";
 
-import { RiInboxLine } from "@remixicon/react";
+import { RiAtLine, RiDeleteBinLine } from "@remixicon/react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
+	bulkDeleteInboxItemsAction,
+	deleteInboxItemAction,
 	discardInboxItemAction,
 	markInboxAsProcessedAction,
 } from "@/app/(dashboard)/pre-lancamentos/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { LancamentoDialog } from "@/components/lancamentos/dialogs/lancamento-dialog/lancamento-dialog";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InboxCard } from "./inbox-card";
@@ -51,6 +54,14 @@ export function InboxPage({
 
 	const [discardOpen, setDiscardOpen] = useState(false);
 	const [itemToDiscard, setItemToDiscard] = useState<InboxItem | null>(null);
+
+	const [deleteOpen, setDeleteOpen] = useState(false);
+	const [itemToDelete, setItemToDelete] = useState<InboxItem | null>(null);
+
+	const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+	const [bulkDeleteStatus, setBulkDeleteStatus] = useState<
+		"processed" | "discarded"
+	>("processed");
 
 	const sortByTimestamp = useCallback(
 		(list: InboxItem[]) =>
@@ -127,6 +138,60 @@ export function InboxPage({
 		throw new Error(result.error);
 	}, [itemToDiscard]);
 
+	const handleDeleteOpenChange = useCallback((open: boolean) => {
+		setDeleteOpen(open);
+		if (!open) {
+			setItemToDelete(null);
+		}
+	}, []);
+
+	const handleDeleteRequest = useCallback((item: InboxItem) => {
+		setItemToDelete(item);
+		setDeleteOpen(true);
+	}, []);
+
+	const handleDeleteConfirm = useCallback(async () => {
+		if (!itemToDelete) return;
+
+		const result = await deleteInboxItemAction({
+			inboxItemId: itemToDelete.id,
+		});
+
+		if (result.success) {
+			toast.success(result.message);
+			return;
+		}
+
+		toast.error(result.error);
+		throw new Error(result.error);
+	}, [itemToDelete]);
+
+	const handleBulkDeleteOpenChange = useCallback((open: boolean) => {
+		setBulkDeleteOpen(open);
+	}, []);
+
+	const handleBulkDeleteRequest = useCallback(
+		(status: "processed" | "discarded") => {
+			setBulkDeleteStatus(status);
+			setBulkDeleteOpen(true);
+		},
+		[],
+	);
+
+	const handleBulkDeleteConfirm = useCallback(async () => {
+		const result = await bulkDeleteInboxItemsAction({
+			status: bulkDeleteStatus,
+		});
+
+		if (result.success) {
+			toast.success(result.message);
+			return;
+		}
+
+		toast.error(result.error);
+		throw new Error(result.error);
+	}, [bulkDeleteStatus]);
+
 	const handleLancamentoSuccess = useCallback(async () => {
 		if (!itemToProcess) return;
 
@@ -180,7 +245,7 @@ export function InboxPage({
 	const renderEmptyState = (message: string) => (
 		<Card className="flex min-h-[50vh] w-full items-center justify-center py-12">
 			<EmptyState
-				media={<RiInboxLine className="size-6 text-primary" />}
+				media={<RiAtLine className="size-6 text-primary" />}
 				title={message}
 				description="As notificações capturadas pelo app OpenMonetis Companion aparecerão aqui. Saiba mais em Ajustes > Companion."
 			/>
@@ -205,6 +270,7 @@ export function InboxPage({
 						onProcess={readonly ? undefined : handleProcessRequest}
 						onDiscard={readonly ? undefined : handleDiscardRequest}
 						onViewDetails={readonly ? undefined : handleDetailsRequest}
+						onDelete={readonly ? handleDeleteRequest : undefined}
 					/>
 				))}
 			</div>
@@ -229,9 +295,33 @@ export function InboxPage({
 					{renderGrid(sortedPending)}
 				</TabsContent>
 				<TabsContent value="processed" className="mt-4">
+					{sortedProcessed.length > 0 && (
+						<div className="mb-4 flex justify-end">
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => handleBulkDeleteRequest("processed")}
+							>
+								<RiDeleteBinLine className="mr-1.5 size-4" />
+								Limpar processados
+							</Button>
+						</div>
+					)}
 					{renderGrid(sortedProcessed, true)}
 				</TabsContent>
 				<TabsContent value="discarded" className="mt-4">
+					{sortedDiscarded.length > 0 && (
+						<div className="mb-4 flex justify-end">
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => handleBulkDeleteRequest("discarded")}
+							>
+								<RiDeleteBinLine className="mr-1.5 size-4" />
+								Limpar descartados
+							</Button>
+						</div>
+					)}
 					{renderGrid(sortedDiscarded, true)}
 				</TabsContent>
 			</Tabs>
@@ -271,6 +361,28 @@ export function InboxPage({
 				confirmVariant="destructive"
 				pendingLabel="Descartando..."
 				onConfirm={handleDiscardConfirm}
+			/>
+
+			<ConfirmActionDialog
+				open={deleteOpen}
+				onOpenChange={handleDeleteOpenChange}
+				title="Excluir notificação?"
+				description="A notificação será excluída permanentemente."
+				confirmLabel="Excluir"
+				confirmVariant="destructive"
+				pendingLabel="Excluindo..."
+				onConfirm={handleDeleteConfirm}
+			/>
+
+			<ConfirmActionDialog
+				open={bulkDeleteOpen}
+				onOpenChange={handleBulkDeleteOpenChange}
+				title={`Limpar ${bulkDeleteStatus === "processed" ? "processados" : "descartados"}?`}
+				description={`Todos os itens ${bulkDeleteStatus === "processed" ? "processados" : "descartados"} serão excluídos permanentemente.`}
+				confirmLabel="Limpar tudo"
+				confirmVariant="destructive"
+				pendingLabel="Excluindo..."
+				onConfirm={handleBulkDeleteConfirm}
 			/>
 		</>
 	);
