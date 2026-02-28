@@ -105,7 +105,7 @@
   /* Base surfaces - warm dark with consistent hue family */
   --background: oklch(18.5% 0.002 70);
   --foreground: oklch(92% 0.015 80);
-  --card: oklch(24% 0.003 70);
+  --card: oklch(22.717% 0.00244 67.467);
   --card-foreground: oklch(92% 0.015 80);
   --popover: oklch(24% 0.003 70);
   --popover-foreground: oklch(92% 0.015 80);

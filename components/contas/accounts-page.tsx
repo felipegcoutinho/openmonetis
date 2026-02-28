@@ -175,12 +175,12 @@ export function AccountsPage({
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<div className="flex justify-start">
+				<div className="flex">
 					<AccountDialog
 						mode="create"
 						logoOptions={logoOptions}
 						trigger={
-							<Button>
+							<Button className="w-full sm:w-auto">
 								<RiAddCircleLine className="size-4" />
 								Nova conta
 							</Button>

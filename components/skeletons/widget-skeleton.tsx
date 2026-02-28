@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
  */
 export function WidgetSkeleton() {
 	return (
-		<Card className="md:h-custom-height-1 relative h-auto md:overflow-hidden">
+		<Card className="relative h-auto md:h-custom-height-1 md:overflow-hidden">
 			<CardHeader className="border-b [.border-b]:pb-2">
 				<div className="flex w-full items-start justify-between">
 					<div className="space-y-2">

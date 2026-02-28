@@ -154,8 +154,8 @@ export default async function Page() {
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* Navigation */}
-			<header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-				<div className="max-w-8xl mx-auto px-4 flex h-14 items-center justify-between">
+			<header className="sticky top-0 z-50 bg-card backdrop-blur-lg supports-backdrop-filter:bg-card/50">
+				<div className="max-w-8xl mx-auto px-4 flex h-16 items-center justify-between">
 					<Logo variant="compact" />
 
 					{/* Center Navigation Links */}

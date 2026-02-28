@@ -29,7 +29,7 @@ export function BasicFieldsSection({
 			</div>
 
 			<div className="flex w-full flex-col gap-2 md:flex-row">
-				<div className="w-1/2 space-y-1">
+				<div className="w-full md:w-1/2 space-y-1">
 					<Label htmlFor="purchaseDate">Data</Label>
 					<DatePicker
 						id="purchaseDate"
@@ -40,7 +40,7 @@ export function BasicFieldsSection({
 					/>
 				</div>
 
-				<div className="w-1/2 space-y-1">
+				<div className="w-full md:w-1/2 space-y-1">
 					<Label htmlFor="amount">Valor</Label>
 					<div className="relative">
 						<CurrencyInput

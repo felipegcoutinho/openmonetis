@@ -26,7 +26,7 @@ export function AppNavbar({
 	notificationsSnapshot,
 }: AppNavbarProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 h-15 shrink-0 flex items-center bg-card backdrop-blur-lg supports-backdrop-filter:bg-card/60">
+		<header className="fixed top-0 left-0 right-0 z-50 h-16 shrink-0 flex items-center bg-card backdrop-blur-lg supports-backdrop-filter:bg-card/50">
 			<div className="w-full max-w-8xl mx-auto px-4 flex items-center gap-4 h-full">
 				{/* Logo */}
 				<Link href="/dashboard" className="shrink-0 mr-1">

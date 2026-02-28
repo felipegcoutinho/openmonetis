@@ -152,13 +152,13 @@ export function CardsPage({
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<div className="flex justify-start">
+				<div className="flex">
 					<CardDialog
 						mode="create"
 						accounts={accounts}
 						logoOptions={logoOptions}
 						trigger={
-							<Button>
+							<Button className="w-full sm:w-auto">
 								<RiAddCircleLine className="size-4" />
 								Novo cartão
 							</Button>

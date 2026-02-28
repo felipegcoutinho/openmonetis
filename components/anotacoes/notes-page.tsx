@@ -197,13 +197,13 @@ export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<div className="flex justify-start">
+				<div className="flex">
 					<NoteDialog
 						mode="create"
 						open={createOpen}
 						onOpenChange={handleCreateOpenChange}
 						trigger={
-							<Button>
+							<Button className="w-full sm:w-auto">
 								<RiAddCircleLine className="size-4" />
 								Nova anotação
 							</Button>

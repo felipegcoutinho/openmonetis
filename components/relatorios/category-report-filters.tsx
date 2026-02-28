@@ -162,8 +162,8 @@ export function CategoryReportFilters({
 
 	return (
 		<div className="flex flex-col gap-4">
-			<div className="flex flex-wrap items-center justify-between gap-2">
-				<div className="flex flex-wrap items-center gap-2">
+			<div className="flex flex-wrap items-center justify-center gap-2 md:justify-between">
+				<div className="flex w-full flex-wrap items-center justify-center gap-2 md:w-auto md:justify-start">
 					{/* Category Multi-Select */}
 					<Popover open={open} onOpenChange={setOpen} modal>
 						<PopoverTrigger asChild>
@@ -172,7 +172,7 @@ export function CategoryReportFilters({
 								role="combobox"
 								aria-expanded={open}
 								aria-label="Selecionar categorias para filtrar"
-								className="w-[180px] justify-between text-sm border-dashed border-input"
+								className="w-full md:w-[180px] justify-between text-sm border-dashed border-input"
 								disabled={isLoading}
 							>
 								<span className="truncate">{selectedText}</span>
@@ -257,7 +257,7 @@ export function CategoryReportFilters({
 						<PopoverTrigger asChild>
 							<Button
 								variant="outline"
-								className="w-[150px] justify-start text-sm border-dashed"
+								className="w-[calc(50%-0.25rem)] md:w-[150px] justify-start text-sm border-dashed"
 								disabled={isLoading}
 							>
 								<RiCalendarLine className="mr-2 h-4 w-4" />
@@ -277,7 +277,7 @@ export function CategoryReportFilters({
 						<PopoverTrigger asChild>
 							<Button
 								variant="outline"
-								className="w-[150px] justify-start text-sm border-dashed"
+								className="w-[calc(50%-0.25rem)] md:w-[150px] justify-start text-sm border-dashed"
 								disabled={isLoading}
 							>
 								<RiCalendarLine className="mr-2 h-4 w-4" />
@@ -299,13 +299,14 @@ export function CategoryReportFilters({
 						size="sm"
 						onClick={handleReset}
 						disabled={isLoading}
+						className="w-full text-center md:w-auto md:text-left"
 					>
 						Limpar
 					</Button>
 				</div>
 
 				{/* Export Button */}
-				{exportButton}
+				<div className="w-full md:w-auto">{exportButton}</div>
 			</div>
 
 			{/* Validation Message */}

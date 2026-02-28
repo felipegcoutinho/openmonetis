@@ -38,23 +38,26 @@ function CategorySection({
 		<div className="space-y-2">
 			<div className="flex items-center justify-between">
 				<span className="text-sm font-medium text-foreground">{title}</span>
-				<MoneyValues amount={total} />
+				<MoneyValues
+					amount={total}
+					className="text-sm font-medium tabular-nums"
+				/>
 			</div>
 
 			{/* Barra de progresso */}
 			<Progress value={confirmedPercentage} className="h-2" />
 
 			{/* Status de confirmados e pendentes */}
-			<div className="flex items-center justify-between gap-4 text-sm">
-				<div className="flex items-center gap-1.5 ">
-					<RiCheckboxCircleLine className="size-3 text-success" />
-					<MoneyValues amount={confirmed} />
+			<div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+				<div className="flex items-center gap-1.5">
+					<RiCheckboxCircleLine className="size-3 shrink-0 text-success" />
+					<MoneyValues amount={confirmed} className="tabular-nums" />
 					<span className="text-xs text-muted-foreground">confirmados</span>
 				</div>
 
-				<div className="flex items-center gap-1.5 ">
-					<RiHourglass2Line className="size-3 text-warning" />
-					<MoneyValues amount={pending} />
+				<div className="flex items-center gap-1.5">
+					<RiHourglass2Line className="size-3 shrink-0 text-warning" />
+					<MoneyValues amount={pending} className="tabular-nums" />
 					<span className="text-xs text-muted-foreground">pendentes</span>
 				</div>
 			</div>

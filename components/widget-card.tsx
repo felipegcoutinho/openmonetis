@@ -111,8 +111,8 @@ export default function WidgetCard({
 			)}
 
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogContent className="max-h-[85vh] w-full max-w-3xl overflow-hidden p-0">
-					<DialogHeader className="px-6 pt-4">
+				<DialogContent className="max-h-[85vh] w-full max-w-[calc(100%-2rem)] sm:max-w-3xl overflow-hidden p-6">
+					<DialogHeader className="text-left">
 						<DialogTitle className="flex items-center gap-2">
 							{icon}
 							<span>{title}</span>
@@ -121,7 +121,7 @@ export default function WidgetCard({
 							<p className="text-muted-foreground text-sm">{subtitle}</p>
 						) : null}
 					</DialogHeader>
-					<div className="scrollbar-hide max-h-[calc(85vh-6rem)] overflow-y-auto px-6 pb-6">
+					<div className="scrollbar-hide max-h-[calc(85vh-6rem)] overflow-y-auto pb-6">
 						{children}
 					</div>
 				</DialogContent>
