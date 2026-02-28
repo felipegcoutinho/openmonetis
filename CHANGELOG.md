@@ -13,6 +13,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Página de top estabelecimentos (`/top-estabelecimentos`): cards "Top Estabelecimentos por Frequência" e "Principais Categorias" empilhados verticalmente no mobile (`grid-cols-1 lg:grid-cols-2`)
 - Padding da lista de parcelas expandida reduzido no mobile (`px-2 sm:px-8`)
 - Ajustes gerais de responsividade em navbar, filtros, skeletons, widgets e dialogs (26 componentes)
+- Remover selecionados: quando todos os itens selecionados pertencem à mesma série (parcelado ou recorrente), abre dialog de escopo com 3 opções ao invés de confirmação simples (parcial da PR #18)
+- Despesa recorrente no cartão de crédito: só consome o limite do cartão quando a data da ocorrência já passou; mesma regra no relatório de cartões (parcial da PR #18)
 
 ## [1.7.3] - 2026-02-27
 
