@@ -5,6 +5,15 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.4] - 2026-02-28
+
+### Alterado
+
+- Card de análise de parcelas (`/dashboard/analise-parcelas`): layout empilhado no mobile — nome/cartão e valores Total/Pendente em linhas separadas ao invés de lado-a-lado, evitando truncamento
+- Página de top estabelecimentos (`/top-estabelecimentos`): cards "Top Estabelecimentos por Frequência" e "Principais Categorias" empilhados verticalmente no mobile (`grid-cols-1 lg:grid-cols-2`)
+- Padding da lista de parcelas expandida reduzido no mobile (`px-2 sm:px-8`)
+- Ajustes gerais de responsividade em navbar, filtros, skeletons, widgets e dialogs (26 componentes)
+
 ## [1.7.3] - 2026-02-27
 
 ### Adicionado
