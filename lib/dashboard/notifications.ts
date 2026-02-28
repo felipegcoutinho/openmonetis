@@ -23,6 +23,7 @@ export type DashboardNotification = {
 	amount: number;
 	period?: string;
 	showAmount: boolean;
+	cardLogo?: string | null;
 };
 
 export type BudgetStatus = "exceeded" | "critical";
@@ -160,6 +161,7 @@ export async function fetchDashboardNotifications(
 			invoiceId: faturas.id,
 			cardId: cartoes.id,
 			cardName: cartoes.name,
+			cardLogo: cartoes.logo,
 			dueDay: cartoes.dueDay,
 			period: faturas.period,
 			totalAmount: sql<number | null>`
@@ -189,6 +191,7 @@ export async function fetchDashboardNotifications(
 			invoiceId: faturas.id,
 			cardId: cartoes.id,
 			cardName: cartoes.name,
+			cardLogo: cartoes.logo,
 			dueDay: cartoes.dueDay,
 			period: sql<string>`COALESCE(${faturas.period}, ${currentPeriod})`,
 			paymentStatus: faturas.paymentStatus,
@@ -219,6 +222,7 @@ export async function fetchDashboardNotifications(
 			faturas.id,
 			cartoes.id,
 			cartoes.name,
+			cartoes.logo,
 			cartoes.dueDay,
 			faturas.period,
 			faturas.paymentStatus,
@@ -296,6 +300,7 @@ export async function fetchDashboardNotifications(
 			amount: Math.abs(amount),
 			period: invoice.period,
 			showAmount: true,
+			cardLogo: invoice.cardLogo,
 		});
 	}
 
@@ -332,6 +337,7 @@ export async function fetchDashboardNotifications(
 			amount: Math.abs(amount),
 			period: invoice.period,
 			showAmount: invoiceIsOverdue,
+			cardLogo: invoice.cardLogo,
 		});
 	}
 

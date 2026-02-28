@@ -5,6 +5,24 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.5] - 2026-02-28
+
+### Adicionado
+
+- Inbox de pré-lançamentos: ações para excluir item individual (processado/descartado) e limpar itens em lote por status
+
+### Alterado
+
+- Página de categorias: layout migrado de cards para tabela com link direto para detalhe, ícone da categoria e ações inline de editar/remover
+- Widgets de boletos e faturas no dashboard: cards e diálogos redesenhados, com destaque visual para status e valores
+- Estados de vencimento em boletos e faturas: quando vencidos e não pagos, exibem indicação "Atrasado / Pagar"
+- Notificações de faturas: exibição de logo do cartão (quando disponível) e atualização dos ícones da listagem
+
+### Corrigido
+
+- `parseDueDate` no widget de faturas agora retorna também a data parseada com fallback seguro (`date: null`) para evitar comparações inválidas
+- Formatação do `components/dashboard/invoices-widget.tsx` ajustada para passar no lint
+
 ## [1.7.4] - 2026-02-28
 
 ### Alterado
@@ -334,4 +352,3 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Atualização de dependências
 - Aplicada formatação no código
-

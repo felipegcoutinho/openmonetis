@@ -5,6 +5,7 @@ import {
 	RiCheckboxCircleFill,
 	RiCheckboxCircleLine,
 	RiLoader4Line,
+	RiMoneyDollarCircleLine,
 } from "@remixicon/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -165,6 +166,12 @@ export function BoletosWidget({ boletos }: BoletosWidgetProps) {
 					<ul className="flex flex-col">
 						{items.map((boleto) => {
 							const statusLabel = buildStatusLabel(boleto);
+							const isOverdue = (() => {
+								if (boleto.isSettled || !boleto.dueDate) return false;
+								const [y, m, d] = boleto.dueDate.split("-").map(Number);
+								if (!y || !m || !d) return false;
+								return new Date(Date.UTC(y, m - 1, d)) < new Date();
+							})();
 
 							return (
 								<li
@@ -204,6 +211,13 @@ export function BoletosWidget({ boletos }: BoletosWidgetProps) {
 											{boleto.isSettled ? (
 												<span className="flex items-center gap-1 text-success">
 													<RiCheckboxCircleFill className="size-3" /> Pago
+												</span>
+											) : isOverdue ? (
+												<span className="overdue-blink">
+													<span className="overdue-blink-primary text-destructive">
+														Atrasado
+													</span>
+													<span className="overdue-blink-secondary">Pagar</span>
 												</span>
 											) : (
 												"Pagar"
@@ -271,7 +285,7 @@ export function BoletosWidget({ boletos }: BoletosWidgetProps) {
 						</div>
 					) : (
 						<>
-							<DialogHeader className="gap-3 text-center sm:text-left">
+							<DialogHeader>
 								<DialogTitle>Confirmar pagamento do boleto</DialogTitle>
 								<DialogDescription>
 									Confirme os dados para registrar o pagamento. Você poderá
@@ -280,47 +294,59 @@ export function BoletosWidget({ boletos }: BoletosWidgetProps) {
 							</DialogHeader>
 
 							{selectedBoleto ? (
-								<div className="flex flex-col gap-4">
-									<div className="flex flex-col items-center gap-3 rounded-lg border border-border/60 bg-muted/50 p-4 text-center sm:flex-row sm:text-left">
-										<div className="flex size-12 shrink-0 items-center justify-center">
-											<RiBarcodeFill className="size-8" />
-										</div>
-										<div className="space-y-1">
-											<p className="text-sm font-medium text-foreground">
-												{selectedBoleto.name}
-											</p>
+								<div className="space-y-4">
+									<div className="rounded-lg border p-4">
+										<div className="flex items-center justify-between">
+											<div className="flex items-center gap-3">
+												<div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+													<RiBarcodeFill className="size-5 text-primary" />
+												</div>
+												<div>
+													<p className="text-sm font-medium text-muted-foreground">
+														Boleto
+													</p>
+													<p className="text-lg font-bold text-foreground">
+														{selectedBoleto.name}
+													</p>
+												</div>
+											</div>
 											{selectedBoletoDueLabel ? (
-												<p className="text-xs text-muted-foreground">
-													{selectedBoletoDueLabel}
-												</p>
+												<div className="text-right">
+													<p className="text-sm text-muted-foreground">
+														{selectedBoletoDueLabel}
+													</p>
+												</div>
 											) : null}
 										</div>
 									</div>
 
-									<div className="grid grid-cols-1 gap-3 text-sm">
-										<div className="flex items-center justify-between rounded border border-border/60 px-3 py-2">
-											<span className="text-xs uppercase text-muted-foreground/80">
-												Valor do boleto
-											</span>
+									<div className="grid gap-3 sm:grid-cols-2">
+										<div className="rounded-lg border p-3">
+											<div className="mb-2 flex items-center gap-2 text-muted-foreground">
+												<RiMoneyDollarCircleLine className="size-4" />
+												<span className="text-xs font-semibold uppercase">
+													Valor do Boleto
+												</span>
+											</div>
 											<MoneyValues
 												amount={selectedBoleto.amount}
-												className="text-lg"
+												className="text-lg font-bold"
 											/>
 										</div>
-										<div className="flex items-center justify-between rounded border border-border/60 px-3 py-2">
-											<span className="text-xs uppercase text-muted-foreground/80">
-												Status atual
-											</span>
-											<span className="text-sm font-medium">
-												<Badge
-													variant={getStatusBadgeVariant(
-														selectedBoleto.isSettled ? "Pago" : "Pendente",
-													)}
-													className="text-xs"
-												>
-													{selectedBoleto.isSettled ? "Pago" : "Pendente"}
-												</Badge>
-											</span>
+										<div className="rounded-lg border p-3">
+											<div className="mb-2 flex items-center gap-2 text-muted-foreground">
+												<RiCheckboxCircleLine className="size-4" />
+												<span className="text-xs font-semibold uppercase">
+													Status
+												</span>
+											</div>
+											<Badge
+												variant={getStatusBadgeVariant(
+													selectedBoleto.isSettled ? "Pago" : "Pendente",
+												)}
+											>
+												{selectedBoleto.isSettled ? "Pago" : "Pendente"}
+											</Badge>
 										</div>
 									</div>
 								</div>

@@ -1,19 +1,40 @@
 "use client";
 
-import { RiAddCircleLine } from "@remixicon/react";
+import {
+	RiAddCircleLine,
+	RiDeleteBin5Line,
+	RiExternalLinkLine,
+	RiPencilLine,
+} from "@remixicon/react";
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { deleteCategoryAction } from "@/app/(dashboard)/categorias/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	CATEGORY_TYPE_LABEL,
 	CATEGORY_TYPES,
 } from "@/lib/categorias/constants";
-import { CategoryCard } from "./category-card";
 import { CategoryDialog } from "./category-dialog";
+import { CategoryIconBadge } from "./category-icon-badge";
 import type { Category, CategoryType } from "./types";
+
+const CATEGORIAS_PROTEGIDAS = [
+	"Transferência interna",
+	"Saldo inicial",
+	"Pagamentos",
+];
 
 interface CategoriesPageProps {
 	categories: Category[];
@@ -129,17 +150,83 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 									{CATEGORY_TYPE_LABEL[type].toLowerCase()}.
 								</div>
 							) : (
-								<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-									{categoriesByType[type].map((category, index) => (
-										<CategoryCard
-											key={category.id}
-											category={category}
-											colorIndex={index}
-											onEdit={handleEdit}
-											onRemove={handleRemoveRequest}
-										/>
-									))}
-								</div>
+								<Card className="py-2">
+									<CardContent className="px-2 py-4 sm:px-4">
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead className="w-10" />
+													<TableHead>Nome</TableHead>
+													<TableHead className="text-right">Ações</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{categoriesByType[type].map((category, index) => {
+													const isProtegida = CATEGORIAS_PROTEGIDAS.includes(
+														category.name,
+													);
+
+													return (
+														<TableRow key={category.id}>
+															<TableCell>
+																<CategoryIconBadge
+																	icon={category.icon}
+																	name={category.name}
+																	colorIndex={index}
+																	size="md"
+																/>
+															</TableCell>
+															<TableCell className="font-medium">
+																<Link
+																	href={`/categorias/${category.id}`}
+																	className="inline-flex items-center gap-1 underline-offset-2 hover:text-primary hover:underline"
+																>
+																	{category.name}
+																	<RiExternalLinkLine
+																		className="size-3 shrink-0 text-muted-foreground"
+																		aria-hidden
+																	/>
+																</Link>
+															</TableCell>
+															<TableCell>
+																<div className="flex items-center justify-end gap-3 text-sm">
+																	{!isProtegida && (
+																		<button
+																			type="button"
+																			onClick={() => handleEdit(category)}
+																			className="flex items-center gap-1 font-medium text-primary transition-opacity hover:opacity-80"
+																		>
+																			<RiPencilLine
+																				className="size-4"
+																				aria-hidden
+																			/>
+																			editar
+																		</button>
+																	)}
+																	{!isProtegida && (
+																		<button
+																			type="button"
+																			onClick={() =>
+																				handleRemoveRequest(category)
+																			}
+																			className="flex items-center gap-1 font-medium text-destructive transition-opacity hover:opacity-80"
+																		>
+																			<RiDeleteBin5Line
+																				className="size-4"
+																				aria-hidden
+																			/>
+																			remover
+																		</button>
+																	)}
+																</div>
+															</TableCell>
+														</TableRow>
+													);
+												})}
+											</TableBody>
+										</Table>
+									</CardContent>
+								</Card>
 							)}
 						</TabsContent>
 					))}

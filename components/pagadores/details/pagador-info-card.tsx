@@ -292,7 +292,7 @@ export function PagadorInfoCard({
 
 						<div className="space-y-4">
 							{/* Total Geral */}
-							<div className="rounded-lg border bg-muted/30 p-4">
+							<div className="rounded-lg border p-4">
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
 										<div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
@@ -318,7 +318,7 @@ export function PagadorInfoCard({
 							{/* Grid de Formas de Pagamento */}
 							<div className="grid gap-3 sm:grid-cols-3">
 								{/* Cartões */}
-								<div className="rounded-lg border bg-background p-3">
+								<div className="rounded-lg border p-3">
 									<div className="flex items-center gap-2 text-muted-foreground mb-2">
 										<RiBankCard2Line className="size-4" />
 										<span className="text-xs font-semibold uppercase">
@@ -331,7 +331,7 @@ export function PagadorInfoCard({
 								</div>
 
 								{/* Boletos */}
-								<div className="rounded-lg border bg-background p-3">
+								<div className="rounded-lg border p-3">
 									<div className="flex items-center gap-2 text-muted-foreground mb-2">
 										<RiBillLine className="size-4" />
 										<span className="text-xs font-semibold uppercase">
@@ -344,7 +344,7 @@ export function PagadorInfoCard({
 								</div>
 
 								{/* Instantâneo */}
-								<div className="rounded-lg border bg-background p-3">
+								<div className="rounded-lg border p-3">
 									<div className="flex items-center gap-2 text-muted-foreground mb-2">
 										<RiExchangeDollarLine className="size-4" />
 										<span className="text-xs font-semibold uppercase">
@@ -361,7 +361,7 @@ export function PagadorInfoCard({
 							<div className="space-y-3">
 								{/* Cartões Utilizados */}
 								{summary.cardUsage.length > 0 && (
-									<div className="rounded-lg border bg-muted/20 p-3">
+									<div className="rounded-lg border p-3">
 										<div className="flex items-center gap-2 mb-2">
 											<RiBankCard2Line className="size-4 text-muted-foreground" />
 											<span className="text-xs font-semibold uppercase text-muted-foreground">
@@ -387,7 +387,7 @@ export function PagadorInfoCard({
 								{/* Status de Boletos */}
 								{(summary.boletoStats.paidCount > 0 ||
 									summary.boletoStats.pendingCount > 0) && (
-									<div className="rounded-lg border bg-muted/20 p-3">
+									<div className="rounded-lg border p-3">
 										<div className="flex items-center gap-2 mb-2">
 											<RiBillLine className="size-4 text-muted-foreground" />
 											<span className="text-xs font-semibold uppercase text-muted-foreground">

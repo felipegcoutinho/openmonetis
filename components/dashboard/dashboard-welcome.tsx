@@ -17,6 +17,7 @@ const formatCurrentDate = (date = new Date()) => {
 		day: "numeric",
 		month: "long",
 		year: "numeric",
+		hour12: false,
 		timeZone: "America/Sao_Paulo",
 	}).format(date);
 
@@ -68,7 +69,7 @@ export function DashboardWelcome({
 				/>
 			</div>
 			<div className="relative tracking-tight text-welcome-banner-foreground">
-				<h1 className="text-xl font-medium">
+				<h1 className="text-xl">
 					{greeting}, {displayName}! <span aria-hidden="true">👋</span>
 				</h1>
 				<p className="mt-2 text-sm opacity-90">{formattedDate}</p>

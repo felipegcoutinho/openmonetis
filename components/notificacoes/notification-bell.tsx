@@ -3,15 +3,16 @@
 import {
 	RiAlertFill,
 	RiArrowRightLine,
+	RiAtLine,
 	RiBankCardLine,
 	RiBarChart2Line,
 	RiCheckboxCircleFill,
 	RiErrorWarningLine,
 	RiFileListLine,
-	RiInboxLine,
 	RiNotification3Line,
 	RiTimeLine,
 } from "@remixicon/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,12 @@ type NotificationBellProps = {
 	preLancamentosCount?: number;
 };
 
+const resolveLogoPath = (logo: string | null | undefined) => {
+	if (!logo) return null;
+	if (/^(https?:\/\/|data:)/.test(logo)) return logo;
+	return logo.startsWith("/") ? logo : `/logos/${logo}`;
+};
+
 function formatDate(dateString: string): string {
 	const [year, month, day] = dateString.split("-").map(Number);
 	const date = new Date(Date.UTC(year, month - 1, day));
@@ -72,10 +79,8 @@ function SectionLabel({
 }) {
 	return (
 		<div className="flex items-center gap-1.5 px-3 pb-1 pt-3">
-			<span className="text-muted-foreground/60">{icon}</span>
-			<span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-				{title}
-			</span>
+			<span className="text-muted-foreground">{icon}</span>
+			<span className="text-xs text-muted-foreground">{title}</span>
 		</div>
 	);
 }
@@ -174,7 +179,7 @@ export function NotificationBell({
 						{preLancamentosCount > 0 && (
 							<div>
 								<SectionLabel
-									icon={<RiInboxLine className="size-3" />}
+									icon={<RiAtLine className="size-3" />}
 									title="Pré-lançamentos"
 								/>
 								<Link
@@ -182,6 +187,7 @@ export function NotificationBell({
 									onClick={() => setOpen(false)}
 									className="group mx-1 mb-1 flex items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-accent/60"
 								>
+									<RiAtLine className="size-6 shrink-0 text-primary" />
 									<p className="flex-1 text-xs leading-snug text-foreground">
 										{preLancamentosCount === 1
 											? "1 pré-lançamento aguardando revisão"
@@ -206,9 +212,9 @@ export function NotificationBell({
 											className="flex items-start gap-2 px-2 py-2"
 										>
 											{n.status === "exceeded" ? (
-												<RiAlertFill className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+												<RiAlertFill className="mt-0.5 size-6 shrink-0 text-destructive" />
 											) : (
-												<RiErrorWarningLine className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+												<RiErrorWarningLine className="mt-0.5 size-6 shrink-0 text-amber-500" />
 											)}
 											<p className="text-xs leading-snug">
 												{n.status === "exceeded" ? (
@@ -243,43 +249,54 @@ export function NotificationBell({
 									title="Cartão de Crédito"
 								/>
 								<div className="mx-1 mb-1 overflow-hidden rounded-md">
-									{invoiceNotifications.map((n) => (
-										<div
-											key={n.id}
-											className="flex items-start gap-2 px-2 py-2"
-										>
-											{n.status === "overdue" ? (
-												<RiAlertFill className="mt-0.5 size-3.5 shrink-0 text-destructive" />
-											) : (
-												<RiTimeLine className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
-											)}
-											<p className="text-xs leading-snug">
-												{n.status === "overdue" ? (
-													<>
-														A fatura de <strong>{n.name}</strong> venceu em{" "}
-														{formatDate(n.dueDate)}
-														{n.showAmount && n.amount > 0 && (
-															<>
-																{" "}
-																— <strong>{formatCurrency(n.amount)}</strong>
-															</>
-														)}
-													</>
+									{invoiceNotifications.map((n) => {
+										const logo = resolveLogoPath(n.cardLogo);
+										return (
+											<div
+												key={n.id}
+												className="flex items-start gap-2 px-2 py-2"
+											>
+												{logo ? (
+													<Image
+														src={logo}
+														alt=""
+														width={24}
+														height={24}
+														className="mt-0.5 size-6 shrink-0 rounded-sm object-contain"
+													/>
+												) : n.status === "overdue" ? (
+													<RiAlertFill className="mt-0.5 size-3.5 shrink-0 text-destructive" />
 												) : (
-													<>
-														A fatura de <strong>{n.name}</strong> vence em{" "}
-														{formatDate(n.dueDate)}
-														{n.showAmount && n.amount > 0 && (
-															<>
-																{" "}
-																— <strong>{formatCurrency(n.amount)}</strong>
-															</>
-														)}
-													</>
+													<RiTimeLine className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
 												)}
-											</p>
-										</div>
-									))}
+												<p className="text-xs leading-snug">
+													{n.status === "overdue" ? (
+														<>
+															A fatura de <strong>{n.name}</strong> venceu em{" "}
+															{formatDate(n.dueDate)}
+															{n.showAmount && n.amount > 0 && (
+																<>
+																	{" "}
+																	— <strong>{formatCurrency(n.amount)}</strong>
+																</>
+															)}
+														</>
+													) : (
+														<>
+															A fatura de <strong>{n.name}</strong> vence em{" "}
+															{formatDate(n.dueDate)}
+															{n.showAmount && n.amount > 0 && (
+																<>
+																	{" "}
+																	— <strong>{formatCurrency(n.amount)}</strong>
+																</>
+															)}
+														</>
+													)}
+												</p>
+											</div>
+										);
+									})}
 								</div>
 							</div>
 						)}
@@ -297,11 +314,14 @@ export function NotificationBell({
 											key={n.id}
 											className="flex items-start gap-2 px-2 py-2"
 										>
-											{n.status === "overdue" ? (
-												<RiAlertFill className="mt-0.5 size-3.5 shrink-0 text-destructive" />
-											) : (
-												<RiTimeLine className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
-											)}
+											<RiAlertFill
+												className={cn(
+													"mt-0.5 size-6 shrink-0",
+													n.status === "overdue"
+														? "text-destructive"
+														: "text-amber-500",
+												)}
+											/>
 											<p className="text-xs leading-snug">
 												{n.status === "overdue" ? (
 													<>

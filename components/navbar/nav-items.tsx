@@ -1,12 +1,12 @@
 import {
 	RiArrowLeftRightLine,
+	RiAtLine,
 	RiBankCard2Line,
 	RiBankLine,
+	RiBarChart2Line,
 	RiCalendarEventLine,
 	RiFileChartLine,
-	RiFundsLine,
 	RiGroupLine,
-	RiInboxLine,
 	RiPriceTag3Line,
 	RiSparklingLine,
 	RiTodoLine,
@@ -39,7 +39,7 @@ export const NAV_SECTIONS: NavSection[] = [
 			{
 				href: "/pre-lancamentos",
 				label: "pré-lançamentos",
-				icon: <RiInboxLine className="size-4" />,
+				icon: <RiAtLine className="size-4" />,
 			},
 			{
 				href: "/calendario",
@@ -65,7 +65,7 @@ export const NAV_SECTIONS: NavSection[] = [
 			{
 				href: "/orcamentos",
 				label: "orçamentos",
-				icon: <RiFundsLine className="size-4" />,
+				icon: <RiBarChart2Line className="size-4" />,
 				preservePeriod: true,
 			},
 		],
