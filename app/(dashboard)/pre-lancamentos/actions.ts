@@ -1,10 +1,9 @@
 "use server";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { preLancamentos } from "@/db/schema";
-import { handleActionError } from "@/lib/actions/helpers";
+import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
 import type { ActionResult } from "@/lib/actions/types";
 import { getUser } from "@/lib/auth/server";
 import { db } from "@/lib/db";
@@ -14,6 +13,10 @@ const markProcessedSchema = z.object({
 });
 
 const discardInboxSchema = z.object({
+	inboxItemId: z.string().uuid("ID do item inválido"),
+});
+
+const restoreDiscardedInboxSchema = z.object({
 	inboxItemId: z.string().uuid("ID do item inválido"),
 });
 
@@ -30,9 +33,7 @@ const bulkDeleteInboxSchema = z.object({
 });
 
 function revalidateInbox() {
-	revalidatePath("/pre-lancamentos");
-	revalidatePath("/lancamentos");
-	revalidatePath("/dashboard");
+	revalidateForEntity("inbox");
 }
 
 /**
@@ -161,6 +162,54 @@ export async function bulkDiscardInboxItemsAction(
 			success: true,
 			message: `${data.inboxItemIds.length} item(s) descartado(s).`,
 		};
+	} catch (error) {
+		return handleActionError(error);
+	}
+}
+
+export async function restoreDiscardedInboxItemAction(
+	input: z.infer<typeof restoreDiscardedInboxSchema>,
+): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = restoreDiscardedInboxSchema.parse(input);
+
+		const [item] = await db
+			.select({ id: preLancamentos.id })
+			.from(preLancamentos)
+			.where(
+				and(
+					eq(preLancamentos.id, data.inboxItemId),
+					eq(preLancamentos.userId, user.id),
+					eq(preLancamentos.status, "discarded"),
+				),
+			)
+			.limit(1);
+
+		if (!item) {
+			return {
+				success: false,
+				error: "Item não encontrado ou não está descartado.",
+			};
+		}
+
+		await db
+			.update(preLancamentos)
+			.set({
+				status: "pending",
+				discardedAt: null,
+				updatedAt: new Date(),
+			})
+			.where(
+				and(
+					eq(preLancamentos.id, data.inboxItemId),
+					eq(preLancamentos.userId, user.id),
+				),
+			);
+
+		revalidateInbox();
+
+		return { success: true, message: "Item voltou para pendentes." };
 	} catch (error) {
 		return handleActionError(error);
 	}

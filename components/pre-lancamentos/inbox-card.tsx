@@ -1,9 +1,10 @@
 "use client";
 
 import {
+	RiArrowGoBackLine,
 	RiCheckLine,
 	RiDeleteBinLine,
-	RiEyeLine,
+	RiFileList2Line,
 	RiMoreLine,
 } from "@remixicon/react";
 import { format, formatDistanceToNow } from "date-fns";
@@ -37,6 +38,7 @@ interface InboxCardProps {
 	onDiscard?: (item: InboxItem) => void;
 	onViewDetails?: (item: InboxItem) => void;
 	onDelete?: (item: InboxItem) => void;
+	onRestoreToPending?: (item: InboxItem) => void | Promise<void>;
 }
 
 function resolveLogoPath(logo: string): string {
@@ -79,6 +81,7 @@ export function InboxCard({
 	onDiscard,
 	onViewDetails,
 	onDelete,
+	onRestoreToPending,
 }: InboxCardProps) {
 	const matchedLogo = useMemo(
 		() =>
@@ -161,7 +164,7 @@ export function InboxCard({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem onClick={() => onViewDetails?.(item)}>
-									<RiEyeLine className="mr-2 size-4" />
+									<RiFileList2Line className="mr-2 size-4" />
 									Ver detalhes
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={() => onProcess?.(item)}>
@@ -204,16 +207,30 @@ export function InboxCard({
 							{formattedStatusDate}
 						</span>
 					)}
-					{onDelete && (
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							className="ml-auto text-muted-foreground hover:text-destructive"
-							onClick={() => onDelete(item)}
-						>
-							<RiDeleteBinLine className="size-4" />
-						</Button>
-					)}
+					<div className="ml-auto flex items-center gap-1">
+						{item.status === "discarded" && onRestoreToPending && (
+							<Button
+								variant="ghost"
+								size="icon-sm"
+								className="text-muted-foreground hover:text-foreground"
+								onClick={() => onRestoreToPending(item)}
+								aria-label="Voltar para pendente"
+								title="Voltar para pendente"
+							>
+								<RiArrowGoBackLine className="size-4" />
+							</Button>
+						)}
+						{onDelete && (
+							<Button
+								variant="ghost"
+								size="icon-sm"
+								className="text-muted-foreground hover:text-destructive"
+								onClick={() => onDelete(item)}
+							>
+								<RiDeleteBinLine className="size-4" />
+							</Button>
+						)}
+					</div>
 				</CardFooter>
 			) : (
 				<CardFooter className="gap-2 pt-3 pb-4">
@@ -226,10 +243,12 @@ export function InboxCard({
 						Processar
 					</Button>
 					<Button
-						size="sm"
-						variant="outline"
+						size="icon-sm"
+						variant="ghost"
 						onClick={() => onDiscard?.(item)}
-						className="text-muted-foreground hover:text-destructive hover:border-destructive"
+						className="text-muted-foreground hover:text-destructive"
+						aria-label="Descartar notificação"
+						title="Descartar notificação"
 					>
 						<RiDeleteBinLine className="size-4" />
 					</Button>

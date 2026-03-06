@@ -8,10 +8,11 @@ import {
 	deleteInboxItemAction,
 	discardInboxItemAction,
 	markInboxAsProcessedAction,
+	restoreDiscardedInboxItemAction,
 } from "@/app/(dashboard)/pre-lancamentos/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
-import { EmptyState } from "@/components/empty-state";
 import { LancamentoDialog } from "@/components/lancamentos/dialogs/lancamento-dialog/lancamento-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -57,6 +58,9 @@ export function InboxPage({
 
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [itemToDelete, setItemToDelete] = useState<InboxItem | null>(null);
+
+	const [restoreOpen, setRestoreOpen] = useState(false);
+	const [itemToRestore, setItemToRestore] = useState<InboxItem | null>(null);
 
 	const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 	const [bulkDeleteStatus, setBulkDeleteStatus] = useState<
@@ -166,6 +170,34 @@ export function InboxPage({
 		throw new Error(result.error);
 	}, [itemToDelete]);
 
+	const handleRestoreOpenChange = useCallback((open: boolean) => {
+		setRestoreOpen(open);
+		if (!open) {
+			setItemToRestore(null);
+		}
+	}, []);
+
+	const handleRestoreRequest = useCallback((item: InboxItem) => {
+		setItemToRestore(item);
+		setRestoreOpen(true);
+	}, []);
+
+	const handleRestoreToPendingConfirm = useCallback(async () => {
+		if (!itemToRestore) return;
+
+		const result = await restoreDiscardedInboxItemAction({
+			inboxItemId: itemToRestore.id,
+		});
+
+		if (result.success) {
+			toast.success(result.message);
+			return;
+		}
+
+		toast.error(result.error);
+		throw new Error(result.error);
+	}, [itemToRestore]);
+
 	const handleBulkDeleteOpenChange = useCallback((open: boolean) => {
 		setBulkDeleteOpen(open);
 	}, []);
@@ -271,6 +303,7 @@ export function InboxPage({
 						onDiscard={readonly ? undefined : handleDiscardRequest}
 						onViewDetails={readonly ? undefined : handleDetailsRequest}
 						onDelete={readonly ? handleDeleteRequest : undefined}
+						onRestoreToPending={readonly ? handleRestoreRequest : undefined}
 					/>
 				))}
 			</div>
@@ -279,15 +312,27 @@ export function InboxPage({
 	return (
 		<>
 			<Tabs defaultValue="pending" className="w-full">
-				<TabsList>
-					<TabsTrigger value="pending">
-						Pendentes ({pendingItems.length})
+				<TabsList className="grid h-auto w-full grid-cols-3 sm:inline-flex sm:h-9 sm:grid-cols-none">
+					<TabsTrigger
+						value="pending"
+						className="h-11 min-w-0 flex-col gap-0 px-1 text-sm leading-tight sm:h-9 sm:flex-row sm:gap-1 sm:px-4"
+					>
+						<span>Pendentes</span>
+						<span>({pendingItems.length})</span>
 					</TabsTrigger>
-					<TabsTrigger value="processed">
-						Processados ({processedItems.length})
+					<TabsTrigger
+						value="processed"
+						className="h-11 min-w-0 flex-col gap-0 px-1 text-sm leading-tight sm:h-9 sm:flex-row sm:gap-1 sm:px-4"
+					>
+						<span>Processados</span>
+						<span>({processedItems.length})</span>
 					</TabsTrigger>
-					<TabsTrigger value="discarded">
-						Descartados ({discardedItems.length})
+					<TabsTrigger
+						value="discarded"
+						className="h-11 min-w-0 flex-col gap-0 px-1 text-sm leading-tight sm:h-9 sm:flex-row sm:gap-1 sm:px-4"
+					>
+						<span>Descartados</span>
+						<span>({discardedItems.length})</span>
 					</TabsTrigger>
 				</TabsList>
 
@@ -372,6 +417,16 @@ export function InboxPage({
 				confirmVariant="destructive"
 				pendingLabel="Excluindo..."
 				onConfirm={handleDeleteConfirm}
+			/>
+
+			<ConfirmActionDialog
+				open={restoreOpen}
+				onOpenChange={handleRestoreOpenChange}
+				title="Retornar para pendentes?"
+				description="A notificação voltará para a lista de pendentes e poderá ser processada depois."
+				confirmLabel="Retornar"
+				pendingLabel="Retornando..."
+				onConfirm={handleRestoreToPendingConfirm}
 			/>
 
 			<ConfirmActionDialog
