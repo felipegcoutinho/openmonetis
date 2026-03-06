@@ -24,6 +24,10 @@ import {
 	formatPercentageChange,
 	formatPeriodLabel,
 } from "@/lib/relatorios/utils";
+import {
+	getPrimaryPdfColor,
+	loadExportLogoDataUrl,
+} from "@/lib/utils/export-branding";
 import type { FilterState } from "./types";
 
 interface CategoryReportExportProps {
@@ -189,26 +193,52 @@ export function CategoryReportExport({
 		}
 	};
 
-	const exportToPDF = () => {
+	const exportToPDF = async () => {
 		try {
 			setIsExporting(true);
 
 			// Create PDF
 			const doc = new jsPDF({ orientation: "landscape" });
+			const primaryColor = getPrimaryPdfColor();
+			const [smallLogoDataUrl, textLogoDataUrl] = await Promise.all([
+				loadExportLogoDataUrl("/logo_small.png"),
+				loadExportLogoDataUrl("/logo_text.png"),
+			]);
+			let brandingEndX = 14;
+
+			if (smallLogoDataUrl) {
+				doc.addImage(smallLogoDataUrl, "PNG", brandingEndX, 7.5, 8, 8);
+				brandingEndX += 10;
+			}
+
+			if (textLogoDataUrl) {
+				doc.addImage(textLogoDataUrl, "PNG", brandingEndX, 8, 30, 8);
+				brandingEndX += 32;
+			}
+
+			const titleX = brandingEndX > 14 ? brandingEndX + 4 : 14;
 
 			// Add header
+			doc.setFont("courier", "normal");
 			doc.setFontSize(16);
-			doc.text("Relatório de Categorias por Período", 14, 15);
+			doc.text("Relatório de Categorias por Período", titleX, 15);
 
 			doc.setFontSize(10);
 			doc.text(
 				`Período: ${formatPeriodLabel(
 					filters.startPeriod,
 				)} - ${formatPeriodLabel(filters.endPeriod)}`,
-				14,
+				titleX,
 				22,
 			);
-			doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 27);
+			doc.text(
+				`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+				titleX,
+				27,
+			);
+			doc.setDrawColor(...primaryColor);
+			doc.setLineWidth(0.5);
+			doc.line(14, 31, doc.internal.pageSize.getWidth() - 14, 31);
 
 			// Build table data
 			const headers = [
@@ -255,13 +285,15 @@ export function CategoryReportExport({
 			autoTable(doc, {
 				head: headers,
 				body: body,
-				startY: 32,
+				startY: 35,
+				tableWidth: "auto",
 				styles: {
+					font: "courier",
 					fontSize: 8,
 					cellPadding: 2,
 				},
 				headStyles: {
-					fillColor: [59, 130, 246], // Blue
+					fillColor: primaryColor,
 					textColor: 255,
 					fontStyle: "bold",
 				},
@@ -301,7 +333,7 @@ export function CategoryReportExport({
 						}
 					}
 				},
-				margin: { top: 32 },
+				margin: { top: 35 },
 			});
 
 			// Save PDF

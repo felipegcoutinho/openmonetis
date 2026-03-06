@@ -19,6 +19,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
+import {
+	getPrimaryPdfColor,
+	loadExportLogoDataUrl,
+} from "@/lib/utils/export-branding";
 import type { LancamentoItem } from "./types";
 
 interface LancamentosExportProps {
@@ -51,6 +55,17 @@ export function LancamentosExport({
 		return "-";
 	};
 
+	const getNameWithInstallment = (lancamento: LancamentoItem) => {
+		const isInstallment =
+			lancamento.condition.trim().toLowerCase() === "parcelado";
+
+		if (!isInstallment || !lancamento.installmentCount) {
+			return lancamento.name;
+		}
+
+		return `${lancamento.name} (${lancamento.currentInstallment ?? 1}/${lancamento.installmentCount})`;
+	};
+
 	const exportToCSV = () => {
 		try {
 			setIsExporting(true);
@@ -71,7 +86,7 @@ export function LancamentosExport({
 			lancamentos.forEach((lancamento) => {
 				const row = [
 					formatDate(lancamento.purchaseDate),
-					lancamento.name,
+					getNameWithInstallment(lancamento),
 					lancamento.transactionType,
 					lancamento.condition,
 					lancamento.paymentMethod,
@@ -129,7 +144,7 @@ export function LancamentosExport({
 			lancamentos.forEach((lancamento) => {
 				const row = [
 					formatDate(lancamento.purchaseDate),
-					lancamento.name,
+					getNameWithInstallment(lancamento),
 					lancamento.transactionType,
 					lancamento.condition,
 					lancamento.paymentMethod,
@@ -145,7 +160,7 @@ export function LancamentosExport({
 
 			ws["!cols"] = [
 				{ wch: 12 }, // Data
-				{ wch: 30 }, // Nome
+				{ wch: 42 }, // Nome
 				{ wch: 15 }, // Tipo
 				{ wch: 15 }, // Condição
 				{ wch: 20 }, // Pagamento
@@ -168,14 +183,33 @@ export function LancamentosExport({
 		}
 	};
 
-	const exportToPDF = () => {
+	const exportToPDF = async () => {
 		try {
 			setIsExporting(true);
 
 			const doc = new jsPDF({ orientation: "landscape" });
+			const primaryColor = getPrimaryPdfColor();
+			const [smallLogoDataUrl, textLogoDataUrl] = await Promise.all([
+				loadExportLogoDataUrl("/logo_small.png"),
+				loadExportLogoDataUrl("/logo_text.png"),
+			]);
+			let brandingEndX = 14;
 
+			if (smallLogoDataUrl) {
+				doc.addImage(smallLogoDataUrl, "PNG", brandingEndX, 7.5, 8, 8);
+				brandingEndX += 10;
+			}
+
+			if (textLogoDataUrl) {
+				doc.addImage(textLogoDataUrl, "PNG", brandingEndX, 8, 30, 8);
+				brandingEndX += 32;
+			}
+
+			const titleX = brandingEndX > 14 ? brandingEndX + 4 : 14;
+
+			doc.setFont("courier", "normal");
 			doc.setFontSize(16);
-			doc.text("Lançamentos", 14, 15);
+			doc.text("Lançamentos", titleX, 15);
 
 			doc.setFontSize(10);
 			const periodParts = period.split("-");
@@ -197,8 +231,15 @@ export function LancamentosExport({
 				periodParts.length === 2
 					? `${monthNames[Number.parseInt(periodParts[1], 10) - 1]}/${periodParts[0]}`
 					: period;
-			doc.text(`Período: ${formattedPeriod}`, 14, 22);
-			doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 27);
+			doc.text(`Período: ${formattedPeriod}`, titleX, 22);
+			doc.text(
+				`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+				titleX,
+				27,
+			);
+			doc.setDrawColor(...primaryColor);
+			doc.setLineWidth(0.5);
+			doc.line(14, 31, doc.internal.pageSize.getWidth() - 14, 31);
 
 			const headers = [
 				[
@@ -216,7 +257,7 @@ export function LancamentosExport({
 
 			const body = lancamentos.map((lancamento) => [
 				formatDate(lancamento.purchaseDate),
-				lancamento.name,
+				getNameWithInstallment(lancamento),
 				lancamento.transactionType,
 				lancamento.condition,
 				lancamento.paymentMethod,
@@ -229,26 +270,28 @@ export function LancamentosExport({
 			autoTable(doc, {
 				head: headers,
 				body: body,
-				startY: 32,
+				startY: 35,
+				tableWidth: "auto",
 				styles: {
+					font: "courier",
 					fontSize: 8,
 					cellPadding: 2,
 				},
 				headStyles: {
-					fillColor: [59, 130, 246],
+					fillColor: primaryColor,
 					textColor: 255,
 					fontStyle: "bold",
 				},
 				columnStyles: {
-					0: { cellWidth: 20 }, // Data
-					1: { cellWidth: 40 }, // Nome
-					2: { cellWidth: 25 }, // Tipo
-					3: { cellWidth: 25 }, // Condição
-					4: { cellWidth: 30 }, // Pagamento
-					5: { cellWidth: 25 }, // Valor
+					0: { cellWidth: 24 }, // Data
+					1: { cellWidth: 58 }, // Nome
+					2: { cellWidth: 22 }, // Tipo
+					3: { cellWidth: 22 }, // Condição
+					4: { cellWidth: 28 }, // Pagamento
+					5: { cellWidth: 24 }, // Valor
 					6: { cellWidth: 30 }, // Categoria
 					7: { cellWidth: 30 }, // Conta/Cartão
-					8: { cellWidth: 30 }, // Pagador
+					8: { cellWidth: 31 }, // Pagador
 				},
 				didParseCell: (cellData) => {
 					if (cellData.section === "body" && cellData.column.index === 5) {
@@ -262,7 +305,7 @@ export function LancamentosExport({
 						}
 					}
 				},
-				margin: { top: 32 },
+				margin: { top: 35 },
 			});
 
 			doc.save(getFileName("pdf"));
