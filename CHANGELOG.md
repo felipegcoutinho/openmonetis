@@ -5,6 +5,19 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+## [1.7.7] - 2026-03-05
+
+### Alterado
+
+- Navegação e estrutura compartilhada: `components/navbar` e `components/sidebar` foram consolidados em `components/navigation/*`, componentes globais migraram para `components/shared/*` e os imports foram padronizados no projeto.
+- Dashboard e relatórios: a análise de parcelas foi movida para `/relatorios/analise-parcelas`, ações rápidas e widgets do dashboard foram refinados, e os cards de relatórios ganharam ajustes para evitar overflow no mobile.
+- Pré-lançamentos e lançamentos: tabs e cards da inbox ficaram mais consistentes no mobile, itens descartados podem voltar para `Pendente` e compras feitas no dia do fechamento do cartão agora entram na próxima fatura.
+- Tipografia e exportações: suporte a `SF Pro` foi removido, a validação de fontes ficou centralizada em `public/fonts/font_index.ts` e as exportações em PDF/CSV/Excel receberam melhor branding e apresentação.
+- Calculadora e diálogos: o arraste ficou mais estável, os bloqueios de fechamento externo foram reforçados e o display interno foi reorganizado para uso mais consistente.
+- Também houve ajustes menores de responsividade, espaçamento e acabamento visual em telas mobile, modais e detalhes de interface.
+
 ## [1.7.6] - 2026-03-02
 
 ### Adicionado
