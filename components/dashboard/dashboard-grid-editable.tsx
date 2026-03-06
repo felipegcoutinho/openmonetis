@@ -16,8 +16,7 @@ import {
 	sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import {
-	RiArrowDownLine,
-	RiArrowUpLine,
+	RiAddCircleLine,
 	RiCheckLine,
 	RiCloseLine,
 	RiDragMove2Line,
@@ -201,11 +200,11 @@ export function DashboardGridEditable({
 			{/* Toolbar */}
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				{!isEditing ? (
-					<div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-2 px-1">
+					<div className="flex w-full min-w-0 flex-col gap-1 px-1 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
 						<span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
 							Ações rápidas
 						</span>
-						<div className="-mb-1 flex items-center gap-2 overflow-x-auto pb-1 sm:mb-0 sm:overflow-visible sm:pb-0">
+						<div className="-mb-1 grid w-full grid-cols-3 gap-1 pb-1 sm:mb-0 sm:flex sm:w-auto sm:items-center sm:gap-2 sm:overflow-visible sm:pb-0">
 							<LancamentoDialog
 								mode="create"
 								pagadorOptions={quickActionOptions.pagadorOptions}
@@ -218,9 +217,16 @@ export function DashboardGridEditable({
 								defaultPeriod={period}
 								defaultTransactionType="Receita"
 								trigger={
-									<Button size="sm" variant="outline" className="gap-2">
-										<RiArrowUpLine className="size-4 text-success/80" />
-										Nova receita
+									<Button
+										size="sm"
+										variant="outline"
+										className="h-12 w-full min-w-0 flex-col justify-center gap-0.5 px-1.5 text-sm whitespace-normal sm:h-8 sm:w-auto sm:flex-row sm:gap-2 sm:px-3 sm:whitespace-nowrap"
+									>
+										<span className="flex items-center gap-0.5">
+											<RiAddCircleLine className="size-3.5 shrink-0 text-success/80" />
+										</span>
+										<span className="sm:hidden">Receita</span>
+										<span className="hidden sm:inline">Nova receita</span>
 									</Button>
 								}
 							/>
@@ -236,18 +242,30 @@ export function DashboardGridEditable({
 								defaultPeriod={period}
 								defaultTransactionType="Despesa"
 								trigger={
-									<Button size="sm" variant="outline" className="gap-2">
-										<RiArrowDownLine className="size-4 text-destructive/80" />
-										Nova despesa
+									<Button
+										size="sm"
+										variant="outline"
+										className="h-12 w-full min-w-0 flex-col justify-center gap-0.5 px-1.5 text-sm whitespace-normal sm:h-8 sm:w-auto sm:flex-row sm:gap-2 sm:px-3 sm:whitespace-nowrap"
+									>
+										<span className="flex items-center gap-0.5">
+											<RiAddCircleLine className="size-3.5 shrink-0 text-destructive/80" />
+										</span>
+										<span className="sm:hidden">Despesa</span>
+										<span className="hidden sm:inline">Nova despesa</span>
 									</Button>
 								}
 							/>
 							<NoteDialog
 								mode="create"
 								trigger={
-									<Button size="sm" variant="outline" className="gap-2">
-										<RiTodoLine className="size-4 text-info/80" />
-										Nova anotação
+									<Button
+										size="sm"
+										variant="outline"
+										className="h-12 w-full min-w-0 flex-col justify-center gap-0.5 px-1.5 text-sm whitespace-normal sm:h-8 sm:w-auto sm:flex-row sm:gap-2 sm:px-3 sm:whitespace-nowrap"
+									>
+										<RiTodoLine className="size-3.5 shrink-0 text-info/80" />
+										<span className="sm:hidden">Anotação</span>
+										<span className="hidden sm:inline">Nova anotação</span>
 									</Button>
 								}
 							/>
@@ -257,7 +275,7 @@ export function DashboardGridEditable({
 					<div />
 				)}
 
-				<div className="flex items-center gap-2">
+				<div className="flex w-full items-center justify-end gap-2 sm:w-auto">
 					{isEditing ? (
 						<>
 							<Button
@@ -281,22 +299,23 @@ export function DashboardGridEditable({
 							</Button>
 						</>
 					) : (
-						<>
+						<div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
 							<WidgetSettingsDialog
 								hiddenWidgets={hiddenWidgets}
 								onToggleWidget={handleToggleWidget}
 								onReset={handleReset}
+								triggerClassName="w-full sm:w-auto"
 							/>
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={handleStartEditing}
-								className="gap-2"
+								className="w-full gap-2 sm:w-auto"
 							>
 								<RiDragMove2Line className="size-4" />
 								Reordenar
 							</Button>
-						</>
+						</div>
 					)}
 				</div>
 			</div>

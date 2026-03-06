@@ -2,7 +2,7 @@
 
 import {
 	RiDeleteBin5Line,
-	RiEyeLine,
+	RiFileList2Line,
 	RiMailSendLine,
 	RiPencilLine,
 	RiVerifiedBadgeFill,
@@ -101,7 +101,7 @@ export function PagadorCard({ pagador, onEdit, onRemove }: PagadorCardProps) {
 					href={`/pagadores/${pagador.id}`}
 					className={`text-primary flex items-center gap-1 font-medium transition-opacity hover:opacity-80`}
 				>
-					<RiEyeLine className="size-4" aria-hidden />
+					<RiFileList2Line className="size-4" aria-hidden />
 					detalhes
 				</Link>
 

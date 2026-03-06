@@ -72,11 +72,11 @@ export function NoteDetailsDialog({
 				</DialogHeader>
 
 				{isTask ? (
-					<div className="max-h-[320px] overflow-auto space-y-3">
+					<Card className="max-h-[320px] overflow-auto gap-2 p-2">
 						{sortedTasks.map((task) => (
-							<Card
+							<div
 								key={task.id}
-								className="flex gap-3 p-3 flex-row items-center"
+								className="flex items-center gap-3 px-3 py-1.5 space-y-1 rounded-md hover:bg-muted/50"
 							>
 								<div
 									className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
@@ -91,14 +91,16 @@ export function NoteDetailsDialog({
 								</div>
 								<span
 									className={`text-sm ${
-										task.completed ? "text-muted-foreground" : "text-foreground"
+										task.completed
+											? "text-muted-foreground line-through"
+											: "text-foreground"
 									}`}
 								>
 									{task.text}
 								</span>
-							</Card>
+							</div>
 						))}
-					</div>
+					</Card>
 				) : (
 					<div className="max-h-[320px] overflow-auto whitespace-pre-line wrap-break-word text-sm text-foreground">
 						{note.description}

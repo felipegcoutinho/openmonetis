@@ -277,7 +277,7 @@ export function LancamentosFilters({
 
 			<div className="flex w-full gap-2 md:w-auto">
 				{exportButton && (
-					<div className="flex-1 md:flex-none [&>*]:w-full [&>*]:md:w-auto">
+					<div className="flex-1 md:flex-none *:w-full *:md:w-auto">
 						{exportButton}
 					</div>
 				)}
@@ -291,13 +291,13 @@ export function LancamentosFilters({
 						<DrawerTrigger asChild>
 							<Button
 								variant="outline"
-								className="flex-1 md:flex-none text-sm border-dashed relative"
+								className="flex-1 md:flex-none text-sm border-dashed relative bg-transparent"
 								aria-label="Abrir filtros"
 							>
 								<RiFilter3Line className="size-4" />
 								Filtros
 								{hasActiveFilters && (
-									<span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
+									<span className="absolute -top-1 -right-1 size-3 rounded-full bg-primary" />
 								)}
 							</Button>
 						</DrawerTrigger>

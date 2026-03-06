@@ -245,7 +245,7 @@ export function BoletosWidget({ boletos }: BoletosWidgetProps) {
 				}}
 			>
 				<DialogContent
-					className="max-w-md"
+					className="max-w-[calc(100%-2rem)] sm:max-w-md"
 					onEscapeKeyDown={(event) => {
 						if (isProcessing) {
 							event.preventDefault();

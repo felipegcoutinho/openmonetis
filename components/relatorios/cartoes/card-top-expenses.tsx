@@ -38,14 +38,14 @@ export function CardTopExpenses({ data }: CardTopExpensesProps) {
 	const maxAmount = Math.max(...data.map((e) => e.amount));
 
 	return (
-		<Card className="h-full">
+		<Card className="h-full overflow-hidden">
 			<CardHeader className="pb-3">
 				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiShoppingBag3Line className="size-4 text-primary" />
 					Top 10 Gastos do Mês
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="pt-0">
+			<CardContent className="overflow-x-hidden pt-0">
 				<div className="flex flex-col">
 					{data.map((expense, index) => (
 						<div
@@ -66,14 +66,14 @@ export function CardTopExpenses({ data }: CardTopExpensesProps) {
 										<span className="text-sm font-medium truncate block">
 											{expense.name}
 										</span>
-										<div className="flex items-center gap-1 mt-0.5 flex-wrap">
+										<div className="mt-0.5 flex min-w-0 flex-col gap-0.5">
 											<span className="text-xs text-muted-foreground">
 												{expense.date}
 											</span>
 											{expense.category && (
 												<Badge
 													variant="secondary"
-													className="text-xs px-1.5 py-0 h-5"
+													className="h-5 max-w-full px-1.5 py-0 text-xs truncate"
 												>
 													{expense.category}
 												</Badge>
@@ -92,7 +92,7 @@ export function CardTopExpenses({ data }: CardTopExpensesProps) {
 							</div>
 
 							{/* Progress bar */}
-							<div className="ml-12 mt-1.5">
+							<div className="pl-12 mt-1.5">
 								<Progress
 									className="h-1.5"
 									value={(expense.amount / maxAmount) * 100}

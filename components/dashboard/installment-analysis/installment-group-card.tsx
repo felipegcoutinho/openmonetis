@@ -80,7 +80,7 @@ export function InstallmentGroupCard({
 								{group.cartaoLogo && (
 									<img
 										src={`/logos/${group.cartaoLogo}`}
-										alt={group.cartaoName}
+										alt={group.cartaoName ?? "Cartão"}
 										className="h-6 w-auto object-contain rounded"
 									/>
 								)}

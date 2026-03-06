@@ -36,7 +36,7 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 	const _totalAmount = data.reduce((acc, c) => acc + c.amount, 0);
 
 	return (
-		<Card className="h-full">
+		<Card className="h-full overflow-hidden">
 			<CardHeader className="pb-3">
 				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiPieChartLine className="size-4 text-primary" />
@@ -44,7 +44,7 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 				</CardTitle>
 			</CardHeader>
 
-			<CardContent className="pt-0">
+			<CardContent className="overflow-x-hidden pt-0">
 				<div className="flex flex-col">
 					{data.map((category, index) => (
 						<div
@@ -80,7 +80,7 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 							</div>
 
 							{/* Progress bar */}
-							<div className="ml-11 mt-1.5">
+							<div className="pl-11 mt-1.5">
 								<Progress className="h-1.5" value={category.percent} />
 							</div>
 						</div>

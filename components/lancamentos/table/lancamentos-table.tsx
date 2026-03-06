@@ -6,8 +6,8 @@ import {
 	RiChat1Line,
 	RiCheckLine,
 	RiDeleteBin5Line,
-	RiEyeLine,
 	RiFileCopyLine,
+	RiFileList2Line,
 	RiGroupLine,
 	RiHistoryLine,
 	RiMoreFill,
@@ -31,8 +31,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CategoryIcon } from "@/components/categorias/category-icon";
-import { EmptyState } from "@/components/empty-state";
 import MoneyValues from "@/components/money-values";
+import { EmptyState } from "@/components/shared/empty-state";
 import { TypeBadge } from "@/components/type-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -588,7 +588,7 @@ const buildColumns = ({
 							<DropdownMenuItem
 								onSelect={() => handleViewDetails(row.original)}
 							>
-								<RiEyeLine className="size-4" />
+								<RiFileList2Line className="size-4" />
 								Detalhes
 							</DropdownMenuItem>
 							{row.original.userId === currentUserId && (

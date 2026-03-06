@@ -50,8 +50,11 @@ export function CalculatorDialogContent({
 	return (
 		<DialogContent
 			ref={contentRefCallback}
-			className="p-4 sm:max-w-sm"
+			className="p-5 sm:max-w-sm sm:p-6"
 			onEscapeKeyDown={(e) => e.preventDefault()}
+			onPointerDownOutside={(e) => e.preventDefault()}
+			onFocusOutside={(e) => e.preventDefault()}
+			onInteractOutside={(e) => e.preventDefault()}
 		>
 			<DialogHeader
 				className="cursor-grab select-none space-y-2 active:cursor-grabbing"

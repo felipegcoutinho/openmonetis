@@ -3,7 +3,7 @@
 import {
 	RiChat3Line,
 	RiDeleteBin5Line,
-	RiEyeLine,
+	RiFileList2Line,
 	RiPencilLine,
 } from "@remixicon/react";
 import Image from "next/image";
@@ -143,7 +143,7 @@ export function CardItem({
 			},
 			{
 				label: "ver fatura",
-				icon: <RiEyeLine className="size-4" aria-hidden />,
+				icon: <RiFileList2Line className="size-4" aria-hidden />,
 				onClick: onInvoice,
 				className: "text-primary",
 			},

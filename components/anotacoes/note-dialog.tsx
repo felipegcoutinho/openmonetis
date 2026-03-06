@@ -338,7 +338,7 @@ export function NoteDialog({
 							</div>
 
 							{sortedTasks.length > 0 && (
-								<div className="space-y-1 max-h-[240px] overflow-y-auto pr-1">
+								<div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 mt-4 rounded-md p-2 bg-card ">
 									{sortedTasks.map((task) => (
 										<div
 											key={task.id}

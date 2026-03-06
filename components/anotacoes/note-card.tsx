@@ -4,7 +4,7 @@ import {
 	RiArchiveLine,
 	RiCheckLine,
 	RiDeleteBin5Line,
-	RiEyeLine,
+	RiFileList2Line,
 	RiInboxUnarchiveLine,
 	RiPencilLine,
 } from "@remixicon/react";
@@ -60,7 +60,7 @@ export function NoteCard({
 		},
 		{
 			label: "detalhes",
-			icon: <RiEyeLine className="size-4" aria-hidden />,
+			icon: <RiFileList2Line className="size-4" aria-hidden />,
 			onClick: onDetails,
 			variant: "default" as const,
 		},
@@ -115,7 +115,9 @@ export function NoteCard({
 								</div>
 								<span
 									className={`leading-relaxed ${
-										task.completed ? "text-muted-foreground" : "text-foreground"
+										task.completed
+											? "text-muted-foreground line-through"
+											: "text-foreground"
 									}`}
 								>
 									{task.text}

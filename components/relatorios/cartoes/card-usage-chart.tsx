@@ -80,14 +80,14 @@ export function CardUsageChart({ data, limit, card }: CardUsageChartProps) {
 	return (
 		<Card>
 			<CardHeader className="pb-2">
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between gap-2">
 					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiBarChartBoxLine className="size-4 text-primary" />
 						Histórico de Uso
 					</CardTitle>
 
 					{/* Card logo and name */}
-					<div className="flex items-center gap-2">
+					<div className="flex min-w-0 items-center gap-2">
 						{logoPath ? (
 							<Image
 								src={logoPath}
@@ -99,13 +99,13 @@ export function CardUsageChart({ data, limit, card }: CardUsageChartProps) {
 						) : (
 							<RiBankCard2Line className="size-5 text-muted-foreground" />
 						)}
-						<span className="text-sm font-medium text-muted-foreground">
+						<span className="max-w-24 truncate text-sm font-medium text-muted-foreground sm:max-w-none">
 							{card.name}
 						</span>
 					</div>
 				</div>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="px-2 sm:px-6">
 				<ChartContainer config={chartConfig} className="h-[280px] w-full">
 					<BarChart
 						data={chartData}

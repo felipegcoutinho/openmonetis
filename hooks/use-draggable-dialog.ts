@@ -10,10 +10,17 @@ function clampPosition(
 	elementWidth: number,
 	elementHeight: number,
 ): Position {
-	const maxX = window.innerWidth - MIN_VISIBLE_PX;
-	const minX = MIN_VISIBLE_PX - elementWidth;
-	const maxY = window.innerHeight - MIN_VISIBLE_PX;
-	const minY = MIN_VISIBLE_PX - elementHeight;
+	// Dialog starts centered (left/top 50% + translate(-50%, -50%)).
+	// Clamp offsets so at least MIN_VISIBLE_PX remains visible on each axis.
+	const halfViewportWidth = window.innerWidth / 2;
+	const halfViewportHeight = window.innerHeight / 2;
+	const halfElementWidth = elementWidth / 2;
+	const halfElementHeight = elementHeight / 2;
+
+	const minX = MIN_VISIBLE_PX - (halfViewportWidth + halfElementWidth);
+	const maxX = halfViewportWidth + halfElementWidth - MIN_VISIBLE_PX;
+	const minY = MIN_VISIBLE_PX - (halfViewportHeight + halfElementHeight);
+	const maxY = halfViewportHeight + halfElementHeight - MIN_VISIBLE_PX;
 
 	return {
 		x: Math.min(Math.max(x, minX), maxX),
@@ -21,11 +28,14 @@ function clampPosition(
 	};
 }
 
-function applyTranslate(el: HTMLElement, x: number, y: number) {
+function applyPosition(el: HTMLElement, x: number, y: number) {
 	if (x === 0 && y === 0) {
 		el.style.translate = "";
+		el.style.transform = "";
 	} else {
-		el.style.translate = `${x}px ${y}px`;
+		// Keep the dialog's centered baseline (-50%, -50%) and only add drag offset.
+		el.style.translate = `calc(-50% + ${x}px) calc(-50% + ${y}px)`;
+		el.style.transform = "";
 	}
 }
 
@@ -56,18 +66,28 @@ export function useDraggableDialog() {
 		const clamped = clampPosition(rawX, rawY, el.offsetWidth, el.offsetHeight);
 
 		offset.current = clamped;
-		applyTranslate(el, clamped.x, clamped.y);
+		applyPosition(el, clamped.x, clamped.y);
 	}, []);
 
 	const onPointerUp = useCallback((e: React.PointerEvent<HTMLElement>) => {
 		dragStart.current = null;
-		(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+		if ((e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId)) {
+			(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+		}
+	}, []);
+
+	const onPointerCancel = useCallback(() => {
+		dragStart.current = null;
+	}, []);
+
+	const onLostPointerCapture = useCallback(() => {
+		dragStart.current = null;
 	}, []);
 
 	const resetPosition = useCallback(() => {
 		offset.current = { x: 0, y: 0 };
 		if (contentRef.current) {
-			applyTranslate(contentRef.current, 0, 0);
+			applyPosition(contentRef.current, 0, 0);
 		}
 	}, []);
 
@@ -75,6 +95,8 @@ export function useDraggableDialog() {
 		onPointerDown,
 		onPointerMove,
 		onPointerUp,
+		onPointerCancel,
+		onLostPointerCapture,
 		style: { touchAction: "none" as const, cursor: "grab" },
 	};
 

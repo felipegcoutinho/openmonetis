@@ -64,6 +64,7 @@ export default function Calculator({
 				resultText={resultText}
 				copied={copied}
 				onCopy={copyToClipboard}
+				isResultView={Boolean(history)}
 			/>
 			<CalculatorKeypad buttons={buttons} activeOperator={operator} />
 			{onSelectValue && (

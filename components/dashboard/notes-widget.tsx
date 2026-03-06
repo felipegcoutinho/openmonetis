@@ -1,6 +1,6 @@
 "use client";
 
-import { RiEyeLine, RiPencilLine, RiTodoLine } from "@remixicon/react";
+import { RiFileList2Line, RiPencilLine, RiTodoLine } from "@remixicon/react";
 import { useCallback, useMemo, useState } from "react";
 import { NoteDetailsDialog } from "@/components/anotacoes/note-details-dialog";
 import { NoteDialog } from "@/components/anotacoes/note-dialog";
@@ -100,13 +100,10 @@ export function NotesWidget({ notes }: NotesWidgetProps) {
 										{buildDisplayTitle(note.title)}
 									</p>
 									<div className="mt-1 flex items-center gap-2">
-										<Badge
-											variant="secondary"
-											className="h-5 px-1.5 text-[10px]"
-										>
+										<Badge variant="outline" className="h-5 px-1.5 text-[10px]">
 											{getTasksSummary(note)}
 										</Badge>
-										<p className="truncate text-xs text-muted-foreground">
+										<p className="truncate text-[11px] text-muted-foreground">
 											{DATE_FORMATTER.format(new Date(note.createdAt))}
 										</p>
 									</div>
@@ -131,7 +128,7 @@ export function NotesWidget({ notes }: NotesWidgetProps) {
 											note.title,
 										)}`}
 									>
-										<RiEyeLine className="size-4" />
+										<RiFileList2Line className="size-4" />
 									</Button>
 								</div>
 							</li>

@@ -53,9 +53,9 @@ export function LancamentoDetailsDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 sm:max-w-xl">
-				<div className="gap-2 space-y-4 py-6">
-					<CardHeader className="flex flex-row items-start border-b">
+			<DialogContent className="p-0 sm:max-w-xl sm:border-0 sm:p-2">
+				<div className="gap-2 space-y-4 py-4">
+					<CardHeader className="flex flex-row items-start border-b sm:border-b-0">
 						<div>
 							<DialogTitle className="group flex items-center gap-2 text-lg">
 								#{lancamento.id}

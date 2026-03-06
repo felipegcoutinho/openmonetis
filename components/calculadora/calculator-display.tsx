@@ -1,5 +1,6 @@
 import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/ui";
 
 export type CalculatorDisplayProps = {
 	history: string | null;
@@ -7,6 +8,7 @@ export type CalculatorDisplayProps = {
 	resultText: string | null;
 	copied: boolean;
 	onCopy: () => void;
+	isResultView: boolean;
 };
 
 export function CalculatorDisplay({
@@ -15,14 +17,27 @@ export function CalculatorDisplay({
 	resultText,
 	copied,
 	onCopy,
+	isResultView,
 }: CalculatorDisplayProps) {
 	return (
-		<div className="rounded-xl border bg-muted px-4 py-5 text-right">
-			{history && (
-				<div className="text-sm text-muted-foreground">{history}</div>
-			)}
-			<div className="flex items-center justify-end gap-2">
-				<div className="text-right text-3xl font-semibold tracking-tight tabular-nums">
+		<div className="flex h-24 flex-col rounded-xl border bg-muted px-4 py-4 text-right">
+			<div className="min-h-5 truncate text-sm text-muted-foreground">
+				{history ?? (
+					<span
+						className="pointer-events-none opacity-0 select-none"
+						aria-hidden
+					>
+						0 + 0
+					</span>
+				)}
+			</div>
+			<div className="mt-auto flex items-end justify-end gap-2">
+				<div
+					className={cn(
+						"truncate text-right font-semibold tracking-tight tabular-nums leading-none transition-all",
+						isResultView ? "text-2xl" : "text-3xl",
+					)}
+				>
 					{expression}
 				</div>
 				{resultText && (

@@ -14,24 +14,31 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { widgetsConfig } from "@/lib/dashboard/widgets/widgets-config";
+import { cn } from "@/lib/utils";
 
 type WidgetSettingsDialogProps = {
 	hiddenWidgets: string[];
 	onToggleWidget: (widgetId: string) => void;
 	onReset: () => void;
+	triggerClassName?: string;
 };
 
 export function WidgetSettingsDialog({
 	hiddenWidgets,
 	onToggleWidget,
 	onReset,
+	triggerClassName,
 }: WidgetSettingsDialogProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline" size="sm" className="gap-2">
+				<Button
+					variant="outline"
+					size="sm"
+					className={cn("gap-2", triggerClassName)}
+				>
 					<RiSettings4Line className="size-4" />
 					Widgets
 				</Button>
