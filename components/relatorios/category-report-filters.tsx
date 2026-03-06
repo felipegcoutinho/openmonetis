@@ -18,7 +18,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { MonthPicker } from "@/components/ui/monthpicker";
+import { MonthPicker } from "@/components/ui/month-picker";
 import {
 	Popover,
 	PopoverContent,

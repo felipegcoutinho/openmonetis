@@ -17,12 +17,12 @@ import {
 	saveInsightsAction,
 } from "@/app/(dashboard)/insights/actions";
 import { DEFAULT_MODEL } from "@/app/(dashboard)/insights/data";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { InsightsResponse } from "@/lib/schemas/insights";
-import { EmptyState } from "../empty-state";
 import { InsightsGrid } from "./insights-grid";
 import { ModelSelector } from "./model-selector";
 

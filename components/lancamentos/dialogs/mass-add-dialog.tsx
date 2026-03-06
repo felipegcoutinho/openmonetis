@@ -15,7 +15,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { MonthPicker } from "@/components/ui/monthpicker";
+import { MonthPicker } from "@/components/ui/month-picker";
 import {
 	Popover,
 	PopoverContent,
@@ -36,7 +36,6 @@ import { groupAndSortCategorias } from "@/lib/lancamentos/categoria-helpers";
 import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
 import { getTodayDateString } from "@/lib/utils/date";
 import { displayPeriod } from "@/lib/utils/period";
-import type { SelectOption } from "../../types";
 import {
 	CategoriaSelectContent,
 	ContaCartaoSelectContent,
@@ -45,6 +44,7 @@ import {
 	TransactionTypeSelectContent,
 } from "../select-items";
 import { EstabelecimentoInput } from "../shared/estabelecimento-input";
+import type { SelectOption } from "../types";
 
 /** Payment methods sem Boleto para este modal */
 const MASS_ADD_PAYMENT_METHODS = LANCAMENTO_PAYMENT_METHODS.filter(

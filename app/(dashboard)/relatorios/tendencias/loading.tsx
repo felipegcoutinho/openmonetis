@@ -1,4 +1,4 @@
-import { CategoryReportSkeleton } from "@/components/skeletons/category-report-skeleton";
+import { CategoryReportSkeleton } from "@/components/shared/skeletons/category-report-skeleton";
 
 export default function Loading() {
 	return (

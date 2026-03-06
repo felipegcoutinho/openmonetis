@@ -3,7 +3,7 @@ import { cartoes, lancamentos, pagadores } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
-} from "@/lib/accounts/constants";
+} from "@/lib/contas/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
@@ -172,8 +172,5 @@ export async function fetchInstallmentAnalysis(
 		0,
 	);
 
-	return {
-		installmentGroups,
-		totalPendingInstallments,
-	};
+	return { installmentGroups, totalPendingInstallments };
 }

@@ -8,7 +8,7 @@ import {
 	duplicatePreviousMonthBudgetsAction,
 } from "@/app/(dashboard)/orcamentos/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
-import { EmptyState } from "@/components/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "../ui/card";
 import { BudgetCard } from "./budget-card";

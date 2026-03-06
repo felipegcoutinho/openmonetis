@@ -2,7 +2,9 @@
 
 import { RiDashboardLine, RiMenuLine } from "@remixicon/react";
 import { useState } from "react";
+import { CalculatorDialogContent } from "@/components/calculadora/calculator-dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -26,7 +28,9 @@ import { MobileTools, NavToolsDropdown } from "./nav-tools";
 
 export function NavMenu() {
 	const [sheetOpen, setSheetOpen] = useState(false);
+	const [calculatorOpen, setCalculatorOpen] = useState(false);
 	const close = () => setSheetOpen(false);
+	const openCalculator = () => setCalculatorOpen(true);
 
 	return (
 		<>
@@ -56,7 +60,7 @@ export function NavMenu() {
 								Ferramentas
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
-								<NavToolsDropdown />
+								<NavToolsDropdown onOpenCalculator={openCalculator} />
 							</NavigationMenuContent>
 						</NavigationMenuItem>
 					</NavigationMenuList>
@@ -114,10 +118,14 @@ export function NavMenu() {
 						})}
 
 						<MobileSectionLabel label="Ferramentas" />
-						<MobileTools onClose={close} />
+						<MobileTools onClose={close} onOpenCalculator={openCalculator} />
 					</nav>
 				</SheetContent>
 			</Sheet>
+
+			<Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
+				<CalculatorDialogContent open={calculatorOpen} />
+			</Dialog>
 		</>
 	);
 }

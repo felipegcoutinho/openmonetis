@@ -17,7 +17,7 @@ import { categorias, contas, lancamentos, pagadores } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
-} from "@/lib/accounts/constants";
+} from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
 import { safeToNumber } from "@/lib/utils/number";

@@ -10,15 +10,15 @@ import {
 	lancamentos,
 	pagadores,
 } from "@/db/schema";
+import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
+import type { ActionResult } from "@/lib/actions/types";
+import { getUser } from "@/lib/auth/server";
 import {
 	INITIAL_BALANCE_CONDITION,
 	INITIAL_BALANCE_NOTE,
 	INITIAL_BALANCE_PAYMENT_METHOD,
 	INITIAL_BALANCE_TRANSACTION_TYPE,
-} from "@/lib/accounts/constants";
-import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
-import type { ActionResult } from "@/lib/actions/types";
-import { getUser } from "@/lib/auth/server";
+} from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import {
 	LANCAMENTO_CONDITIONS,

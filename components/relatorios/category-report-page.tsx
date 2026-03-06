@@ -7,8 +7,8 @@ import {
 } from "@remixicon/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState, useTransition } from "react";
-import { EmptyState } from "@/components/empty-state";
-import { CategoryReportSkeleton } from "@/components/skeletons/category-report-skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CategoryReportSkeleton } from "@/components/shared/skeletons/category-report-skeleton";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CategoryChartData } from "@/lib/relatorios/fetch-category-chart-data";

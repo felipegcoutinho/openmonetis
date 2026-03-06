@@ -1,6 +1,6 @@
 import { and, desc, eq, type SQL, sum } from "drizzle-orm";
 import { cartoes, faturas, lancamentos } from "@/db/schema";
-import { buildInvoicePaymentNote } from "@/lib/accounts/constants";
+import { buildInvoicePaymentNote } from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import {
 	INVOICE_PAYMENT_STATUS,

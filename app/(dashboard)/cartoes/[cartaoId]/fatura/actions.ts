@@ -9,9 +9,9 @@ import {
 	lancamentos,
 	pagadores,
 } from "@/db/schema";
-import { buildInvoicePaymentNote } from "@/lib/accounts/constants";
 import { revalidateForEntity } from "@/lib/actions/helpers";
 import { getUser } from "@/lib/auth/server";
+import { buildInvoicePaymentNote } from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import {
 	INVOICE_PAYMENT_STATUS,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
-import { MonthPicker } from "@/components/ui/monthpicker";
+import { MonthPicker } from "@/components/ui/month-picker";
 import {
 	Popover,
 	PopoverContent,

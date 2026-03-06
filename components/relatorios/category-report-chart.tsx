@@ -9,7 +9,7 @@ import {
 	type TooltipProps,
 	XAxis,
 } from "recharts";
-import { EmptyState } from "@/components/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import {
 	Card,
 	CardContent,

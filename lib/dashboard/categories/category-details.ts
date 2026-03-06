@@ -1,10 +1,10 @@
 import { and, desc, eq, isNull, ne, or, sql } from "drizzle-orm";
 import { categorias, contas, lancamentos, pagadores } from "@/db/schema";
+import type { CategoryType } from "@/lib/categorias/constants";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
-} from "@/lib/accounts/constants";
-import type { CategoryType } from "@/lib/categorias/constants";
+} from "@/lib/contas/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { mapLancamentosData } from "@/lib/lancamentos/page-helpers";

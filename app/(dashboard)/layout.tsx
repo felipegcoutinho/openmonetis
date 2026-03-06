@@ -1,5 +1,5 @@
 import { FontProvider } from "@/components/font-provider";
-import { AppNavbar } from "@/components/navbar/app-navbar";
+import { AppNavbar } from "@/components/navigation/navbar/app-navbar";
 import { PrivacyProvider } from "@/components/privacy-provider";
 import { getUserSession } from "@/lib/auth/server";
 import { fetchDashboardNotifications } from "@/lib/dashboard/notifications";

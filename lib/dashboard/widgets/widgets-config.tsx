@@ -17,11 +17,11 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BoletosWidget } from "@/components/dashboard/boletos-widget";
+import { InstallmentExpensesWidget } from "@/components/dashboard/installment-expenses-widget";
 import { ExpensesByCategoryWidgetWithChart } from "@/components/dashboard/expenses-by-category-widget-with-chart";
 import { GoalsProgressWidget } from "@/components/dashboard/goals-progress-widget";
 import { IncomeByCategoryWidgetWithChart } from "@/components/dashboard/income-by-category-widget-with-chart";
 import { IncomeExpenseBalanceWidget } from "@/components/dashboard/income-expense-balance-widget";
-import { InstallmentExpensesWidget } from "@/components/dashboard/installment-expenses-widget";
 import { InvoicesWidget } from "@/components/dashboard/invoices-widget";
 import { MyAccountsWidget } from "@/components/dashboard/my-accounts-widget";
 import { NotesWidget } from "@/components/dashboard/notes-widget";
@@ -31,7 +31,7 @@ import { PaymentStatusWidget } from "@/components/dashboard/payment-status-widge
 import { PurchasesByCategoryWidget } from "@/components/dashboard/purchases-by-category-widget";
 import { RecurringExpensesWidget } from "@/components/dashboard/recurring-expenses-widget";
 import { SpendingOverviewWidget } from "@/components/dashboard/spending-overview-widget";
-import type { DashboardData } from "./fetch-dashboard-data";
+import type { DashboardData } from "../fetch-dashboard-data";
 
 export type WidgetConfig = {
 	id: string;
@@ -172,15 +172,6 @@ export const widgetsConfig: WidgetConfig[] = [
 		icon: <RiNumbersLine className="size-4" />,
 		component: ({ data }) => (
 			<InstallmentExpensesWidget data={data.installmentExpensesData} />
-		),
-		action: (
-			<Link
-				href="/dashboard/analise-parcelas"
-				className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-			>
-				Análise
-				<RiArrowRightLine className="size-4" />
-			</Link>
 		),
 	},
 	{

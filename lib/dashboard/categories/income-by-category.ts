@@ -3,7 +3,7 @@ import { categorias, contas, lancamentos, orcamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
-} from "@/lib/accounts/constants";
+} from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 import { calculatePercentageChange } from "@/lib/utils/math";

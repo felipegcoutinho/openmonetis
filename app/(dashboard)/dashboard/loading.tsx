@@ -1,10 +1,6 @@
-import { DashboardGridSkeleton } from "@/components/skeletons";
+import { DashboardGridSkeleton } from "@/components/shared/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
 
-/**
- * Loading state para a página do dashboard
- * Estrutura: Welcome Banner → Month Picker → Section Cards → Widget Grid
- */
 export default function DashboardLoading() {
 	return (
 		<main className="flex flex-col gap-4">

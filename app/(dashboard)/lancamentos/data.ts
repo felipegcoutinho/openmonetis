@@ -6,7 +6,7 @@ import {
 	lancamentos,
 	pagadores,
 } from "@/db/schema";
-import { INITIAL_BALANCE_NOTE } from "@/lib/accounts/constants";
+import { INITIAL_BALANCE_NOTE } from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 
 export async function fetchLancamentos(filters: SQL[]) {

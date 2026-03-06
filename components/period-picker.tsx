@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MonthPicker } from "@/components/ui/monthpicker";
+import { MonthPicker } from "@/components/ui/month-picker";
 import {
 	Popover,
 	PopoverContent,

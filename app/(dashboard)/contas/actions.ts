@@ -4,18 +4,18 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { categorias, contas, lancamentos, pagadores } from "@/db/schema";
 import {
-	INITIAL_BALANCE_CATEGORY_NAME,
-	INITIAL_BALANCE_CONDITION,
-	INITIAL_BALANCE_NOTE,
-	INITIAL_BALANCE_PAYMENT_METHOD,
-	INITIAL_BALANCE_TRANSACTION_TYPE,
-} from "@/lib/accounts/constants";
-import {
 	type ActionResult,
 	handleActionError,
 	revalidateForEntity,
 } from "@/lib/actions/helpers";
 import { getUser } from "@/lib/auth/server";
+import {
+	INITIAL_BALANCE_CATEGORY_NAME,
+	INITIAL_BALANCE_CONDITION,
+	INITIAL_BALANCE_NOTE,
+	INITIAL_BALANCE_PAYMENT_METHOD,
+	INITIAL_BALANCE_TRANSACTION_TYPE,
+} from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
 import { noteSchema, uuidSchema } from "@/lib/schemas/common";

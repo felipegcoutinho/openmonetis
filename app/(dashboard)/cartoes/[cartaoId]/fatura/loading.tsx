@@ -2,7 +2,7 @@ import {
 	FilterSkeleton,
 	InvoiceSummaryCardSkeleton,
 	TransactionsTableSkeleton,
-} from "@/components/skeletons";
+} from "@/components/shared/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**

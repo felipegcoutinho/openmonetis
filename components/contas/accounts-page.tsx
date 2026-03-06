@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { deleteAccountAction } from "@/app/(dashboard)/contas/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { AccountCard } from "@/components/contas/account-card";
-import { EmptyState } from "@/components/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrentPeriod } from "@/lib/utils/period";

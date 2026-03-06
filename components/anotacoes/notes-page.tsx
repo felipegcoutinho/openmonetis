@@ -8,7 +8,7 @@ import {
 	deleteNoteAction,
 } from "@/app/(dashboard)/anotacoes/actions";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
-import { EmptyState } from "@/components/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "../ui/card";

@@ -8,6 +8,7 @@ import {
 	RiFileChartLine,
 	RiGroupLine,
 	RiPriceTag3Line,
+	RiSecurePaymentLine,
 	RiSparklingLine,
 	RiStore2Line,
 	RiTodoLine,
@@ -110,6 +111,11 @@ export const NAV_SECTIONS: NavSection[] = [
 				label: "uso de cartões",
 				icon: <RiBankCard2Line className="size-4" />,
 				preservePeriod: true,
+			},
+			{
+				href: "/relatorios/analise-parcelas",
+				label: "análise de parcelas",
+				icon: <RiSecurePaymentLine className="size-4" />,
 			},
 			{
 				href: "/relatorios/estabelecimentos",

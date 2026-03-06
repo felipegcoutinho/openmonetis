@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { FeedbackDialogBody } from "@/components/feedback/feedback-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
 	DropdownMenu,
@@ -24,7 +25,6 @@ import { authClient } from "@/lib/auth/client";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { cn } from "@/lib/utils/ui";
 import { version } from "@/package.json";
-import { Badge } from "../ui/badge";
 
 const itemClass =
 	"flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent";

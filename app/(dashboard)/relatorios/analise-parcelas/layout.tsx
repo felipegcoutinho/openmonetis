@@ -1,5 +1,5 @@
 import { RiSecurePaymentLine } from "@remixicon/react";
-import PageDescription from "@/components/page-description";
+import PageDescription from "@/components/shared/page-description";
 
 export const metadata = {
 	title: "Análise de Parcelas | OpenMonetis",

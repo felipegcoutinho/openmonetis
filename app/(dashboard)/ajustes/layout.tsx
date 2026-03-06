@@ -1,5 +1,5 @@
 import { RiSettings2Line } from "@remixicon/react";
-import PageDescription from "@/components/page-description";
+import PageDescription from "@/components/shared/page-description";
 
 export const metadata = {
 	title: "Ajustes | OpenMonetis",

@@ -1,14 +1,14 @@
-import { EstablishmentsList } from "@/components/top-estabelecimentos/establishments-list";
-import { HighlightsCards } from "@/components/top-estabelecimentos/highlights-cards";
-import { PeriodFilterButtons } from "@/components/top-estabelecimentos/period-filter";
-import { SummaryCards } from "@/components/top-estabelecimentos/summary-cards";
-import { TopCategories } from "@/components/top-estabelecimentos/top-categories";
+import { EstablishmentsList } from "@/components/relatorios/estabelecimentos/establishments-list";
+import { HighlightsCards } from "@/components/relatorios/estabelecimentos/highlights-cards";
+import { PeriodFilterButtons } from "@/components/relatorios/estabelecimentos/period-filter";
+import { SummaryCards } from "@/components/relatorios/estabelecimentos/summary-cards";
+import { TopCategories } from "@/components/relatorios/estabelecimentos/top-categories";
 import { Card } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/server";
 import {
 	fetchTopEstabelecimentosData,
 	type PeriodFilter,
-} from "@/lib/top-estabelecimentos/fetch-data";
+} from "@/lib/relatorios/estabelecimentos/fetch-data";
 import { parsePeriodParam } from "@/lib/utils/period";
 
 type PageSearchParams = Promise<Record<string, string | string[] | undefined>>;

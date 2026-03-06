@@ -3,7 +3,7 @@ import { lancamentos } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
-} from "@/lib/accounts/constants";
+} from "@/lib/contas/constants";
 import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
@@ -65,9 +65,11 @@ export async function fetchInstallmentExpenses(
 		)
 		.orderBy(desc(lancamentos.purchaseDate), desc(lancamentos.createdAt));
 
+	type InstallmentExpenseRow = (typeof rows)[number];
+
 	const expenses = rows
 		.map(
-			(row): InstallmentExpense => ({
+			(row: InstallmentExpenseRow): InstallmentExpense => ({
 				id: row.id,
 				name: row.name,
 				amount: Math.abs(toNumber(row.amount)),
@@ -79,7 +81,7 @@ export async function fetchInstallmentExpenses(
 				period: row.period,
 			}),
 		)
-		.sort((a, b) => {
+		.sort((a: InstallmentExpense, b: InstallmentExpense) => {
 			// Calcula parcelas restantes para cada item
 			const remainingA =
 				a.installmentCount && a.currentInstallment
@@ -94,7 +96,5 @@ export async function fetchInstallmentExpenses(
 			return remainingA - remainingB;
 		});
 
-	return {
-		expenses,
-	};
+	return { expenses };
 }

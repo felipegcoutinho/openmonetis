@@ -1,6 +1,6 @@
 import { and, eq, ilike, not, sql } from "drizzle-orm";
 import { contas, lancamentos, pagadores } from "@/db/schema";
-import { INITIAL_BALANCE_NOTE } from "@/lib/accounts/constants";
+import { INITIAL_BALANCE_NOTE } from "@/lib/contas/constants";
 import { db } from "@/lib/db";
 import { loadLogoOptions } from "@/lib/logo/options";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
