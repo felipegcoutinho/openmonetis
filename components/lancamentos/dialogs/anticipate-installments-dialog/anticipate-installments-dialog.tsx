@@ -60,7 +60,7 @@ interface AnticipateInstallmentsDialogProps {
 
 type AnticipationFormValues = {
 	anticipationPeriod: string;
-	discount: number;
+	discount: string;
 	pagadorId: string;
 	categoriaId: string;
 	note: string;
@@ -95,7 +95,7 @@ export function AnticipateInstallmentsDialog({
 	const { formState, updateField, setFormState } =
 		useFormState<AnticipationFormValues>({
 			anticipationPeriod: defaultPeriod,
-			discount: 0,
+			discount: "0",
 			pagadorId: "",
 			categoriaId: "",
 			note: "",
@@ -110,23 +110,25 @@ export function AnticipateInstallmentsDialog({
 
 			getEligibleInstallmentsAction(seriesId)
 				.then((result) => {
-					if (result.success && result.data) {
-						setEligibleInstallments(result.data);
-
-						// Pré-preencher pagador e categoria da primeira parcela
-						if (result.data.length > 0) {
-							const first = result.data[0];
-							setFormState({
-								anticipationPeriod: defaultPeriod,
-								discount: 0,
-								pagadorId: first.pagadorId ?? "",
-								categoriaId: first.categoriaId ?? "",
-								note: "",
-							});
-						}
-					} else {
+					if (!result.success) {
 						toast.error(result.error || "Erro ao carregar parcelas");
 						setEligibleInstallments([]);
+						return;
+					}
+
+					const installments = result.data ?? [];
+					setEligibleInstallments(installments);
+
+					// Pré-preencher pagador e categoria da primeira parcela
+					if (installments.length > 0) {
+						const first = installments[0];
+						setFormState({
+							anticipationPeriod: defaultPeriod,
+							discount: "0",
+							pagadorId: first.pagadorId ?? "",
+							categoriaId: first.categoriaId ?? "",
+							note: "",
+						});
 					}
 				})
 				.catch((error) => {
@@ -268,9 +270,7 @@ export function AnticipateInstallmentsDialog({
 									<CurrencyInput
 										id="anticipation-discount"
 										value={formState.discount}
-										onValueChange={(value) =>
-											updateField("discount", value ?? 0)
-										}
+										onValueChange={(value) => updateField("discount", value)}
 										placeholder="R$ 0,00"
 										disabled={isPending}
 									/>

@@ -71,9 +71,6 @@ export function formatPurchaseDate(date: Date): string {
  * Formata o texto da parcela atual
  * Exemplo: "1 de 6"
  */
-export function formatCurrentInstallment(
-	current: number,
-	total: number,
-): string {
+export function formatCurrentInstallment(current: number, total: number): string {
 	return `${current} de ${total}`;
 }

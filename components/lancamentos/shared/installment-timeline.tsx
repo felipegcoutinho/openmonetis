@@ -1,9 +1,9 @@
 import { RiArrowDownFill, RiCheckLine } from "@remixicon/react";
 import {
 	calculateLastInstallmentDate,
-	formatCurrentInstallment,
-	formatLastInstallmentDate,
 	formatPurchaseDate,
+	formatLastInstallmentDate,
+	formatCurrentInstallment,
 } from "@/lib/installments/utils";
 
 type InstallmentTimelineProps = {

@@ -59,14 +59,15 @@ export function AnticipationHistoryDialog({
 		try {
 			const result = await getInstallmentAnticipationsAction(seriesId);
 
-			if (result.success && result.data) {
-				setAnticipations(result.data);
-			} else {
+			if (!result.success) {
 				toast.error(
 					result.error || "Erro ao carregar histórico de antecipações",
 				);
 				setAnticipations([]);
+				return;
 			}
+
+			setAnticipations(result.data ?? []);
 		} catch (error) {
 			console.error("Erro ao buscar antecipações:", error);
 			toast.error("Erro ao carregar histórico de antecipações");

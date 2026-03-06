@@ -17,10 +17,10 @@ import {
 	generateAnticipationNote,
 } from "@/lib/installments/anticipation-helpers";
 import type {
+	InstallmentAnticipationWithRelations,
 	CancelAnticipationInput,
 	CreateAnticipationInput,
 	EligibleInstallment,
-	InstallmentAnticipationWithRelations,
 } from "@/lib/installments/anticipation-types";
 import { uuidSchema } from "@/lib/schemas/common";
 import { formatDecimalForDbRequired } from "@/lib/utils/currency";
@@ -94,7 +94,7 @@ export async function getEligibleInstallmentsAction(
 			},
 		});
 
-		const eligibleInstallments: EligibleInstallment[] = rows.map((row) => ({
+		const eligibleInstallments: EligibleInstallment[] = rows.map((row: any) => ({
 			id: row.id,
 			name: row.name,
 			amount: row.amount,
@@ -110,10 +110,11 @@ export async function getEligibleInstallmentsAction(
 
 		return {
 			success: true,
+			message: "Parcelas elegíveis carregadas.",
 			data: eligibleInstallments,
 		};
 	} catch (error) {
-		return handleActionError(error);
+		return handleActionError(error) as ActionResult<EligibleInstallment[]>;
 	}
 }
 
@@ -154,7 +155,7 @@ export async function createInstallmentAnticipationAction(
 
 		// 2. Calcular valor total
 		const totalAmountCents = installments.reduce(
-			(sum, inst) => sum + Number(inst.amount) * 100,
+			(sum: number, inst: any) => sum + Number(inst.amount) * 100,
 			0,
 		);
 		const totalAmount = totalAmountCents / 100;
@@ -181,7 +182,7 @@ export async function createInstallmentAnticipationAction(
 		const firstInstallment = installments[0];
 
 		// 4. Criar lançamento e antecipação em transação
-		await db.transaction(async (tx) => {
+		await db.transaction(async (tx: any) => {
 			// 4.1. Criar o lançamento de antecipação (com desconto aplicado)
 			const [newLancamento] = await tx
 				.insert(lancamentos)
@@ -205,7 +206,7 @@ export async function createInstallmentAnticipationAction(
 					note:
 						data.note ||
 						generateAnticipationNote(
-							installments.map((inst) => ({
+							installments.map((inst: any) => ({
 								id: inst.id,
 								name: inst.name,
 								amount: inst.amount,
@@ -329,10 +330,13 @@ export async function getInstallmentAnticipationsAction(
 
 		return {
 			success: true,
+			message: "Antecipações carregadas.",
 			data: anticipations,
 		};
 	} catch (error) {
-		return handleActionError(error);
+		return handleActionError(
+			error,
+		) as ActionResult<InstallmentAnticipationWithRelations[]>;
 	}
 }
 
@@ -347,7 +351,7 @@ export async function cancelInstallmentAnticipationAction(
 		const user = await getUser();
 		const data = cancelAnticipationSchema.parse(input);
 
-		await db.transaction(async (tx) => {
+		await db.transaction(async (tx: any) => {
 			// 1. Buscar antecipação usando query builder
 			const anticipationRows = await tx
 				.select({
@@ -469,9 +473,12 @@ export async function getAnticipationDetailsAction(
 
 		return {
 			success: true,
+			message: "Detalhes da antecipação carregados.",
 			data: anticipation,
 		};
 	} catch (error) {
-		return handleActionError(error);
+		return handleActionError(
+			error,
+		) as ActionResult<InstallmentAnticipationWithRelations>;
 	}
 }

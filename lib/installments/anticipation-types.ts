@@ -38,6 +38,7 @@ export type CreateAnticipationInput = {
 	seriesId: string;
 	installmentIds: string[];
 	anticipationPeriod: string;
+	discount?: number;
 	pagadorId?: string;
 	categoriaId?: string;
 	note?: string;

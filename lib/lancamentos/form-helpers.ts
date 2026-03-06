@@ -12,7 +12,7 @@ import {
  * and due day. The period represents the month the fatura is due (vencimento).
  *
  * Steps:
- * 1. If purchase day > closing day → the purchase missed this month's closing,
+ * 1. If purchase day >= closing day → the purchase missed this month's closing,
  *    so it enters the NEXT month's billing cycle (+1 month from purchase).
  * 2. Then, if dueDay < closingDay, the due date falls in the month AFTER the
  *    closing month (e.g., closes 22nd, due 1st → closes Mar/22, due Apr/1),
@@ -25,6 +25,7 @@ import {
  *
  * // Card closes day 5, due day 15 (dueDay >= closingDay → no extra)
  * deriveCreditCardPeriod("2026-02-10", "5", "15")  // "2026-03" (missed Feb closing → Mar cycle → due Mar)
+ * deriveCreditCardPeriod("2026-02-05", "5", "15")  // "2026-03" (closing day itself already goes to next cycle)
  * deriveCreditCardPeriod("2026-02-03", "5", "15")  // "2026-02" (in Feb cycle → due Feb)
  */
 export function deriveCreditCardPeriod(
@@ -44,8 +45,8 @@ export function deriveCreditCardPeriod(
 	// Start with the purchase month as the billing cycle
 	let period = basePeriod;
 
-	// If purchase is after closing day, it enters the next billing cycle
-	if (purchaseDayNum > closingDayNum) {
+	// If purchase is on/after closing day, it enters the next billing cycle
+	if (purchaseDayNum >= closingDayNum) {
 		period = getNextPeriod(period);
 	}
 
