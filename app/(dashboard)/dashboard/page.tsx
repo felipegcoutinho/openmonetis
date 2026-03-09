@@ -1,6 +1,6 @@
 import { DashboardGridEditable } from "@/components/dashboard/dashboard-grid-editable";
+import { DashboardMetricsCards } from "@/components/dashboard/dashboard-metrics-cards";
 import { DashboardWelcome } from "@/components/dashboard/dashboard-welcome";
-import { SectionCards } from "@/components/dashboard/section-cards";
 import MonthNavigation from "@/components/month-picker/month-navigation";
 import { getUser } from "@/lib/auth/server";
 import { fetchDashboardData } from "@/lib/dashboard/fetch-dashboard-data";
@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: PageProps) {
 			fetchLancamentoFilterSources(user.id),
 			getRecentEstablishmentsAction(),
 		]);
-	const { disableMagnetlines, dashboardWidgets } = preferences;
+	const { dashboardWidgets } = preferences;
 	const sluggedFilters = buildSluggedFilters(filterSources);
 	const {
 		pagadorOptions,
@@ -57,12 +57,9 @@ export default async function Page({ searchParams }: PageProps) {
 
 	return (
 		<main className="flex flex-col gap-4">
-			<DashboardWelcome
-				name={user.name}
-				disableMagnetlines={disableMagnetlines}
-			/>
+			<DashboardWelcome name={user.name} />
 			<MonthNavigation />
-			<SectionCards metrics={dashboardData.metrics} />
+			<DashboardMetricsCards metrics={dashboardData.metrics} />
 			<DashboardGridEditable
 				data={dashboardData}
 				period={selectedPeriod}

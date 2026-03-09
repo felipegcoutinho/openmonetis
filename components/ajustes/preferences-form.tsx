@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updatePreferencesAction } from "@/app/(dashboard)/ajustes/actions";
-import { useFont } from "@/components/font-provider";
+import { useFont } from "@/components/providers/font-provider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -39,7 +39,6 @@ import {
 import { FONT_OPTIONS } from "@/public/fonts/font_index";
 
 interface PreferencesFormProps {
-	disableMagnetlines: boolean;
 	extratoNoteAsColumn: boolean;
 	lancamentosColumnOrder: string[] | null;
 	systemFont: string;
@@ -84,7 +83,6 @@ function SortableColumnItem({ id }: { id: string }) {
 }
 
 export function PreferencesForm({
-	disableMagnetlines,
 	extratoNoteAsColumn: initialExtratoNoteAsColumn,
 	lancamentosColumnOrder: initialColumnOrder,
 	systemFont: initialSystemFont,
@@ -92,8 +90,6 @@ export function PreferencesForm({
 }: PreferencesFormProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
-	const [magnetlinesDisabled, setMagnetlinesDisabled] =
-		useState(disableMagnetlines);
 	const [extratoNoteAsColumn, setExtratoNoteAsColumn] = useState(
 		initialExtratoNoteAsColumn,
 	);
@@ -138,7 +134,6 @@ export function PreferencesForm({
 
 		startTransition(async () => {
 			const result = await updatePreferencesAction({
-				disableMagnetlines: magnetlinesDisabled,
 				extratoNoteAsColumn,
 				lancamentosColumnOrder: columnOrder,
 				systemFont: selectedSystemFont,
@@ -271,35 +266,6 @@ export function PreferencesForm({
 							</div>
 						</SortableContext>
 					</DndContext>
-				</div>
-			</section>
-
-			<div className="border-b" />
-
-			{/* Seção: Dashboard */}
-			<section className="space-y-4">
-				<div>
-					<h3 className="text-base font-semibold">Dashboard</h3>
-					<p className="text-sm text-muted-foreground">
-						Opções que afetam a experiência no painel principal.
-					</p>
-				</div>
-
-				<div className="flex items-center justify-between rounded-lg border p-4 max-w-md">
-					<div className="space-y-0.5">
-						<Label htmlFor="magnetlines" className="text-base">
-							Desabilitar Magnetlines
-						</Label>
-						<p className="text-sm text-muted-foreground">
-							Remove o recurso de linhas magnéticas do sistema.
-						</p>
-					</div>
-					<Switch
-						id="magnetlines"
-						checked={magnetlinesDisabled}
-						onCheckedChange={setMagnetlinesDisabled}
-						disabled={isPending}
-					/>
 				</div>
 			</section>
 

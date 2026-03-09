@@ -1,8 +1,8 @@
 import { and, eq, ne, sql } from "drizzle-orm";
 import { categorias, lancamentos, orcamentos } from "@/db/schema";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 const BUDGET_CRITICAL_THRESHOLD = 80;
 

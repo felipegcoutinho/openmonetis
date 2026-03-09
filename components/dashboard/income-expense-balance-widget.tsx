@@ -2,14 +2,15 @@
 
 import { RiLineChartLine } from "@remixicon/react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { CardContent } from "@/components/ui/card";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 } from "@/components/ui/chart";
-import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { IncomeExpenseBalanceData } from "@/lib/dashboard/income-expense-balance";
+import { formatCurrency } from "@/lib/utils/currency";
 
 type IncomeExpenseBalanceWidgetProps = {
 	data: IncomeExpenseBalanceData;
@@ -80,15 +81,6 @@ export function IncomeExpenseBalanceWidget({
 								return null;
 							}
 
-							const formatCurrency = (value: number) => {
-								return new Intl.NumberFormat("pt-BR", {
-									style: "currency",
-									currency: "BRL",
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								}).format(value);
-							};
-
 							return (
 								<div className="rounded-lg border bg-background p-2 shadow-sm">
 									<div className="grid gap-2">
@@ -103,7 +95,7 @@ export function IncomeExpenseBalanceWidget({
 													className="flex items-center gap-2"
 												>
 													<div
-														className="h-3 w-3 rounded-full"
+														className="size-2 rounded-full"
 														style={{ backgroundColor: config?.color }}
 													/>
 													<span className="text-xs text-muted-foreground">
@@ -144,7 +136,7 @@ export function IncomeExpenseBalanceWidget({
 			<div className="flex items-center justify-center gap-6">
 				<div className="flex items-center gap-2">
 					<div
-						className="h-3 w-3 rounded-full"
+						className="size-2 rounded-full"
 						style={{ backgroundColor: chartConfig.receita.color }}
 					/>
 					<span className="text-sm text-muted-foreground">
@@ -153,7 +145,7 @@ export function IncomeExpenseBalanceWidget({
 				</div>
 				<div className="flex items-center gap-2">
 					<div
-						className="h-3 w-3 rounded-full"
+						className="size-2 rounded-full"
 						style={{ backgroundColor: chartConfig.despesa.color }}
 					/>
 					<span className="text-sm text-muted-foreground">
@@ -162,7 +154,7 @@ export function IncomeExpenseBalanceWidget({
 				</div>
 				<div className="flex items-center gap-2">
 					<div
-						className="h-3 w-3 rounded-full"
+						className="size-2 rounded-full"
 						style={{ backgroundColor: chartConfig.balanco.color }}
 					/>
 					<span className="text-sm text-muted-foreground">

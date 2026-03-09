@@ -127,7 +127,6 @@ export const preferenciasUsuario = pgTable("preferencias_usuario", {
 		.notNull()
 		.unique()
 		.references(() => user.id, { onDelete: "cascade" }),
-	disableMagnetlines: boolean("disable_magnetlines").notNull().default(false),
 	extratoNoteAsColumn: boolean("extrato_note_as_column")
 		.notNull()
 		.default(false),

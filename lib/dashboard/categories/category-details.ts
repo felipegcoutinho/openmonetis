@@ -5,10 +5,10 @@ import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { mapLancamentosData } from "@/lib/lancamentos/page-helpers";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 import { getPreviousPeriod } from "@/lib/utils/period";
 
 type MappedLancamentos = ReturnType<typeof mapLancamentosData>;

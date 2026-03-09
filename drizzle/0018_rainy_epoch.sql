@@ -1,0 +1,1 @@
+ALTER TABLE "preferencias_usuario" DROP COLUMN "disable_magnetlines";

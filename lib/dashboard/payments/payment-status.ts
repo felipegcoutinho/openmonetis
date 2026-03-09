@@ -1,9 +1,12 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, inArray, sql } from "drizzle-orm";
 import { lancamentos } from "@/db/schema";
-import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
+import {
+	buildDashboardAdminPeriodFilters,
+	excludeAutoInvoiceEntries,
+} from "@/lib/dashboard/lancamento-filters";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 export type PaymentStatusCategory = {
 	total: number;
@@ -51,11 +54,13 @@ export async function fetchPaymentStatus(
 		.from(lancamentos)
 		.where(
 			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.period, period),
-				eq(lancamentos.pagadorId, adminPagadorId),
+				...buildDashboardAdminPeriodFilters({
+					userId,
+					period,
+					adminPagadorId,
+				}),
 				inArray(lancamentos.transactionType, ["Receita", "Despesa"]),
-				sql`(${lancamentos.note} IS NULL OR ${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`})`,
+				excludeAutoInvoiceEntries(),
 			),
 		)
 		.groupBy(lancamentos.transactionType);

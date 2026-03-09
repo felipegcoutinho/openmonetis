@@ -7,6 +7,7 @@ import {
 	RiIncreaseDecreaseLine,
 	RiSubtractLine,
 } from "@remixicon/react";
+import MoneyValues from "@/components/shared/money-values";
 import {
 	Card,
 	CardAction,
@@ -14,10 +15,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import type { DashboardCardMetrics } from "@/lib/dashboard/metrics";
-import MoneyValues from "../money-values";
+import type { DashboardCardMetrics } from "@/lib/dashboard/dashboard-metrics";
+import { formatPercentage } from "@/lib/utils/percentage";
 
-type SectionCardsProps = {
+type DashboardMetricsCardsProps = {
 	metrics: DashboardCardMetrics;
 };
 
@@ -70,7 +71,11 @@ const getPercentChange = (current: number, previous: number): string => {
 
 	const change = ((current - previous) / Math.abs(previous)) * 100;
 	return Number.isFinite(change) && Math.abs(change) < 1000000
-		? `${change > 0 ? "+" : ""}${change.toFixed(1)}%`
+		? formatPercentage(change, {
+				maximumFractionDigits: 1,
+				minimumFractionDigits: 1,
+				signDisplay: "always",
+			})
 		: "—";
 };
 
@@ -82,7 +87,7 @@ const getTrendColor = (trend: Trend, invertTrend: boolean): string => {
 		: "text-destructive border-destructive";
 };
 
-export function SectionCards({ metrics }: SectionCardsProps) {
+export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 	return (
 		<div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
 			{CARDS.map(({ label, key, icon: Icon, invertTrend }) => {
@@ -94,8 +99,8 @@ export function SectionCards({ metrics }: SectionCardsProps) {
 				return (
 					<Card key={label} className="@container/card gap-2">
 						<CardHeader>
-							<CardTitle className="flex items-center gap-1">
-								<Icon className="size-4 text-primary" />
+							<CardTitle className="flex items-center gap-1 font-[aeonik]	tracking-tighter lowercase">
+								<Icon className="size-4" />
 								{label}
 							</CardTitle>
 							<MoneyValues className="text-2xl" amount={metric.current} />
@@ -108,9 +113,9 @@ export function SectionCards({ metrics }: SectionCardsProps) {
 						</CardHeader>
 						<CardFooter className="flex-col items-start gap-2 text-sm">
 							<div className="line-clamp-1 flex gap-2 text-xs">
-								Mês anterior
+								mês anterior
 							</div>
-							<div className="text-muted-foreground">
+							<div className="text-foreground">
 								<MoneyValues amount={metric.previous} />
 							</div>
 						</CardFooter>

@@ -1,9 +1,9 @@
 import { and, eq, sql } from "drizzle-orm";
 import { contas, lancamentos, pagadores } from "@/db/schema";
 import { INITIAL_BALANCE_NOTE } from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 type RawDashboardAccount = {
 	id: string;

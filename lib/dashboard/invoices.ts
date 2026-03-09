@@ -1,13 +1,14 @@
 import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import { cartoes, faturas, lancamentos, pagadores } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import {
 	INVOICE_PAYMENT_STATUS,
 	INVOICE_STATUS_VALUES,
 	type InvoicePaymentStatus,
 } from "@/lib/faturas";
+import { toDateOnlyString } from "@/lib/utils/date";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 type RawDashboardInvoice = {
 	invoiceId: string | null;
@@ -22,6 +23,15 @@ type RawDashboardInvoice = {
 	totalAmount: string | number | null;
 	transactionCount: string | number | null;
 	invoiceCreatedAt: Date | null;
+};
+
+type RawInvoiceBreakdownRow = {
+	cardId: string | null;
+	period: string | null;
+	pagadorId: string | null;
+	pagadorName: string | null;
+	pagadorAvatar: string | null;
+	amount: number | string | null;
 };
 
 export type InvoicePagadorBreakdown = {
@@ -49,22 +59,6 @@ export type DashboardInvoice = {
 export type DashboardInvoicesSnapshot = {
 	invoices: DashboardInvoice[];
 	totalPending: number;
-};
-
-const toISODate = (value: Date | string | null | undefined) => {
-	if (!value) {
-		return null;
-	}
-
-	if (value instanceof Date) {
-		return value.toISOString().slice(0, 10);
-	}
-
-	if (typeof value === "string") {
-		return value.slice(0, 10);
-	}
-
-	return null;
 };
 
 const isInvoiceStatus = (value: unknown): value is InvoicePaymentStatus =>
@@ -113,7 +107,7 @@ export async function fetchDashboardInvoices(
 			!Number.isNaN(row.purchaseDate.valueOf())
 				? row.purchaseDate
 				: row.createdAt;
-		const isoDate = toISODate(resolvedDate);
+		const isoDate = toDateOnlyString(resolvedDate);
 		if (!isoDate) {
 			continue;
 		}
@@ -123,7 +117,10 @@ export async function fetchDashboardInvoices(
 		}
 	}
 
-	const [rows, breakdownRows] = await Promise.all([
+	const [rows, breakdownRows]: [
+		RawDashboardInvoice[],
+		RawInvoiceBreakdownRow[],
+	] = await Promise.all([
 		db
 			.select({
 				invoiceId: faturas.id,
@@ -216,54 +213,57 @@ export async function fetchDashboardInvoices(
 		breakdownMap.set(key, current);
 	}
 
-	const invoices = rows
-		.map((row: RawDashboardInvoice | null) => {
-			if (!row) return null;
+	const invoices: DashboardInvoice[] = [];
 
-			const totalAmount = toNumber(row.totalAmount);
-			const transactionCount = toNumber(row.transactionCount);
-			const paymentStatus = isInvoiceStatus(row.paymentStatus)
-				? row.paymentStatus
-				: INVOICE_PAYMENT_STATUS.PENDING;
+	for (const row of rows) {
+		if (!row) {
+			continue;
+		}
 
-			const shouldInclude =
-				transactionCount > 0 ||
-				Math.abs(totalAmount) > 0 ||
-				row.invoiceId !== null;
+		const totalAmount = toNumber(row.totalAmount);
+		const transactionCount = toNumber(row.transactionCount);
+		const paymentStatus = isInvoiceStatus(row.paymentStatus)
+			? row.paymentStatus
+			: INVOICE_PAYMENT_STATUS.PENDING;
 
-			if (!shouldInclude) {
-				return null;
-			}
+		const shouldInclude =
+			transactionCount > 0 ||
+			Math.abs(totalAmount) > 0 ||
+			row.invoiceId !== null;
 
-			const resolvedPeriod = row.period ?? period;
-			const paymentKey = `${row.cardId}:${resolvedPeriod}`;
-			const paidAt =
-				paymentStatus === INVOICE_PAYMENT_STATUS.PAID
-					? (paymentMap.get(paymentKey) ?? toISODate(row.invoiceCreatedAt))
-					: null;
+		if (!shouldInclude) {
+			continue;
+		}
 
-			return {
-				id: row.invoiceId ?? buildFallbackId(row.cardId, period),
-				cardId: row.cardId,
-				cardName: row.cardName,
-				cardBrand: row.cardBrand,
-				cardStatus: row.cardStatus,
-				logo: row.logo,
-				dueDay: row.dueDay,
-				period: resolvedPeriod,
-				paymentStatus,
-				totalAmount,
-				paidAt,
-				pagadorBreakdown: (
-					breakdownMap.get(`${row.cardId}:${resolvedPeriod}`) ?? []
-				).sort((a, b) => b.amount - a.amount),
-			} satisfies DashboardInvoice;
-		})
-		.filter((invoice): invoice is DashboardInvoice => invoice !== null)
-		.sort((a, b) => {
-			// Ordena do maior valor para o menor
-			return Math.abs(b.totalAmount) - Math.abs(a.totalAmount);
+		const resolvedPeriod = row.period ?? period;
+		const paymentKey = `${row.cardId}:${resolvedPeriod}`;
+		const paidAt =
+			paymentStatus === INVOICE_PAYMENT_STATUS.PAID
+				? (paymentMap.get(paymentKey) ?? toDateOnlyString(row.invoiceCreatedAt))
+				: null;
+
+		invoices.push({
+			id: row.invoiceId ?? buildFallbackId(row.cardId, period),
+			cardId: row.cardId,
+			cardName: row.cardName,
+			cardBrand: row.cardBrand,
+			cardStatus: row.cardStatus,
+			logo: row.logo,
+			dueDay: row.dueDay,
+			period: resolvedPeriod,
+			paymentStatus,
+			totalAmount,
+			paidAt,
+			pagadorBreakdown: (
+				breakdownMap.get(`${row.cardId}:${resolvedPeriod}`) ?? []
+			).sort((a, b) => b.amount - a.amount),
 		});
+	}
+
+	invoices.sort((a, b) => {
+		// Ordena do maior valor para o menor
+		return Math.abs(b.totalAmount) - Math.abs(a.totalAmount);
+	});
 
 	const totalPending = invoices.reduce((total, invoice) => {
 		if (invoice.paymentStatus !== INVOICE_PAYMENT_STATUS.PENDING) {

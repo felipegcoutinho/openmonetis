@@ -4,7 +4,6 @@ import { db, schema } from "@/lib/db";
 import { type FontKey, normalizeFontKey } from "@/public/fonts/font_index";
 
 export interface UserPreferences {
-	disableMagnetlines: boolean;
 	extratoNoteAsColumn: boolean;
 	lancamentosColumnOrder: string[] | null;
 	systemFont: FontKey;
@@ -34,7 +33,6 @@ export async function fetchUserPreferences(
 ): Promise<UserPreferences | null> {
 	const result = await db
 		.select({
-			disableMagnetlines: schema.preferenciasUsuario.disableMagnetlines,
 			extratoNoteAsColumn: schema.preferenciasUsuario.extratoNoteAsColumn,
 			lancamentosColumnOrder: schema.preferenciasUsuario.lancamentosColumnOrder,
 			systemFont: schema.preferenciasUsuario.systemFont,

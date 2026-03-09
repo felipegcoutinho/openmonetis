@@ -6,6 +6,7 @@ import {
 } from "@remixicon/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -26,9 +27,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { WidgetEmptyState } from "@/components/widget-empty-state";
 import type { CategoryHistoryData } from "@/lib/dashboard/categories/category-history";
 import { CATEGORY_COLORS } from "@/lib/utils/category-colors";
+import { formatCurrency, formatCurrencyCompact } from "@/lib/utils/currency";
 import { getIconComponent } from "@/lib/utils/icons";
 
 type CategoryHistoryWidgetProps = {
@@ -124,33 +125,6 @@ export function CategoryHistoryWidget({ data }: CategoryHistoryWidgetProps) {
 		return config;
 	}, [filteredCategories]);
 
-	const formatCurrency = (value: number) => {
-		return new Intl.NumberFormat("pt-BR", {
-			style: "currency",
-			currency: "BRL",
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(value);
-	};
-
-	const formatCurrencyCompact = (value: number) => {
-		if (value >= 1000) {
-			return new Intl.NumberFormat("pt-BR", {
-				style: "currency",
-				currency: "BRL",
-				minimumFractionDigits: 0,
-				maximumFractionDigits: 0,
-				notation: "compact",
-			}).format(value);
-		}
-		return new Intl.NumberFormat("pt-BR", {
-			style: "currency",
-			currency: "BRL",
-			minimumFractionDigits: 0,
-			maximumFractionDigits: 0,
-		}).format(value);
-	};
-
 	const handleAddCategory = (categoryId: string) => {
 		if (
 			categoryId &&
@@ -217,7 +191,9 @@ export function CategoryHistoryWidget({ data }: CategoryHistoryWidgetProps) {
 											style={{ borderColor: color }}
 										>
 											{IconComponent ? (
-												<IconComponent className="size-4" style={{ color }} />
+												<span style={{ color }}>
+													<IconComponent className="size-4" />
+												</span>
 											) : (
 												<div
 													className="size-3 rounded-sm"
@@ -383,7 +359,7 @@ export function CategoryHistoryWidget({ data }: CategoryHistoryWidgetProps) {
 								axisLine={false}
 								tickMargin={8}
 								className="text-xs"
-								tickFormatter={formatCurrencyCompact}
+								tickFormatter={(value) => formatCurrencyCompact(Number(value))}
 							/>
 							<ChartTooltip
 								content={({ active, payload }) => {

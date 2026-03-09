@@ -23,15 +23,15 @@ import {
 	RiEyeOffLine,
 	RiTodoLine,
 } from "@remixicon/react";
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { NoteDialog } from "@/components/anotacoes/note-dialog";
 import { SortableWidget } from "@/components/dashboard/sortable-widget";
 import { WidgetSettingsDialog } from "@/components/dashboard/widget-settings-dialog";
 import { LancamentoDialog } from "@/components/lancamentos/dialogs/lancamento-dialog/lancamento-dialog";
 import type { SelectOption } from "@/components/lancamentos/types";
+import { ExpandableWidgetCard } from "@/components/shared/expandable-widget-card";
 import { Button } from "@/components/ui/button";
-import WidgetCard from "@/components/widget-card";
 import type { DashboardData } from "@/lib/dashboard/fetch-dashboard-data";
 import {
 	resetWidgetPreferences,
@@ -58,6 +58,8 @@ type DashboardGridEditableProps = {
 	};
 };
 
+const DEFAULT_WIDGET_ORDER = widgetsConfig.map((widget) => widget.id);
+
 export function DashboardGridEditable({
 	data,
 	period,
@@ -68,9 +70,8 @@ export function DashboardGridEditable({
 	const [isPending, startTransition] = useTransition();
 
 	// Initialize widget order and hidden state
-	const defaultOrder = widgetsConfig.map((w) => w.id);
 	const [widgetOrder, setWidgetOrder] = useState<string[]>(
-		initialPreferences?.order ?? defaultOrder,
+		initialPreferences?.order ?? DEFAULT_WIDGET_ORDER,
 	);
 	const [hiddenWidgets, setHiddenWidgets] = useState<string[]>(
 		initialPreferences?.hidden ?? [],
@@ -118,7 +119,7 @@ export function DashboardGridEditable({
 		return ordered;
 	}, [widgetOrder, hiddenWidgets]);
 
-	const handleDragEnd = useCallback((event: DragEndEvent) => {
+	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
 
 		if (over && active.id !== over.id) {
@@ -128,44 +129,41 @@ export function DashboardGridEditable({
 				return arrayMove(items, oldIndex, newIndex);
 			});
 		}
-	}, []);
+	};
 
-	const handleToggleWidget = useCallback(
-		(widgetId: string) => {
-			const newHidden = hiddenWidgets.includes(widgetId)
-				? hiddenWidgets.filter((id) => id !== widgetId)
-				: [...hiddenWidgets, widgetId];
+	const handleToggleWidget = (widgetId: string) => {
+		const newHidden = hiddenWidgets.includes(widgetId)
+			? hiddenWidgets.filter((id) => id !== widgetId)
+			: [...hiddenWidgets, widgetId];
 
-			setHiddenWidgets(newHidden);
+		setHiddenWidgets(newHidden);
 
-			// Salvar automaticamente ao toggle
-			startTransition(async () => {
-				await updateWidgetPreferences({
-					order: widgetOrder,
-					hidden: newHidden,
-				});
+		// Salvar automaticamente ao toggle
+		startTransition(async () => {
+			await updateWidgetPreferences({
+				order: widgetOrder,
+				hidden: newHidden,
 			});
-		},
-		[hiddenWidgets, widgetOrder],
-	);
+		});
+	};
 
-	const handleHideWidget = useCallback((widgetId: string) => {
+	const handleHideWidget = (widgetId: string) => {
 		setHiddenWidgets((prev) => [...prev, widgetId]);
-	}, []);
+	};
 
-	const handleStartEditing = useCallback(() => {
+	const handleStartEditing = () => {
 		setOriginalOrder(widgetOrder);
 		setOriginalHidden(hiddenWidgets);
 		setIsEditing(true);
-	}, [widgetOrder, hiddenWidgets]);
+	};
 
-	const handleCancelEditing = useCallback(() => {
+	const handleCancelEditing = () => {
 		setWidgetOrder(originalOrder);
 		setHiddenWidgets(originalHidden);
 		setIsEditing(false);
-	}, [originalOrder, originalHidden]);
+	};
 
-	const handleSave = useCallback(() => {
+	const handleSave = () => {
 		startTransition(async () => {
 			const result = await updateWidgetPreferences({
 				order: widgetOrder,
@@ -179,21 +177,21 @@ export function DashboardGridEditable({
 				toast.error(result.error ?? "Erro ao salvar");
 			}
 		});
-	}, [widgetOrder, hiddenWidgets]);
+	};
 
-	const handleReset = useCallback(() => {
+	const handleReset = () => {
 		startTransition(async () => {
 			const result = await resetWidgetPreferences();
 
 			if (result.success) {
-				setWidgetOrder(defaultOrder);
+				setWidgetOrder(DEFAULT_WIDGET_ORDER);
 				setHiddenWidgets([]);
 				toast.success("Preferências restauradas!");
 			} else {
 				toast.error(result.error ?? "Erro ao restaurar");
 			}
 		});
-	}, [defaultOrder]);
+	};
 
 	return (
 		<div className="space-y-4">
@@ -360,14 +358,14 @@ export function DashboardGridEditable({
 											</div>
 										</div>
 									)}
-									<WidgetCard
+									<ExpandableWidgetCard
 										title={widget.title}
 										subtitle={widget.subtitle}
 										icon={widget.icon}
 										action={widget.action}
 									>
 										{widget.component({ data, period })}
-									</WidgetCard>
+									</ExpandableWidgetCard>
 								</div>
 							</SortableWidget>
 						))}

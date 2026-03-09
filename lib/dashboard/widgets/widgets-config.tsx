@@ -16,16 +16,16 @@ import {
 } from "@remixicon/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { BoletosWidget } from "@/components/dashboard/boletos-widget";
-import { InstallmentExpensesWidget } from "@/components/dashboard/installment-expenses-widget";
+import { BillWidget } from "@/components/dashboard/bill-widget";
 import { ExpensesByCategoryWidgetWithChart } from "@/components/dashboard/expenses-by-category-widget-with-chart";
 import { GoalsProgressWidget } from "@/components/dashboard/goals-progress-widget";
 import { IncomeByCategoryWidgetWithChart } from "@/components/dashboard/income-by-category-widget-with-chart";
 import { IncomeExpenseBalanceWidget } from "@/components/dashboard/income-expense-balance-widget";
+import { InstallmentExpensesWidget } from "@/components/dashboard/installment-expenses-widget";
 import { InvoicesWidget } from "@/components/dashboard/invoices-widget";
 import { MyAccountsWidget } from "@/components/dashboard/my-accounts-widget";
 import { NotesWidget } from "@/components/dashboard/notes-widget";
-import { PagadoresWidget } from "@/components/dashboard/pagadores-widget";
+import { PayersWidget } from "@/components/dashboard/payers-widget";
 import { PaymentOverviewWidget } from "@/components/dashboard/payment-overview-widget";
 import { PaymentStatusWidget } from "@/components/dashboard/payment-status-widget";
 import { PurchasesByCategoryWidget } from "@/components/dashboard/purchases-by-category-widget";
@@ -70,9 +70,7 @@ export const widgetsConfig: WidgetConfig[] = [
 		title: "Boletos",
 		subtitle: "Controle de boletos do período",
 		icon: <RiBarcodeLine className="size-4" />,
-		component: ({ data }) => (
-			<BoletosWidget boletos={data.boletosSnapshot.boletos} />
-		),
+		component: ({ data }) => <BillWidget bills={data.billsSnapshot.bills} />,
 	},
 	{
 		id: "payment-status",
@@ -98,7 +96,7 @@ export const widgetsConfig: WidgetConfig[] = [
 		subtitle: "Despesas por pagador no período",
 		icon: <RiGroupLine className="size-4" />,
 		component: ({ data }) => (
-			<PagadoresWidget pagadores={data.pagadoresSnapshot.pagadores} />
+			<PayersWidget pagadores={data.pagadoresSnapshot.pagadores} />
 		),
 		action: (
 			<Link

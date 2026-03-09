@@ -8,19 +8,16 @@ import {
 	RiVerifiedBadgeFill,
 } from "@remixicon/react";
 import Link from "next/link";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CardContent } from "@/components/ui/card";
 import type { DashboardPagador } from "@/lib/dashboard/pagadores";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
-import { WidgetEmptyState } from "../widget-empty-state";
+import { formatPercentage } from "@/lib/utils/percentage";
 
-type PagadoresWidgetProps = {
+type PayersWidgetProps = {
 	pagadores: DashboardPagador[];
-};
-
-const formatPercentage = (value: number) => {
-	return `${Math.abs(value).toFixed(0)}%`;
 };
 
 const buildInitials = (value: string) => {
@@ -37,7 +34,7 @@ const buildInitials = (value: string) => {
 	return `${firstChar}${secondChar}`.toUpperCase() || "??";
 };
 
-export function PagadoresWidget({ pagadores }: PagadoresWidgetProps) {
+export function PayersWidget({ pagadores }: PayersWidgetProps) {
 	return (
 		<CardContent className="flex flex-col gap-4 px-0">
 			{pagadores.length === 0 ? (

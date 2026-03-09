@@ -1,21 +1,10 @@
-import {
-	and,
-	asc,
-	eq,
-	gte,
-	ilike,
-	isNull,
-	lte,
-	ne,
-	not,
-	or,
-	sum,
-} from "drizzle-orm";
+import { and, asc, eq, gte, lte, ne, sum } from "drizzle-orm";
 import { contas, lancamentos } from "@/db/schema";
 import {
-	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
-	INITIAL_BALANCE_NOTE,
-} from "@/lib/contas/constants";
+	buildDashboardAdminFilters,
+	excludeAutoInvoiceEntries,
+	excludeInitialBalanceWhenConfigured,
+} from "@/lib/dashboard/lancamento-filters";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
 import { safeToNumber } from "@/lib/utils/number";
@@ -107,21 +96,12 @@ export async function fetchDashboardCardMetrics(
 		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
 		.where(
 			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.pagadorId, adminPagadorId),
+				...buildDashboardAdminFilters({ userId, adminPagadorId }),
 				gte(lancamentos.period, startPeriod),
 				lte(lancamentos.period, period),
 				ne(lancamentos.transactionType, TRANSFERENCIA),
-				or(
-					isNull(lancamentos.note),
-					not(ilike(lancamentos.note, `${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`)),
-				),
-				// Excluir saldos iniciais se a conta tiver o flag ativo
-				or(
-					ne(lancamentos.note, INITIAL_BALANCE_NOTE),
-					isNull(contas.excludeInitialBalanceFromIncome),
-					eq(contas.excludeInitialBalanceFromIncome, false),
-				),
+				excludeAutoInvoiceEntries(),
+				excludeInitialBalanceWhenConfigured(),
 			),
 		)
 		.groupBy(lancamentos.period, lancamentos.transactionType)

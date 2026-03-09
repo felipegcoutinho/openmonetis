@@ -1,62 +1,38 @@
 import { RiBarChartBoxLine, RiExternalLinkLine } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-} from "@/components/ui/card";
+import { CardFooter } from "@/components/ui/card";
 import type { DashboardAccount } from "@/lib/dashboard/accounts";
+import { resolveLogoSrc } from "@/lib/logo";
 import { formatPeriodForUrl } from "@/lib/utils/period";
-import MoneyValues from "../money-values";
-import { WidgetEmptyState } from "../widget-empty-state";
+import MoneyValues from "@/components/shared/money-values";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 
 type MyAccountsWidgetProps = {
 	accounts: DashboardAccount[];
 	totalBalance: number;
-	maxVisible?: number;
 	period: string;
-};
-
-const resolveLogoSrc = (logo: string | null) => {
-	if (!logo) {
-		return null;
-	}
-
-	const fileName = logo.split("/").filter(Boolean).pop() ?? logo;
-	return `/logos/${fileName}`;
-};
-
-const buildInitials = (name: string) => {
-	const parts = name.trim().split(/\s+/).filter(Boolean);
-	if (parts.length === 0) return "CC";
-	if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-	return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
 };
 
 export function MyAccountsWidget({
 	accounts,
 	totalBalance,
-	maxVisible = 5,
 	period,
 }: MyAccountsWidgetProps) {
 	const visibleAccounts = accounts.filter(
 		(account) => !account.excludeFromBalance,
 	);
-	const displayedAccounts = visibleAccounts.slice(0, maxVisible);
+	const displayedAccounts = visibleAccounts.slice(0, 5);
 	const remainingCount = visibleAccounts.length - displayedAccounts.length;
 
 	return (
 		<>
-			<CardHeader className="pb-4 px-0">
-				<CardDescription>Saldo Total</CardDescription>
-				<div className="text-2xl text-foreground">
-					<MoneyValues amount={totalBalance} />
-				</div>
-			</CardHeader>
+			<div className="flex justify-between py-2">
+				Saldo Total
+				<MoneyValues className="text-2xl" amount={totalBalance} />
+			</div>
 
-			<CardContent className="py-2 px-0">
+			<div className="py-2 px-0">
 				{displayedAccounts.length === 0 ? (
 					<div className="-mt-10">
 						<WidgetEmptyState
@@ -71,7 +47,6 @@ export function MyAccountsWidget({
 					<ul className="flex flex-col">
 						{displayedAccounts.map((account) => {
 							const logoSrc = resolveLogoSrc(account.logo);
-							const initials = buildInitials(account.name);
 
 							return (
 								<li
@@ -79,20 +54,14 @@ export function MyAccountsWidget({
 									className="flex items-center justify-between gap-2 border-b border-dashed py-2 last:border-0"
 								>
 									<div className="flex min-w-0 flex-1 items-center gap-3">
-										{logoSrc ? (
-											<div className="relative size-10 overflow-hidden">
-												<Image
-													src={logoSrc}
-													alt={`Logo da conta ${account.name}`}
-													fill
-													className="object-contain rounded-full"
-												/>
-											</div>
-										) : (
-											<div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-sm font-semibold uppercase text-secondary-foreground">
-												{initials}
-											</div>
-										)}
+										<div className="relative size-10 overflow-hidden">
+											<Image
+												src={logoSrc}
+												alt={`Logo da conta ${account.name}`}
+												fill
+												className="object-contain rounded-full"
+											/>
+										</div>
 
 										<div className="min-w-0">
 											<Link
@@ -122,7 +91,7 @@ export function MyAccountsWidget({
 						})}
 					</ul>
 				)}
-			</CardContent>
+			</div>
 
 			{visibleAccounts.length > displayedAccounts.length ? (
 				<CardFooter className="border-border/60 border-t pt-4 text-sm text-muted-foreground">

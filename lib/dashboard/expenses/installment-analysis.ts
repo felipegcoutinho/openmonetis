@@ -4,23 +4,28 @@ import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
+import {
+	buildDateOnlyStringFromPeriodDay,
+	parseLocalDateString,
+} from "@/lib/utils/date";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 // Calcula a data de vencimento baseada no período e dia de vencimento do cartão
 function calculateDueDate(period: string, dueDay: string | null): Date | null {
 	if (!dueDay) return null;
 
 	try {
-		const [year, month] = period.split("-");
-		if (!year || !month) return null;
+		const dueDateString = buildDateOnlyStringFromPeriodDay(period, dueDay);
+		if (!dueDateString) return null;
 
-		const day = parseInt(dueDay, 10);
-		if (Number.isNaN(day)) return null;
+		const dueDate = parseLocalDateString(dueDateString);
+		if (Number.isNaN(dueDate.getTime())) return null;
 
-		// Criar data ao meio-dia para evitar problemas de timezone
-		return new Date(parseInt(year, 10), parseInt(month, 10) - 1, day, 12, 0, 0);
+		// Meio-dia evita drift visual em serialização/locales diferentes.
+		dueDate.setHours(12, 0, 0, 0);
+		return dueDate;
 	} catch {
 		return null;
 	}

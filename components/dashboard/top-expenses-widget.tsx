@@ -3,13 +3,13 @@
 import { RiArrowUpDoubleLine } from "@remixicon/react";
 import { useMemo, useState } from "react";
 import { EstabelecimentoLogo } from "@/components/lancamentos/shared/estabelecimento-logo";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Switch } from "@/components/ui/switch";
 import type {
 	TopExpense,
 	TopExpensesData,
 } from "@/lib/dashboard/expenses/top-expenses";
-import { WidgetEmptyState } from "../widget-empty-state";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 
 type TopExpensesWidgetProps = {
 	allExpenses: TopExpensesData;

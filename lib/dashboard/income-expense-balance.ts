@@ -1,12 +1,18 @@
-import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { contas, lancamentos } from "@/db/schema";
 import {
-	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
-	INITIAL_BALANCE_NOTE,
-} from "@/lib/contas/constants";
-import { toNumber } from "@/lib/dashboard/common";
+	buildDashboardAdminFilters,
+	excludeAutoInvoiceEntries,
+	excludeInitialBalanceWhenConfigured,
+} from "@/lib/dashboard/lancamento-filters";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
+import {
+	buildPeriodWindow,
+	formatPeriodMonthShort,
+	getCurrentPeriod,
+} from "@/lib/utils/period";
 
 export type MonthData = {
 	month: string;
@@ -20,47 +26,12 @@ export type IncomeExpenseBalanceData = {
 	months: MonthData[];
 };
 
-const MONTH_LABELS: Record<string, string> = {
-	"01": "jan",
-	"02": "fev",
-	"03": "mar",
-	"04": "abr",
-	"05": "mai",
-	"06": "jun",
-	"07": "jul",
-	"08": "ago",
-	"09": "set",
-	"10": "out",
-	"11": "nov",
-	"12": "dez",
-};
-
 const generateLast6Months = (currentPeriod: string): string[] => {
-	const [yearStr, monthStr] = currentPeriod.split("-");
-	let year = Number.parseInt(yearStr ?? "", 10);
-	let month = Number.parseInt(monthStr ?? "", 10);
-
-	if (Number.isNaN(year) || Number.isNaN(month)) {
-		const now = new Date();
-		year = now.getFullYear();
-		month = now.getMonth() + 1;
+	try {
+		return buildPeriodWindow(currentPeriod, 6);
+	} catch {
+		return buildPeriodWindow(getCurrentPeriod(), 6);
 	}
-
-	const periods: string[] = [];
-
-	for (let i = 5; i >= 0; i--) {
-		let targetMonth = month - i;
-		let targetYear = year;
-
-		while (targetMonth <= 0) {
-			targetMonth += 12;
-			targetYear -= 1;
-		}
-
-		periods.push(`${targetYear}-${String(targetMonth).padStart(2, "0")}`);
-	}
-
-	return periods;
 };
 
 export async function fetchIncomeExpenseBalance(
@@ -85,17 +56,11 @@ export async function fetchIncomeExpenseBalance(
 		.leftJoin(contas, eq(lancamentos.contaId, contas.id))
 		.where(
 			and(
-				eq(lancamentos.userId, userId),
-				eq(lancamentos.pagadorId, adminPagadorId),
+				...buildDashboardAdminFilters({ userId, adminPagadorId }),
 				inArray(lancamentos.period, periods),
 				inArray(lancamentos.transactionType, ["Receita", "Despesa"]),
-				sql`(${lancamentos.note} IS NULL OR ${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`})`,
-				// Excluir saldos iniciais se a conta tiver o flag ativo
-				or(
-					ne(lancamentos.note, INITIAL_BALANCE_NOTE),
-					isNull(contas.excludeInitialBalanceFromIncome),
-					eq(contas.excludeInitialBalanceFromIncome, false),
-				),
+				excludeAutoInvoiceEntries(),
+				excludeInitialBalanceWhenConfigured(),
 			),
 		)
 		.groupBy(lancamentos.period, lancamentos.transactionType);
@@ -117,12 +82,10 @@ export async function fetchIncomeExpenseBalance(
 	// Build result array preserving period order
 	const months = periods.map((period) => {
 		const entry = dataMap.get(period) ?? { income: 0, expense: 0 };
-		const [, monthPart] = period.split("-");
-		const monthLabel = MONTH_LABELS[monthPart ?? "01"] ?? monthPart;
 
 		return {
 			month: period,
-			monthLabel: monthLabel ?? "",
+			monthLabel: formatPeriodMonthShort(period).toLowerCase(),
 			income: entry.income,
 			expense: entry.expense,
 			balance: entry.income - entry.expense,

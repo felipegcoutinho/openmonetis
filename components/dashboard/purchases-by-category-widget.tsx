@@ -1,9 +1,10 @@
 "use client";
 
 import { RiArrowDownSFill, RiStore3Line } from "@remixicon/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EstabelecimentoLogo } from "@/components/lancamentos/shared/estabelecimento-logo";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import {
 	Select,
 	SelectContent,
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/select";
 import { CATEGORY_TYPE_LABEL } from "@/lib/categorias/constants";
 import type { PurchasesByCategoryData } from "@/lib/dashboard/purchases-by-category";
-import { WidgetEmptyState } from "../widget-empty-state";
 
 type PurchasesByCategoryWidgetProps = {
 	data: PurchasesByCategoryData;
@@ -38,21 +38,11 @@ const STORAGE_KEY = "purchases-by-category-selected";
 export function PurchasesByCategoryWidget({
 	data,
 }: PurchasesByCategoryWidgetProps) {
-	// Inicializa com a categoria salva ou a primeira disponível
-	const [selectedCategoryId, setSelectedCategoryId] = useState<string>(() => {
-		if (typeof window === "undefined") {
-			const firstCategory = data.categories[0];
-			return firstCategory ? firstCategory.id : "";
-		}
-
-		const saved = sessionStorage.getItem(STORAGE_KEY);
-		if (saved && data.categories.some((cat) => cat.id === saved)) {
-			return saved;
-		}
-
-		const firstCategory = data.categories[0];
-		return firstCategory ? firstCategory.id : "";
-	});
+	const firstCategoryId = data.categories[0]?.id ?? "";
+	const hasRestoredSelectionRef = useRef(false);
+	const hasPersistedSelectionRef = useRef(false);
+	const [selectedCategoryId, setSelectedCategoryId] =
+		useState<string>(firstCategoryId);
 
 	// Agrupa categorias por tipo
 	const categoriesByType = useMemo(() => {
@@ -72,27 +62,52 @@ export function PurchasesByCategoryWidget({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data.categories]);
 
-	// Salva a categoria selecionada quando mudar
+	// Restaura a categoria salva apenas depois da montagem para manter SSR e cliente consistentes.
 	useEffect(() => {
+		if (hasRestoredSelectionRef.current) {
+			return;
+		}
+
+		hasRestoredSelectionRef.current = true;
+
+		const saved = sessionStorage.getItem(STORAGE_KEY);
+		if (saved && data.categories.some((cat) => cat.id === saved)) {
+			setSelectedCategoryId(saved);
+			return;
+		}
+
+		setSelectedCategoryId(firstCategoryId);
+	}, [data.categories, firstCategoryId]);
+
+	// Salva a categoria selecionada quando mudar, sem sobrescrever o valor salvo na primeira montagem.
+	useEffect(() => {
+		if (!hasPersistedSelectionRef.current) {
+			hasPersistedSelectionRef.current = true;
+			return;
+		}
+
 		if (selectedCategoryId) {
 			sessionStorage.setItem(STORAGE_KEY, selectedCategoryId);
+			return;
 		}
+
+		sessionStorage.removeItem(STORAGE_KEY);
 	}, [selectedCategoryId]);
 
 	// Atualiza a categoria selecionada se ela não existir mais na lista
 	useEffect(() => {
+		if (!selectedCategoryId && firstCategoryId) {
+			setSelectedCategoryId(firstCategoryId);
+			return;
+		}
+
 		if (
 			selectedCategoryId &&
 			!data.categories.some((cat) => cat.id === selectedCategoryId)
 		) {
-			const firstCategory = data.categories[0];
-			if (firstCategory) {
-				setSelectedCategoryId(firstCategory.id);
-			} else {
-				setSelectedCategoryId("");
-			}
+			setSelectedCategoryId(firstCategoryId);
 		}
-	}, [data.categories, selectedCategoryId]);
+	}, [data.categories, firstCategoryId, selectedCategoryId]);
 
 	const currentTransactions = useMemo(() => {
 		if (!selectedCategoryId) {

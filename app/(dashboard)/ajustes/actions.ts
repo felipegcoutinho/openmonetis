@@ -54,7 +54,6 @@ const deleteAccountSchema = z.object({
 });
 
 const updatePreferencesSchema = z.object({
-	disableMagnetlines: z.boolean(),
 	extratoNoteAsColumn: z.boolean(),
 	lancamentosColumnOrder: z.array(z.string()).nullable(),
 	systemFont: z.enum(FONT_KEYS).default(DEFAULT_FONT_KEY),
@@ -403,7 +402,6 @@ export async function updatePreferencesAction(
 			await db
 				.update(schema.preferenciasUsuario)
 				.set({
-					disableMagnetlines: validated.disableMagnetlines,
 					extratoNoteAsColumn: validated.extratoNoteAsColumn,
 					lancamentosColumnOrder: validated.lancamentosColumnOrder,
 					systemFont: validated.systemFont,
@@ -415,7 +413,6 @@ export async function updatePreferencesAction(
 			// Create new preferences
 			await db.insert(schema.preferenciasUsuario).values({
 				userId: session.user.id,
-				disableMagnetlines: validated.disableMagnetlines,
 				extratoNoteAsColumn: validated.extratoNoteAsColumn,
 				lancamentosColumnOrder: validated.lancamentosColumnOrder,
 				systemFont: validated.systemFont,

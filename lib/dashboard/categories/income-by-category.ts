@@ -1,32 +1,21 @@
-import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { categorias, contas, lancamentos, orcamentos } from "@/db/schema";
 import {
-	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
-	INITIAL_BALANCE_NOTE,
-} from "@/lib/contas/constants";
+	buildCategoryBreakdownData,
+	type DashboardCategoryBreakdownData,
+	type DashboardCategoryBreakdownItem,
+} from "@/lib/dashboard/categories/category-breakdown";
+import {
+	buildDashboardAdminFilters,
+	excludeAutoInvoiceEntries,
+	excludeInitialBalanceWhenConfigured,
+} from "@/lib/dashboard/lancamento-filters";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
-import { calculatePercentageChange } from "@/lib/utils/math";
-import { safeToNumber } from "@/lib/utils/number";
 import { getPreviousPeriod } from "@/lib/utils/period";
 
-export type CategoryIncomeItem = {
-	categoryId: string;
-	categoryName: string;
-	categoryIcon: string | null;
-	currentAmount: number;
-	previousAmount: number;
-	percentageChange: number | null;
-	percentageOfTotal: number;
-	budgetAmount: number | null;
-	budgetUsedPercentage: number | null;
-};
-
-export type IncomeByCategoryData = {
-	categories: CategoryIncomeItem[];
-	currentTotal: number;
-	previousTotal: number;
-};
+export type CategoryIncomeItem = DashboardCategoryBreakdownItem;
+export type IncomeByCategoryData = DashboardCategoryBreakdownData;
 
 export async function fetchIncomeByCategory(
 	userId: string,
@@ -54,21 +43,12 @@ export async function fetchIncomeByCategory(
 			.leftJoin(contas, eq(lancamentos.contaId, contas.id))
 			.where(
 				and(
-					eq(lancamentos.userId, userId),
-					eq(lancamentos.pagadorId, adminPagadorId),
+					...buildDashboardAdminFilters({ userId, adminPagadorId }),
 					inArray(lancamentos.period, [period, previousPeriod]),
 					eq(lancamentos.transactionType, "Receita"),
 					eq(categorias.type, "receita"),
-					or(
-						isNull(lancamentos.note),
-						sql`${lancamentos.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
-					),
-					// Excluir saldos iniciais se a conta tiver o flag ativo
-					or(
-						ne(lancamentos.note, INITIAL_BALANCE_NOTE),
-						isNull(contas.excludeInitialBalanceFromIncome),
-						eq(contas.excludeInitialBalanceFromIncome, false),
-					),
+					excludeAutoInvoiceEntries(),
+					excludeInitialBalanceWhenConfigured(),
 				),
 			)
 			.groupBy(
@@ -86,85 +66,9 @@ export async function fetchIncomeByCategory(
 			.where(and(eq(orcamentos.userId, userId), eq(orcamentos.period, period))),
 	]);
 
-	// Build budget lookup
-	const budgetMap = new Map<string, number>();
-	for (const row of budgetRows) {
-		if (row.categoriaId) {
-			budgetMap.set(row.categoriaId, safeToNumber(row.amount));
-		}
-	}
-
-	// Build category data from grouped results
-	const categoryMap = new Map<
-		string,
-		{
-			name: string;
-			icon: string | null;
-			current: number;
-			previous: number;
-		}
-	>();
-
-	for (const row of rows) {
-		const entry = categoryMap.get(row.categoryId) ?? {
-			name: row.categoryName,
-			icon: row.categoryIcon,
-			current: 0,
-			previous: 0,
-		};
-
-		const amount = Math.abs(safeToNumber(row.total));
-		if (row.period === period) {
-			entry.current = amount;
-		} else {
-			entry.previous = amount;
-		}
-		categoryMap.set(row.categoryId, entry);
-	}
-
-	// Calculate totals
-	let currentTotal = 0;
-	let previousTotal = 0;
-	for (const entry of categoryMap.values()) {
-		currentTotal += entry.current;
-		previousTotal += entry.previous;
-	}
-
-	// Build result
-	const categories: CategoryIncomeItem[] = [];
-	for (const [categoryId, entry] of categoryMap) {
-		const percentageChange = calculatePercentageChange(
-			entry.current,
-			entry.previous,
-		);
-		const percentageOfTotal =
-			currentTotal > 0 ? (entry.current / currentTotal) * 100 : 0;
-
-		const budgetAmount = budgetMap.get(categoryId) ?? null;
-		const budgetUsedPercentage =
-			budgetAmount && budgetAmount > 0
-				? (entry.current / budgetAmount) * 100
-				: null;
-
-		categories.push({
-			categoryId,
-			categoryName: entry.name,
-			categoryIcon: entry.icon,
-			currentAmount: entry.current,
-			previousAmount: entry.previous,
-			percentageChange,
-			percentageOfTotal,
-			budgetAmount,
-			budgetUsedPercentage,
-		});
-	}
-
-	// Ordena por valor atual (maior para menor)
-	categories.sort((a, b) => b.currentAmount - a.currentAmount);
-
-	return {
-		categories,
-		currentTotal,
-		previousTotal,
-	};
+	return buildCategoryBreakdownData({
+		rows,
+		budgetRows,
+		period,
+	});
 }

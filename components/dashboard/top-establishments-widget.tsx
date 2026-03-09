@@ -1,8 +1,8 @@
 import { RiStore2Line } from "@remixicon/react";
 import { EstabelecimentoLogo } from "@/components/lancamentos/shared/estabelecimento-logo";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import type { TopEstablishmentsData } from "@/lib/dashboard/top-establishments";
-import { WidgetEmptyState } from "../widget-empty-state";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 
 type TopEstablishmentsWidgetProps = {
 	data: TopEstablishmentsData;

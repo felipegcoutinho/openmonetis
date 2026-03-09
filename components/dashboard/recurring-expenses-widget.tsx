@@ -1,9 +1,8 @@
 import { RiRefreshLine } from "@remixicon/react";
 import { EstabelecimentoLogo } from "@/components/lancamentos/shared/estabelecimento-logo";
-import MoneyValues from "@/components/money-values";
-import { CardContent } from "@/components/ui/card";
+import MoneyValues from "@/components/shared/money-values";
 import type { RecurringExpensesData } from "@/lib/dashboard/expenses/recurring-expenses";
-import { WidgetEmptyState } from "../widget-empty-state";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 
 type RecurringExpensesWidgetProps = {
 	data: RecurringExpensesData;
@@ -31,7 +30,7 @@ export function RecurringExpensesWidget({
 	}
 
 	return (
-		<CardContent className="flex flex-col gap-4 px-0">
+		<div className="flex flex-col gap-4 px-0">
 			<ul className="flex flex-col gap-2">
 				{data.expenses.map((expense) => {
 					return (
@@ -61,6 +60,6 @@ export function RecurringExpensesWidget({
 					);
 				})}
 			</ul>
-		</CardContent>
+		</div>
 	);
 }

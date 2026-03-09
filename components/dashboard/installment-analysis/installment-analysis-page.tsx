@@ -6,7 +6,7 @@ import {
 	RiCheckboxLine,
 } from "@remixicon/react";
 import { useMemo, useState } from "react";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InstallmentGroupCard } from "./installment-group-card";

@@ -1,15 +1,15 @@
 import { unstable_cache } from "next/cache";
 import { fetchDashboardAccounts } from "./accounts";
-import { fetchDashboardBoletos } from "./boletos";
+import { fetchDashboardBills } from "./bills";
 import { fetchExpensesByCategory } from "./categories/expenses-by-category";
 import { fetchIncomeByCategory } from "./categories/income-by-category";
+import { fetchDashboardCardMetrics } from "./dashboard-metrics";
 import { fetchInstallmentExpenses } from "./expenses/installment-expenses";
 import { fetchRecurringExpenses } from "./expenses/recurring-expenses";
 import { fetchTopExpenses } from "./expenses/top-expenses";
 import { fetchGoalsProgressData } from "./goals-progress";
 import { fetchIncomeExpenseBalance } from "./income-expense-balance";
 import { fetchDashboardInvoices } from "./invoices";
-import { fetchDashboardCardMetrics } from "./metrics";
 import { fetchDashboardNotes } from "./notes";
 import { fetchDashboardPagadores } from "./pagadores";
 import { fetchPaymentConditions } from "./payments/payment-conditions";
@@ -23,7 +23,7 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		metrics,
 		accountsSnapshot,
 		invoicesSnapshot,
-		boletosSnapshot,
+		billsSnapshot,
 		goalsProgressData,
 		paymentStatusData,
 		incomeExpenseBalanceData,
@@ -43,7 +43,7 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		fetchDashboardCardMetrics(userId, period),
 		fetchDashboardAccounts(userId),
 		fetchDashboardInvoices(userId, period),
-		fetchDashboardBoletos(userId, period),
+		fetchDashboardBills(userId, period),
 		fetchGoalsProgressData(userId, period),
 		fetchPaymentStatus(userId, period),
 		fetchIncomeExpenseBalance(userId, period),
@@ -65,7 +65,7 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		metrics,
 		accountsSnapshot,
 		invoicesSnapshot,
-		boletosSnapshot,
+		billsSnapshot,
 		goalsProgressData,
 		paymentStatusData,
 		incomeExpenseBalanceData,
@@ -95,7 +95,7 @@ export function fetchDashboardData(userId: string, period: string) {
 		[`dashboard-${userId}-${period}`],
 		{
 			tags: ["dashboard", `dashboard-${userId}`],
-			revalidate: 120,
+			revalidate: 60,
 		},
 	)();
 }

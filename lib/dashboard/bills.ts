@@ -2,13 +2,14 @@
 
 import { and, asc, eq } from "drizzle-orm";
 import { lancamentos } from "@/db/schema";
-import { toNumber } from "@/lib/dashboard/common";
 import { db } from "@/lib/db";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import { toDateOnlyString } from "@/lib/utils/date";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
 
-type RawDashboardBoleto = {
+type RawDashboardBill = {
 	id: string;
 	name: string;
 	amount: string | number | null;
@@ -17,7 +18,7 @@ type RawDashboardBoleto = {
 	isSettled: boolean | null;
 };
 
-export type DashboardBoleto = {
+export type DashboardBill = {
 	id: string;
 	name: string;
 	amount: number;
@@ -26,35 +27,19 @@ export type DashboardBoleto = {
 	isSettled: boolean;
 };
 
-export type DashboardBoletosSnapshot = {
-	boletos: DashboardBoleto[];
+export type DashboardBillsSnapshot = {
+	bills: DashboardBill[];
 	totalPendingAmount: number;
 	pendingCount: number;
 };
 
-const toISODate = (value: Date | string | null) => {
-	if (!value) {
-		return null;
-	}
-
-	if (value instanceof Date) {
-		return value.toISOString().slice(0, 10);
-	}
-
-	if (typeof value === "string") {
-		return value;
-	}
-
-	return null;
-};
-
-export async function fetchDashboardBoletos(
+export async function fetchDashboardBills(
 	userId: string,
 	period: string,
-): Promise<DashboardBoletosSnapshot> {
+): Promise<DashboardBillsSnapshot> {
 	const adminPagadorId = await getAdminPagadorId(userId);
 	if (!adminPagadorId) {
-		return { boletos: [], totalPendingAmount: 0, pendingCount: 0 };
+		return { bills: [], totalPendingAmount: 0, pendingCount: 0 };
 	}
 
 	const rows = await db
@@ -81,14 +66,14 @@ export async function fetchDashboardBoletos(
 			asc(lancamentos.name),
 		);
 
-	const boletos = rows.map((row: RawDashboardBoleto): DashboardBoleto => {
+	const bills = rows.map((row: RawDashboardBill): DashboardBill => {
 		const amount = Math.abs(toNumber(row.amount));
 		return {
 			id: row.id,
 			name: row.name,
 			amount,
-			dueDate: toISODate(row.dueDate),
-			boletoPaymentDate: toISODate(row.boletoPaymentDate),
+			dueDate: toDateOnlyString(row.dueDate),
+			boletoPaymentDate: toDateOnlyString(row.boletoPaymentDate),
 			isSettled: Boolean(row.isSettled),
 		};
 	});
@@ -96,15 +81,15 @@ export async function fetchDashboardBoletos(
 	let totalPendingAmount = 0;
 	let pendingCount = 0;
 
-	for (const boleto of boletos) {
-		if (!boleto.isSettled) {
-			totalPendingAmount += boleto.amount;
+	for (const bill of bills) {
+		if (!bill.isSettled) {
+			totalPendingAmount += bill.amount;
 			pendingCount += 1;
 		}
 	}
 
 	return {
-		boletos,
+		bills,
 		totalPendingAmount,
 		pendingCount,
 	};

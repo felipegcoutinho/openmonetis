@@ -67,9 +67,6 @@ export default async function Page() {
 								</p>
 							</div>
 							<PreferencesForm
-								disableMagnetlines={
-									userPreferences?.disableMagnetlines ?? false
-								}
 								extratoNoteAsColumn={
 									userPreferences?.extratoNoteAsColumn ?? false
 								}

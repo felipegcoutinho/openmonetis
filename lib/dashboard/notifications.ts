@@ -11,6 +11,14 @@ import {
 import { db } from "@/lib/db";
 import { INVOICE_PAYMENT_STATUS } from "@/lib/faturas";
 import { getAdminPagadorId } from "@/lib/pagadores/get-admin-id";
+import {
+	buildDateOnlyStringFromPeriodDay,
+	getBusinessDateString,
+	isDateOnlyPast,
+	isDateOnlyWithinDays,
+	toDateOnlyString,
+} from "@/lib/utils/date";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
 
 export type NotificationType = "overdue" | "due_soon";
 
@@ -47,100 +55,6 @@ const PAYMENT_METHOD_BOLETO = "Boleto";
 const BUDGET_CRITICAL_THRESHOLD = 80;
 
 /**
- * Calcula a data de vencimento de uma fatura baseado no período e dia de vencimento
- * @param period Período no formato YYYY-MM
- * @param dueDay Dia do vencimento (1-31)
- * @returns Data de vencimento no formato YYYY-MM-DD
- */
-function calculateDueDate(period: string, dueDay: string): string {
-	const [year, month] = period.split("-");
-	const yearNumber = Number(year);
-	const monthNumber = Number(month);
-	const hasValidMonth =
-		Number.isInteger(yearNumber) &&
-		Number.isInteger(monthNumber) &&
-		monthNumber >= 1 &&
-		monthNumber <= 12;
-
-	const daysInMonth = hasValidMonth
-		? new Date(yearNumber, monthNumber, 0).getDate()
-		: null;
-
-	const dueDayNumber = Number(dueDay);
-	const hasValidDueDay = Number.isInteger(dueDayNumber) && dueDayNumber > 0;
-
-	const clampedDay =
-		hasValidMonth && hasValidDueDay && daysInMonth
-			? Math.min(dueDayNumber, daysInMonth)
-			: hasValidDueDay
-				? dueDayNumber
-				: null;
-
-	const day = clampedDay
-		? String(clampedDay).padStart(2, "0")
-		: dueDay.padStart(2, "0");
-
-	const normalizedMonth =
-		hasValidMonth && month.length < 2 ? month.padStart(2, "0") : month;
-
-	return `${year}-${normalizedMonth}-${day}`;
-}
-
-/**
- * Normaliza uma data para o início do dia em UTC (00:00:00)
- */
-function normalizeDate(date: Date): Date {
-	return new Date(
-		Date.UTC(
-			date.getUTCFullYear(),
-			date.getUTCMonth(),
-			date.getUTCDate(),
-			0,
-			0,
-			0,
-			0,
-		),
-	);
-}
-
-/**
- * Converte string "YYYY-MM-DD" para Date em UTC (evita problemas de timezone)
- */
-function parseUTCDate(dateString: string): Date {
-	const [year, month, day] = dateString.split("-").map(Number);
-	return new Date(Date.UTC(year, month - 1, day));
-}
-
-/**
- * Verifica se uma data está atrasada (antes do dia atual, não incluindo hoje)
- */
-function isOverdue(dueDate: string, today: Date): boolean {
-	const due = parseUTCDate(dueDate);
-	const dueNormalized = normalizeDate(due);
-	return dueNormalized < today;
-}
-
-/**
- * Verifica se uma data vence nos próximos X dias (incluindo hoje)
- */
-function isDueWithinDays(
-	dueDate: string,
-	today: Date,
-	daysThreshold: number,
-): boolean {
-	const due = parseUTCDate(dueDate);
-	const dueNormalized = normalizeDate(due);
-	const limitDate = new Date(today);
-	limitDate.setUTCDate(limitDate.getUTCDate() + daysThreshold);
-	return dueNormalized >= today && dueNormalized <= limitDate;
-}
-
-function toNum(value: unknown): number {
-	if (typeof value === "number") return value;
-	return Number(value) || 0;
-}
-
-/**
  * Busca todas as notificações do dashboard:
  * - Faturas de cartão atrasadas ou com vencimento próximo
  * - Boletos não pagos atrasados ou com vencimento próximo
@@ -150,7 +64,7 @@ export async function fetchDashboardNotifications(
 	userId: string,
 	currentPeriod: string,
 ): Promise<DashboardNotificationsSnapshot> {
-	const today = normalizeDate(new Date());
+	const today = getBusinessDateString();
 	const DAYS_THRESHOLD = 5;
 
 	const adminPagadorId = await getAdminPagadorId(userId);
@@ -285,8 +199,12 @@ export async function fetchDashboardNotifications(
 	// Faturas atrasadas (períodos anteriores)
 	for (const invoice of overdueInvoices) {
 		if (!invoice.period || !invoice.dueDay) continue;
-		const dueDate = calculateDueDate(invoice.period, invoice.dueDay);
-		const amount = toNum(invoice.totalAmount);
+		const dueDate = buildDateOnlyStringFromPeriodDay(
+			invoice.period,
+			invoice.dueDay,
+		);
+		if (!dueDate) continue;
+		const amount = toNumber(invoice.totalAmount);
 		const notificationId = invoice.invoiceId
 			? `invoice-${invoice.invoiceId}`
 			: `invoice-${invoice.cardId}-${invoice.period}`;
@@ -307,8 +225,13 @@ export async function fetchDashboardNotifications(
 	// Faturas do período atual
 	for (const invoice of currentInvoices) {
 		if (!invoice.period || !invoice.dueDay) continue;
-		const amount = toNum(invoice.totalAmount);
-		const transactionCount = toNum(invoice.transactionCount);
+		const dueDate = buildDateOnlyStringFromPeriodDay(
+			invoice.period,
+			invoice.dueDay,
+		);
+		if (!dueDate) continue;
+		const amount = toNumber(invoice.totalAmount);
+		const transactionCount = toNumber(invoice.transactionCount);
 		const paymentStatus =
 			invoice.paymentStatus ?? INVOICE_PAYMENT_STATUS.PENDING;
 
@@ -319,9 +242,12 @@ export async function fetchDashboardNotifications(
 		if (!shouldInclude) continue;
 		if (paymentStatus === INVOICE_PAYMENT_STATUS.PAID) continue;
 
-		const dueDate = calculateDueDate(invoice.period, invoice.dueDay);
-		const invoiceIsOverdue = isOverdue(dueDate, today);
-		const invoiceIsDueSoon = isDueWithinDays(dueDate, today, DAYS_THRESHOLD);
+		const invoiceIsOverdue = isDateOnlyPast(dueDate, today);
+		const invoiceIsDueSoon = isDateOnlyWithinDays(
+			dueDate,
+			DAYS_THRESHOLD,
+			today,
+		);
 		if (!invoiceIsOverdue && !invoiceIsDueSoon) continue;
 
 		const notificationId = invoice.invoiceId
@@ -343,17 +269,18 @@ export async function fetchDashboardNotifications(
 
 	// Boletos
 	for (const boleto of boletosRows) {
-		if (!boleto.dueDate) continue;
-		const dueDate =
-			boleto.dueDate instanceof Date
-				? `${boleto.dueDate.getUTCFullYear()}-${String(boleto.dueDate.getUTCMonth() + 1).padStart(2, "0")}-${String(boleto.dueDate.getUTCDate()).padStart(2, "0")}`
-				: boleto.dueDate;
+		const dueDate = toDateOnlyString(boleto.dueDate);
+		if (!dueDate) continue;
 
-		const boletoIsOverdue = isOverdue(dueDate, today);
-		const boletoIsDueSoon = isDueWithinDays(dueDate, today, DAYS_THRESHOLD);
+		const boletoIsOverdue = isDateOnlyPast(dueDate, today);
+		const boletoIsDueSoon = isDateOnlyWithinDays(
+			dueDate,
+			DAYS_THRESHOLD,
+			today,
+		);
 		const isOldPeriod = boleto.period < currentPeriod;
 		const isCurrentPeriod = boleto.period === currentPeriod;
-		const amount = toNum(boleto.amount);
+		const amount = toNumber(boleto.amount);
 
 		if (isOldPeriod) {
 			notifications.push({
@@ -391,8 +318,8 @@ export async function fetchDashboardNotifications(
 	const budgetNotifications: BudgetNotification[] = [];
 
 	for (const row of budgetRows) {
-		const budgetAmount = toNum(row.budgetAmount);
-		const spentAmount = toNum(row.spentAmount);
+		const budgetAmount = toNumber(row.budgetAmount);
+		const spentAmount = toNumber(row.spentAmount);
 		if (budgetAmount <= 0) continue;
 
 		const usedPercentage = (spentAmount / budgetAmount) * 100;
