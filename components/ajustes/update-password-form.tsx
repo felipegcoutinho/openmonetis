@@ -7,7 +7,7 @@ import {
 	RiEyeLine,
 	RiEyeOffLine,
 } from "@remixicon/react";
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updatePasswordAction } from "@/app/(dashboard)/ajustes/actions";
 import { Button } from "@/components/ui/button";
@@ -85,16 +85,12 @@ export function UpdatePasswordForm({ authProvider }: UpdatePasswordFormProps) {
 	const isGoogleAuth = authProvider === "google";
 
 	// Validação em tempo real: senhas coincidem
-	const passwordsMatch = useMemo(() => {
-		if (!confirmPassword) return null; // Não mostrar erro se campo vazio
-		return newPassword === confirmPassword;
-	}, [newPassword, confirmPassword]);
+	const passwordsMatch = !confirmPassword
+		? null
+		: newPassword === confirmPassword;
 
 	// Validação de requisitos da senha
-	const passwordValidation = useMemo(
-		() => validatePassword(newPassword),
-		[newPassword],
-	);
+	const passwordValidation = validatePassword(newPassword);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();

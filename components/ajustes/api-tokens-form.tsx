@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatDateTime } from "@/lib/utils/date";
 
 interface ApiToken {
 	id: string;
@@ -290,7 +291,11 @@ export function ApiTokensForm({ tokens }: ApiTokensFormProps) {
 										)}
 										{" · "}
 										Criado em{" "}
-										{new Date(token.createdAt).toLocaleDateString("pt-BR")}
+										{formatDateTime(token.createdAt, {
+											day: "2-digit",
+											month: "2-digit",
+											year: "numeric",
+										}) ?? "—"}
 									</p>
 								</div>
 							</div>

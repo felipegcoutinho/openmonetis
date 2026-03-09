@@ -6,7 +6,7 @@ import {
 	RiEyeLine,
 	RiEyeOffLine,
 } from "@remixicon/react";
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateEmailAction } from "@/app/(dashboard)/ajustes/actions";
 import { Button } from "@/components/ui/button";
@@ -32,16 +32,14 @@ export function UpdateEmailForm({
 	const isGoogleAuth = authProvider === "google";
 
 	// Validação em tempo real: e-mails coincidem
-	const emailsMatch = useMemo(() => {
-		if (!confirmEmail) return null; // Não mostrar erro se campo vazio
-		return newEmail.toLowerCase() === confirmEmail.toLowerCase();
-	}, [newEmail, confirmEmail]);
+	const emailsMatch = !confirmEmail
+		? null
+		: newEmail.toLowerCase() === confirmEmail.toLowerCase();
 
 	// Validação: novo e-mail é diferente do atual
-	const isEmailDifferent = useMemo(() => {
-		if (!newEmail) return true;
-		return newEmail.toLowerCase() !== currentEmail.toLowerCase();
-	}, [newEmail, currentEmail]);
+	const isEmailDifferent = !newEmail
+		? true
+		: newEmail.toLowerCase() !== currentEmail.toLowerCase();
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();

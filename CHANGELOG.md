@@ -7,6 +7,58 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-09
+
+### Alterado
+
+- Hooks e memoização: removidos `useCallback`/`useMemo` preventivos em páginas de listagem, navegação, formulários de ajustes, calendário e controllers da dashboard; também foi corrigido o uso indevido de `setState` dentro de `useMemo` no relatório por categoria.
+- Pagadores: a tela de detalhe agora mantém o card principal do pagador visível durante a navegação entre abas, sem repetir o bloco completo dentro de cada seção.
+- Pagadores: detalhes sensíveis como envio automático, último envio e observações agora ficam ocultos quando o acesso ao pagador é somente leitura.
+- Pagadores: o e-mail do pagador agora aparece apenas no cabeçalho fixo, evitando repetição dentro do card de detalhes.
+- Relatório de tendências: a tabela e os cards mobile agora exibem a média mensal do período filtrado ao lado do total, com destaque visual em azul; a coluna de categoria também ficou mais compacta com truncamento para nomes longos.
+- Dashboard: o welcome banner deixou de ser um bloco colorido para virar apenas texto destacado.
+- Tema global: removidos do `globals.css` os tokens legados de `welcome-banner`, que não eram mais usados após a simplificação do dashboard.
+- UI base: o `Card` compartilhado agora mantém a borda neutra no estado padrão e aplica um gradiente entre `border` e `primary` no hover.
+- Assets: imagens que estavam soltas na raiz de `public/` foram movidas para `public/imagens/`, com atualização dos caminhos usados por landing page, logos, exports e manifesto do app.
+- Dashboard: `section-cards` foi renomeado para `dashboard-metrics-cards`, deixando mais claro que o componente representa os cards de métricas no topo da dashboard.
+- Dashboard: nomes em `lib/dashboard` foram padronizados por responsabilidade, com domínio `bills` em inglês no código, helpers mais explícitos e remoção do `common.ts` genérico.
+- Widgets: `widget-card` foi separado entre um card base e uma versão expansível, isolando a lógica de overflow sem alterar o visual atual dos widgets.
+- Dashboard: `invoices-widget` foi dividido em componentes locais (`invoices/`) e teve helpers/controle movidos para `lib/dashboard`, deixando o arquivo principal focado na composição visual.
+- Dashboard: `boletos-widget` foi renomeado para `bill-widget`, ganhou componentes locais em `bills/` e teve o estado/formatadores extraídos para `lib/dashboard`.
+- Dashboard: `payment-status-widget` teve os componentes visuais internos separados em uma pasta local, deixando o arquivo principal só como ponto de composição.
+- Dashboard: `notes-widget` teve lista, item e composição dos dialogs separados em `notes/`, com helpers/controller extraídos para `lib/dashboard` para manter responsabilidades mais claras.
+- Dashboard: `goals-progress-widget` agora separa lista, item e diálogo em `goals-progress/`, com helpers/controller extraídos para `lib/dashboard` para manter o componente principal focado em composição.
+- Dashboard: `payment-overview-widget` passou a separar o shell de abas da regra de estado, isolando a composição dos widgets de condições e formas de pagamento.
+- Dashboard: `payment-conditions-widget` e `payment-methods-widget` passaram a usar uma base visual compartilhada para listas de distribuição, reduzindo duplicação e deixando cada widget responsável só por mapear seus dados.
+- Dashboard: os componentes internos de comportamento de pagamento foram reunidos em `payment-overview/`, deixando apenas o widget pai na raiz de `components/dashboard`.
+- Dashboard: `installment-expenses-widget` teve item/lista/view separados em `installment-expenses/`, com cálculos auxiliares movidos para `lib/dashboard` para deixar o componente principal focado na composição.
+- Datas: helpers de `YYYY-MM-DD`, labels de vencimento/pagamento e o relógio de negócio foram centralizados em `lib/utils/date.ts`, com adoção inicial em dashboard, pagadores, calendário, exports e actions de pagamento para reduzir drift de timezone.
+- Dashboard: `bill-widget` e `invoices-widget` agora compartilham um hook base de confirmação de pagamento em `lib/dashboard`, mantendo os wrappers específicos só com as regras de cada domínio.
+- Dashboard: os widgets de receita e despesa por categoria passaram a compartilhar uma view de breakdown no client e um builder de agregação no server, preservando queries separadas para não misturar regras financeiras específicas.
+- Dashboard: filtros repetidos de `lancamentos` passaram a usar helpers compartilhados em `lib/dashboard/lancamento-filters.ts`, reduzindo duplicação nas queries centrais de métricas, categorias, pagamentos, compras e estabelecimentos.
+- Lançamentos: a tabela deixou de quebrar ao formatar datas inválidas ou serializadas como ISO completo, normalizando `purchaseDate` para `YYYY-MM-DD` e adicionando fallback seguro no `formatDate`.
+- Períodos: `lib/utils/period` passou a concentrar conversões `Date <-> YYYY-MM` e labels reutilizáveis, com adoção inicial em pickers, calendário e filtros de relatórios.
+- Períodos: a adoção dos helpers centrais avançou para histórico de categorias, relatórios de cartões, exportações, insights, actions e cálculos de parcelas, reduzindo parse manual de `YYYY-MM` em regras de domínio.
+- Dashboard e faturas: labels financeiros de vencimento/pagamento agora compartilham uma base em `lib/utils/financial-dates.ts`, reduzindo duplicação entre `bills` e `invoices`.
+- Formatadores: porcentagens passaram a usar um util compartilhado em `lib/utils/percentage.ts`, com adoção inicial em breakdowns, metas, relatórios e cabeçalhos de categoria.
+- Formatadores: moeda passou a ter base compartilhada em `lib/utils/currency.ts`, com adoção inicial em componentes compartilhados, notificações e cards de relatórios.
+- Formatadores: a adoção do util de moeda avançou em resumo de fatura, extrato de conta, diálogo de orçamento, cabeçalho de pagador e histórico de categorias.
+- Datas e labels: `formatDateTime` foi adicionado em `lib/utils/date.ts`, com adoção em pagadores, notificações relacionadas e no modal de calendário para reduzir repetição de `toLocaleString`/`toLocaleDateString`.
+- Logos e cartões: resolução de logos e brand assets foi consolidada em `lib/logo/index.ts` e `lib/cartoes/brand-assets.ts`, com adoção principal em cartões, contas, notificações, inbox, relatórios e seletores.
+- Notas: helpers transversais saíram de `lib/dashboard` e foram separados entre `lib/notes/formatters.ts` e `lib/dashboard/notes-mappers.ts`, deixando o dashboard responsável apenas pela adaptação dos dados do widget.
+- Documentação: o relatório de duplicações de datas e utils agora inclui um checklist executivo com itens feitos, pendentes e o que não vale abstrair agora.
+
+### Corrigido
+
+- Hooks e sincronização: o provider de privacidade voltou a reagir corretamente às mudanças do modo privado, e o resumo de fatura agora reseta a data de pagamento quando a prop inicial deixa de existir.
+- Compatibilidade da refatoração de hooks e relatórios: `useMobile`/`useIsMobile` voltaram a ter exports compatíveis, o shim de `components/ui/use-mobile.ts` foi restaurado para o sidebar e `lib/relatorios/types.ts` voltou a reexportar os tipos usados pelos fetchers legados.
+- Widgets expansíveis: o shell compartilhado voltou a aplicar `relative` e `overflow-hidden`, mantendo o gradiente e o botão "Ver tudo" presos ao card.
+- Dashboard: o widget "Lançamentos por categoria" deixou de ler a categoria salva no `sessionStorage` durante a renderização inicial, evitando mismatch de hidratação entre servidor e cliente.
+
+### Removido
+
+- Dashboard/Ajustes: toda a implementação legada de `magnet-lines` foi removida, incluindo componente órfão, preferência de usuário e a coluna `disable_magnetlines` do schema com migration dedicada.
+
 ## [1.7.7] - 2026-03-05
 
 ### Alterado
