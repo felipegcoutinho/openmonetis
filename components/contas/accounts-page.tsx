@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteAccountAction } from "@/app/(dashboard)/contas/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { AccountCard } from "@/components/contas/account-card";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { resolveLogoSrc } from "@/lib/logo";
 import { getCurrentPeriod } from "@/lib/utils/period";
 import { Card } from "../ui/card";
 import { AccountDialog } from "./account-dialog";
@@ -22,15 +23,6 @@ interface AccountsPageProps {
 	archivedAccounts: Account[];
 	logoOptions: string[];
 }
-
-const resolveLogoSrc = (logo: string | null) => {
-	if (!logo) {
-		return undefined;
-	}
-
-	const fileName = logo.split("/").filter(Boolean).pop() ?? logo;
-	return `/logos/${fileName}`;
-};
 
 export function AccountsPage({
 	accounts,
@@ -135,7 +127,7 @@ export function AccountsPage({
 		return (
 			<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
 				{list.map((account) => {
-					const logoSrc = resolveLogoSrc(account.logo);
+					const logoSrc = resolveLogoSrc(account.logo) ?? undefined;
 
 					return (
 						<AccountCard
@@ -229,6 +221,8 @@ export function AccountsPage({
 						...a,
 						balance: a.balance ?? a.initialBalance ?? 0,
 						excludeFromBalance: a.excludeFromBalance ?? false,
+						excludeInitialBalanceFromIncome:
+							a.excludeInitialBalanceFromIncome ?? false,
 					}))}
 					fromAccountId={transferFromAccount.id}
 					currentPeriod={getCurrentPeriod()}

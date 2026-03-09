@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { deletePagadorShareAction } from "@/app/(dashboard)/pagadores/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDateTime } from "@/lib/utils/date";
 
 interface PagadorLeaveShareCardProps {
 	shareId: string;
@@ -37,11 +38,12 @@ export function PagadorLeaveShareCard({
 		});
 	};
 
-	const formattedDate = new Date(createdAt).toLocaleDateString("pt-BR", {
-		day: "2-digit",
-		month: "long",
-		year: "numeric",
-	});
+	const formattedDate =
+		formatDateTime(createdAt, {
+			day: "2-digit",
+			month: "long",
+			year: "numeric",
+		}) ?? "—";
 
 	return (
 		<Card className="border">

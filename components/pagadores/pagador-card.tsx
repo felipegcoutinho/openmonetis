@@ -9,7 +9,6 @@ import {
 } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
@@ -23,11 +22,7 @@ interface PagadorCardProps {
 }
 
 export function PagadorCard({ pagador, onEdit, onRemove }: PagadorCardProps) {
-	const avatarSrc = useMemo(
-		() => getAvatarSrc(pagador.avatarUrl),
-		[pagador.avatarUrl],
-	);
-
+	const avatarSrc = getAvatarSrc(pagador.avatarUrl);
 	const isAdmin = pagador.role === PAGADOR_ROLE_ADMIN;
 	const isReadOnly = !pagador.canEdit;
 

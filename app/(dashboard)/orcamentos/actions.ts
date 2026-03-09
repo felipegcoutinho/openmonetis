@@ -3,18 +3,16 @@
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { categorias, orcamentos } from "@/db/schema";
-import {
-	type ActionResult,
-	handleActionError,
-	revalidateForEntity,
-} from "@/lib/actions/helpers";
+import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
 import { getUser } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { periodSchema, uuidSchema } from "@/lib/schemas/common";
+import type { ActionResult } from "@/lib/types/actions";
 import {
 	formatDecimalForDbRequired,
 	normalizeDecimalInput,
 } from "@/lib/utils/currency";
+import { getPreviousPeriod } from "@/lib/utils/period";
 
 const budgetBaseSchema = z.object({
 	categoriaId: uuidSchema("Categoria"),
@@ -43,9 +41,13 @@ const deleteBudgetSchema = z.object({
 	id: uuidSchema("Orçamento"),
 });
 
-type BudgetCreateInput = z.infer<typeof createBudgetSchema>;
-type BudgetUpdateInput = z.infer<typeof updateBudgetSchema>;
-type BudgetDeleteInput = z.infer<typeof deleteBudgetSchema>;
+type BudgetCreateInput = z.input<typeof createBudgetSchema>;
+type BudgetUpdateInput = z.input<typeof updateBudgetSchema>;
+type BudgetDeleteInput = z.input<typeof deleteBudgetSchema>;
+type BudgetCopyRow = {
+	categoriaId: string | null;
+	amount: unknown;
+};
 
 const ensureCategory = async (userId: string, categoriaId: string) => {
 	const category = await db.query.categorias.findFirst({
@@ -193,7 +195,7 @@ const duplicatePreviousMonthSchema = z.object({
 	period: periodSchema,
 });
 
-type DuplicatePreviousMonthInput = z.infer<typeof duplicatePreviousMonthSchema>;
+type DuplicatePreviousMonthInput = z.input<typeof duplicatePreviousMonthSchema>;
 
 export async function duplicatePreviousMonthBudgetsAction(
 	input: DuplicatePreviousMonthInput,
@@ -203,22 +205,15 @@ export async function duplicatePreviousMonthBudgetsAction(
 		const data = duplicatePreviousMonthSchema.parse(input);
 
 		// Calcular mês anterior
-		const [year, month] = data.period.split("-").map(Number);
-		const currentDate = new Date(year, month - 1, 1);
-		const previousDate = new Date(currentDate);
-		previousDate.setMonth(previousDate.getMonth() - 1);
-
-		const prevYear = previousDate.getFullYear();
-		const prevMonth = String(previousDate.getMonth() + 1).padStart(2, "0");
-		const previousPeriod = `${prevYear}-${prevMonth}`;
+		const previousPeriod = getPreviousPeriod(data.period);
 
 		// Buscar orçamentos do mês anterior
-		const previousBudgets = await db.query.orcamentos.findMany({
+		const previousBudgets = (await db.query.orcamentos.findMany({
 			where: and(
 				eq(orcamentos.userId, user.id),
 				eq(orcamentos.period, previousPeriod),
 			),
-		});
+		})) as BudgetCopyRow[];
 
 		if (previousBudgets.length === 0) {
 			return {
@@ -228,12 +223,12 @@ export async function duplicatePreviousMonthBudgetsAction(
 		}
 
 		// Buscar orçamentos existentes do mês atual
-		const currentBudgets = await db.query.orcamentos.findMany({
+		const currentBudgets = (await db.query.orcamentos.findMany({
 			where: and(
 				eq(orcamentos.userId, user.id),
 				eq(orcamentos.period, data.period),
 			),
-		});
+		})) as BudgetCopyRow[];
 
 		// Filtrar para evitar duplicatas
 		const existingCategoryIds = new Set(

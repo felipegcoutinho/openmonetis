@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import {
 	Select,
@@ -10,16 +9,10 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { LANCAMENTO_CONDITIONS } from "@/lib/lancamentos/constants";
+import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils/ui";
 import { ConditionSelectContent } from "../../select-items";
 import type { ConditionSectionProps } from "./lancamento-dialog-types";
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("pt-BR", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
 
 export function ConditionSection({
 	formState,
@@ -27,56 +20,37 @@ export function ConditionSection({
 	showInstallments,
 	showRecurrence,
 }: ConditionSectionProps) {
-	const amount = useMemo(() => {
-		const value = Number(formState.amount);
-		return Number.isNaN(value) || value <= 0 ? null : value;
-	}, [formState.amount]);
+	const parsedAmount = Number(formState.amount);
+	const amount =
+		Number.isNaN(parsedAmount) || parsedAmount <= 0 ? null : parsedAmount;
 
-	const getInstallmentLabel = useCallback(
-		(count: number) => {
-			if (amount) {
-				const installmentValue = amount / count;
-				return `${count}x de R$ ${formatCurrency(installmentValue)}`;
-			}
-			return `${count}x`;
-		},
-		[amount],
-	);
+	const getInstallmentLabel = (count: number) => {
+		if (amount) {
+			const installmentValue = amount / count;
+			return `${count}x de R$ ${formatCurrency(installmentValue)}`;
+		}
 
-	const _getRecurrenceLabel = (count: number) => {
-		return `${count} meses`;
+		return `${count}x`;
 	};
 
-	const installmentSummary = useMemo(() => {
-		if (!showInstallments || !formState.installmentCount || !amount) {
-			return null;
-		}
+	const installmentCount = Number(formState.installmentCount);
+	const installmentSummary =
+		showInstallments &&
+		formState.installmentCount &&
+		amount &&
+		!Number.isNaN(installmentCount) &&
+		installmentCount > 0
+			? getInstallmentLabel(installmentCount)
+			: null;
 
-		const count = Number(formState.installmentCount);
-		if (Number.isNaN(count) || count <= 0) {
-			return null;
-		}
-
-		return getInstallmentLabel(count);
-	}, [
-		showInstallments,
-		formState.installmentCount,
-		amount,
-		getInstallmentLabel,
-	]);
-
-	const recurrenceSummary = useMemo(() => {
-		if (!showRecurrence || !formState.recurrenceCount) {
-			return null;
-		}
-
-		const count = Number(formState.recurrenceCount);
-		if (Number.isNaN(count) || count <= 0) {
-			return null;
-		}
-
-		return `Por ${count} meses`;
-	}, [showRecurrence, formState.recurrenceCount]);
+	const recurrenceCount = Number(formState.recurrenceCount);
+	const recurrenceSummary =
+		showRecurrence &&
+		formState.recurrenceCount &&
+		!Number.isNaN(recurrenceCount) &&
+		recurrenceCount > 0
+			? `Por ${recurrenceCount} meses`
+			: null;
 
 	return (
 		<div className="flex w-full flex-col gap-2 md:flex-row">

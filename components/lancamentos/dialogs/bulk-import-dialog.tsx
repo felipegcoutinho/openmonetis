@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { createLancamentoAction } from "@/app/(dashboard)/lancamentos/actions";
 import { Button } from "@/components/ui/button";
@@ -58,20 +58,18 @@ export function BulkImportDialog({
 	const [contaId, setContaId] = useState<string | undefined>(undefined);
 	const [cartaoId, setCartaoId] = useState<string | undefined>(undefined);
 	const [isPending, startTransition] = useTransition();
+	type CreateLancamentoInput = Parameters<typeof createLancamentoAction>[0];
 
 	// Reset form when dialog opens/closes
-	const handleOpenChange = useCallback(
-		(newOpen: boolean) => {
-			if (!newOpen) {
-				setPagadorId(defaultPagadorId ?? undefined);
-				setCategoriaId(undefined);
-				setContaId(undefined);
-				setCartaoId(undefined);
-			}
-			onOpenChange(newOpen);
-		},
-		[onOpenChange, defaultPagadorId],
-	);
+	const handleOpenChange = (newOpen: boolean) => {
+		if (!newOpen) {
+			setPagadorId(defaultPagadorId ?? undefined);
+			setCategoriaId(undefined);
+			setContaId(undefined);
+			setCartaoId(undefined);
+		}
+		onOpenChange(newOpen);
+	};
 
 	const categoriaGroups = useMemo(() => {
 		// Get unique transaction types from items
@@ -88,111 +86,100 @@ export function BulkImportDialog({
 		return groupAndSortCategorias(filtered);
 	}, [categoriaOptions, items]);
 
-	const handleSubmit = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault();
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 
-			if (!pagadorId) {
-				toast.error("Selecione o pagador.");
-				return;
-			}
+		if (!pagadorId) {
+			toast.error("Selecione o pagador.");
+			return;
+		}
 
-			if (!categoriaId) {
-				toast.error("Selecione a categoria.");
-				return;
-			}
+		if (!categoriaId) {
+			toast.error("Selecione a categoria.");
+			return;
+		}
 
-			startTransition(async () => {
-				let successCount = 0;
-				let errorCount = 0;
+		startTransition(async () => {
+			let successCount = 0;
+			let errorCount = 0;
 
-				for (const item of items) {
-					const sanitizedAmount = Math.abs(item.amount);
+			for (const item of items) {
+				const sanitizedAmount = Math.abs(item.amount);
 
-					// Determine payment method based on original item
-					const isCredit = item.paymentMethod === "Cartão de crédito";
+				// Determine payment method based on original item
+				const isCredit = item.paymentMethod === "Cartão de crédito";
 
-					// Validate payment method fields
-					if (isCredit && !cartaoId) {
-						toast.error("Selecione um cartão de crédito.");
-						return;
-					}
-
-					if (!isCredit && !contaId) {
-						toast.error("Selecione uma conta.");
-						return;
-					}
-
-					const payload = {
-						purchaseDate: item.purchaseDate,
-						period: item.period,
-						name: item.name,
-						transactionType: item.transactionType as
-							| "Despesa"
-							| "Receita"
-							| "Transferência",
-						amount: sanitizedAmount,
-						condition: item.condition as "À vista" | "Parcelado" | "Recorrente",
-						paymentMethod: item.paymentMethod as
-							| "Cartão de crédito"
-							| "Cartão de débito"
-							| "Pix"
-							| "Dinheiro"
-							| "Boleto"
-							| "Pré-Pago | VR/VA"
-							| "Transferência bancária",
-						pagadorId,
-						secondaryPagadorId: undefined,
-						isSplit: false,
-						contaId: isCredit ? undefined : contaId,
-						cartaoId: isCredit ? cartaoId : undefined,
-						categoriaId,
-						note: item.note || undefined,
-						isSettled: isCredit ? null : Boolean(item.isSettled),
-						installmentCount:
-							item.condition === "Parcelado" && item.installmentCount
-								? Number(item.installmentCount)
-								: undefined,
-						recurrenceCount:
-							item.condition === "Recorrente" && item.recurrenceCount
-								? Number(item.recurrenceCount)
-								: undefined,
-						dueDate:
-							item.paymentMethod === "Boleto" && item.dueDate
-								? item.dueDate
-								: undefined,
-					};
-
-					const result = await createLancamentoAction(payload);
-
-					if (result.success) {
-						successCount++;
-					} else {
-						errorCount++;
-						console.error(`Failed to import ${item.name}:`, result.error);
-					}
+				// Validate payment method fields
+				if (isCredit && !cartaoId) {
+					toast.error("Selecione um cartão de crédito.");
+					return;
 				}
 
-				if (errorCount === 0) {
-					toast.success(
-						`${successCount} ${
-							successCount === 1
-								? "lançamento importado"
-								: "lançamentos importados"
-						} com sucesso!`,
-					);
-					handleOpenChange(false);
-				} else if (successCount > 0) {
-					toast.warning(
-						`${successCount} importados, ${errorCount} falharam. Verifique o console para detalhes.`,
-					);
+				if (!isCredit && !contaId) {
+					toast.error("Selecione uma conta.");
+					return;
+				}
+
+				const payload: CreateLancamentoInput = {
+					purchaseDate: item.purchaseDate,
+					period: item.period,
+					name: item.name,
+					transactionType:
+						item.transactionType as CreateLancamentoInput["transactionType"],
+					amount: sanitizedAmount,
+					condition: item.condition as CreateLancamentoInput["condition"],
+					paymentMethod:
+						item.paymentMethod as CreateLancamentoInput["paymentMethod"],
+					pagadorId: pagadorId ?? null,
+					secondaryPagadorId: undefined,
+					isSplit: false,
+					contaId: isCredit ? null : (contaId ?? null),
+					cartaoId: isCredit ? (cartaoId ?? null) : null,
+					categoriaId: categoriaId ?? null,
+					note: item.note ?? null,
+					isSettled: isCredit ? null : Boolean(item.isSettled),
+					installmentCount:
+						item.condition === "Parcelado" && item.installmentCount
+							? Number(item.installmentCount)
+							: undefined,
+					recurrenceCount:
+						item.condition === "Recorrente" && item.recurrenceCount
+							? Number(item.recurrenceCount)
+							: undefined,
+					dueDate:
+						item.paymentMethod === "Boleto" && item.dueDate
+							? item.dueDate
+							: undefined,
+				};
+
+				const result = await createLancamentoAction(payload);
+
+				if (result.success) {
+					successCount++;
 				} else {
-					toast.error("Falha ao importar lançamentos. Verifique o console.");
+					errorCount++;
+					console.error(`Failed to import ${item.name}:`, result.error);
 				}
-			});
-		},
-		[items, pagadorId, categoriaId, contaId, cartaoId, handleOpenChange],
-	);
+			}
+
+			if (errorCount === 0) {
+				toast.success(
+					`${successCount} ${
+						successCount === 1
+							? "lançamento importado"
+							: "lançamentos importados"
+					} com sucesso!`,
+				);
+				handleOpenChange(false);
+			} else if (successCount > 0) {
+				toast.warning(
+					`${successCount} importados, ${errorCount} falharam. Verifique o console para detalhes.`,
+				);
+			} else {
+				toast.error("Falha ao importar lançamentos. Verifique o console.");
+			}
+		});
+	};
 
 	const itemCount = items.length;
 	const hasCredit = items.some(

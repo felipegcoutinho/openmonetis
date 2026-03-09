@@ -38,6 +38,10 @@ import type {
 	BudgetNotification,
 	DashboardNotification,
 } from "@/lib/dashboard/notifications";
+import { resolveLogoSrc } from "@/lib/logo";
+import { formatCurrency } from "@/lib/utils/currency";
+import { formatDateOnly } from "@/lib/utils/date";
+import { formatPercentage } from "@/lib/utils/percentage";
 import { cn } from "@/lib/utils/ui";
 
 type NotificationBellProps = {
@@ -47,27 +51,13 @@ type NotificationBellProps = {
 	preLancamentosCount?: number;
 };
 
-const resolveLogoPath = (logo: string | null | undefined) => {
-	if (!logo) return null;
-	if (/^(https?:\/\/|data:)/.test(logo)) return logo;
-	return logo.startsWith("/") ? logo : `/logos/${logo}`;
-};
-
 function formatDate(dateString: string): string {
-	const [year, month, day] = dateString.split("-").map(Number);
-	const date = new Date(Date.UTC(year, month - 1, day));
-	return date.toLocaleDateString("pt-BR", {
-		day: "2-digit",
-		month: "short",
-		timeZone: "UTC",
-	});
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-	}).format(amount);
+	return (
+		formatDateOnly(dateString, {
+			day: "2-digit",
+			month: "short",
+		}) ?? dateString
+	);
 }
 
 function SectionLabel({
@@ -115,9 +105,9 @@ export function NotificationBell({
 							aria-expanded={open}
 							className={cn(
 								buttonVariants({ variant: "ghost", size: "icon-sm" }),
-								"group relative text-muted-foreground transition-all duration-200",
-								"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
-								"data-[state=open]:bg-accent/60 data-[state=open]:text-foreground border",
+								"group relative border border-black/10 text-black/75 shadow-none transition-all duration-200",
+								"hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-2 focus-visible:ring-black/20",
+								"data-[state=open]:bg-black/10 data-[state=open]:text-black",
 							)}
 						>
 							<RiNotification3Line
@@ -130,7 +120,7 @@ export function NotificationBell({
 								<>
 									<span
 										aria-hidden
-										className="absolute -right-1.5 -top-1.5 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground shadow-xs ring-2 ring-background"
+										className="absolute -right-1.5 -top-1.5 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-xs font-semibold text-destructive-foreground "
 									>
 										{displayCount}
 									</span>
@@ -148,7 +138,7 @@ export function NotificationBell({
 			<DropdownMenuContent
 				align="end"
 				sideOffset={12}
-				className="w-76 overflow-hidden rounded-lg border border-border/60 bg-popover/95 p-0 shadow-lg backdrop-blur-lg supports-backdrop-filter:backdrop-blur-md"
+				className="w-76 overflow-hidden rounded-lg border border-border/60 bg-popover p-0 shadow-none"
 			>
 				{/* Header */}
 				<DropdownMenuLabel className="flex items-center justify-between gap-2 border-b border-border/50 px-3 py-2.5 text-sm font-semibold">
@@ -223,13 +213,22 @@ export function NotificationBell({
 														excedido —{" "}
 														<strong>{formatCurrency(n.spentAmount)}</strong> de{" "}
 														{formatCurrency(n.budgetAmount)} (
-														{Math.round(n.usedPercentage)}%)
+														{formatPercentage(n.usedPercentage, {
+															maximumFractionDigits: 0,
+															minimumFractionDigits: 0,
+														})}
+														)
 													</>
 												) : (
 													<>
 														<strong>{n.categoryName}</strong> atingiu{" "}
-														<strong>{Math.round(n.usedPercentage)}%</strong> do
-														orçamento —{" "}
+														<strong>
+															{formatPercentage(n.usedPercentage, {
+																maximumFractionDigits: 0,
+																minimumFractionDigits: 0,
+															})}
+														</strong>{" "}
+														do orçamento —{" "}
 														<strong>{formatCurrency(n.spentAmount)}</strong> de{" "}
 														{formatCurrency(n.budgetAmount)}
 													</>
@@ -250,7 +249,7 @@ export function NotificationBell({
 								/>
 								<div className="mx-1 mb-1 overflow-hidden rounded-md">
 									{invoiceNotifications.map((n) => {
-										const logo = resolveLogoPath(n.cardLogo);
+										const logo = resolveLogoSrc(n.cardLogo);
 										return (
 											<div
 												key={n.id}

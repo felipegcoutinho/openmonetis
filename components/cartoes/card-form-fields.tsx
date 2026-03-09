@@ -20,7 +20,7 @@ import {
 	DAYS_IN_MONTH,
 	DEFAULT_CARD_BRANDS,
 	DEFAULT_CARD_STATUS,
-} from "./constants";
+} from "@/lib/cartoes/constants";
 import type { CardFormValues } from "./types";
 
 interface AccountOption {

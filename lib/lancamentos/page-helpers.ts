@@ -19,6 +19,7 @@ import {
 	PAGADOR_ROLE_ADMIN,
 	PAGADOR_ROLE_TERCEIRO,
 } from "@/lib/pagadores/constants";
+import { toDateOnlyString } from "@/lib/utils/date";
 
 type PagadorRow = typeof pagadores.$inferSelect;
 type ContaRow = typeof contas.$inferSelect;
@@ -185,12 +186,10 @@ export const fetchLancamentoFilterSources = async (userId: string) => {
 				where: eq(pagadores.userId, userId),
 			}),
 			db.query.contas.findMany({
-				where: (contas, { eq, and }) =>
-					and(eq(contas.userId, userId), eq(contas.status, "Ativa")),
+				where: and(eq(contas.userId, userId), eq(contas.status, "Ativa")),
 			}),
 			db.query.cartoes.findMany({
-				where: (cartoes, { eq, and }) =>
-					and(eq(cartoes.userId, userId), eq(cartoes.status, "Ativo")),
+				where: and(eq(cartoes.userId, userId), eq(cartoes.status, "Ativo")),
 			}),
 			db.query.categorias.findMany({
 				where: eq(categorias.userId, userId),
@@ -405,7 +404,7 @@ export const mapLancamentosData = (rows: LancamentoRowWithRelations[]) =>
 		id: item.id,
 		userId: item.userId,
 		name: item.name,
-		purchaseDate: item.purchaseDate?.toISOString() ?? new Date().toISOString(),
+		purchaseDate: toDateOnlyString(item.purchaseDate) ?? "",
 		period: item.period ?? "",
 		transactionType: item.transactionType,
 		amount: Number(item.amount ?? 0),

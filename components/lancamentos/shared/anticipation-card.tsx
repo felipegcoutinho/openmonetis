@@ -6,8 +6,8 @@ import { ptBR } from "date-fns/locale";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { cancelInstallmentAnticipationAction } from "@/app/(dashboard)/lancamentos/anticipation-actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
-import MoneyValues from "@/components/money-values";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
+import MoneyValues from "@/components/shared/money-values";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

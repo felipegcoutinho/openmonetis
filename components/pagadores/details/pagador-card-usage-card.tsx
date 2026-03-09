@@ -1,21 +1,10 @@
 import { RiBankCard2Line } from "@remixicon/react";
 import Image from "next/image";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { CardContent } from "@/components/ui/card";
-import { WidgetEmptyState } from "@/components/widget-empty-state";
+import { resolveLogoSrc } from "@/lib/logo";
 import type { PagadorCardUsageItem } from "@/lib/pagadores/details";
-
-const resolveLogoPath = (logo?: string | null) => {
-	if (!logo) return null;
-	if (
-		logo.startsWith("http://") ||
-		logo.startsWith("https://") ||
-		logo.startsWith("data:")
-	) {
-		return logo;
-	}
-	return logo.startsWith("/") ? logo : `/logos/${logo}`;
-};
 
 const buildInitials = (value: string) => {
 	const parts = value.trim().split(/\s+/).filter(Boolean);
@@ -50,7 +39,7 @@ export function PagadorCardUsageCard({ items }: PagadorCardUsageCardProps) {
 		<CardContent className="flex flex-col gap-4 px-0">
 			<ul className="flex flex-col">
 				{items.map((item) => {
-					const logoPath = resolveLogoPath(item.logo);
+					const logoPath = resolveLogoSrc(item.logo);
 					const initials = buildInitials(item.name);
 					return (
 						<li

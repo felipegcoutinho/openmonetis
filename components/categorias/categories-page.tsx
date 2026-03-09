@@ -7,10 +7,10 @@ import {
 	RiPencilLine,
 } from "@remixicon/react";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { deleteCategoryAction } from "@/app/(dashboard)/categorias/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -69,31 +69,31 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 		return base;
 	}, [categories]);
 
-	const handleEdit = useCallback((category: Category) => {
+	const handleEdit = (category: Category) => {
 		setSelectedCategory(category);
 		setEditOpen(true);
-	}, []);
+	};
 
-	const handleEditOpenChange = useCallback((open: boolean) => {
+	const handleEditOpenChange = (open: boolean) => {
 		setEditOpen(open);
 		if (!open) {
 			setSelectedCategory(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveRequest = useCallback((category: Category) => {
+	const handleRemoveRequest = (category: Category) => {
 		setCategoryToRemove(category);
 		setRemoveOpen(true);
-	}, []);
+	};
 
-	const handleRemoveOpenChange = useCallback((open: boolean) => {
+	const handleRemoveOpenChange = (open: boolean) => {
 		setRemoveOpen(open);
 		if (!open) {
 			setCategoryToRemove(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveConfirm = useCallback(async () => {
+	const handleRemoveConfirm = async () => {
 		if (!categoryToRemove) {
 			return;
 		}
@@ -107,7 +107,7 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [categoryToRemove]);
+	};
 
 	const removeTitle = categoryToRemove
 		? `Remover categoria "${categoryToRemove.name}"?`

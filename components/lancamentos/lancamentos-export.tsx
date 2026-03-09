@@ -19,10 +19,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/lancamentos/formatting-helpers";
+import { formatDateOnly, formatDateTime } from "@/lib/utils/date";
 import {
 	getPrimaryPdfColor,
 	loadExportLogoDataUrl,
 } from "@/lib/utils/export-branding";
+import { displayPeriod } from "@/lib/utils/period";
 import type { LancamentoItem } from "./types";
 
 interface LancamentosExportProps {
@@ -41,12 +43,13 @@ export function LancamentosExport({
 	};
 
 	const formatDate = (dateString: string) => {
-		const date = new Date(dateString);
-		return date.toLocaleDateString("pt-BR", {
-			day: "2-digit",
-			month: "2-digit",
-			year: "numeric",
-		});
+		return (
+			formatDateOnly(dateString, {
+				day: "2-digit",
+				month: "2-digit",
+				year: "numeric",
+			}) ?? dateString
+		);
 	};
 
 	const getContaCartaoName = (lancamento: LancamentoItem) => {
@@ -190,8 +193,8 @@ export function LancamentosExport({
 			const doc = new jsPDF({ orientation: "landscape" });
 			const primaryColor = getPrimaryPdfColor();
 			const [smallLogoDataUrl, textLogoDataUrl] = await Promise.all([
-				loadExportLogoDataUrl("/logo_small.png"),
-				loadExportLogoDataUrl("/logo_text.png"),
+				loadExportLogoDataUrl("/imagens/logo_small.png"),
+				loadExportLogoDataUrl("/imagens/logo_text.png"),
 			]);
 			let brandingEndX = 14;
 
@@ -212,28 +215,15 @@ export function LancamentosExport({
 			doc.text("Lançamentos", titleX, 15);
 
 			doc.setFontSize(10);
-			const periodParts = period.split("-");
-			const monthNames = [
-				"Janeiro",
-				"Fevereiro",
-				"Março",
-				"Abril",
-				"Maio",
-				"Junho",
-				"Julho",
-				"Agosto",
-				"Setembro",
-				"Outubro",
-				"Novembro",
-				"Dezembro",
-			];
-			const formattedPeriod =
-				periodParts.length === 2
-					? `${monthNames[Number.parseInt(periodParts[1], 10) - 1]}/${periodParts[0]}`
-					: period;
-			doc.text(`Período: ${formattedPeriod}`, titleX, 22);
+			doc.text(`Período: ${displayPeriod(period)}`, titleX, 22);
 			doc.text(
-				`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+				`Gerado em: ${
+					formatDateTime(new Date(), {
+						day: "2-digit",
+						month: "2-digit",
+						year: "numeric",
+					}) ?? "—"
+				}`,
 				titleX,
 				27,
 			);

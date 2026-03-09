@@ -1,7 +1,7 @@
 "use client";
 
 import { RiAtLine, RiDeleteBinLine } from "@remixicon/react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
 	bulkDeleteInboxItemsAction,
@@ -10,8 +10,8 @@ import {
 	markInboxAsProcessedAction,
 	restoreDiscardedInboxItemAction,
 } from "@/app/(dashboard)/pre-lancamentos/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { LancamentoDialog } from "@/components/lancamentos/dialogs/lancamento-dialog/lancamento-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -67,66 +67,71 @@ export function InboxPage({
 		"processed" | "discarded"
 	>("processed");
 
-	const sortByTimestamp = useCallback(
-		(list: InboxItem[]) =>
-			[...list].sort(
+	const sortedPending = useMemo(
+		() =>
+			[...pendingItems].sort(
 				(a, b) =>
 					new Date(b.notificationTimestamp).getTime() -
 					new Date(a.notificationTimestamp).getTime(),
 			),
-		[],
-	);
-
-	const sortedPending = useMemo(
-		() => sortByTimestamp(pendingItems),
-		[pendingItems, sortByTimestamp],
+		[pendingItems],
 	);
 	const sortedProcessed = useMemo(
-		() => sortByTimestamp(processedItems),
-		[processedItems, sortByTimestamp],
+		() =>
+			[...processedItems].sort(
+				(a, b) =>
+					new Date(b.notificationTimestamp).getTime() -
+					new Date(a.notificationTimestamp).getTime(),
+			),
+		[processedItems],
 	);
 	const sortedDiscarded = useMemo(
-		() => sortByTimestamp(discardedItems),
-		[discardedItems, sortByTimestamp],
+		() =>
+			[...discardedItems].sort(
+				(a, b) =>
+					new Date(b.notificationTimestamp).getTime() -
+					new Date(a.notificationTimestamp).getTime(),
+			),
+		[discardedItems],
 	);
 
-	const handleProcessOpenChange = useCallback((open: boolean) => {
+	const handleProcessOpenChange = (open: boolean) => {
 		setProcessOpen(open);
 		if (!open) {
 			setItemToProcess(null);
 		}
-	}, []);
+	};
 
-	const handleDetailsOpenChange = useCallback((open: boolean) => {
+	const handleDetailsOpenChange = (open: boolean) => {
 		setDetailsOpen(open);
 		if (!open) {
 			setItemDetails(null);
 		}
-	}, []);
+	};
 
-	const handleDiscardOpenChange = useCallback((open: boolean) => {
+	const handleDiscardOpenChange = (open: boolean) => {
 		setDiscardOpen(open);
 		if (!open) {
 			setItemToDiscard(null);
 		}
-	}, []);
+	};
 
-	const handleProcessRequest = useCallback((item: InboxItem) => {
+	const handleProcessRequest = (item: InboxItem) => {
 		setItemToProcess(item);
 		setProcessOpen(true);
-	}, []);
+	};
 
-	const handleDetailsRequest = useCallback((item: InboxItem) => {
+	const handleDetailsRequest = (item: InboxItem) => {
 		setItemDetails(item);
 		setDetailsOpen(true);
-	}, []);
+	};
 
-	const handleDiscardRequest = useCallback((item: InboxItem) => {
+	const handleDiscardRequest = (item: InboxItem) => {
 		setItemToDiscard(item);
 		setDiscardOpen(true);
-	}, []);
+	};
 
-	const handleDiscardConfirm = useCallback(async () => {
+	const handleDiscardConfirm = async () => {
 		if (!itemToDiscard) return;
 
 		const result = await discardInboxItemAction({
@@ -140,21 +145,21 @@ export function InboxPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [itemToDiscard]);
+	};
 
-	const handleDeleteOpenChange = useCallback((open: boolean) => {
+	const handleDeleteOpenChange = (open: boolean) => {
 		setDeleteOpen(open);
 		if (!open) {
 			setItemToDelete(null);
 		}
-	}, []);
+	};
 
-	const handleDeleteRequest = useCallback((item: InboxItem) => {
+	const handleDeleteRequest = (item: InboxItem) => {
 		setItemToDelete(item);
 		setDeleteOpen(true);
-	}, []);
+	};
 
-	const handleDeleteConfirm = useCallback(async () => {
+	const handleDeleteConfirm = async () => {
 		if (!itemToDelete) return;
 
 		const result = await deleteInboxItemAction({
@@ -168,21 +173,21 @@ export function InboxPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [itemToDelete]);
+	};
 
-	const handleRestoreOpenChange = useCallback((open: boolean) => {
+	const handleRestoreOpenChange = (open: boolean) => {
 		setRestoreOpen(open);
 		if (!open) {
 			setItemToRestore(null);
 		}
-	}, []);
+	};
 
-	const handleRestoreRequest = useCallback((item: InboxItem) => {
+	const handleRestoreRequest = (item: InboxItem) => {
 		setItemToRestore(item);
 		setRestoreOpen(true);
-	}, []);
+	};
 
-	const handleRestoreToPendingConfirm = useCallback(async () => {
+	const handleRestoreToPendingConfirm = async () => {
 		if (!itemToRestore) return;
 
 		const result = await restoreDiscardedInboxItemAction({
@@ -196,21 +201,18 @@ export function InboxPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [itemToRestore]);
+	};
 
-	const handleBulkDeleteOpenChange = useCallback((open: boolean) => {
+	const handleBulkDeleteOpenChange = (open: boolean) => {
 		setBulkDeleteOpen(open);
-	}, []);
+	};
 
-	const handleBulkDeleteRequest = useCallback(
-		(status: "processed" | "discarded") => {
-			setBulkDeleteStatus(status);
-			setBulkDeleteOpen(true);
-		},
-		[],
-	);
+	const handleBulkDeleteRequest = (status: "processed" | "discarded") => {
+		setBulkDeleteStatus(status);
+		setBulkDeleteOpen(true);
+	};
 
-	const handleBulkDeleteConfirm = useCallback(async () => {
+	const handleBulkDeleteConfirm = async () => {
 		const result = await bulkDeleteInboxItemsAction({
 			status: bulkDeleteStatus,
 		});
@@ -222,9 +224,9 @@ export function InboxPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [bulkDeleteStatus]);
+	};
 
-	const handleLancamentoSuccess = useCallback(async () => {
+	const handleLancamentoSuccess = async () => {
 		if (!itemToProcess) return;
 
 		const result = await markInboxAsProcessedAction({
@@ -236,7 +238,7 @@ export function InboxPage({
 		} else {
 			toast.error(result.error);
 		}
-	}, [itemToProcess]);
+	};
 
 	// Prepare default values from inbox item
 	const getDateString = (

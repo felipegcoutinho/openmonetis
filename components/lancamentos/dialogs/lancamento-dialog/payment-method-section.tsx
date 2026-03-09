@@ -16,24 +16,13 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
-import { displayPeriod } from "@/lib/utils/period";
+import { dateToPeriod, displayPeriod, periodToDate } from "@/lib/utils/period";
 import { cn } from "@/lib/utils/ui";
 import {
 	ContaCartaoSelectContent,
 	PaymentMethodSelectContent,
 } from "../../select-items";
 import type { PaymentMethodSectionProps } from "./lancamento-dialog-types";
-
-function periodToDate(period: string): Date {
-	const [year, month] = period.split("-").map(Number);
-	return new Date(year, month - 1, 1);
-}
-
-function dateToPeriod(date: Date): string {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	return `${year}-${month}`;
-}
 
 function InlinePeriodPicker({
 	period,

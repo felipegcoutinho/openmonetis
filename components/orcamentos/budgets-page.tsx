@@ -1,13 +1,13 @@
 "use client";
 
 import { RiAddCircleLine, RiFileCopyLine, RiFundsLine } from "@remixicon/react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
 	deleteBudgetAction,
 	duplicatePreviousMonthBudgetsAction,
 } from "@/app/(dashboard)/orcamentos/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "../ui/card";
@@ -36,31 +36,31 @@ export function BudgetsPage({
 
 	const hasBudgets = budgets.length > 0;
 
-	const handleEdit = useCallback((budget: Budget) => {
+	const handleEdit = (budget: Budget) => {
 		setSelectedBudget(budget);
 		setEditOpen(true);
-	}, []);
+	};
 
-	const handleEditOpenChange = useCallback((open: boolean) => {
+	const handleEditOpenChange = (open: boolean) => {
 		setEditOpen(open);
 		if (!open) {
 			setSelectedBudget(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveRequest = useCallback((budget: Budget) => {
+	const handleRemoveRequest = (budget: Budget) => {
 		setBudgetToRemove(budget);
 		setRemoveOpen(true);
-	}, []);
+	};
 
-	const handleRemoveOpenChange = useCallback((open: boolean) => {
+	const handleRemoveOpenChange = (open: boolean) => {
 		setRemoveOpen(open);
 		if (!open) {
 			setBudgetToRemove(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveConfirm = useCallback(async () => {
+	const handleRemoveConfirm = async () => {
 		if (!budgetToRemove) {
 			return;
 		}
@@ -74,9 +74,9 @@ export function BudgetsPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [budgetToRemove]);
+	};
 
-	const handleDuplicateConfirm = useCallback(async () => {
+	const handleDuplicateConfirm = async () => {
 		const result = await duplicatePreviousMonthBudgetsAction({
 			period: selectedPeriod,
 		});
@@ -89,7 +89,7 @@ export function BudgetsPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [selectedPeriod]);
+	};
 
 	const removeTitle = budgetToRemove
 		? `Remover orçamento de "${

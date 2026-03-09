@@ -6,6 +6,7 @@ import {
 import { notFound } from "next/navigation";
 import { fetchUserPreferences } from "@/app/(dashboard)/ajustes/data";
 import { getRecentEstablishmentsAction } from "@/app/(dashboard)/lancamentos/actions";
+import { ExpandableWidgetCard } from "@/components/shared/expandable-widget-card";
 import { LancamentosPage as LancamentosSection } from "@/components/lancamentos/page/lancamentos-page";
 import type {
 	ContaCartaoFilterOption,
@@ -15,6 +16,7 @@ import type {
 } from "@/components/lancamentos/types";
 import MonthNavigation from "@/components/month-picker/month-navigation";
 import { PagadorCardUsageCard } from "@/components/pagadores/details/pagador-card-usage-card";
+import { PagadorHeaderCard } from "@/components/pagadores/details/pagador-header-card";
 import { PagadorHistoryCard } from "@/components/pagadores/details/pagador-history-card";
 import { PagadorInfoCard } from "@/components/pagadores/details/pagador-info-card";
 import { PagadorLeaveShareCard } from "@/components/pagadores/details/pagador-leave-share-card";
@@ -25,7 +27,6 @@ import {
 } from "@/components/pagadores/details/pagador-payment-method-cards";
 import { PagadorSharingCard } from "@/components/pagadores/details/pagador-sharing-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WidgetCard from "@/components/widget-card";
 import type { pagadores } from "@/db/schema";
 import { getUserId } from "@/lib/auth/server";
 import {
@@ -50,6 +51,7 @@ import {
 	fetchPagadorHistory,
 	fetchPagadorMonthlyBreakdown,
 	fetchPagadorPaymentStatus,
+	type PagadorCardUsageItem,
 } from "@/lib/pagadores/details";
 import { parsePeriodParam } from "@/lib/utils/period";
 import {
@@ -232,6 +234,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 					label: pagador.name,
 					slug: pagador.id,
 					role: pagador.role,
+					avatarUrl: pagador.avatarUrl,
 				},
 			],
 			categoriaFiltersRaw: [],
@@ -284,7 +287,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 		periodLabel,
 		totalExpenses: monthlyBreakdown.totalExpenses,
 		paymentSplits: monthlyBreakdown.paymentSplits,
-		cardUsage: cardUsage.slice(0, 3).map((item) => ({
+		cardUsage: cardUsage.slice(0, 3).map((item: PagadorCardUsageItem) => ({
 			name: item.name,
 			amount: item.amount,
 		})),
@@ -308,15 +311,14 @@ export default async function Page({ params, searchParams }: PageProps) {
 					<TabsTrigger value="painel">Painel</TabsTrigger>
 					<TabsTrigger value="lancamentos">Lançamentos</TabsTrigger>
 				</TabsList>
+				<PagadorHeaderCard
+					pagador={pagadorData}
+					selectedPeriod={selectedPeriod}
+					summary={summaryPreview}
+				/>
 
 				<TabsContent value="profile" className="space-y-4">
-					<section>
-						<PagadorInfoCard
-							pagador={pagadorData}
-							selectedPeriod={selectedPeriod}
-							summary={summaryPreview}
-						/>
-					</section>
+					<PagadorInfoCard pagador={pagadorData} />
 					{canEdit && pagadorData.shareCode ? (
 						<PagadorSharingCard
 							pagadorId={pagador.id}
@@ -343,27 +345,27 @@ export default async function Page({ params, searchParams }: PageProps) {
 					</section>
 
 					<section className="grid gap-3 lg:grid-cols-3">
-						<WidgetCard
+						<ExpandableWidgetCard
 							title="Minhas Faturas"
 							subtitle="Valores por cartão neste período"
 							icon={<RiBankCard2Line className="size-4" />}
 						>
 							<PagadorCardUsageCard items={cardUsage} />
-						</WidgetCard>
-						<WidgetCard
+						</ExpandableWidgetCard>
+						<ExpandableWidgetCard
 							title="Boletos"
 							subtitle="Boletos registrados neste período"
 							icon={<RiBarcodeLine className="size-4" />}
 						>
 							<PagadorBoletoCard items={boletoItems} />
-						</WidgetCard>
-						<WidgetCard
+						</ExpandableWidgetCard>
+						<ExpandableWidgetCard
 							title="Status de Pagamento"
 							subtitle="Situação das despesas no período"
 							icon={<RiWallet3Line className="size-4" />}
 						>
 							<PagadorPaymentStatusCard data={paymentStatus} />
-						</WidgetCard>
+						</ExpandableWidgetCard>
 					</section>
 				</TabsContent>
 

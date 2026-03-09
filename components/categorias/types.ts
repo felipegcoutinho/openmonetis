@@ -1,3 +1,5 @@
+import type { CategoryType } from "@/lib/categorias/constants";
+
 export type { CategoryType } from "@/lib/categorias/constants";
 export {
 	CATEGORY_TYPE_LABEL,

@@ -14,6 +14,8 @@ import {
 	fetchPagadorHistory,
 	fetchPagadorMonthlyBreakdown,
 } from "@/lib/pagadores/details";
+import { formatCurrency } from "@/lib/utils/currency";
+import { formatDateTime } from "@/lib/utils/date";
 import { displayPeriod } from "@/lib/utils/period";
 
 const inputSchema = z.object({
@@ -27,20 +29,14 @@ type ActionResult =
 	| { success: true; message: string }
 	| { success: false; error: string };
 
-const formatCurrency = (value: number) =>
-	value.toLocaleString("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-		maximumFractionDigits: 2,
-	});
-
 const formatDate = (value: Date | null | undefined) => {
-	if (!value) return "—";
-	return value.toLocaleDateString("pt-BR", {
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-	});
+	return (
+		formatDateTime(value, {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+		}) ?? "—"
+	);
 };
 
 // Escapa HTML para prevenir XSS
@@ -515,25 +511,47 @@ export async function sendPagadorSummaryAction(
 				.orderBy(desc(lancamentos.purchaseDate)),
 		]);
 
-		const normalizedBoletos: BoletoItem[] = boletoRows.map((row) => ({
+		const normalizedBoletos: BoletoItem[] = (
+			boletoRows as Array<{
+				name: string | null;
+				amount: unknown;
+				dueDate: Date | null;
+			}>
+		).map((row) => ({
 			name: row.name ?? "Sem descrição",
 			amount: Math.abs(Number(row.amount ?? 0)),
 			dueDate: row.dueDate,
 		}));
 
-		const normalizedLancamentos: LancamentoRow[] = lancamentoRows.map(
-			(row) => ({
-				id: row.id,
-				name: row.name,
-				paymentMethod: row.paymentMethod,
-				condition: row.condition,
-				transactionType: row.transactionType,
-				purchaseDate: row.purchaseDate,
-				amount: Number(row.amount ?? 0),
-			}),
-		);
+		const normalizedLancamentos: LancamentoRow[] = (
+			lancamentoRows as Array<{
+				id: string;
+				name: string | null;
+				paymentMethod: string | null;
+				condition: string | null;
+				transactionType: string | null;
+				purchaseDate: Date | null;
+				amount: unknown;
+			}>
+		).map((row) => ({
+			id: row.id,
+			name: row.name,
+			paymentMethod: row.paymentMethod,
+			condition: row.condition,
+			transactionType: row.transactionType,
+			purchaseDate: row.purchaseDate,
+			amount: Number(row.amount ?? 0),
+		}));
 
-		const normalizedParcelados: ParceladoItem[] = parceladoRows.map((row) => {
+		const normalizedParcelados: ParceladoItem[] = (
+			parceladoRows as Array<{
+				name: string | null;
+				amount: unknown;
+				installmentCount: number | null;
+				currentInstallment: number | null;
+				purchaseDate: Date | null;
+			}>
+		).map((row) => {
 			const installmentAmount = Math.abs(Number(row.amount ?? 0));
 			const installmentCount = row.installmentCount ?? 1;
 			const totalAmount = installmentAmount * installmentCount;

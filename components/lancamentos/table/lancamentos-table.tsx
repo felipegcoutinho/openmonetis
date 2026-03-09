@@ -31,9 +31,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CategoryIcon } from "@/components/categorias/category-icon";
-import MoneyValues from "@/components/money-values";
 import { EmptyState } from "@/components/shared/empty-state";
-import { TypeBadge } from "@/components/type-badge";
+import MoneyValues from "@/components/shared/money-values";
+import { TypeBadge } from "@/components/shared/type-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DEFAULT_LANCAMENTOS_COLUMN_ORDER } from "@/lib/lancamentos/column-order";
+import { resolveLogoSrc } from "@/lib/logo";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { formatDate } from "@/lib/utils/date";
 import { getConditionIcon, getPaymentMethodIcon } from "@/lib/utils/icons";
@@ -81,15 +82,6 @@ import type {
 	LancamentoItem,
 } from "../types";
 import { LancamentosFilters } from "./lancamentos-filters";
-
-const resolveLogoSrc = (logo: string | null) => {
-	if (!logo) {
-		return null;
-	}
-
-	const fileName = logo.split("/").filter(Boolean).pop() ?? logo;
-	return `/logos/${fileName}`;
-};
 
 type BuildColumnsArgs = {
 	currentUserId: string;
@@ -386,7 +378,7 @@ const buildColumns = ({
 			cell: ({ row }) => {
 				const { pagadorId, pagadorName, pagadorAvatar } = row.original;
 
-				const label = pagadorName.trim() || "Sem pagador";
+				const label = pagadorName?.trim() || "Sem pagador";
 				const displayName = label.split(/\s+/)[0] ?? label;
 				const avatarSrc = getAvatarSrc(pagadorAvatar);
 				const initial = displayName.charAt(0).toUpperCase() || "?";

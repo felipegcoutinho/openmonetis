@@ -2,15 +2,15 @@
 
 import { RiAddCircleLine } from "@remixicon/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
 	deletePagadorAction,
 	joinPagadorByShareCodeAction,
 } from "@/app/(dashboard)/pagadores/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { PagadorCard } from "@/components/pagadores/pagador-card";
 import { PagadorDialog } from "@/components/pagadores/pagador-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
@@ -49,35 +49,35 @@ export function PagadoresPage({
 		[pagadores],
 	);
 
-	const handleEdit = useCallback((pagador: Pagador) => {
+	const handleEdit = (pagador: Pagador) => {
 		setSelectedPagador(pagador);
 		setEditOpen(true);
-	}, []);
+	};
 
-	const handleEditOpenChange = useCallback((open: boolean) => {
+	const handleEditOpenChange = (open: boolean) => {
 		setEditOpen(open);
 		if (!open) {
 			setSelectedPagador(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveRequest = useCallback((pagador: Pagador) => {
+	const handleRemoveRequest = (pagador: Pagador) => {
 		if (pagador.role === PAGADOR_ROLE_ADMIN) {
 			toast.error("Pagadores administradores não podem ser removidos.");
 			return;
 		}
 		setPagadorToRemove(pagador);
 		setRemoveOpen(true);
-	}, []);
+	};
 
-	const handleRemoveOpenChange = useCallback((open: boolean) => {
+	const handleRemoveOpenChange = (open: boolean) => {
 		setRemoveOpen(open);
 		if (!open) {
 			setPagadorToRemove(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveConfirm = useCallback(async () => {
+	const handleRemoveConfirm = async () => {
 		if (!pagadorToRemove) {
 			return;
 		}
@@ -91,37 +91,34 @@ export function PagadoresPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [pagadorToRemove]);
+	};
 
 	const removeTitle = pagadorToRemove
 		? `Remover pagador "${pagadorToRemove.name}"?`
 		: "Remover pagador?";
 
-	const handleJoinByCode = useCallback(
-		(event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault();
-			if (!shareCodeInput.trim()) {
-				toast.error("Informe um código válido.");
+	const handleJoinByCode = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (!shareCodeInput.trim()) {
+			toast.error("Informe um código válido.");
+			return;
+		}
+
+		startJoin(async () => {
+			const result = await joinPagadorByShareCodeAction({
+				code: shareCodeInput.trim(),
+			});
+
+			if (!result.success) {
+				toast.error(result.error);
 				return;
 			}
 
-			startJoin(async () => {
-				const result = await joinPagadorByShareCodeAction({
-					code: shareCodeInput.trim(),
-				});
-
-				if (!result.success) {
-					toast.error(result.error);
-					return;
-				}
-
-				toast.success(result.message);
-				setShareCodeInput("");
-				router.refresh();
-			});
-		},
-		[shareCodeInput, router],
-	);
+			toast.success(result.message);
+			setShareCodeInput("");
+			router.refresh();
+		});
+	};
 
 	return (
 		<>

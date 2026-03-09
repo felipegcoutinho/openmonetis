@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,25 +19,19 @@ export function PagadorSection({
 	secondaryPagadorOptions,
 	totalAmount,
 }: PagadorSectionProps) {
-	const handlePrimaryAmountChange = useCallback(
-		(value: string) => {
-			onFieldChange("primarySplitAmount", value);
-			const numericValue = Number.parseFloat(value) || 0;
-			const remaining = Math.max(0, totalAmount - numericValue);
-			onFieldChange("secondarySplitAmount", remaining.toFixed(2));
-		},
-		[totalAmount, onFieldChange],
-	);
+	const handlePrimaryAmountChange = (value: string) => {
+		onFieldChange("primarySplitAmount", value);
+		const numericValue = Number.parseFloat(value) || 0;
+		const remaining = Math.max(0, totalAmount - numericValue);
+		onFieldChange("secondarySplitAmount", remaining.toFixed(2));
+	};
 
-	const handleSecondaryAmountChange = useCallback(
-		(value: string) => {
-			onFieldChange("secondarySplitAmount", value);
-			const numericValue = Number.parseFloat(value) || 0;
-			const remaining = Math.max(0, totalAmount - numericValue);
-			onFieldChange("primarySplitAmount", remaining.toFixed(2));
-		},
-		[totalAmount, onFieldChange],
-	);
+	const handleSecondaryAmountChange = (value: string) => {
+		onFieldChange("secondarySplitAmount", value);
+		const numericValue = Number.parseFloat(value) || 0;
+		const remaining = Math.max(0, totalAmount - numericValue);
+		onFieldChange("primarySplitAmount", remaining.toFixed(2));
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-2 md:flex-row">

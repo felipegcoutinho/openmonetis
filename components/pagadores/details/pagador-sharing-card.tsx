@@ -79,7 +79,7 @@ export function PagadorSharingCard({
 	return (
 		<Card className="border">
 			<CardHeader>
-				<CardTitle className="text-base font-semibold">
+				<CardTitle className="text-lg font-semibold">
 					Compartilhamentos
 				</CardTitle>
 				<p className="text-sm text-muted-foreground">

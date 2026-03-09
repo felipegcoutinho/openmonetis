@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PagadorMonthlyBreakdown } from "@/lib/pagadores/details";
 import { cn } from "@/lib/utils/ui";

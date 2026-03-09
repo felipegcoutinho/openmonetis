@@ -3,6 +3,8 @@ import { Resend } from "resend";
 import { pagadores } from "@/db/schema";
 import { db } from "@/lib/db";
 import { getResendFromEmail } from "@/lib/email/resend";
+import { formatCurrency } from "@/lib/utils/currency";
+import { formatDateTime } from "@/lib/utils/date";
 
 type ActionType = "created" | "deleted";
 
@@ -24,20 +26,21 @@ export type PagadorNotificationRequest = {
 	entriesByPagador: Map<string, NotificationEntry[]>;
 };
 
-const formatCurrency = (value: number) =>
-	value.toLocaleString("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-		maximumFractionDigits: 2,
-	});
+type PagadorNotificationRecipient = {
+	id: string;
+	name: string | null;
+	email: string | null;
+	isAutoSend: boolean | null;
+};
 
 const formatDate = (value: Date | null) => {
-	if (!value) return "—";
-	return value.toLocaleDateString("pt-BR", {
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-	});
+	return (
+		formatDateTime(value, {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+		}) ?? "—"
+	);
 };
 
 const buildHtmlBody = ({
@@ -133,9 +136,9 @@ export async function sendPagadorAutoEmails({
 		return;
 	}
 
-	const pagadorRows = await db.query.pagadores.findMany({
+	const pagadorRows = (await db.query.pagadores.findMany({
 		where: inArray(pagadores.id, pagadorIds),
-	});
+	})) as PagadorNotificationRecipient[];
 
 	if (pagadorRows.length === 0) {
 		return;
@@ -146,7 +149,7 @@ export async function sendPagadorAutoEmails({
 		action === "created" ? "Novo lançamento" : "Lançamento removido";
 
 	const results = await Promise.allSettled(
-		pagadorRows.map(async (pagador) => {
+		pagadorRows.map(async (pagador: PagadorNotificationRecipient) => {
 			if (!pagador.email || !pagador.isAutoSend) {
 				return;
 			}
@@ -172,7 +175,7 @@ export async function sendPagadorAutoEmails({
 	);
 
 	// Log any failed email sends
-	results.forEach((result, index) => {
+	results.forEach((result: PromiseSettledResult<void>, index: number) => {
 		if (result.status === "rejected") {
 			const pagador = pagadorRows[index];
 			console.error(

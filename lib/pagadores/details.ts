@@ -14,6 +14,13 @@ import {
 import { cartoes, lancamentos } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/lib/contas/constants";
 import { db } from "@/lib/db";
+import { toDateOnlyString } from "@/lib/utils/date";
+import { safeToNumber as toNumber } from "@/lib/utils/number";
+import {
+	addMonthsToPeriod,
+	buildPeriodRange,
+	formatCompactPeriodLabel,
+} from "@/lib/utils/period";
 
 const RECEITA = "Receita";
 const DESPESA = "Despesa";
@@ -63,76 +70,6 @@ export type PagadorPaymentStatusData = {
 	pendingAmount: number;
 	pendingCount: number;
 	totalAmount: number;
-};
-
-const toISODate = (value: Date | string | null | undefined): string | null => {
-	if (!value) return null;
-	if (value instanceof Date) return value.toISOString().slice(0, 10);
-	return typeof value === "string" ? value : null;
-};
-
-const toNumber = (value: string | number | bigint | null) => {
-	if (typeof value === "number") {
-		return value;
-	}
-	if (typeof value === "bigint") {
-		return Number(value);
-	}
-	if (!value) {
-		return 0;
-	}
-	const parsed = Number(value);
-	return Number.isNaN(parsed) ? 0 : parsed;
-};
-
-const formatPeriod = (year: number, month: number) =>
-	`${year}-${String(month).padStart(2, "0")}`;
-
-const normalizePeriod = (period: string) => {
-	const [yearStr, monthStr] = period.split("-");
-	const year = Number.parseInt(yearStr ?? "", 10);
-	const month = Number.parseInt(monthStr ?? "", 10);
-	if (Number.isNaN(year) || Number.isNaN(month)) {
-		throw new Error(`Período inválido: ${period}`);
-	}
-	return { year, month };
-};
-
-const buildPeriodWindow = (period: string, months: number) => {
-	const { year, month } = normalizePeriod(period);
-	const items: string[] = [];
-	let currentYear = year;
-	let currentMonth = month;
-
-	for (let i = 0; i < months; i += 1) {
-		items.unshift(formatPeriod(currentYear, currentMonth));
-		currentMonth -= 1;
-		if (currentMonth < 1) {
-			currentMonth = 12;
-			currentYear -= 1;
-		}
-	}
-
-	return items;
-};
-
-const formatPeriodLabel = (period: string) => {
-	try {
-		const { year, month } = normalizePeriod(period);
-		const formatter = new Intl.DateTimeFormat("pt-BR", {
-			month: "short",
-		});
-		const date = new Date(year, month - 1, 1);
-		const rawLabel = formatter.format(date).replace(".", "");
-		const label =
-			rawLabel.length > 0
-				? rawLabel.charAt(0).toUpperCase().concat(rawLabel.slice(1))
-				: rawLabel;
-		const suffix = String(year).slice(-2);
-		return `${label}/${suffix}`;
-	} catch {
-		return period;
-	}
 };
 
 const excludeAutoInvoiceEntries = () =>
@@ -206,9 +143,10 @@ export async function fetchPagadorHistory({
 	period,
 	months = 6,
 }: BaseFilters & { months?: number }): Promise<PagadorHistoryPoint[]> {
-	const window = buildPeriodWindow(period, months);
-	const start = window[0];
-	const end = window[window.length - 1];
+	const startPeriod = addMonthsToPeriod(period, -(Math.max(months, 1) - 1));
+	const windowPeriods = buildPeriodRange(startPeriod, period);
+	const start = windowPeriods[0];
+	const end = windowPeriods[windowPeriods.length - 1];
 
 	const rows = await db
 		.select({
@@ -233,7 +171,7 @@ export async function fetchPagadorHistory({
 		{ receitas: number; despesas: number }
 	>();
 
-	for (const key of window) {
+	for (const key of windowPeriods) {
 		totalsByPeriod.set(key, { receitas: 0, despesas: 0 });
 	}
 
@@ -250,9 +188,9 @@ export async function fetchPagadorHistory({
 		}
 	}
 
-	return window.map((key) => ({
+	return windowPeriods.map((key) => ({
 		period: key,
-		label: formatPeriodLabel(key),
+		label: formatCompactPeriodLabel(key),
 		receitas: totalsByPeriod.get(key)?.receitas ?? 0,
 		despesas: totalsByPeriod.get(key)?.despesas ?? 0,
 	}));
@@ -283,20 +221,22 @@ export async function fetchPagadorCardUsage({
 		)
 		.groupBy(lancamentos.cartaoId, cartoes.name, cartoes.logo);
 
-	return rows
-		.filter((row) => Boolean(row.cartaoId))
-		.map((row) => {
-			if (!row.cartaoId) {
-				throw new Error("cartaoId should not be null after filter");
-			}
-			return {
-				id: row.cartaoId,
-				name: row.cardName ?? "Cartão",
-				logo: row.cardLogo ?? null,
-				amount: Math.abs(toNumber(row.totalAmount)),
-			};
-		})
-		.sort((a, b) => b.amount - a.amount);
+	const items: PagadorCardUsageItem[] = [];
+
+	for (const row of rows) {
+		if (!row.cartaoId) {
+			continue;
+		}
+
+		items.push({
+			id: row.cartaoId,
+			name: row.cardName ?? "Cartão",
+			logo: row.cardLogo ?? null,
+			amount: Math.abs(toNumber(row.totalAmount)),
+		});
+	}
+
+	return items.sort((a, b) => b.amount - a.amount);
 }
 
 export async function fetchPagadorBoletoStats({
@@ -374,14 +314,20 @@ export async function fetchPagadorBoletoItems({
 		)
 		.orderBy(asc(lancamentos.dueDate));
 
-	return rows.map((row) => ({
-		id: row.id,
-		name: row.name,
-		amount: Math.abs(toNumber(row.amount)),
-		dueDate: toISODate(row.dueDate),
-		boletoPaymentDate: toISODate(row.boletoPaymentDate),
-		isSettled: Boolean(row.isSettled),
-	}));
+	const items: PagadorBoletoItem[] = [];
+
+	for (const row of rows) {
+		items.push({
+			id: row.id,
+			name: row.name,
+			amount: Math.abs(toNumber(row.amount)),
+			dueDate: toDateOnlyString(row.dueDate),
+			boletoPaymentDate: toDateOnlyString(row.boletoPaymentDate),
+			isSettled: Boolean(row.isSettled),
+		});
+	}
+
+	return items;
 }
 
 export async function fetchPagadorPaymentStatus({

@@ -15,7 +15,7 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
-import { WidgetEmptyState } from "@/components/widget-empty-state";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { currencyFormatter } from "@/lib/lancamentos/formatting-helpers";
 import type { PagadorHistoryPoint } from "@/lib/pagadores/details";
 

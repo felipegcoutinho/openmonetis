@@ -1,13 +1,13 @@
 "use client";
 
-import DotIcon from "@/components/dot-icon";
+import StatusDot from "@/components/shared/status-dot";
 
 export function TypeSelectContent({ label }: { label: string }) {
 	const isReceita = label === "Receita";
 
 	return (
 		<span className="flex items-center gap-2">
-			<DotIcon color={isReceita ? "bg-success" : "bg-destructive"} />
+			<StatusDot color={isReceita ? "bg-success" : "bg-destructive"} />
 			<span>{label}</span>
 		</span>
 	);

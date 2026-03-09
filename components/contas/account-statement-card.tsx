@@ -1,8 +1,8 @@
 "use client";
 import { RiInformationLine } from "@remixicon/react";
 import Image from "next/image";
-import { type ReactNode, useMemo } from "react";
-import MoneyValues from "@/components/money-values";
+import type { ReactNode } from "react";
+import MoneyValues from "@/components/shared/money-values";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,6 +10,8 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { resolveLogoSrc } from "@/lib/logo";
+import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils/ui";
 
 type DetailValue = string | number | ReactNode;
@@ -27,22 +29,9 @@ type AccountStatementCardProps = {
 	actions?: React.ReactNode;
 };
 
-const resolveLogoPath = (logo?: string | null) => {
-	if (!logo) return null;
-	if (
-		logo.startsWith("http://") ||
-		logo.startsWith("https://") ||
-		logo.startsWith("data:")
-	) {
-		return logo;
-	}
-
-	return logo.startsWith("/") ? logo : `/logos/${logo}`;
-};
-
 const getAccountStatusBadgeVariant = (
 	status: string,
-): "success" | "secondary" => {
+): "success" | "outline" => {
 	const normalizedStatus = status.toLowerCase();
 	if (normalizedStatus === "ativa") {
 		return "success";
@@ -62,13 +51,7 @@ export function AccountStatementCard({
 	logo,
 	actions,
 }: AccountStatementCardProps) {
-	const logoPath = useMemo(() => resolveLogoPath(logo), [logo]);
-
-	const formatCurrency = (value: number) =>
-		value.toLocaleString("pt-BR", {
-			style: "currency",
-			currency: "BRL",
-		});
+	const logoPath = resolveLogoSrc(logo);
 
 	return (
 		<Card className="border">

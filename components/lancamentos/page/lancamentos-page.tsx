@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
 	createMassLancamentosAction,
@@ -10,7 +10,7 @@ import {
 	toggleLancamentoSettlementAction,
 	updateLancamentoBulkAction,
 } from "@/app/(dashboard)/lancamentos/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 
 import { AnticipateInstallmentsDialog } from "../dialogs/anticipate-installments-dialog/anticipate-installments-dialog";
 import { AnticipationHistoryDialog } from "../dialogs/anticipate-installments-dialog/anticipation-history-dialog";
@@ -139,7 +139,7 @@ export function LancamentosPage({
 		LancamentoItem[]
 	>([]);
 
-	const handleToggleSettlement = useCallback(async (item: LancamentoItem) => {
+	const handleToggleSettlement = async (item: LancamentoItem) => {
 		if (item.paymentMethod === "Cartão de crédito") {
 			toast.info(
 				"Pagamentos com cartão são conciliados automaticamente. Ajuste pelo cartão.",
@@ -182,9 +182,9 @@ export function LancamentosPage({
 		} finally {
 			setSettlementLoadingId(null);
 		}
-	}, []);
+	};
 
-	const handleDelete = useCallback(async () => {
+	const handleDelete = async () => {
 		if (!lancamentoToDelete) {
 			return;
 		}
@@ -200,91 +200,82 @@ export function LancamentosPage({
 
 		toast.success(result.message);
 		setDeleteOpen(false);
-	}, [lancamentoToDelete]);
+	};
 
-	const handleBulkDelete = useCallback(
-		async (scope: BulkActionScope) => {
-			if (!pendingDeleteData) {
-				return;
-			}
+	const handleBulkDelete = async (scope: BulkActionScope) => {
+		if (!pendingDeleteData) {
+			return;
+		}
 
-			const result = await deleteLancamentoBulkAction({
-				id: pendingDeleteData.id,
-				scope,
-			});
+		const result = await deleteLancamentoBulkAction({
+			id: pendingDeleteData.id,
+			scope,
+		});
 
-			if (!result.success) {
-				toast.error(result.error);
-				throw new Error(result.error);
-			}
+		if (!result.success) {
+			toast.error(result.error);
+			throw new Error(result.error);
+		}
 
-			toast.success(result.message);
-			setBulkDeleteOpen(false);
-			setPendingDeleteData(null);
-		},
-		[pendingDeleteData],
-	);
+		toast.success(result.message);
+		setBulkDeleteOpen(false);
+		setPendingDeleteData(null);
+	};
 
-	const handleBulkEditRequest = useCallback(
-		(data: {
-			id: string;
-			name: string;
-			categoriaId: string | undefined;
-			note: string;
-			pagadorId: string | undefined;
-			contaId: string | undefined;
-			cartaoId: string | undefined;
-			amount: number;
-			dueDate: string | null;
-			boletoPaymentDate: string | null;
-		}) => {
-			if (!selectedLancamento) {
-				return;
-			}
+	const handleBulkEditRequest = (data: {
+		id: string;
+		name: string;
+		categoriaId: string | undefined;
+		note: string;
+		pagadorId: string | undefined;
+		contaId: string | undefined;
+		cartaoId: string | undefined;
+		amount: number;
+		dueDate: string | null;
+		boletoPaymentDate: string | null;
+	}) => {
+		if (!selectedLancamento) {
+			return;
+		}
 
-			setPendingEditData({
-				...data,
-				lancamento: selectedLancamento,
-			});
-			setEditOpen(false);
-			setBulkEditOpen(true);
-		},
-		[selectedLancamento],
-	);
+		setPendingEditData({
+			...data,
+			lancamento: selectedLancamento,
+		});
+		setEditOpen(false);
+		setBulkEditOpen(true);
+	};
 
-	const handleBulkEdit = useCallback(
-		async (scope: BulkActionScope) => {
-			if (!pendingEditData) {
-				return;
-			}
+	const handleBulkEdit = async (scope: BulkActionScope) => {
+		if (!pendingEditData) {
+			return;
+		}
 
-			const result = await updateLancamentoBulkAction({
-				id: pendingEditData.id,
-				scope,
-				name: pendingEditData.name,
-				categoriaId: pendingEditData.categoriaId,
-				note: pendingEditData.note,
-				pagadorId: pendingEditData.pagadorId,
-				contaId: pendingEditData.contaId,
-				cartaoId: pendingEditData.cartaoId,
-				amount: pendingEditData.amount,
-				dueDate: pendingEditData.dueDate,
-				boletoPaymentDate: pendingEditData.boletoPaymentDate,
-			});
+		const result = await updateLancamentoBulkAction({
+			id: pendingEditData.id,
+			scope,
+			name: pendingEditData.name,
+			categoriaId: pendingEditData.categoriaId,
+			note: pendingEditData.note,
+			pagadorId: pendingEditData.pagadorId,
+			contaId: pendingEditData.contaId,
+			cartaoId: pendingEditData.cartaoId,
+			amount: pendingEditData.amount,
+			dueDate: pendingEditData.dueDate,
+			boletoPaymentDate: pendingEditData.boletoPaymentDate,
+		});
 
-			if (!result.success) {
-				toast.error(result.error);
-				throw new Error(result.error);
-			}
+		if (!result.success) {
+			toast.error(result.error);
+			throw new Error(result.error);
+		}
 
-			toast.success(result.message);
-			setBulkEditOpen(false);
-			setPendingEditData(null);
-		},
-		[pendingEditData],
-	);
+		toast.success(result.message);
+		setBulkEditOpen(false);
+		setPendingEditData(null);
+	};
 
-	const handleMassAddSubmit = useCallback(async (data: MassAddFormData) => {
+	const handleMassAddSubmit = async (data: MassAddFormData) => {
 		const result = await createMassLancamentosAction(data);
 
 		if (!result.success) {
@@ -293,9 +284,9 @@ export function LancamentosPage({
 		}
 
 		toast.success(result.message);
-	}, []);
+	};
 
-	const handleMultipleBulkDelete = useCallback((items: LancamentoItem[]) => {
+	const handleMultipleBulkDelete = (items: LancamentoItem[]) => {
 		// Se todos os selecionados são da mesma série (parcelado/recorrente), abrir dialog de escopo
 		const withSeries = items.filter((i) => i.seriesId);
 		const sameSeries =
@@ -309,9 +300,9 @@ export function LancamentosPage({
 		}
 		setPendingMultipleDeleteData(items);
 		setMultipleBulkDeleteOpen(true);
-	}, []);
+	};
 
-	const confirmMultipleBulkDelete = useCallback(async () => {
+	const confirmMultipleBulkDelete = async () => {
 		if (pendingMultipleDeleteData.length === 0) {
 			return;
 		}
@@ -327,42 +318,42 @@ export function LancamentosPage({
 		toast.success(result.message);
 		setMultipleBulkDeleteOpen(false);
 		setPendingMultipleDeleteData([]);
-	}, [pendingMultipleDeleteData]);
+	};
 
 	const [transactionTypeForCreate, setTransactionTypeForCreate] = useState<
 		"Despesa" | "Receita" | null
 	>(null);
 
-	const handleCreate = useCallback((type: "Despesa" | "Receita") => {
+	const handleCreate = (type: "Despesa" | "Receita") => {
 		setTransactionTypeForCreate(type);
 		setCreateOpen(true);
-	}, []);
+	};
 
-	const handleMassAdd = useCallback(() => {
+	const handleMassAdd = () => {
 		setMassAddOpen(true);
-	}, []);
+	};
 
-	const handleEdit = useCallback((item: LancamentoItem) => {
+	const handleEdit = (item: LancamentoItem) => {
 		setSelectedLancamento(item);
 		setEditOpen(true);
-	}, []);
+	};
 
-	const handleCopy = useCallback((item: LancamentoItem) => {
+	const handleCopy = (item: LancamentoItem) => {
 		setLancamentoToCopy(item);
 		setCopyOpen(true);
-	}, []);
+	};
 
-	const handleImport = useCallback((item: LancamentoItem) => {
+	const handleImport = (item: LancamentoItem) => {
 		setLancamentoToImport(item);
 		setImportOpen(true);
-	}, []);
+	};
 
-	const handleBulkImport = useCallback((items: LancamentoItem[]) => {
+	const handleBulkImport = (items: LancamentoItem[]) => {
 		setLancamentosToImport(items);
 		setBulkImportOpen(true);
-	}, []);
+	};
 
-	const handleConfirmDelete = useCallback((item: LancamentoItem) => {
+	const handleConfirmDelete = (item: LancamentoItem) => {
 		if (item.seriesId) {
 			setPendingDeleteData(item);
 			setBulkDeleteOpen(true);
@@ -370,22 +361,22 @@ export function LancamentosPage({
 			setLancamentoToDelete(item);
 			setDeleteOpen(true);
 		}
-	}, []);
+	};
 
-	const handleViewDetails = useCallback((item: LancamentoItem) => {
+	const handleViewDetails = (item: LancamentoItem) => {
 		setSelectedLancamento(item);
 		setDetailsOpen(true);
-	}, []);
+	};
 
-	const handleAnticipate = useCallback((item: LancamentoItem) => {
+	const handleAnticipate = (item: LancamentoItem) => {
 		setSelectedForAnticipation(item);
 		setAnticipateOpen(true);
-	}, []);
+	};
 
-	const handleViewAnticipationHistory = useCallback((item: LancamentoItem) => {
+	const handleViewAnticipationHistory = (item: LancamentoItem) => {
 		setSelectedForAnticipation(item);
 		setAnticipationHistoryOpen(true);
-	}, []);
+	};
 
 	return (
 		<>

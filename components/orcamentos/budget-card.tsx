@@ -7,7 +7,7 @@ import {
 } from "@remixicon/react";
 import Link from "next/link";
 import { CategoryIconBadge } from "@/components/categorias/category-icon-badge";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils/ui";

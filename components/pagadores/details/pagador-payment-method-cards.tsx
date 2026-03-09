@@ -5,39 +5,16 @@ import {
 	RiWallet3Line,
 } from "@remixicon/react";
 import { EstabelecimentoLogo } from "@/components/lancamentos/shared/estabelecimento-logo";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
+import { WidgetEmptyState } from "@/components/shared/widget-empty-state";
 import { CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { WidgetEmptyState } from "@/components/widget-empty-state";
+import { buildBillStatusLabel } from "@/lib/dashboard/bills-helpers";
 import type {
 	PagadorBoletoItem,
 	PagadorPaymentStatusData,
 } from "@/lib/pagadores/details";
 import { cn } from "@/lib/utils/ui";
-
-// --- Boleto helpers ---
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
-	day: "2-digit",
-	month: "short",
-	year: "numeric",
-	timeZone: "UTC",
-});
-
-const buildDateLabel = (value: string | null, prefix?: string) => {
-	if (!value) return null;
-	const [year, month, day] = value.split("-").map((part) => Number(part));
-	if (!year || !month || !day) return null;
-	const formatted = DATE_FORMATTER.format(
-		new Date(Date.UTC(year, month - 1, day)),
-	);
-	return prefix ? `${prefix} ${formatted}` : formatted;
-};
-
-const buildStatusLabel = (item: PagadorBoletoItem) => {
-	if (item.isSettled) return buildDateLabel(item.boletoPaymentDate, "Pago em");
-	return buildDateLabel(item.dueDate, "Vence em");
-};
 
 // --- PagadorBoletoCard ---
 
@@ -62,7 +39,7 @@ export function PagadorBoletoCard({ items }: PagadorBoletoCardProps) {
 		<CardContent className="flex flex-col gap-4 px-0">
 			<ul className="flex flex-col">
 				{items.map((item) => {
-					const statusLabel = buildStatusLabel(item);
+					const statusLabel = buildBillStatusLabel(item);
 					return (
 						<li
 							key={item.id}

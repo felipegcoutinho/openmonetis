@@ -8,7 +8,7 @@ import {
 } from "@remixicon/react";
 import type React from "react";
 import { cn } from "@/lib/utils/ui";
-import MoneyValues from "../money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 

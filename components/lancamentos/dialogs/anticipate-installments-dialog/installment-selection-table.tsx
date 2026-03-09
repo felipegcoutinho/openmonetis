@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import type { EligibleInstallment } from "@/lib/installments/anticipation-types";
 import { formatCurrentInstallment } from "@/lib/installments/utils";
+import { formatShortPeriodLabel } from "@/lib/utils/period";
 import { cn } from "@/lib/utils/ui";
 
 interface InstallmentSelectionTableProps {
@@ -41,12 +42,6 @@ export function InstallmentSelectionTable({
 		} else {
 			onSelectionChange(installments.map((inst) => inst.id));
 		}
-	};
-
-	const formatPeriod = (period: string) => {
-		const [year, month] = period.split("-");
-		const date = new Date(Number(year), Number(month) - 1);
-		return format(date, "MMM/yyyy", { locale: ptBR });
 	};
 
 	const formatDate = (date: Date | null) => {
@@ -116,7 +111,7 @@ export function InstallmentSelectionTable({
 									</Badge>
 								</TableCell>
 								<TableCell className="font-medium">
-									{formatPeriod(inst.period)}
+									{formatShortPeriodLabel(inst.period)}
 								</TableCell>
 								<TableCell className="text-muted-foreground">
 									{formatDate(inst.dueDate)}

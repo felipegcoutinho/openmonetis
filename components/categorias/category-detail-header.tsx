@@ -1,8 +1,9 @@
 import { RiArrowDownSFill, RiArrowUpSFill } from "@remixicon/react";
+import { TypeBadge } from "@/components/shared/type-badge";
 import type { CategoryType } from "@/lib/categorias/constants";
 import { currencyFormatter } from "@/lib/lancamentos/formatting-helpers";
+import { formatPercentage } from "@/lib/utils/percentage";
 import { cn } from "@/lib/utils/ui";
-import { TypeBadge } from "../type-badge";
 import { Card } from "../ui/card";
 import { CategoryIconBadge } from "./category-icon-badge";
 
@@ -61,9 +62,12 @@ export function CategoryDetailHeader({
 
 	const variationLabel =
 		typeof percentageChange === "number"
-			? `${percentageChange > 0 ? "+" : ""}${Math.abs(percentageChange).toFixed(
-					1,
-				)}%`
+			? formatPercentage(percentageChange, {
+					minimumFractionDigits: 1,
+					maximumFractionDigits: 1,
+					absolute: true,
+					signDisplay: percentageChange === 0 ? "auto" : "always",
+				})
 			: "—";
 
 	return (

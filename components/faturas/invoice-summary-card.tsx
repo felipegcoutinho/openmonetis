@@ -3,17 +3,18 @@
 import { RiEditLine } from "@remixicon/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
 	updateInvoicePaymentStatusAction,
 	updatePaymentDateAction,
 } from "@/app/(dashboard)/cartoes/[cartaoId]/fatura/actions";
-import DotIcon from "@/components/dot-icon";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
+import StatusDot from "@/components/shared/status-dot";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { resolveCardBrandAsset } from "@/lib/cartoes/brand-assets";
 import {
 	INVOICE_PAYMENT_STATUS,
 	INVOICE_STATUS_BADGE_VARIANT,
@@ -21,6 +22,8 @@ import {
 	INVOICE_STATUS_LABEL,
 	type InvoicePaymentStatus,
 } from "@/lib/faturas";
+import { resolveLogoSrc } from "@/lib/logo";
+import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils/ui";
 import { EditPaymentDateDialog } from "./edit-payment-date-dialog";
 
@@ -41,26 +44,6 @@ type InvoiceSummaryCardProps = {
 	actions?: React.ReactNode;
 };
 
-const BRAND_ASSETS: Record<string, string> = {
-	visa: "/bandeiras/visa.svg",
-	mastercard: "/bandeiras/mastercard.svg",
-	amex: "/bandeiras/amex.svg",
-	american: "/bandeiras/amex.svg",
-	elo: "/bandeiras/elo.svg",
-	hipercard: "/bandeiras/hipercard.svg",
-	hiper: "/bandeiras/hipercard.svg",
-};
-
-const resolveBrandAsset = (brand: string) => {
-	const normalized = brand.trim().toLowerCase();
-
-	const match = (
-		Object.keys(BRAND_ASSETS) as Array<keyof typeof BRAND_ASSETS>
-	).find((entry) => normalized.includes(entry));
-
-	return match ? BRAND_ASSETS[match] : null;
-};
-
 const actionLabelByStatus: Record<InvoicePaymentStatus, string> = {
 	[INVOICE_PAYMENT_STATUS.PENDING]: "Marcar como paga",
 	[INVOICE_PAYMENT_STATUS.PAID]: "Desfazer pagamento",
@@ -75,19 +58,6 @@ const actionVariantByStatus: Record<
 };
 
 const formatDay = (value: string) => value.padStart(2, "0");
-
-const resolveLogoPath = (logo?: string | null) => {
-	if (!logo) return null;
-	if (
-		logo.startsWith("http://") ||
-		logo.startsWith("https://") ||
-		logo.startsWith("data:")
-	) {
-		return logo;
-	}
-
-	return logo.startsWith("/") ? logo : `/logos/${logo}`;
-};
 
 const getCardStatusDotColor = (status: string | null) => {
 	if (!status) return "bg-gray-400";
@@ -122,26 +92,13 @@ export function InvoiceSummaryCard({
 
 	// Atualizar estado quando initialPaymentDate mudar
 	useEffect(() => {
-		if (initialPaymentDate) {
-			setPaymentDate(initialPaymentDate);
-		}
+		setPaymentDate(initialPaymentDate ?? new Date());
 	}, [initialPaymentDate]);
 
-	const logoPath = useMemo(() => resolveLogoPath(logo), [logo]);
-
-	const brandAsset = useMemo(
-		() => (cardBrand ? resolveBrandAsset(cardBrand) : null),
-		[cardBrand],
-	);
-
-	const limitLabel = useMemo(() => {
-		if (typeof limitAmount !== "number") return "—";
-		return limitAmount.toLocaleString("pt-BR", {
-			style: "currency",
-			currency: "BRL",
-			maximumFractionDigits: 2,
-		});
-	}, [limitAmount]);
+	const logoPath = resolveLogoSrc(logo);
+	const brandAsset = resolveCardBrandAsset(cardBrand);
+	const limitLabel =
+		typeof limitAmount === "number" ? formatCurrency(limitAmount) : "—";
 
 	const targetStatus =
 		invoiceStatus === INVOICE_PAYMENT_STATUS.PAID
@@ -286,7 +243,7 @@ export function InvoiceSummaryCard({
 						value={
 							cardStatus ? (
 								<div className="flex items-center gap-1.5">
-									<DotIcon color={getCardStatusDotColor(cardStatus)} />
+									<StatusDot color={getCardStatusDotColor(cardStatus)} />
 									<span className="truncate">{cardStatus}</span>
 								</div>
 							) : (

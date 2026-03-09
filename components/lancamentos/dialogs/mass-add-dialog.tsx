@@ -33,9 +33,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { groupAndSortCategorias } from "@/lib/lancamentos/categoria-helpers";
-import { LANCAMENTO_PAYMENT_METHODS } from "@/lib/lancamentos/constants";
+import {
+	LANCAMENTO_PAYMENT_METHODS,
+	type LANCAMENTO_TRANSACTION_TYPES,
+} from "@/lib/lancamentos/constants";
 import { getTodayDateString } from "@/lib/utils/date";
-import { displayPeriod } from "@/lib/utils/period";
+import { dateToPeriod, displayPeriod, periodToDate } from "@/lib/utils/period";
 import {
 	CategoriaSelectContent,
 	ContaCartaoSelectContent,
@@ -50,17 +53,8 @@ import type { SelectOption } from "../types";
 const MASS_ADD_PAYMENT_METHODS = LANCAMENTO_PAYMENT_METHODS.filter(
 	(m) => m !== "Boleto",
 );
-
-function periodToDate(period: string): Date {
-	const [year, month] = period.split("-").map(Number);
-	return new Date(year, month - 1, 1);
-}
-
-function dateToPeriod(date: Date): string {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	return `${year}-${month}`;
-}
+type MassAddTransactionType = (typeof LANCAMENTO_TRANSACTION_TYPES)[number];
+type MassAddPaymentMethod = (typeof LANCAMENTO_PAYMENT_METHODS)[number];
 
 function InlinePeriodPicker({
 	period,
@@ -111,23 +105,9 @@ interface MassAddDialogProps {
 	defaultCartaoId?: string | null;
 }
 
-export interface MassAddFormData {
-	fixedFields: {
-		transactionType?: string;
-		paymentMethod?: string;
-		condition?: string;
-		period?: string;
-		contaId?: string;
-		cartaoId?: string;
-	};
-	transactions: Array<{
-		purchaseDate: string;
-		name: string;
-		amount: string;
-		categoriaId?: string;
-		pagadorId?: string;
-	}>;
-}
+export type MassAddFormData = Parameters<
+	typeof import("@/app/(dashboard)/lancamentos/actions").createMassLancamentosAction
+>[0];
 
 interface TransactionRow {
 	id: string;
@@ -154,8 +134,9 @@ export function MassAddDialog({
 	const [loading, setLoading] = useState(false);
 
 	// Fixed fields state (sempre ativos, sem checkboxes)
-	const [transactionType, setTransactionType] = useState<string>("Despesa");
-	const [paymentMethod, setPaymentMethod] = useState<string>(
+	const [transactionType, setTransactionType] =
+		useState<MassAddTransactionType>("Despesa");
+	const [paymentMethod, setPaymentMethod] = useState<MassAddPaymentMethod>(
 		LANCAMENTO_PAYMENT_METHODS[0],
 	);
 	const [period, setPeriod] = useState<string>(selectedPeriod);
@@ -257,7 +238,7 @@ export function MassAddDialog({
 			transactions: transactions.map((t) => ({
 				purchaseDate: t.purchaseDate,
 				name: t.name.trim(),
-				amount: t.amount.trim(),
+				amount: Number(t.amount.trim()),
 				categoriaId: t.categoriaId,
 				pagadorId: t.pagadorId,
 			})),
@@ -312,7 +293,9 @@ export function MassAddDialog({
 								<Label htmlFor="transaction-type">Tipo de Transação</Label>
 								<Select
 									value={transactionType}
-									onValueChange={setTransactionType}
+									onValueChange={(value) =>
+										setTransactionType(value as MassAddTransactionType)
+									}
 								>
 									<SelectTrigger id="transaction-type" className="w-full">
 										<SelectValue>
@@ -338,7 +321,7 @@ export function MassAddDialog({
 								<Select
 									value={paymentMethod}
 									onValueChange={(value) => {
-										setPaymentMethod(value);
+										setPaymentMethod(value as MassAddPaymentMethod);
 										// Reset conta/cartao when changing payment method
 										if (value === "Cartão de crédito") {
 											setContaId(undefined);

@@ -20,7 +20,10 @@ import {
 	PERIOD_FORMAT_REGEX,
 } from "@/lib/faturas";
 import { PAGADOR_ROLE_ADMIN } from "@/lib/pagadores/constants";
-import { parseLocalDateString } from "@/lib/utils/date";
+import { getBusinessTodayDate, parseLocalDateString } from "@/lib/utils/date";
+
+const isValidPaymentDate = (value: string) =>
+	!Number.isNaN(parseLocalDateString(value).getTime());
 
 const updateInvoicePaymentStatusSchema = z.object({
 	cartaoId: z.string({ message: "Cartão inválido." }).uuid("Cartão inválido."),
@@ -30,7 +33,12 @@ const updateInvoicePaymentStatusSchema = z.object({
 	status: z.enum(
 		INVOICE_STATUS_VALUES as [InvoicePaymentStatus, ...InvoicePaymentStatus[]],
 	),
-	paymentDate: z.string().optional(),
+	paymentDate: z
+		.string()
+		.optional()
+		.refine((value) => !value || isValidPaymentDate(value), {
+			message: "Data de pagamento inválida.",
+		}),
 });
 
 type UpdateInvoicePaymentStatusInput = z.infer<
@@ -157,7 +165,7 @@ export async function updateInvoicePaymentStatusAction(
 						// Usar a data customizada ou a data atual como data de pagamento
 						const invoiceDate = data.paymentDate
 							? parseLocalDateString(data.paymentDate)
-							: new Date();
+							: getBusinessTodayDate();
 
 						const amount = `-${formatDecimal(adminShare)}`;
 						const payload = {
@@ -229,7 +237,11 @@ const updatePaymentDateSchema = z.object({
 	period: z
 		.string({ message: "Período inválido." })
 		.regex(PERIOD_FORMAT_REGEX, "Período inválido."),
-	paymentDate: z.string({ message: "Data de pagamento inválida." }),
+	paymentDate: z
+		.string({ message: "Data de pagamento inválida." })
+		.refine((value) => isValidPaymentDate(value), {
+			message: "Data de pagamento inválida.",
+		}),
 });
 
 type UpdatePaymentDateInput = z.infer<typeof updatePaymentDateSchema>;

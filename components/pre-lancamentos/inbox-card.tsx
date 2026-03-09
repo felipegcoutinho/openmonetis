@@ -10,8 +10,7 @@ import {
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Image from "next/image";
-import { useMemo } from "react";
-import MoneyValues from "@/components/money-values";
+import MoneyValues from "@/components/shared/money-values";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +27,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { resolveLogoSrc } from "@/lib/logo";
 import type { InboxItem } from "./types";
 
 interface InboxCardProps {
@@ -41,17 +41,6 @@ interface InboxCardProps {
 	onRestoreToPending?: (item: InboxItem) => void | Promise<void>;
 }
 
-function resolveLogoPath(logo: string): string {
-	if (
-		logo.startsWith("http") ||
-		logo.startsWith("data:") ||
-		logo.startsWith("/")
-	) {
-		return logo;
-	}
-	return `/logos/${logo}`;
-}
-
 function findMatchingLogo(
 	sourceAppName: string | null,
 	appLogoMap: Record<string, string>,
@@ -61,12 +50,12 @@ function findMatchingLogo(
 	const appName = sourceAppName.toLowerCase();
 
 	// Exact match first
-	if (appLogoMap[appName]) return resolveLogoPath(appLogoMap[appName]);
+	if (appLogoMap[appName]) return resolveLogoSrc(appLogoMap[appName]);
 
 	// Partial match: card/account name contains app name or vice versa
 	for (const [name, logo] of Object.entries(appLogoMap)) {
 		if (name.includes(appName) || appName.includes(name)) {
-			return resolveLogoPath(logo);
+			return resolveLogoSrc(logo);
 		}
 	}
 
@@ -83,11 +72,9 @@ export function InboxCard({
 	onDelete,
 	onRestoreToPending,
 }: InboxCardProps) {
-	const matchedLogo = useMemo(
-		() =>
-			appLogoMap ? findMatchingLogo(item.sourceAppName, appLogoMap) : null,
-		[item.sourceAppName, appLogoMap],
-	);
+	const matchedLogo = appLogoMap
+		? findMatchingLogo(item.sourceAppName, appLogoMap)
+		: null;
 
 	const amount = item.parsedAmount ? parseFloat(item.parsedAmount) : null;
 

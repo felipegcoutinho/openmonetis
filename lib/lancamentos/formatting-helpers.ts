@@ -1,6 +1,14 @@
 /**
  * Formatting helpers for displaying lancamento data
  */
+import {
+	currencyFormatter,
+	formatCurrency as formatCurrencyValue,
+} from "@/lib/utils/currency";
+import { formatDateOnly } from "@/lib/utils/date";
+import { formatMonthYearLabel } from "@/lib/utils/period";
+
+export { currencyFormatter };
 
 /**
  * Capitalizes the first letter of a string
@@ -10,14 +18,6 @@ function capitalize(value: string): string {
 		? value[0]?.toUpperCase().concat(value.slice(1))
 		: value;
 }
-
-/**
- * Currency formatter for pt-BR locale (BRL)
- */
-export const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-	style: "currency",
-	currency: "BRL",
-});
 
 /**
  * Date formatter for pt-BR locale (dd/mm/yyyy)
@@ -44,9 +44,13 @@ export const monthFormatter = new Intl.DateTimeFormat("pt-BR", {
  */
 export function formatDate(value?: string | null): string {
 	if (!value) return "—";
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return "—";
-	return dateFormatter.format(date);
+	return (
+		formatDateOnly(value, {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+		}) ?? "—"
+	);
 }
 
 /**
@@ -57,10 +61,11 @@ export function formatDate(value?: string | null): string {
  */
 export function formatPeriod(value?: string | null): string {
 	if (!value) return "—";
-	const [year, month] = value.split("-").map(Number);
-	if (!year || !month) return value;
-	const date = new Date(year, month - 1, 1);
-	return capitalize(monthFormatter.format(date));
+	try {
+		return formatMonthYearLabel(value);
+	} catch {
+		return value;
+	}
 }
 
 /**
@@ -97,5 +102,5 @@ export function getTransactionBadgeVariant(
  * @example formatCurrency(1234.56) => "R$ 1.234,56"
  */
 export function formatCurrency(value: number): string {
-	return currencyFormatter.format(value);
+	return formatCurrencyValue(value);
 }

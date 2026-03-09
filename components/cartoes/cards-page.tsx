@@ -2,25 +2,27 @@
 
 import { RiAddCircleLine, RiBankCard2Line } from "@remixicon/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { deleteCardAction } from "@/app/(dashboard)/cartoes/actions";
-import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card as UiCard } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CardDialog } from "./card-dialog";
 import { CardItem } from "./card-item";
+import type { Card as CreditCard } from "./types";
 
 type AccountOption = {
 	id: string;
 	name: string;
+	logo: string | null;
 };
 
 interface CardsPageProps {
-	cards: Card[];
-	archivedCards: Card[];
+	cards: CreditCard[];
+	archivedCards: CreditCard[];
 	accounts: AccountOption[];
 	logoOptions: string[];
 }
@@ -34,56 +36,54 @@ export function CardsPage({
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("ativos");
 	const [editOpen, setEditOpen] = useState(false);
-	const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+	const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
 	const [removeOpen, setRemoveOpen] = useState(false);
-	const [cardToRemove, setCardToRemove] = useState<Card | null>(null);
+	const [cardToRemove, setCardToRemove] = useState<CreditCard | null>(null);
 
-	const sortCards = useCallback(
-		(list: Card[]) =>
-			[...list].sort((a, b) =>
+	const orderedCards = useMemo(
+		() =>
+			[...cards].sort((a, b) =>
 				a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }),
 			),
-		[],
+		[cards],
 	);
-
-	const orderedCards = useMemo(() => sortCards(cards), [cards, sortCards]);
 	const orderedArchivedCards = useMemo(
-		() => sortCards(archivedCards),
-		[archivedCards, sortCards],
+		() =>
+			[...archivedCards].sort((a, b) =>
+				a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }),
+			),
+		[archivedCards],
 	);
 
-	const handleEdit = useCallback((card: Card) => {
+	const handleEdit = (card: CreditCard) => {
 		setSelectedCard(card);
 		setEditOpen(true);
-	}, []);
+	};
 
-	const handleEditOpenChange = useCallback((open: boolean) => {
+	const handleEditOpenChange = (open: boolean) => {
 		setEditOpen(open);
 		if (!open) {
 			setSelectedCard(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveRequest = useCallback((card: Card) => {
+	const handleRemoveRequest = (card: CreditCard) => {
 		setCardToRemove(card);
 		setRemoveOpen(true);
-	}, []);
+	};
 
-	const handleInvoice = useCallback(
-		(card: Card) => {
-			router.push(`/cartoes/${card.id}/fatura`);
-		},
-		[router],
-	);
+	const handleInvoice = (card: CreditCard) => {
+		router.push(`/cartoes/${card.id}/fatura`);
+	};
 
-	const handleRemoveOpenChange = useCallback((open: boolean) => {
+	const handleRemoveOpenChange = (open: boolean) => {
 		setRemoveOpen(open);
 		if (!open) {
 			setCardToRemove(null);
 		}
-	}, []);
+	};
 
-	const handleRemoveConfirm = useCallback(async () => {
+	const handleRemoveConfirm = async () => {
 		if (!cardToRemove) {
 			return;
 		}
@@ -97,16 +97,16 @@ export function CardsPage({
 
 		toast.error(result.error);
 		throw new Error(result.error);
-	}, [cardToRemove]);
+	};
 
 	const removeTitle = cardToRemove
 		? `Remover cartão "${cardToRemove.name}"?`
 		: "Remover cartão?";
 
-	const renderCardList = (list: Card[], isArchived: boolean) => {
+	const renderCardList = (list: CreditCard[], isArchived: boolean) => {
 		if (list.length === 0) {
 			return (
-				<Card className="flex w-full items-center justify-center py-12">
+				<UiCard className="flex w-full items-center justify-center py-12">
 					<EmptyState
 						media={<RiBankCard2Line className="size-6 text-primary" />}
 						title={
@@ -120,7 +120,7 @@ export function CardsPage({
 								: "Adicione seu primeiro cartão para acompanhar limites e faturas com mais controle."
 						}
 					/>
-				</Card>
+				</UiCard>
 			);
 		}
 

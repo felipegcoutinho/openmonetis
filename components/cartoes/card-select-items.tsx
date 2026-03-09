@@ -2,35 +2,17 @@
 
 import { RiBankLine } from "@remixicon/react";
 import Image from "next/image";
-import DotIcon from "@/components/dot-icon";
+import StatusDot from "@/components/shared/status-dot";
+import { resolveCardBrandLogoSrc } from "@/lib/cartoes/brand-assets";
+import { resolveLogoSrc } from "@/lib/logo";
 
 type SelectItemContentProps = {
 	label: string;
 	logo?: string | null;
 };
 
-const resolveLogoSrc = (logo: string | null) => {
-	if (!logo) {
-		return null;
-	}
-
-	const fileName = logo.split("/").filter(Boolean).pop() ?? logo;
-	return `/logos/${fileName}`;
-};
-
-const getBrandLogo = (brand: string): string | null => {
-	const brandMap: Record<string, string> = {
-		Visa: "visa.png",
-		Mastercard: "mastercard.png",
-		Elo: "elo.png",
-	};
-
-	return brandMap[brand] ?? null;
-};
-
 export function BrandSelectContent({ label }: { label: string }) {
-	const brandLogo = getBrandLogo(label);
-	const logoSrc = brandLogo ? `/logos/${brandLogo}` : null;
+	const logoSrc = resolveCardBrandLogoSrc(label);
 
 	return (
 		<span className="flex items-center gap-2">
@@ -55,7 +37,7 @@ export function StatusSelectContent({ label }: { label: string }) {
 
 	return (
 		<span className="flex items-center gap-2">
-			<DotIcon
+			<StatusDot
 				color={isActive ? "bg-success" : "bg-slate-400 dark:bg-slate-500"}
 			/>
 			<span>{label}</span>

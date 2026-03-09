@@ -3,8 +3,9 @@
 import { RiBankCard2Line, RiBankLine } from "@remixicon/react";
 import Image from "next/image";
 import { CategoryIcon } from "@/components/categorias/category-icon";
-import DotIcon from "@/components/dot-icon";
+import StatusDot from "@/components/shared/status-dot";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { resolveLogoSrc } from "@/lib/logo";
 import { getAvatarSrc } from "@/lib/pagadores/utils";
 import { getConditionIcon, getPaymentMethodIcon } from "@/lib/utils/icons";
 
@@ -56,7 +57,7 @@ export function TransactionTypeSelectContent({ label }: { label: string }) {
 
 	return (
 		<span className="flex items-center gap-2">
-			<DotIcon color={colorMap[label]} />
+			<StatusDot color={colorMap[label]} />
 			<span>{label}</span>
 		</span>
 	);
@@ -89,15 +90,6 @@ export function ContaCartaoSelectContent({
 	logo,
 	isCartao,
 }: SelectItemContentProps & { isCartao?: boolean }) {
-	const resolveLogoSrc = (logoPath: string | null) => {
-		if (!logoPath) {
-			return null;
-		}
-
-		const fileName = logoPath.split("/").filter(Boolean).pop() ?? logoPath;
-		return `/logos/${fileName}`;
-	};
-
 	const logoSrc = resolveLogoSrc(logo);
 	const Icon = isCartao ? RiBankCard2Line : RiBankLine;
 

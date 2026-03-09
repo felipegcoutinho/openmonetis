@@ -7,7 +7,7 @@ import {
 	RiPencilLine,
 } from "@remixicon/react";
 import Image from "next/image";
-import { useMemo } from "react";
+import MoneyValues from "@/components/shared/money-values";
 import {
 	Card,
 	CardContent,
@@ -20,8 +20,9 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { resolveCardBrandAsset } from "@/lib/cartoes/brand-assets";
+import { resolveLogoSrc } from "@/lib/logo";
 import { cn } from "@/lib/utils/ui";
-import MoneyValues from "../money-values";
 
 interface CardItemProps {
 	name: string;
@@ -39,26 +40,6 @@ interface CardItemProps {
 	onInvoice?: () => void;
 	onRemove?: () => void;
 }
-
-const BRAND_ASSETS: Record<string, string> = {
-	visa: "/bandeiras/visa.svg",
-	mastercard: "/bandeiras/mastercard.svg",
-	amex: "/bandeiras/amex.svg",
-	american: "/bandeiras/amex.svg",
-	elo: "/bandeiras/elo.svg",
-	hipercard: "/bandeiras/hipercard.svg",
-	hiper: "/bandeiras/hipercard.svg",
-};
-
-const resolveBrandAsset = (brand: string) => {
-	const normalized = brand.trim().toLowerCase();
-
-	const match = (
-		Object.keys(BRAND_ASSETS) as Array<keyof typeof BRAND_ASSETS>
-	).find((entry) => normalized.includes(entry));
-
-	return match ? BRAND_ASSETS[match] : null;
-};
 
 const formatDay = (value: string) => value.padStart(2, "0");
 
@@ -83,7 +64,7 @@ export function CardItem({
 	const limitTotal = limit ?? null;
 	const used =
 		limitInUse ??
-		(limitTotal !== null && limitAvailable !== null
+		(limitTotal !== null && limitAvailable != null
 			? Math.max(limitTotal - limitAvailable, 0)
 			: limitTotal !== null
 				? 0
@@ -100,62 +81,38 @@ export function CardItem({
 			? Math.min(Math.max((used / limitTotal) * 100, 0), 100)
 			: 0;
 
-	const logoPath = useMemo(() => {
-		if (!logo) {
-			return null;
-		}
+	const logoPath = resolveLogoSrc(logo);
+	const brandAsset = resolveCardBrandAsset(brand);
+	const isInactive = status?.toLowerCase() === "inativo";
+	const metrics =
+		limitTotal === null || used === null || available === null
+			? null
+			: [
+					{ label: "Limite Total", value: limitTotal },
+					{ label: "Em uso", value: used },
+					{ label: "Disponível", value: available },
+				];
 
-		if (
-			logo.startsWith("http://") ||
-			logo.startsWith("https://") ||
-			logo.startsWith("data:")
-		) {
-			return logo;
-		}
-
-		return logo.startsWith("/") ? logo : `/logos/${logo}`;
-	}, [logo]);
-
-	const brandAsset = useMemo(() => resolveBrandAsset(brand), [brand]);
-
-	const isInactive = useMemo(
-		() => status?.toLowerCase() === "inativo",
-		[status],
-	);
-
-	const metrics = useMemo(() => {
-		if (limitTotal === null) return null;
-
-		return [
-			{ label: "Limite Total", value: limitTotal },
-			{ label: "Em uso", value: used },
-			{ label: "Disponível", value: available },
-		];
-	}, [available, limitTotal, used]);
-
-	const actions = useMemo(
-		() => [
-			{
-				label: "editar",
-				icon: <RiPencilLine className="size-4" aria-hidden />,
-				onClick: onEdit,
-				className: "text-primary",
-			},
-			{
-				label: "ver fatura",
-				icon: <RiFileList2Line className="size-4" aria-hidden />,
-				onClick: onInvoice,
-				className: "text-primary",
-			},
-			{
-				label: "remover",
-				icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
-				onClick: onRemove,
-				className: "text-destructive",
-			},
-		],
-		[onEdit, onInvoice, onRemove],
-	);
+	const actions = [
+		{
+			label: "editar",
+			icon: <RiPencilLine className="size-4" aria-hidden />,
+			onClick: onEdit,
+			className: "text-primary",
+		},
+		{
+			label: "ver fatura",
+			icon: <RiFileList2Line className="size-4" aria-hidden />,
+			onClick: onInvoice,
+			className: "text-primary",
+		},
+		{
+			label: "remover",
+			icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
+			onClick: onRemove,
+			className: "text-destructive",
+		},
+	];
 
 	return (
 		<Card className="flex flex-col p-6 w-full">

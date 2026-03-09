@@ -11,7 +11,6 @@ import {
 	pagadores,
 } from "@/db/schema";
 import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
-import type { ActionResult } from "@/lib/actions/types";
 import { getUser } from "@/lib/auth/server";
 import {
 	INITIAL_BALANCE_CONDITION,
@@ -30,8 +29,10 @@ import {
 	sendPagadorAutoEmails,
 } from "@/lib/pagadores/notifications";
 import { noteSchema, uuidSchema } from "@/lib/schemas/common";
+import type { ActionResult } from "@/lib/types/actions";
 import { formatDecimalForDbRequired } from "@/lib/utils/currency";
-import { getTodayDate, parseLocalDateString } from "@/lib/utils/date";
+import { getBusinessTodayDate, parseLocalDateString } from "@/lib/utils/date";
+import { addMonthsToPeriod } from "@/lib/utils/period";
 
 // ============================================================================
 // Authorization Validation Functions
@@ -108,11 +109,14 @@ const resolvePeriod = (purchaseDate: string, period?: string | null) => {
 	return `${year}-${month}`;
 };
 
+const isValidDateInput = (value: string) =>
+	!Number.isNaN(parseLocalDateString(value).getTime());
+
 const baseFields = z.object({
 	purchaseDate: z
 		.string({ message: "Informe a data da transação." })
 		.trim()
-		.refine((value) => !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => isValidDateInput(value), {
 			message: "Data da transação inválida.",
 		}),
 	period: z
@@ -164,14 +168,14 @@ const baseFields = z.object({
 	dueDate: z
 		.string()
 		.trim()
-		.refine((value) => !value || !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => !value || isValidDateInput(value), {
 			message: "Informe uma data de vencimento válida.",
 		})
 		.optional(),
 	boletoPaymentDate: z
 		.string()
 		.trim()
-		.refine((value) => !value || !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => !value || isValidDateInput(value), {
 			message: "Informe uma data de pagamento válida.",
 		})
 		.optional(),
@@ -351,23 +355,6 @@ const splitAmount = (totalCents: number, parts: number) => {
 		{ length: parts },
 		(_, index) => base + (index < remainder ? 1 : 0),
 	);
-};
-
-const addMonthsToPeriod = (period: string, offset: number) => {
-	const [yearStr, monthStr] = period.split("-");
-	const baseYear = Number(yearStr);
-	const baseMonth = Number(monthStr);
-
-	if (!baseYear || !baseMonth) {
-		throw new Error("Período inválido.");
-	}
-
-	const date = new Date(baseYear, baseMonth - 1, 1);
-	date.setMonth(date.getMonth() + offset);
-
-	const nextYear = date.getFullYear();
-	const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
-	return `${nextYear}-${nextMonth}`;
 };
 
 const addMonthsToDate = (value: Date, offset: number) => {
@@ -648,7 +635,7 @@ export async function createLancamentoAction(
 		const boletoPaymentDate = shouldSetBoletoPaymentDate
 			? data.boletoPaymentDate
 				? parseLocalDateString(data.boletoPaymentDate)
-				: getTodayDate()
+				: getBusinessTodayDate()
 			: null;
 
 		const amountSign: 1 | -1 = data.transactionType === "Despesa" ? -1 : 1;
@@ -828,7 +815,7 @@ export async function updateLancamentoAction(
 		const boletoPaymentDateValue = shouldSetBoletoPaymentDate
 			? data.boletoPaymentDate
 				? parseLocalDateString(data.boletoPaymentDate)
-				: getTodayDate()
+				: getBusinessTodayDate()
 			: null;
 
 		await db
@@ -982,7 +969,7 @@ export async function toggleLancamentoSettlementAction(
 		const isBoleto = existing.paymentMethod === "Boleto";
 		const boletoPaymentDate = isBoleto
 			? data.value
-				? getTodayDate()
+				? getBusinessTodayDate()
 				: null
 			: null;
 
@@ -1118,7 +1105,7 @@ const updateBulkSchema = z.object({
 	dueDate: z
 		.string()
 		.trim()
-		.refine((value) => !value || !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => !value || isValidDateInput(value), {
 			message: "Informe uma data de vencimento válida.",
 		})
 		.optional()
@@ -1126,7 +1113,7 @@ const updateBulkSchema = z.object({
 	boletoPaymentDate: z
 		.string()
 		.trim()
-		.refine((value) => !value || !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => !value || isValidDateInput(value), {
 			message: "Informe uma data de pagamento válida.",
 		})
 		.optional()
@@ -1284,7 +1271,7 @@ export async function updateLancamentoBulkAction(
 			});
 
 			await applyUpdates(
-				futureLancamentos.map((item) => ({
+				futureLancamentos.map((item: (typeof futureLancamentos)[number]) => ({
 					id: item.id,
 					purchaseDate: item.purchaseDate ?? null,
 				})),
@@ -1311,7 +1298,7 @@ export async function updateLancamentoBulkAction(
 			});
 
 			await applyUpdates(
-				allLancamentos.map((item) => ({
+				allLancamentos.map((item: (typeof allLancamentos)[number]) => ({
 					id: item.id,
 					purchaseDate: item.purchaseDate ?? null,
 				})),
@@ -1335,7 +1322,7 @@ const massAddTransactionSchema = z.object({
 	purchaseDate: z
 		.string({ message: "Informe a data da transação." })
 		.trim()
-		.refine((value) => !Number.isNaN(new Date(value).getTime()), {
+		.refine((value) => isValidDateInput(value), {
 			message: "Data da transação inválida.",
 		}),
 	name: z
@@ -1598,12 +1585,12 @@ export async function deleteMultipleLancamentosAction(
 		const notificationData = existing
 			.filter(
 				(
-					item,
+					item: (typeof existing)[number],
 				): item is typeof item & {
 					pagadorId: NonNullable<typeof item.pagadorId>;
 				} => Boolean(item.pagadorId),
 			)
-			.map((item) => ({
+			.map((item: (typeof existing)[number]) => ({
 				pagadorId: item.pagadorId,
 				name: item.name ?? null,
 				amount: item.amount ?? null,
@@ -1662,11 +1649,11 @@ export async function getRecentEstablishmentsAction(): Promise<string[]> {
 
 		// Remove duplicates and filter empty names
 		const uniqueNames = Array.from(
-			new Set(
+			new Set<string>(
 				results
-					.map((r) => r.name)
+					.map((r: (typeof results)[number]) => r.name)
 					.filter(
-						(name): name is string =>
+						(name: string | null): name is string =>
 							name != null &&
 							name.trim().length > 0 &&
 							!name.toLowerCase().startsWith("pagamento fatura"),

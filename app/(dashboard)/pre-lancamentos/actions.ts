@@ -4,7 +4,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { preLancamentos } from "@/db/schema";
 import { handleActionError, revalidateForEntity } from "@/lib/actions/helpers";
-import type { ActionResult } from "@/lib/actions/types";
+import type { ActionResult } from "@/lib/types/actions";
 import { getUser } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 
