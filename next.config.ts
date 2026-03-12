@@ -19,6 +19,85 @@ const nextConfig: NextConfig = {
 	devIndicators: {
 		position: "bottom-right",
 	},
+	async redirects() {
+		return [
+			{ source: "/ajustes", destination: "/settings", permanent: true },
+			{ source: "/anotacoes", destination: "/notes", permanent: true },
+			{ source: "/calendario", destination: "/calendar", permanent: true },
+			{ source: "/cartoes", destination: "/cards", permanent: true },
+			{
+				source: "/accounts/:accountId/extrato",
+				destination: "/accounts/:accountId/statement",
+				permanent: true,
+			},
+			{
+				source: "/cartoes/:cartaoId/fatura",
+				destination: "/cards/:cartaoId/invoice",
+				permanent: true,
+			},
+			{
+				source: "/cards/:cardId/fatura",
+				destination: "/cards/:cardId/invoice",
+				permanent: true,
+			},
+			{
+				source: "/categorias/historico",
+				destination: "/categories/history",
+				permanent: true,
+			},
+			{
+				source: "/categorias/:categoryId",
+				destination: "/categories/:categoryId",
+				permanent: true,
+			},
+			{ source: "/categorias", destination: "/categories", permanent: true },
+			{ source: "/contas", destination: "/accounts", permanent: true },
+			{
+				source: "/contas/:contaId/extrato",
+				destination: "/accounts/:contaId/statement",
+				permanent: true,
+			},
+			{ source: "/lancamentos", destination: "/transactions", permanent: true },
+			{ source: "/orcamentos", destination: "/budgets", permanent: true },
+			{ source: "/pagadores", destination: "/payers", permanent: true },
+			{
+				source: "/pagadores/:pagadorId",
+				destination: "/payers/:pagadorId",
+				permanent: true,
+			},
+			{ source: "/pre-lancamentos", destination: "/inbox", permanent: true },
+			{
+				source: "/relatorios",
+				destination: "/reports/category-trends",
+				permanent: true,
+			},
+			{
+				source: "/relatorios/analise-parcelas",
+				destination: "/reports/installment-analysis",
+				permanent: true,
+			},
+			{
+				source: "/relatorios/estabelecimentos",
+				destination: "/reports/establishments",
+				permanent: true,
+			},
+			{
+				source: "/relatorios/tendencias",
+				destination: "/reports/category-trends",
+				permanent: true,
+			},
+			{
+				source: "/relatorios/uso-cartoes",
+				destination: "/reports/card-usage",
+				permanent: true,
+			},
+			{
+				source: "/changelog",
+				destination: "/settings/changelog",
+				permanent: true,
+			},
+		];
+	},
 	// Headers for Safari compatibility
 	async headers() {
 		return [

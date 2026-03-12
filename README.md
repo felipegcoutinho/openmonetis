@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/imagens/logo_small.png" alt="OpenMonetis Logo" height="80" />
+  <img src="./public/images/logo_small.png" alt="OpenMonetis Logo" height="80" />
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 ---
 
 <p align="center">
-  <img src="./public/imagens/dashboard-preview-light.webp" alt="Dashboard Preview" width="800" />
+  <img src="./public/images/dashboard-preview-light.webp" alt="Dashboard Preview" width="800" />
 </p>
 
 ---
