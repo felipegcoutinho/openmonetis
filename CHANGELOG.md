@@ -11,11 +11,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Refatoração de identificadores: todos os identificadores internos (variáveis, props, tipos, funções) foram migrados de PT-BR para inglês (`lancamento` → `transaction`, `pagador` → `payer`, `conta` → `account`, `cartao` → `card`, `categoria` → `category`, `orcamento` → `budget`, entre outros). Strings de UI e mensagens para o usuário foram mantidas em português.
 - Consistência interna: filtros de lançamentos passaram a usar search params em inglês (`type`, `condition`, `payment`, `payer`, `category`, `accountCard`), e resíduos de naming PT-BR foram limpos em dialogs, pages e helpers de `transactions`, `payers` e dashboard.
+- Lançamentos recorrentes: a criação de recorrências voltou a gerar todos os meses diretamente no fluxo de lançamento, com seleção explícita da quantidade de meses no formulário.
+- UI compartilhada: `type-badge` foi renomeado para `transaction-type-badge`, ganhou mapeamento centralizado por tipo financeiro e passou a usar o mesmo visual refinado em tabela, detalhe de transação e cabeçalho de categoria.
+- Navbar: a barra superior passou a usar um `dot pattern` SVG sutil sobre a cor primária, com máscara horizontal e camada de luz suave para dar textura sem perder a leitura limpa.
+- Autenticação: os cards de login e cadastro agora compartilham uma base visual com `dot pattern` suave e leve brilho em `primary`, reaproveitando a mesma linguagem aplicada na navbar sem prejudicar a legibilidade do formulário.
+- Autenticação: login e cadastro foram reequilibrados com espaçamentos mais consistentes, conteúdo centralizado em largura útil fixa, cabeçalhos com descrição e sidebar com composição mais harmônica, sem alterar a estrutura principal das telas.
+- Interface e textos: labels que ainda misturavam inglês com português foram padronizados em formulários, tabelas, relatórios e estados vazios, junto de pequenos ajustes de ícones e acabamentos visuais.
 
 ### Corrigido
 
 - Lançamentos: o schema compartilhado de observação voltou a aceitar `null`, corrigindo o erro `Invalid input: expected string, received null` ao salvar novos lançamentos sem anotação.
 - Cartões/Faturas: o pagamento da fatura passou a usar o valor líquido do período no cartão, evitando que o extrato da conta registre o total bruto das despesas quando houver receitas como estornos ou créditos na mesma fatura.
+
+### Removido
+
+- Recorrência legada: a tabela `recurring_series`, seus schemas, actions, geração lazy e o widget correspondente da dashboard foram removidos do projeto.
 
 ### Alterado
 
