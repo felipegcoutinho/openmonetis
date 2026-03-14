@@ -5,9 +5,8 @@ import {
 	formatCondition,
 	formatDate,
 	formatPeriod,
-	getTransactionBadgeVariant,
 } from "@/features/transactions/formatting-helpers";
-import { Badge } from "@/shared/components/ui/badge";
+import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
 import { Button } from "@/shared/components/ui/button";
 import {
 	CardContent,
@@ -93,12 +92,12 @@ export function TransactionDetailsDialog({
 								</li>
 
 								<DetailRow
-									label={transaction.cartaoName ? "Cartão" : "FinancialAccount"}
+									label={transaction.cartaoName ? "Cartão" : "Conta"}
 									value={transaction.cartaoName ?? transaction.contaName ?? "—"}
 								/>
 
 								<DetailRow
-									label="Category"
+									label="Categoria"
 									value={transaction.categoriaName ?? "—"}
 								/>
 
@@ -106,19 +105,13 @@ export function TransactionDetailsDialog({
 									<span className="text-muted-foreground">
 										Tipo de Transação
 									</span>
-									<span className="capitalize">
-										<Badge
-											variant={getTransactionBadgeVariant(
-												transaction.categoriaName === "Saldo inicial"
-													? "Saldo inicial"
-													: transaction.transactionType,
-											)}
-										>
-											{transaction.categoriaName === "Saldo inicial"
-												? "Saldo Inicial"
-												: transaction.transactionType}
-										</Badge>
-									</span>
+									<TransactionTypeBadge
+										kind={
+											transaction.categoriaName === "Saldo inicial"
+												? "Saldo inicial"
+												: transaction.transactionType
+										}
+									/>
 								</li>
 
 								<DetailRow

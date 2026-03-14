@@ -129,7 +129,7 @@ export function CategoryReportFilters({
 
 	const selectedText =
 		selectedCategories.length === 0
-			? "Category"
+			? "Categoria"
 			: selectedCategories.length === categories.length
 				? "Todas"
 				: selectedCategories.length === 1

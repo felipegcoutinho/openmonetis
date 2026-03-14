@@ -11,10 +11,10 @@ import {
 import { fetchUserPreferences } from "@/features/settings/queries";
 import { TransactionsPage as LancamentosSection } from "@/features/transactions/components/page/transactions-page";
 import {
-	buildTransactionWhere,
 	buildOptionSets,
 	buildSluggedFilters,
 	buildSlugMaps,
+	buildTransactionWhere,
 	extractTransactionSearchFilters,
 	getSingleParam,
 	mapTransactionsData,

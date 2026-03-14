@@ -24,8 +24,8 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import {
-	CategorySelectContent,
 	AccountCardSelectContent,
+	CategorySelectContent,
 	PayerSelectContent,
 } from "../select-items";
 import type { SelectOption, TransactionItem } from "../types";
@@ -203,7 +203,7 @@ export function BulkImportDialog({
 
 				<form className="space-y-4" onSubmit={handleSubmit}>
 					<div className="space-y-2">
-						<Label htmlFor="pagador">Payer *</Label>
+						<Label htmlFor="pagador">Pagador *</Label>
 						<Select value={payerId} onValueChange={setPagadorId}>
 							<SelectTrigger id="pagador" className="w-full">
 								<SelectValue placeholder="Selecione o pagador">
@@ -235,7 +235,7 @@ export function BulkImportDialog({
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="categoria">Category *</Label>
+						<Label htmlFor="categoria">Categoria *</Label>
 						<Select value={categoryId} onValueChange={setCategoriaId}>
 							<SelectTrigger id="categoria" className="w-full">
 								<SelectValue placeholder="Selecione a categoria">
@@ -274,7 +274,7 @@ export function BulkImportDialog({
 					{hasNonCredit && (
 						<div className="space-y-2">
 							<Label htmlFor="conta">
-								FinancialAccount {hasCredit ? "(para não cartão)" : "*"}
+								Conta {hasCredit ? "(para não cartão)" : "*"}
 							</Label>
 							<Select value={accountId} onValueChange={setContaId}>
 								<SelectTrigger id="conta" className="w-full">

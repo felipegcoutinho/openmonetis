@@ -32,7 +32,7 @@ export function PagadorInfoCard({ payer }: PayerInfoCardProps) {
 		<Card className="border gap-4">
 			<CardHeader className="gap-1.5">
 				<CardTitle className="text-lg font-semibold">
-					Detalhes do payer
+					Detalhes do pagador
 				</CardTitle>
 				<CardDescription>
 					{showSensitiveDetails

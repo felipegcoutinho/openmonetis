@@ -1,11 +1,5 @@
 import { and, asc, eq, inArray, isNull, or, sql, sum } from "drizzle-orm";
-import {
-	type Budget,
-	budgets,
-	categories,
-	payers,
-	transactions,
-} from "@/db/schema";
+import { budgets, categories, payers, transactions } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
 import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";

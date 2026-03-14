@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAddCircleLine, RiBankCard2Line } from "@remixicon/react";
+import { RiAddCircleFill, RiBankCard2Line } from "@remixicon/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -164,7 +164,7 @@ export function CardsPage({
 						logoOptions={logoOptions}
 						trigger={
 							<Button className="w-full sm:w-auto">
-								<RiAddCircleLine className="size-4" />
+								<RiAddCircleFill className="size-4" />
 								Novo cartão
 							</Button>
 						}

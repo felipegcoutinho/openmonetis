@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAddCircleLine, RiBankLine } from "@remixicon/react";
+import { RiAddCircleFill, RiBankLine } from "@remixicon/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -176,7 +176,7 @@ export function AccountsPage({
 						logoOptions={logoOptions}
 						trigger={
 							<Button className="w-full sm:w-auto">
-								<RiAddCircleLine className="size-4" />
+								<RiAddCircleFill className="size-4" />
 								Nova conta
 							</Button>
 						}

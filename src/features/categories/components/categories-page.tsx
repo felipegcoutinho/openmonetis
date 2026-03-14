@@ -1,7 +1,7 @@
 "use client";
 
 import {
-	RiAddCircleLine,
+	RiAddCircleFill,
 	RiDeleteBin5Line,
 	RiExternalLinkLine,
 	RiPencilLine,
@@ -127,7 +127,7 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 						defaultType={activeType}
 						trigger={
 							<Button className="w-full sm:w-auto">
-								<RiAddCircleLine className="size-4" />
+								<RiAddCircleFill className="size-4" />
 								Nova categoria
 							</Button>
 						}

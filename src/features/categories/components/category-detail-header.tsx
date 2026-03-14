@@ -1,5 +1,5 @@
 import { RiArrowDownSFill, RiArrowUpSFill } from "@remixicon/react";
-import { TypeBadge } from "@/shared/components/type-badge";
+import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
 import { Card } from "@/shared/components/ui/card";
 import type { CategoryType } from "@/shared/lib/categories/constants";
 import { currencyFormatter } from "@/shared/utils/currency";
@@ -85,7 +85,7 @@ export function CategoryDetailHeader({
 							{category.name}
 						</h1>
 						<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-							<TypeBadge type={category.type} />
+							<TransactionTypeBadge kind={category.type} />
 							<span>
 								{transactionCount}{" "}
 								{transactionCount === 1 ? "lançamento" : "lançamentos"} no{" "}

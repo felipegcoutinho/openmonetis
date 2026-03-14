@@ -134,7 +134,7 @@ export function InsightsPage({ period, onAnalyze }: InsightsPageProps) {
 	return (
 		<div className="flex flex-col gap-6">
 			{/* Privacy Warning */}
-			<Alert className="border-none">
+			<Alert className="border-none bg-primary/15">
 				<RiAlertLine className="size-4" color="red" />
 				<AlertDescription className="text-sm text-card-foreground">
 					<strong>Aviso de privacidade:</strong> Ao gerar insights, seus dados

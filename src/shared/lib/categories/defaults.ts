@@ -42,7 +42,7 @@ export const DEFAULT_CATEGORIES: DefaultCategory[] = [
 	{ name: "Outras receitas", type: "receita", icon: "RiMore2Line" },
 	{ name: "Saldo inicial", type: "receita", icon: "RiWallet2Line" },
 
-	// Category especial para transferências entre financialAccounts
+	// Category especial para transferências entre Contas
 	{
 		name: "Transferência interna",
 		type: "receita",

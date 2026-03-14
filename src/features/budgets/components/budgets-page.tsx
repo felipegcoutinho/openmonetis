@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAddCircleLine, RiFileCopyLine, RiFundsLine } from "@remixicon/react";
+import { RiAddCircleFill, RiFileCopyLine, RiFundsLine } from "@remixicon/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -115,7 +115,7 @@ export function BudgetsPage({
 								disabled={categories.length === 0}
 								className="w-full sm:w-auto"
 							>
-								<RiAddCircleLine className="size-4" />
+								<RiAddCircleFill className="size-4" />
 								Novo orçamento
 							</Button>
 						}

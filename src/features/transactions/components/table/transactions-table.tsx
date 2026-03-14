@@ -34,7 +34,7 @@ import { CategoryIcon } from "@/features/categories/components/category-icon";
 import { DEFAULT_LANCAMENTOS_COLUMN_ORDER } from "@/features/transactions/column-order";
 import { EmptyState } from "@/shared/components/empty-state";
 import MoneyValues from "@/shared/components/money-values";
-import { TypeBadge } from "@/shared/components/type-badge";
+import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
 import {
 	Avatar,
 	AvatarFallback,
@@ -302,8 +302,8 @@ const buildColumns = ({
 						: row.original.transactionType;
 
 				return (
-					<TypeBadge
-						type={
+					<TransactionTypeBadge
+						kind={
 							type as "Despesa" | "Receita" | "Transferência" | "Saldo inicial"
 						}
 					/>
@@ -458,7 +458,7 @@ const buildColumns = ({
 						<Tooltip>
 							<TooltipTrigger asChild>{content}</TooltipTrigger>
 							<TooltipContent side="top">
-								{isCartao ? "Cartão" : "FinancialAccount"}: {label}
+								{isCartao ? "Cartão" : "Conta"}: {label}
 							</TooltipContent>
 						</Tooltip>
 					);
@@ -484,7 +484,7 @@ const buildColumns = ({
 							</Link>
 						</TooltipTrigger>
 						<TooltipContent side="top">
-							{isCartao ? "Cartão" : "FinancialAccount"}: {label}
+							{isCartao ? "Cartão" : "Conta"}: {label}
 						</TooltipContent>
 					</Tooltip>
 				);
@@ -607,7 +607,7 @@ const buildColumns = ({
 								row.original.userId !== currentUserId && (
 									<DropdownMenuItem onSelect={() => handleImport(row.original)}>
 										<RiFileCopyLine className="size-4" />
-										Importar para Minha FinancialAccount
+										Importar para Minha Conta
 									</DropdownMenuItem>
 								)}
 							{row.original.userId === currentUserId && (
@@ -866,14 +866,14 @@ export function TransactionsTable({
 										onClick={() => onCreate("Receita")}
 										className="w-full sm:w-auto"
 									>
-										<RiAddCircleLine className="size-4" />
+										<RiAddCircleFill className="size-4" />
 										Nova Receita
 									</Button>
 									<Button
 										onClick={() => onCreate("Despesa")}
 										className="w-full sm:w-auto"
 									>
-										<RiAddCircleLine className="size-4" />
+										<RiAddCircleFill className="size-4" />
 										Nova Despesa
 									</Button>
 								</>
@@ -887,7 +887,7 @@ export function TransactionsTable({
 											size="icon"
 											className="hidden size-9 sm:inline-flex"
 										>
-											<RiAddCircleFill className="size-4" />
+											<RiAddCircleLine className="size-4" />
 											<span className="sr-only">
 												Adicionar múltiplos lançamentos
 											</span>

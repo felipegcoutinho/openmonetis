@@ -113,10 +113,7 @@ export async function fetchDashboardPayers(
 		}))
 		.sort((a, b) => b.totalExpenses - a.totalExpenses);
 
-	const totalExpenses = payerList.reduce(
-		(sum, p) => sum + p.totalExpenses,
-		0,
-	);
+	const totalExpenses = payerList.reduce((sum, p) => sum + p.totalExpenses, 0);
 
 	return {
 		payers: payerList,

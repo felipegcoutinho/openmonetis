@@ -69,7 +69,7 @@ export function ExpandableWidgetCard({
 						<div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-linear-to-t from-card to-transparent pt-12 pb-6">
 							<Button
 								variant="secondary"
-								className="pointer-events-auto rounded-full text-xs"
+								className="pointer-events-auto rounded-full text-xs backdrop-blur-sm bg-primary/10"
 								onClick={() => setIsOpen(true)}
 								aria-label="Expandir para ver todo o conteúdo"
 							>

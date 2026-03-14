@@ -194,7 +194,7 @@ export function PaymentMethodSection({
 								!isUpdateMode ? "md:w-1/2" : "md:w-full",
 							)}
 						>
-							<Label htmlFor="conta">FinancialAccount</Label>
+							<Label htmlFor="conta">Conta</Label>
 							<Select
 								value={formState.accountId}
 								onValueChange={(value) => onFieldChange("accountId", value)}
@@ -308,7 +308,7 @@ export function PaymentMethodSection({
 								!isUpdateMode ? "md:w-1/2" : "md:w-full",
 							)}
 						>
-							<Label htmlFor="contaUpdate">FinancialAccount</Label>
+							<Label htmlFor="contaUpdate">Conta</Label>
 							<Select
 								value={formState.accountId}
 								onValueChange={(value) => onFieldChange("accountId", value)}

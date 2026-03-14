@@ -1,8 +1,8 @@
 import type { payers } from "@/db/schema";
 import type {
 	AccountCardFilterOption,
-	TransactionFilterOption,
 	SelectOption,
+	TransactionFilterOption,
 	TransactionItem,
 } from "@/features/transactions/components/types";
 import type { buildOptionSets } from "@/features/transactions/page-helpers";
@@ -35,10 +35,7 @@ export function buildReadOnlyOptionSets(
 		if (item.accountId && !contaOptionsMap.has(item.accountId)) {
 			contaOptionsMap.set(item.accountId, {
 				value: item.accountId,
-				label: normalizeOptionLabel(
-					item.contaName,
-					"FinancialAccount sem nome",
-				),
+				label: normalizeOptionLabel(item.contaName, "Conta sem nome"),
 				slug: item.accountId,
 			});
 		}

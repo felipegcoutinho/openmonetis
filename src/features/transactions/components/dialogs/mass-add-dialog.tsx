@@ -44,8 +44,8 @@ import {
 	periodToDate,
 } from "@/shared/utils/period";
 import {
-	CategorySelectContent,
 	AccountCardSelectContent,
+	CategorySelectContent,
 	PayerSelectContent,
 	PaymentMethodSelectContent,
 	TransactionTypeSelectContent,
@@ -413,7 +413,7 @@ export function MassAddDialog({
 							{/* FinancialAccount (for non-credit-card methods) */}
 							{!isCartaoSelected ? (
 								<div className="space-y-2">
-									<Label htmlFor="conta">FinancialAccount</Label>
+									<Label htmlFor="conta">Conta</Label>
 									<Select value={accountId} onValueChange={setContaId}>
 										<SelectTrigger id="conta" className="w-full">
 											<SelectValue placeholder="Selecione">
@@ -534,7 +534,7 @@ export function MassAddDialog({
 												htmlFor={`pagador-${transaction.id}`}
 												className="sr-only"
 											>
-												Payer {index + 1}
+												Pagador {index + 1}
 											</Label>
 											<Select
 												value={transaction.payerId}
@@ -546,7 +546,7 @@ export function MassAddDialog({
 													id={`pagador-${transaction.id}`}
 													className="w-32 truncate"
 												>
-													<SelectValue placeholder="Payer">
+													<SelectValue placeholder="Pagador">
 														{transaction.payerId &&
 															(() => {
 																const selectedOption = payerOptions.find(
@@ -579,7 +579,7 @@ export function MassAddDialog({
 												htmlFor={`categoria-${transaction.id}`}
 												className="sr-only"
 											>
-												Category {index + 1}
+												Categoria {index + 1}
 											</Label>
 											<Select
 												value={transaction.categoryId}
@@ -591,7 +591,7 @@ export function MassAddDialog({
 													id={`categoria-${transaction.id}`}
 													className="w-32 truncate"
 												>
-													<SelectValue placeholder="Category" />
+													<SelectValue placeholder="Categoria" />
 												</SelectTrigger>
 												<SelectContent>
 													{groupedCategorias.map((group) => (

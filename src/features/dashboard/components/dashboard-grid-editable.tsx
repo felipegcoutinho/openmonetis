@@ -16,7 +16,7 @@ import {
 	sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import {
-	RiAddCircleLine,
+	RiAddCircleFill,
 	RiCheckLine,
 	RiCloseLine,
 	RiDragMove2Line,
@@ -198,10 +198,7 @@ export function DashboardGridEditable({
 			{/* Toolbar */}
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				{!isEditing ? (
-					<div className="flex w-full min-w-0 flex-col gap-1 px-1 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
-						<span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-							Ações rápidas
-						</span>
+					<div className="flex w-full min-w-0 flex-col gap-1 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
 						<div className="-mb-1 grid w-full grid-cols-3 gap-1 pb-1 sm:mb-0 sm:flex sm:w-auto sm:items-center sm:gap-2 sm:overflow-visible sm:pb-0">
 							<TransactionDialog
 								mode="create"
@@ -221,7 +218,7 @@ export function DashboardGridEditable({
 										className="h-12 w-full min-w-0 flex-col justify-center gap-0.5 px-1.5 text-sm whitespace-normal sm:h-8 sm:w-auto sm:flex-row sm:gap-2 sm:px-3 sm:whitespace-nowrap"
 									>
 										<span className="flex items-center gap-0.5">
-											<RiAddCircleLine className="size-3.5 shrink-0 text-success/80" />
+											<RiAddCircleFill className="size-3.5 shrink-0 text-success/80" />
 										</span>
 										<span className="sm:hidden">Receita</span>
 										<span className="hidden sm:inline">Nova receita</span>
@@ -246,7 +243,7 @@ export function DashboardGridEditable({
 										className="h-12 w-full min-w-0 flex-col justify-center gap-0.5 px-1.5 text-sm whitespace-normal sm:h-8 sm:w-auto sm:flex-row sm:gap-2 sm:px-3 sm:whitespace-nowrap"
 									>
 										<span className="flex items-center gap-0.5">
-											<RiAddCircleLine className="size-3.5 shrink-0 text-destructive/80" />
+											<RiAddCircleFill className="size-3.5 shrink-0 text-destructive/80" />
 										</span>
 										<span className="sm:hidden">Despesa</span>
 										<span className="hidden sm:inline">Nova despesa</span>

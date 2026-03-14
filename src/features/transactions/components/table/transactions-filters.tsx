@@ -368,7 +368,7 @@ export function TransactionsFilters({
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-sm font-medium">Payer</label>
+									<label className="text-sm font-medium">Pagador</label>
 									<Select
 										value={getParamValue("payer")}
 										onValueChange={(value) =>
@@ -409,7 +409,7 @@ export function TransactionsFilters({
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-sm font-medium">Category</label>
+									<label className="text-sm font-medium">Categoria</label>
 									<Popover
 										open={categoryOpen}
 										onOpenChange={setCategoryOpen}

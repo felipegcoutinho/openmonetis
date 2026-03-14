@@ -24,7 +24,7 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 				<CardHeader className="pb-3">
 					<CardTitle className="flex items-center gap-1.5 text-base">
 						<RiPieChartLine className="size-4 text-primary" />
-						Gastos por Category
+						Gastos por Categoria
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
@@ -45,7 +45,7 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 			<CardHeader className="pb-3">
 				<CardTitle className="flex items-center gap-1.5 text-base">
 					<RiPieChartLine className="size-4 text-primary" />
-					Gastos por Category
+					Gastos por Categoria
 				</CardTitle>
 			</CardHeader>
 

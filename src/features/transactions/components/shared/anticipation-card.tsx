@@ -134,14 +134,14 @@ export function AnticipationCard({
 
 					{anticipation.payer && (
 						<div>
-							<dt className="text-muted-foreground">Payer</dt>
+							<dt className="text-muted-foreground">Pagador</dt>
 							<dd className="mt-1 font-medium">{anticipation.payer.name}</dd>
 						</div>
 					)}
 
 					{anticipation.category && (
 						<div>
-							<dt className="text-muted-foreground">Category</dt>
+							<dt className="text-muted-foreground">Categoria</dt>
 							<dd className="mt-1 font-medium">{anticipation.category.name}</dd>
 						</div>
 					)}

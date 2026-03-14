@@ -65,7 +65,7 @@ export function CategorySection({
 					showTransactionTypeField ? "md:w-1/2" : "md:w-full",
 				)}
 			>
-				<Label htmlFor="categoria">Category</Label>
+				<Label htmlFor="categoria">Categoria</Label>
 				<Select
 					value={formState.categoryId}
 					onValueChange={(value) => onFieldChange("categoryId", value)}

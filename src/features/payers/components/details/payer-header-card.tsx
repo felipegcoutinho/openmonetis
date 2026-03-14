@@ -201,7 +201,7 @@ export function PayerHeaderCard({
 									{summary.periodLabel}
 								</span>{" "}
 								para{" "}
-								<span className="font-medium text-foreground">
+								<span className="font-semibold text-foreground">
 									{payer.email}
 								</span>
 							</DialogDescription>

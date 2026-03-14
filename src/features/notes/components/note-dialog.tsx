@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAddLine, RiDeleteBinLine } from "@remixicon/react";
+import { RiAddCircleFill, RiDeleteBinLine } from "@remixicon/react";
 import {
 	type ReactNode,
 	useEffect,
@@ -329,7 +329,7 @@ export function NoteDialog({
 										disabled={isPending || !normalize(newTaskText)}
 										className="shrink-0"
 									>
-										<RiAddLine className="h-4 w-4" />
+										<RiAddCircleFill className="h-4 w-4" />
 									</Button>
 								</div>
 							</div>

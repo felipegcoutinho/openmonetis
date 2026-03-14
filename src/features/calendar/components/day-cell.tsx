@@ -162,7 +162,7 @@ export function DayCell({ day, onSelect, onCreate }: DayCellProps) {
 				<button
 					type="button"
 					onClick={handleCreateClick}
-					className="flex size-6 items-center justify-center rounded-full border bg-muted text-muted-foreground transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+					className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
 					aria-label={`Criar lançamento em ${day.date}`}
 				>
 					<RiAddLine className="size-3.5" />

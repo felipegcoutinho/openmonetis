@@ -73,21 +73,6 @@ export function formatCondition(value?: string | null): string {
 }
 
 /**
- * Gets the badge variant for a transaction type
- * @param type - Transaction type (Receita/Despesa)
- * @returns Badge variant
- */
-export function getTransactionBadgeVariant(
-	type?: string | null,
-): "default" | "destructive" | "secondary" {
-	if (!type) return "secondary";
-	const normalized = type.toLowerCase();
-	return normalized === "receita" || normalized === "saldo inicial"
-		? "default"
-		: "destructive";
-}
-
-/**
  * Formats currency value
  * @param value - Numeric value
  * @returns Formatted currency string

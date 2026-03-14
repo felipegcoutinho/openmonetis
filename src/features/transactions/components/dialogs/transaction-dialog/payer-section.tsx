@@ -36,7 +36,7 @@ export function PayerSection({
 	return (
 		<div className="flex w-full flex-col gap-2 md:flex-row">
 			<div className="w-full space-y-1">
-				<Label htmlFor="payer">Payer</Label>
+				<Label htmlFor="payer">Pagador</Label>
 				<div className="flex gap-2">
 					<Select
 						value={formState.payerId}

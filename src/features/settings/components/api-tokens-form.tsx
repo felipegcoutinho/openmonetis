@@ -1,7 +1,7 @@
 "use client";
 
 import {
-	RiAddLine,
+	RiAddCircleFill,
 	RiAlertLine,
 	RiCheckLine,
 	RiDeleteBinLine,
@@ -154,7 +154,7 @@ export function ApiTokensForm({ tokens }: ApiTokensFormProps) {
 				>
 					<DialogTrigger asChild>
 						<Button size="sm">
-							<RiAddLine className="h-4 w-4 mr-1" />
+							<RiAddCircleFill className="h-4 w-4 mr-1" />
 							Novo Token
 						</Button>
 					</DialogTrigger>

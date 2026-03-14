@@ -92,7 +92,7 @@ export function EstablishmentsList({
 													.map((cat, catIndex) => (
 														<Badge
 															key={catIndex}
-															variant="secondary"
+															variant="outline"
 															className="text-xs px-1.5 py-0 h-5"
 														>
 															{cat.name}

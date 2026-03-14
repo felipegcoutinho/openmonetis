@@ -160,7 +160,7 @@ export function CardFormFields({
 			</div>
 
 			<div className="flex flex-col gap-2 sm:col-span-2">
-				<Label htmlFor="card-account">FinancialAccount vinculada</Label>
+				<Label htmlFor="card-account">Conta vinculada</Label>
 				<Select
 					value={values.accountId}
 					onValueChange={(value) => onChange("accountId", value)}

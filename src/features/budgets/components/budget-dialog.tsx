@@ -207,7 +207,7 @@ export function BudgetDialog({
 				) : (
 					<form className="space-y-4" onSubmit={handleSubmit}>
 						<div className="space-y-2">
-							<Label htmlFor="budget-category">Category</Label>
+							<Label htmlFor="budget-category">Categoria</Label>
 							<Select
 								value={formState.categoryId}
 								onValueChange={(value) => updateField("categoryId", value)}

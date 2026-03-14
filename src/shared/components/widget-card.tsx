@@ -41,7 +41,7 @@ export default function WidgetCard({
 							<span className="size-4">{icon}</span>
 							{title}
 						</CardTitle>
-						<CardDescription className="text-muted-foreground text-sm lowercase mt-2">
+						<CardDescription className="text-muted-foreground text-sm lowercase mt-1.5 tracking-tight">
 							{subtitle}
 						</CardDescription>
 					</div>

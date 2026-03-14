@@ -54,7 +54,7 @@ export function CategoryReportExport({
 
 			// Build CSV content
 			const headers = [
-				"Category",
+				"Categoria",
 				...data.periods.map(formatPeriodLabel),
 				"Total",
 			];
@@ -129,7 +129,7 @@ export function CategoryReportExport({
 
 			// Build data array
 			const headers = [
-				"Category",
+				"Categoria",
 				...data.periods.map(formatPeriodLabel),
 				"Total",
 			];
@@ -249,7 +249,7 @@ export function CategoryReportExport({
 
 			// Build table data
 			const headers = [
-				["Category", ...data.periods.map(formatPeriodLabel), "Total"],
+				["Categoria", ...data.periods.map(formatPeriodLabel), "Total"],
 			];
 			const body: string[][] = [];
 

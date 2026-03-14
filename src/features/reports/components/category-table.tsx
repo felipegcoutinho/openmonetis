@@ -65,7 +65,7 @@ export function CategoryTable({
 				<TableHeader>
 					<TableRow>
 						<TableHead className="w-[240px] min-w-[240px] font-bold">
-							Category
+							Categoria
 						</TableHead>
 						{periods.map((period) => (
 							<TableHead
