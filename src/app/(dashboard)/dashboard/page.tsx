@@ -3,7 +3,6 @@ import { DashboardMetricsCards } from "@/features/dashboard/components/dashboard
 import { DashboardWelcome } from "@/features/dashboard/components/dashboard-welcome";
 import { fetchDashboardData } from "@/features/dashboard/fetch-dashboard-data";
 import { fetchUserDashboardPreferences } from "@/features/dashboard/preferences-queries";
-import { triggerRecurringGeneration } from "@/features/recurring/trigger-recurring-generation";
 import {
 	buildOptionSets,
 	buildSluggedFilters,
@@ -25,7 +24,6 @@ type PageProps = {
 
 export default async function Page({ searchParams }: PageProps) {
 	const user = await getUser();
-	await triggerRecurringGeneration(user.id);
 	const resolvedSearchParams = searchParams ? await searchParams : undefined;
 	const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
 	const { period: selectedPeriod } = parsePeriodParam(periodoParam);

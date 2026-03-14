@@ -562,55 +562,6 @@ export const installmentAnticipations = pgTable(
 	}),
 );
 
-// ===================== RECURRING SERIES =====================
-
-export type RecurringSeriesTemplate = {
-	name: string;
-	amount: string;
-	transactionType: string;
-	paymentMethod: string;
-	categoryId: string | null;
-	accountId: string | null;
-	cardId: string | null;
-	payerId: string | null;
-	note: string | null;
-	condition: string;
-};
-
-export const recurringSeries = pgTable(
-	"recurring_series",
-	{
-		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-		userId: text("user_id")
-			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
-		status: text("status").notNull().default("active"), // "active" | "paused" | "cancelled"
-		dayOfMonth: smallint("day_of_month").notNull(),
-		lastGeneratedPeriod: text("last_generated_period").notNull(), // YYYY-MM
-		templateData: jsonb("template_data")
-			.notNull()
-			.$type<RecurringSeriesTemplate>(),
-		createdAt: timestamp("created_at", {
-			mode: "date",
-			withTimezone: true,
-		})
-			.notNull()
-			.defaultNow(),
-		updatedAt: timestamp("updated_at", {
-			mode: "date",
-			withTimezone: true,
-		})
-			.notNull()
-			.defaultNow(),
-	},
-	(table) => ({
-		userIdStatusIdx: index("recurring_series_user_id_status_idx").on(
-			table.userId,
-			table.status,
-		),
-	}),
-);
-
 // ===================== TRANSACTIONS =====================
 
 export const transactions = pgTable(
@@ -664,10 +615,6 @@ export const transactions = pgTable(
 		}),
 		seriesId: uuid("series_id"),
 		transferId: uuid("transfer_id"),
-		recurringSeriesId: uuid("recurring_series_id").references(
-			() => recurringSeries.id,
-			{ onDelete: "set null" },
-		),
 	},
 	(table) => ({
 		// Índice composto mais importante: userId + period (usado em quase todas as queries do dashboard)
@@ -722,7 +669,6 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	installmentAnticipations: many(installmentAnticipations),
 	apiTokens: many(apiTokens),
 	inboxItems: many(inboxItems),
-	recurringSeries: many(recurringSeries),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -876,22 +822,7 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 		fields: [transactions.anticipationId],
 		references: [installmentAnticipations.id],
 	}),
-	recurringSeries: one(recurringSeries, {
-		fields: [transactions.recurringSeriesId],
-		references: [recurringSeries.id],
-	}),
 }));
-
-export const recurringSeriesRelations = relations(
-	recurringSeries,
-	({ one, many }) => ({
-		user: one(user, {
-			fields: [recurringSeries.userId],
-			references: [user.id],
-		}),
-		transactions: many(transactions),
-	}),
-);
 
 export const installmentAnticipationsRelations = relations(
 	installmentAnticipations,
@@ -938,5 +869,3 @@ export type ApiToken = typeof apiTokens.$inferSelect;
 export type NewApiToken = typeof apiTokens.$inferInsert;
 export type InboxItem = typeof inboxItems.$inferSelect;
 export type NewInboxItem = typeof inboxItems.$inferInsert;
-export type RecurringSeries = typeof recurringSeries.$inferSelect;
-export type NewRecurringSeries = typeof recurringSeries.$inferInsert;

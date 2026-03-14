@@ -30,7 +30,6 @@ import { PaymentOverviewWidget } from "@/features/dashboard/components/payment-o
 import { PaymentStatusWidget } from "@/features/dashboard/components/payment-status-widget";
 import { PurchasesByCategoryWidget } from "@/features/dashboard/components/purchases-by-category-widget";
 import { RecurringExpensesWidget } from "@/features/dashboard/components/recurring-expenses-widget";
-import { RecurringSeriesWidget } from "@/features/dashboard/components/recurring-series-widget";
 import { SpendingOverviewWidget } from "@/features/dashboard/components/spending-overview-widget";
 import type { DashboardData } from "../fetch-dashboard-data";
 
@@ -162,15 +161,6 @@ export const widgetsConfig: WidgetConfig[] = [
 		icon: <RiRefreshLine className="size-4" />,
 		component: ({ data }) => (
 			<RecurringExpensesWidget data={data.recurringExpensesData} />
-		),
-	},
-	{
-		id: "recurring-series",
-		title: "Séries Recorrentes",
-		subtitle: "Gerencie seus lançamentos recorrentes",
-		icon: <RiRefreshLine className="size-4" />,
-		component: ({ data }) => (
-			<RecurringSeriesWidget data={data.recurringSeriesData} />
 		),
 	},
 	{

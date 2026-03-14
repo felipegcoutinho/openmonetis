@@ -33,7 +33,6 @@ export const revalidateConfig = {
 	notes: ["/notes", "/notes/archived", "/dashboard"],
 	transactions: ["/transactions", "/accounts"],
 	inbox: ["/inbox", "/transactions", "/dashboard"],
-	recurring: ["/transactions", "/dashboard"],
 } as const;
 
 /** Entities whose mutations should invalidate the dashboard cache */

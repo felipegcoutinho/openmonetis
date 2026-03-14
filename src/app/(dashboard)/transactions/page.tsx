@@ -1,11 +1,10 @@
-import { triggerRecurringGeneration } from "@/features/recurring/trigger-recurring-generation";
 import { fetchUserPreferences } from "@/features/settings/queries";
 import { TransactionsPage } from "@/features/transactions/components/page/transactions-page";
 import {
-	buildTransactionWhere,
 	buildOptionSets,
 	buildSluggedFilters,
 	buildSlugMaps,
+	buildTransactionWhere,
 	extractTransactionSearchFilters,
 	getSingleParam,
 	mapTransactionsData,
@@ -28,7 +27,6 @@ type PageProps = {
 
 export default async function Page({ searchParams }: PageProps) {
 	const userId = await getUserId();
-	await triggerRecurringGeneration(userId);
 	const resolvedSearchParams = searchParams ? await searchParams : undefined;
 
 	const periodoParamRaw = getSingleParam(resolvedSearchParams, "periodo");

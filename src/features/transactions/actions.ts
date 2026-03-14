@@ -3,13 +3,11 @@
 import { randomUUID } from "node:crypto";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { RecurringSeriesTemplate } from "@/db/schema";
 import {
 	cards,
 	categories,
 	financialAccounts,
 	payers,
-	recurringSeries,
 	transactions,
 } from "@/db/schema";
 import {
@@ -219,6 +217,22 @@ const refineLancamento = (
 			path: ["accountId"],
 			message: "Selecione a conta.",
 		});
+	}
+
+	if (data.condition === "Recorrente") {
+		if (!data.recurrenceCount) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ["recurrenceCount"],
+				message: "Informe por quantos meses a recorrência acontecerá.",
+			});
+		} else if (data.recurrenceCount < 2) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ["recurrenceCount"],
+				message: "A recorrência deve ter ao menos dois meses.",
+			});
+		}
 	}
 
 	if (data.condition === "Parcelado") {
@@ -518,23 +532,33 @@ const buildLancamentoRecords = ({
 	}
 
 	if (data.condition === "Recorrente") {
-		// For the new recurring model, only create 1 row (the current month)
-		// Future rows will be generated lazily by generateRecurringTransactions
-		shares.forEach((share) => {
-			const settled = resolveSettledValue(0);
-			records.push({
-				...basePayload,
-				amount: centsToDecimalString(share.amountCents * amountSign),
-				payerId: share.payerId,
-				purchaseDate,
-				period,
-				isSettled: settled,
-				recurrenceCount: null,
-				dueDate,
-				boletoPaymentDate:
-					data.paymentMethod === "Boleto" && settled ? boletoPaymentDate : null,
+		const recurrenceTotal = data.recurrenceCount ?? 0;
+
+		for (let index = 0; index < recurrenceTotal; index += 1) {
+			const recurrencePeriod = addMonthsToPeriod(period, index);
+			const recurrencePurchaseDate = addMonthsToDate(purchaseDate, index);
+			const recurrenceDueDate = dueDate
+				? addMonthsToDate(dueDate, index)
+				: null;
+
+			shares.forEach((share) => {
+				const settled = resolveSettledValue(index);
+				records.push({
+					...basePayload,
+					amount: centsToDecimalString(share.amountCents * amountSign),
+					payerId: share.payerId,
+					purchaseDate: recurrencePurchaseDate,
+					period: recurrencePeriod,
+					isSettled: settled,
+					recurrenceCount: recurrenceTotal,
+					dueDate: recurrenceDueDate,
+					boletoPaymentDate:
+						data.paymentMethod === "Boleto" && settled
+							? boletoPaymentDate
+							: null,
+				});
 			});
-		});
+		}
 
 		return records;
 	}
@@ -661,42 +685,7 @@ export async function createTransactionAction(
 			throw new Error("Não foi possível criar os lançamentos solicitados.");
 		}
 
-		await db.transaction(async (tx: typeof db) => {
-			// If creating a recurring series, insert the series row first
-			if (data.condition === "Recorrente" && seriesId) {
-				const templateData: RecurringSeriesTemplate = {
-					name: data.name,
-					amount: centsToDecimalString(
-						Math.round(Math.abs(data.amount) * 100) *
-							(data.transactionType === "Despesa" ? -1 : 1),
-					),
-					transactionType: data.transactionType,
-					paymentMethod: data.paymentMethod,
-					categoryId: data.categoryId ?? null,
-					accountId: data.accountId ?? null,
-					cardId: data.cardId ?? null,
-					payerId: data.payerId ?? null,
-					note: data.note ?? null,
-					condition: "Recorrente",
-				};
-
-				await tx.insert(recurringSeries).values({
-					id: seriesId,
-					userId: user.id,
-					status: "active",
-					dayOfMonth: purchaseDate.getDate(),
-					lastGeneratedPeriod: period,
-					templateData,
-				});
-
-				// Link lancamento records to the recurring series
-				for (const record of records) {
-					record.recurringSeriesId = seriesId;
-				}
-			}
-
-			await tx.insert(transactions).values(records);
-		});
+		await db.insert(transactions).values(records);
 
 		const notificationEntries = buildEntriesByPayer(
 			records.map((record) => ({

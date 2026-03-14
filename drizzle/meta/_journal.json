@@ -134,13 +134,6 @@
 			"when": 1773020417482,
 			"tag": "0018_rainy_epoch",
 			"breakpoints": true
-		},
-		{
-			"idx": 19,
-			"version": "7",
-			"when": 1773265586360,
-			"tag": "0019_parched_mephistopheles",
-			"breakpoints": true
 		}
 	]
 }

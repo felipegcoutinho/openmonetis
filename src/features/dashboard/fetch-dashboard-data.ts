@@ -16,7 +16,6 @@ import { fetchPaymentConditions } from "./payments/payment-conditions-queries";
 import { fetchPaymentMethods } from "./payments/payment-methods-queries";
 import { fetchPaymentStatus } from "./payments/payment-status-queries";
 import { fetchPurchasesByCategory } from "./purchases-by-category-queries";
-import { fetchRecurringSeries } from "./recurring/recurring-series-queries";
 import { fetchTopEstablishments } from "./top-establishments-queries";
 
 async function fetchDashboardDataInternal(userId: string, period: string) {
@@ -40,7 +39,6 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		purchasesByCategoryData,
 		incomeByCategoryData,
 		expensesByCategoryData,
-		recurringSeriesData,
 	] = await Promise.all([
 		fetchDashboardCardMetrics(userId, period),
 		fetchDashboardAccounts(userId),
@@ -61,7 +59,6 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		fetchPurchasesByCategory(userId, period),
 		fetchIncomeByCategory(userId, period),
 		fetchExpensesByCategory(userId, period),
-		fetchRecurringSeries(userId),
 	]);
 
 	return {
@@ -84,7 +81,6 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		purchasesByCategoryData,
 		incomeByCategoryData,
 		expensesByCategoryData,
-		recurringSeriesData,
 	};
 }
 

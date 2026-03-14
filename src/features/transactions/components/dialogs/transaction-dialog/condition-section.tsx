@@ -101,14 +101,26 @@ export function ConditionSection({
 
 			{showRecurrence ? (
 				<div className="space-y-1 w-full md:w-1/2">
-					<Label htmlFor="recurrenceInfo">Recorrência</Label>
-					<p
-						id="recurrenceInfo"
-						className="text-xs text-muted-foreground rounded-md border border-dashed border-border p-2.5"
+					<Label htmlFor="recurrenceCount">Repetirá por</Label>
+					<Select
+						value={formState.recurrenceCount}
+						onValueChange={(value) => onFieldChange("recurrenceCount", value)}
 					>
-						Este lançamento será repetido todo mês automaticamente até ser
-						pausado ou cancelado.
-					</p>
+						<SelectTrigger id="recurrenceCount" className="w-full">
+							<SelectValue placeholder="Selecione">
+								{formState.recurrenceCount
+									? `${formState.recurrenceCount} meses`
+									: null}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							{[...Array(47)].map((_, index) => (
+								<SelectItem key={index + 2} value={String(index + 2)}>
+									{index + 2} meses
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</div>
 			) : null}
 		</div>

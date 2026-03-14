@@ -1,5 +1,5 @@
 "use client";
-import { RiAddLine } from "@remixicon/react";
+import { RiArrowDropDownLine } from "@remixicon/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -292,7 +292,10 @@ export function TransactionDialog({
 				formState.condition === "Parcelado" && formState.installmentCount
 					? Number(formState.installmentCount)
 					: undefined,
-			recurrenceCount: undefined,
+			recurrenceCount:
+				formState.condition === "Recorrente" && formState.recurrenceCount
+					? Number(formState.recurrenceCount)
+					: undefined,
 			dueDate:
 				formState.paymentMethod === "Boleto" && formState.dueDate
 					? formState.dueDate
@@ -375,7 +378,7 @@ export function TransactionDialog({
 	const title =
 		mode === "create"
 			? isImportMode
-				? "Importar para Minha FinancialAccount"
+				? "Importar para Minha Conta"
 				: isCopyMode
 					? "Copiar lançamento"
 					: isNewWithType
@@ -476,7 +479,7 @@ export function TransactionDialog({
 						}
 					>
 						<CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer [&[data-state=open]>svg]:rotate-180 mt-4">
-							<RiAddLine className="text-primary size-4 transition-transform duration-200" />
+							<RiArrowDropDownLine className="text-primary size-4 transition-transform duration-200" />
 							Condições e anotações
 						</CollapsibleTrigger>
 						<CollapsibleContent className="space-y-3 pt-3">
