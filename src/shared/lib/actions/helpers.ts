@@ -24,28 +24,28 @@ export function handleActionError(error: unknown): ActionResult {
  * Configuration for revalidation after mutations
  */
 export const revalidateConfig = {
-	cartoes: ["/cards", "/accounts", "/transactions"],
-	contas: ["/accounts", "/transactions"],
-	categorias: ["/categories"],
-	estabelecimentos: ["/reports/establishments", "/transactions"],
-	orcamentos: ["/budgets"],
-	pagadores: ["/payers"],
-	anotacoes: ["/notes", "/notes/arquivadas", "/dashboard"],
-	lancamentos: ["/transactions", "/accounts"],
+	cards: ["/cards", "/accounts", "/transactions"],
+	accounts: ["/accounts", "/transactions"],
+	categories: ["/categories"],
+	establishments: ["/reports/establishments", "/transactions"],
+	budgets: ["/budgets"],
+	payers: ["/payers"],
+	notes: ["/notes", "/notes/archived", "/dashboard"],
+	transactions: ["/transactions", "/accounts"],
 	inbox: ["/inbox", "/transactions", "/dashboard"],
-	recorrentes: ["/transactions", "/dashboard"],
+	recurring: ["/transactions", "/dashboard"],
 } as const;
 
 /** Entities whose mutations should invalidate the dashboard cache */
 const DASHBOARD_ENTITIES: ReadonlySet<string> = new Set([
-	"lancamentos",
-	"contas",
-	"cartoes",
-	"orcamentos",
-	"pagadores",
-	"anotacoes",
+	"transactions",
+	"accounts",
+	"cards",
+	"budgets",
+	"payers",
+	"notes",
 	"inbox",
-	"recorrentes",
+	"recurring",
 ]);
 
 /**

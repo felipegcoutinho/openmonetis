@@ -121,18 +121,18 @@ export const passkey = pgTable("passkey", {
 	}),
 });
 
-export const preferenciasUsuario = pgTable("preferencias_usuario", {
+export const userPreferences = pgTable("preferencias_usuario", {
 	id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
 	userId: text("user_id")
 		.notNull()
 		.unique()
 		.references(() => user.id, { onDelete: "cascade" }),
-	extratoNoteAsColumn: boolean("extrato_note_as_column")
+	statementNoteAsColumn: boolean("extrato_note_as_column")
 		.notNull()
 		.default(false),
 	systemFont: text("system_font").notNull().default("ai-sans"),
 	moneyFont: text("money_font").notNull().default("ai-sans"),
-	lancamentosColumnOrder: jsonb("lancamentos_column_order").$type<
+	transactionsColumnOrder: jsonb("lancamentos_column_order").$type<
 		string[] | null
 	>(),
 	dashboardWidgets: jsonb("dashboard_widgets").$type<{
@@ -155,7 +155,7 @@ export const preferenciasUsuario = pgTable("preferencias_usuario", {
 
 // ===================== PUBLIC TABLES =====================
 
-export const contas = pgTable(
+export const financialAccounts = pgTable(
 	"contas",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -189,7 +189,7 @@ export const contas = pgTable(
 	}),
 );
 
-export const categorias = pgTable(
+export const categories = pgTable(
 	"categorias",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -214,7 +214,7 @@ export const categorias = pgTable(
 	}),
 );
 
-export const pagadores = pgTable(
+export const payers = pgTable(
 	"pagadores",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -257,13 +257,13 @@ export const pagadores = pgTable(
 	}),
 );
 
-export const compartilhamentosPagador = pgTable(
+export const payerShares = pgTable(
 	"compartilhamentos_pagador",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-		pagadorId: uuid("pagador_id")
+		payerId: uuid("pagador_id")
 			.notNull()
-			.references(() => pagadores.id, { onDelete: "cascade" }),
+			.references(() => payers.id, { onDelete: "cascade" }),
 		sharedWithUserId: text("shared_with_user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
@@ -279,13 +279,14 @@ export const compartilhamentosPagador = pgTable(
 			.defaultNow(),
 	},
 	(table) => ({
-		uniqueCompartilhamentoPagador: uniqueIndex(
-			"compartilhamentos_pagador_unique",
-		).on(table.pagadorId, table.sharedWithUserId),
+		uniquePayerShare: uniqueIndex("compartilhamentos_pagador_unique").on(
+			table.payerId,
+			table.sharedWithUserId,
+		),
 	}),
 );
 
-export const cartoes = pgTable(
+export const cards = pgTable(
 	"cartoes",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -306,9 +307,9 @@ export const cartoes = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		contaId: uuid("conta_id")
+		accountId: uuid("conta_id")
 			.notNull()
-			.references(() => contas.id, {
+			.references(() => financialAccounts.id, {
 				onDelete: "cascade",
 				onUpdate: "cascade",
 			}),
@@ -321,7 +322,7 @@ export const cartoes = pgTable(
 	}),
 );
 
-export const faturas = pgTable(
+export const invoices = pgTable(
 	"faturas",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -336,7 +337,7 @@ export const faturas = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		cartaoId: uuid("cartao_id").references(() => cartoes.id, {
+		cardId: uuid("cartao_id").references(() => cards.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
@@ -346,14 +347,14 @@ export const faturas = pgTable(
 			table.userId,
 			table.period,
 		),
-		cartaoIdPeriodIdx: index("faturas_cartao_id_period_idx").on(
-			table.cartaoId,
+		cardIdPeriodIdx: index("faturas_cartao_id_period_idx").on(
+			table.cardId,
 			table.period,
 		),
 	}),
 );
 
-export const orcamentos = pgTable(
+export const budgets = pgTable(
 	"orcamentos",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -368,7 +369,7 @@ export const orcamentos = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		categoriaId: uuid("categoria_id").references(() => categorias.id, {
+		categoryId: uuid("categoria_id").references(() => categories.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
@@ -381,13 +382,13 @@ export const orcamentos = pgTable(
 	}),
 );
 
-export const anotacoes = pgTable("anotacoes", {
+export const notes = pgTable("anotacoes", {
 	id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
 	title: text("titulo"),
 	description: text("descricao"),
 	type: text("tipo").notNull().default("nota"), // "nota" ou "tarefa"
 	tasks: text("tasks"), // JSON stringificado com array de tarefas
-	arquivada: boolean("arquivada").notNull().default(false),
+	archived: boolean("arquivada").notNull().default(false),
 	createdAt: timestamp("created_at", {
 		mode: "date",
 		withTimezone: true,
@@ -399,7 +400,7 @@ export const anotacoes = pgTable("anotacoes", {
 		.references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const insightsSalvos = pgTable(
+export const savedInsights = pgTable(
 	"insights_salvos",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -432,7 +433,7 @@ export const insightsSalvos = pgTable(
 
 // ===================== OPENMONETIS COMPANION =====================
 
-export const tokensApi = pgTable(
+export const apiTokens = pgTable(
 	"tokens_api",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -456,7 +457,7 @@ export const tokensApi = pgTable(
 	}),
 );
 
-export const preLancamentos = pgTable(
+export const inboxItems = pgTable(
 	"pre_lancamentos",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -484,7 +485,7 @@ export const preLancamentos = pgTable(
 		status: text("status").notNull().default("pending"), // pending, processed, discarded
 
 		// Referência ao lançamento criado (se processado)
-		lancamentoId: uuid("lancamento_id").references(() => lancamentos.id, {
+		transactionId: uuid("lancamento_id").references(() => transactions.id, {
 			onDelete: "set null",
 		}),
 
@@ -518,7 +519,7 @@ export const preLancamentos = pgTable(
 	}),
 );
 
-export const antecipacoesParcelas = pgTable(
+export const installmentAnticipations = pgTable(
 	"antecipacoes_parcelas",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -533,13 +534,13 @@ export const antecipacoesParcelas = pgTable(
 		discount: numeric("desconto", { precision: 12, scale: 2 })
 			.notNull()
 			.default("0"),
-		lancamentoId: uuid("lancamento_id")
+		transactionId: uuid("lancamento_id")
 			.notNull()
-			.references(() => lancamentos.id, { onDelete: "cascade" }),
-		pagadorId: uuid("pagador_id").references(() => pagadores.id, {
+			.references(() => transactions.id, { onDelete: "cascade" }),
+		payerId: uuid("pagador_id").references(() => payers.id, {
 			onDelete: "cascade",
 		}),
-		categoriaId: uuid("categoria_id").references(() => categorias.id, {
+		categoryId: uuid("categoria_id").references(() => categories.id, {
 			onDelete: "cascade",
 		}),
 		note: text("anotacao"),
@@ -568,10 +569,10 @@ export type RecurringSeriesTemplate = {
 	amount: string;
 	transactionType: string;
 	paymentMethod: string;
-	categoriaId: string | null;
-	contaId: string | null;
-	cartaoId: string | null;
-	pagadorId: string | null;
+	categoryId: string | null;
+	accountId: string | null;
+	cardId: string | null;
+	payerId: string | null;
 	note: string | null;
 	condition: string;
 };
@@ -610,9 +611,9 @@ export const recurringSeries = pgTable(
 	}),
 );
 
-// ===================== LANCAMENTOS =====================
+// ===================== TRANSACTIONS =====================
 
-export const lancamentos = pgTable(
+export const transactions = pgTable(
 	"lancamentos",
 	{
 		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -633,7 +634,7 @@ export const lancamentos = pgTable(
 		isDivided: boolean("dividido").default(false),
 		isAnticipated: boolean("antecipado").default(false),
 		anticipationId: uuid("antecipacao_id").references(
-			() => antecipacoesParcelas.id,
+			() => installmentAnticipations.id,
 			{ onDelete: "set null" },
 		),
 		createdAt: timestamp("created_at", {
@@ -645,19 +646,19 @@ export const lancamentos = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		cartaoId: uuid("cartao_id").references(() => cartoes.id, {
+		cardId: uuid("cartao_id").references(() => cards.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
-		contaId: uuid("conta_id").references(() => contas.id, {
+		accountId: uuid("conta_id").references(() => financialAccounts.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
-		categoriaId: uuid("categoria_id").references(() => categorias.id, {
+		categoryId: uuid("categoria_id").references(() => categories.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
-		pagadorId: uuid("pagador_id").references(() => pagadores.id, {
+		payerId: uuid("pagador_id").references(() => payers.id, {
 			onDelete: "cascade",
 			onUpdate: "cascade",
 		}),
@@ -681,8 +682,8 @@ export const lancamentos = pgTable(
 			table.transactionType,
 		),
 		// Índice para queries por pagador + period (invoice/breakdown queries)
-		pagadorIdPeriodIdx: index("lancamentos_pagador_id_period_idx").on(
-			table.pagadorId,
+		payerIdPeriodIdx: index("lancamentos_pagador_id_period_idx").on(
+			table.payerId,
 			table.period,
 		),
 		// Índice para queries ordenadas por data de compra
@@ -700,8 +701,8 @@ export const lancamentos = pgTable(
 			table.condition,
 		),
 		// Índice para queries de cartão específico
-		cartaoIdPeriodIdx: index("lancamentos_cartao_id_period_idx").on(
-			table.cartaoId,
+		cardIdPeriodIdx: index("lancamentos_cartao_id_period_idx").on(
+			table.cardId,
 			table.period,
 		),
 	}),
@@ -710,17 +711,17 @@ export const lancamentos = pgTable(
 export const userRelations = relations(user, ({ many, one }) => ({
 	accounts: many(account),
 	sessions: many(session),
-	anotacoes: many(anotacoes),
-	cartoes: many(cartoes),
-	categorias: many(categorias),
-	contas: many(contas),
-	faturas: many(faturas),
-	lancamentos: many(lancamentos),
-	orcamentos: many(orcamentos),
-	pagadores: many(pagadores),
-	antecipacoesParcelas: many(antecipacoesParcelas),
-	tokensApi: many(tokensApi),
-	preLancamentos: many(preLancamentos),
+	notes: many(notes),
+	cards: many(cards),
+	categories: many(categories),
+	financialAccounts: many(financialAccounts),
+	invoices: many(invoices),
+	transactions: many(transactions),
+	budgets: many(budgets),
+	payers: many(payers),
+	installmentAnticipations: many(installmentAnticipations),
+	apiTokens: many(apiTokens),
+	inboxItems: many(inboxItems),
 	recurringSeries: many(recurringSeries),
 }));
 
@@ -738,145 +739,145 @@ export const sessionRelations = relations(session, ({ one }) => ({
 	}),
 }));
 
-export const contasRelations = relations(contas, ({ one, many }) => ({
-	user: one(user, {
-		fields: [contas.userId],
-		references: [user.id],
-	}),
-	cartoes: many(cartoes),
-	lancamentos: many(lancamentos),
-}));
-
-export const categoriasRelations = relations(categorias, ({ one, many }) => ({
-	user: one(user, {
-		fields: [categorias.userId],
-		references: [user.id],
-	}),
-	lancamentos: many(lancamentos),
-	orcamentos: many(orcamentos),
-}));
-
-export const pagadoresRelations = relations(pagadores, ({ one, many }) => ({
-	user: one(user, {
-		fields: [pagadores.userId],
-		references: [user.id],
-	}),
-	lancamentos: many(lancamentos),
-	compartilhamentos: many(compartilhamentosPagador),
-}));
-
-export const compartilhamentosPagadorRelations = relations(
-	compartilhamentosPagador,
-	({ one }) => ({
-		pagador: one(pagadores, {
-			fields: [compartilhamentosPagador.pagadorId],
-			references: [pagadores.id],
-		}),
-		sharedWithUser: one(user, {
-			fields: [compartilhamentosPagador.sharedWithUserId],
+export const financialAccountsRelations = relations(
+	financialAccounts,
+	({ one, many }) => ({
+		user: one(user, {
+			fields: [financialAccounts.userId],
 			references: [user.id],
 		}),
-		createdByUser: one(user, {
-			fields: [compartilhamentosPagador.createdByUserId],
-			references: [user.id],
-		}),
+		cards: many(cards),
+		transactions: many(transactions),
 	}),
 );
 
-export const cartoesRelations = relations(cartoes, ({ one, many }) => ({
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
 	user: one(user, {
-		fields: [cartoes.userId],
+		fields: [categories.userId],
 		references: [user.id],
 	}),
-	conta: one(contas, {
-		fields: [cartoes.contaId],
-		references: [contas.id],
-	}),
-	faturas: many(faturas),
-	lancamentos: many(lancamentos),
+	transactions: many(transactions),
+	budgets: many(budgets),
 }));
 
-export const faturasRelations = relations(faturas, ({ one }) => ({
+export const payersRelations = relations(payers, ({ one, many }) => ({
 	user: one(user, {
-		fields: [faturas.userId],
+		fields: [payers.userId],
 		references: [user.id],
 	}),
-	cartao: one(cartoes, {
-		fields: [faturas.cartaoId],
-		references: [cartoes.id],
-	}),
+	transactions: many(transactions),
+	shares: many(payerShares),
 }));
 
-export const orcamentosRelations = relations(orcamentos, ({ one }) => ({
-	user: one(user, {
-		fields: [orcamentos.userId],
+export const payerSharesRelations = relations(payerShares, ({ one }) => ({
+	payer: one(payers, {
+		fields: [payerShares.payerId],
+		references: [payers.id],
+	}),
+	sharedWithUser: one(user, {
+		fields: [payerShares.sharedWithUserId],
 		references: [user.id],
 	}),
-	categoria: one(categorias, {
-		fields: [orcamentos.categoriaId],
-		references: [categorias.id],
-	}),
-}));
-
-export const anotacoesRelations = relations(anotacoes, ({ one }) => ({
-	user: one(user, {
-		fields: [anotacoes.userId],
+	createdByUser: one(user, {
+		fields: [payerShares.createdByUserId],
 		references: [user.id],
 	}),
 }));
 
-export const insightsSalvosRelations = relations(insightsSalvos, ({ one }) => ({
+export const cardsRelations = relations(cards, ({ one, many }) => ({
 	user: one(user, {
-		fields: [insightsSalvos.userId],
+		fields: [cards.userId],
+		references: [user.id],
+	}),
+	financialAccount: one(financialAccounts, {
+		fields: [cards.accountId],
+		references: [financialAccounts.id],
+	}),
+	invoices: many(invoices),
+	transactions: many(transactions),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+	user: one(user, {
+		fields: [invoices.userId],
+		references: [user.id],
+	}),
+	card: one(cards, {
+		fields: [invoices.cardId],
+		references: [cards.id],
+	}),
+}));
+
+export const budgetsRelations = relations(budgets, ({ one }) => ({
+	user: one(user, {
+		fields: [budgets.userId],
+		references: [user.id],
+	}),
+	category: one(categories, {
+		fields: [budgets.categoryId],
+		references: [categories.id],
+	}),
+}));
+
+export const notesRelations = relations(notes, ({ one }) => ({
+	user: one(user, {
+		fields: [notes.userId],
 		references: [user.id],
 	}),
 }));
 
-export const tokensApiRelations = relations(tokensApi, ({ one }) => ({
+export const savedInsightsRelations = relations(savedInsights, ({ one }) => ({
 	user: one(user, {
-		fields: [tokensApi.userId],
+		fields: [savedInsights.userId],
 		references: [user.id],
 	}),
 }));
 
-export const preLancamentosRelations = relations(preLancamentos, ({ one }) => ({
+export const apiTokensRelations = relations(apiTokens, ({ one }) => ({
 	user: one(user, {
-		fields: [preLancamentos.userId],
+		fields: [apiTokens.userId],
 		references: [user.id],
-	}),
-	lancamento: one(lancamentos, {
-		fields: [preLancamentos.lancamentoId],
-		references: [lancamentos.id],
 	}),
 }));
 
-export const lancamentosRelations = relations(lancamentos, ({ one }) => ({
+export const inboxItemsRelations = relations(inboxItems, ({ one }) => ({
 	user: one(user, {
-		fields: [lancamentos.userId],
+		fields: [inboxItems.userId],
 		references: [user.id],
 	}),
-	cartao: one(cartoes, {
-		fields: [lancamentos.cartaoId],
-		references: [cartoes.id],
+	transaction: one(transactions, {
+		fields: [inboxItems.transactionId],
+		references: [transactions.id],
 	}),
-	conta: one(contas, {
-		fields: [lancamentos.contaId],
-		references: [contas.id],
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+	user: one(user, {
+		fields: [transactions.userId],
+		references: [user.id],
 	}),
-	categoria: one(categorias, {
-		fields: [lancamentos.categoriaId],
-		references: [categorias.id],
+	card: one(cards, {
+		fields: [transactions.cardId],
+		references: [cards.id],
 	}),
-	pagador: one(pagadores, {
-		fields: [lancamentos.pagadorId],
-		references: [pagadores.id],
+	financialAccount: one(financialAccounts, {
+		fields: [transactions.accountId],
+		references: [financialAccounts.id],
 	}),
-	anticipation: one(antecipacoesParcelas, {
-		fields: [lancamentos.anticipationId],
-		references: [antecipacoesParcelas.id],
+	category: one(categories, {
+		fields: [transactions.categoryId],
+		references: [categories.id],
+	}),
+	payer: one(payers, {
+		fields: [transactions.payerId],
+		references: [payers.id],
+	}),
+	anticipation: one(installmentAnticipations, {
+		fields: [transactions.anticipationId],
+		references: [installmentAnticipations.id],
 	}),
 	recurringSeries: one(recurringSeries, {
-		fields: [lancamentos.recurringSeriesId],
+		fields: [transactions.recurringSeriesId],
 		references: [recurringSeries.id],
 	}),
 }));
@@ -888,28 +889,28 @@ export const recurringSeriesRelations = relations(
 			fields: [recurringSeries.userId],
 			references: [user.id],
 		}),
-		lancamentos: many(lancamentos),
+		transactions: many(transactions),
 	}),
 );
 
-export const antecipacoesParcRelations = relations(
-	antecipacoesParcelas,
+export const installmentAnticipationsRelations = relations(
+	installmentAnticipations,
 	({ one, many }) => ({
 		user: one(user, {
-			fields: [antecipacoesParcelas.userId],
+			fields: [installmentAnticipations.userId],
 			references: [user.id],
 		}),
-		lancamento: one(lancamentos, {
-			fields: [antecipacoesParcelas.lancamentoId],
-			references: [lancamentos.id],
+		transaction: one(transactions, {
+			fields: [installmentAnticipations.transactionId],
+			references: [transactions.id],
 		}),
-		pagador: one(pagadores, {
-			fields: [antecipacoesParcelas.pagadorId],
-			references: [pagadores.id],
+		payer: one(payers, {
+			fields: [installmentAnticipations.payerId],
+			references: [payers.id],
 		}),
-		categoria: one(categorias, {
-			fields: [antecipacoesParcelas.categoriaId],
-			references: [categorias.id],
+		category: one(categories, {
+			fields: [installmentAnticipations.categoryId],
+			references: [categories.id],
 		}),
 	}),
 );
@@ -919,23 +920,23 @@ export type NewUser = typeof user.$inferInsert;
 export type Account = typeof account.$inferSelect;
 export type Session = typeof session.$inferSelect;
 export type Verification = typeof verification.$inferSelect;
-export type PreferenciasUsuario = typeof preferenciasUsuario.$inferSelect;
-export type NovasPreferenciasUsuario = typeof preferenciasUsuario.$inferInsert;
-export type CompartilhamentoPagador =
-	typeof compartilhamentosPagador.$inferSelect;
-export type Conta = typeof contas.$inferSelect;
-export type Categoria = typeof categorias.$inferSelect;
-export type Pagador = typeof pagadores.$inferSelect;
-export type Cartao = typeof cartoes.$inferSelect;
-export type Fatura = typeof faturas.$inferSelect;
-export type Orcamento = typeof orcamentos.$inferSelect;
-export type Anotacao = typeof anotacoes.$inferSelect;
-export type InsightSalvo = typeof insightsSalvos.$inferSelect;
-export type Lancamento = typeof lancamentos.$inferSelect;
-export type AntecipacaoParcela = typeof antecipacoesParcelas.$inferSelect;
-export type TokenApi = typeof tokensApi.$inferSelect;
-export type NovoTokenApi = typeof tokensApi.$inferInsert;
-export type PreLancamento = typeof preLancamentos.$inferSelect;
-export type NovoPreLancamento = typeof preLancamentos.$inferInsert;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type NewUserPreferences = typeof userPreferences.$inferInsert;
+export type PayerShare = typeof payerShares.$inferSelect;
+export type FinancialAccount = typeof financialAccounts.$inferSelect;
+export type Category = typeof categories.$inferSelect;
+export type Payer = typeof payers.$inferSelect;
+export type Card = typeof cards.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
+export type Budget = typeof budgets.$inferSelect;
+export type Note = typeof notes.$inferSelect;
+export type SavedInsight = typeof savedInsights.$inferSelect;
+export type Transaction = typeof transactions.$inferSelect;
+export type InstallmentAnticipation =
+	typeof installmentAnticipations.$inferSelect;
+export type ApiToken = typeof apiTokens.$inferSelect;
+export type NewApiToken = typeof apiTokens.$inferInsert;
+export type InboxItem = typeof inboxItems.$inferSelect;
+export type NewInboxItem = typeof inboxItems.$inferInsert;
 export type RecurringSeries = typeof recurringSeries.$inferSelect;
 export type NewRecurringSeries = typeof recurringSeries.$inferInsert;

@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { tokensApi } from "@/db/schema";
+import { apiTokens } from "@/db/schema";
 import { auth } from "@/shared/lib/auth/config";
 import { db } from "@/shared/lib/db";
 
@@ -17,19 +17,19 @@ export async function GET() {
 		// Buscar tokens ativos do usuário
 		const activeTokens = await db
 			.select({
-				id: tokensApi.id,
-				name: tokensApi.name,
-				tokenPrefix: tokensApi.tokenPrefix,
-				lastUsedAt: tokensApi.lastUsedAt,
-				lastUsedIp: tokensApi.lastUsedIp,
-				expiresAt: tokensApi.expiresAt,
-				createdAt: tokensApi.createdAt,
+				id: apiTokens.id,
+				name: apiTokens.name,
+				tokenPrefix: apiTokens.tokenPrefix,
+				lastUsedAt: apiTokens.lastUsedAt,
+				lastUsedIp: apiTokens.lastUsedIp,
+				expiresAt: apiTokens.expiresAt,
+				createdAt: apiTokens.createdAt,
 			})
-			.from(tokensApi)
+			.from(apiTokens)
 			.where(
-				and(eq(tokensApi.userId, session.user.id), isNull(tokensApi.revokedAt)),
+				and(eq(apiTokens.userId, session.user.id), isNull(apiTokens.revokedAt)),
 			)
-			.orderBy(desc(tokensApi.createdAt));
+			.orderBy(desc(apiTokens.createdAt));
 
 		return NextResponse.json({ tokens: activeTokens });
 	} catch (error) {

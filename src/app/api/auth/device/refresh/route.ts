@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { tokensApi } from "@/db/schema";
+import { apiTokens } from "@/db/schema";
 import {
 	extractBearerToken,
 	hashToken,
@@ -33,11 +33,11 @@ export async function POST(request: Request) {
 		}
 
 		// Verificar se token não foi revogado
-		const tokenRecord = await db.query.tokensApi.findFirst({
+		const tokenRecord = await db.query.apiTokens.findFirst({
 			where: and(
-				eq(tokensApi.id, payload.tokenId),
-				eq(tokensApi.userId, payload.sub),
-				isNull(tokensApi.revokedAt),
+				eq(apiTokens.id, payload.tokenId),
+				eq(apiTokens.userId, payload.sub),
+				isNull(apiTokens.revokedAt),
 			),
 		});
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
 		// Atualizar hash do token e último uso
 		await db
-			.update(tokensApi)
+			.update(apiTokens)
 			.set({
 				tokenHash: hashToken(result.accessToken),
 				lastUsedAt: new Date(),
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 					request.headers.get("x-real-ip"),
 				expiresAt: result.expiresAt,
 			})
-			.where(eq(tokensApi.id, payload.tokenId));
+			.where(eq(apiTokens.id, payload.tokenId));
 
 		return NextResponse.json({
 			accessToken: result.accessToken,

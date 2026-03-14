@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { tokensApi } from "@/db/schema";
+import { apiTokens } from "@/db/schema";
 import { extractBearerToken, hashToken } from "@/shared/lib/auth/api-token";
 import { db } from "@/shared/lib/db";
 
@@ -29,10 +29,10 @@ export async function POST(request: Request) {
 		const tokenHash = hashToken(token);
 
 		// Buscar token no banco
-		const tokenRecord = await db.query.tokensApi.findFirst({
+		const tokenRecord = await db.query.apiTokens.findFirst({
 			where: and(
-				eq(tokensApi.tokenHash, tokenHash),
-				isNull(tokensApi.revokedAt),
+				eq(apiTokens.tokenHash, tokenHash),
+				isNull(apiTokens.revokedAt),
 			),
 		});
 
@@ -50,12 +50,12 @@ export async function POST(request: Request) {
 			null;
 
 		await db
-			.update(tokensApi)
+			.update(apiTokens)
 			.set({
 				lastUsedAt: new Date(),
 				lastUsedIp: clientIp,
 			})
-			.where(eq(tokensApi.id, tokenRecord.id));
+			.where(eq(apiTokens.id, tokenRecord.id));
 
 		return NextResponse.json({
 			valid: true,

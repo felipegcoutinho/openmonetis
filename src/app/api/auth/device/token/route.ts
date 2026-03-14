@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { tokensApi } from "@/db/schema";
+import { apiTokens } from "@/db/schema";
 import {
 	generateTokenPair,
 	getTokenPrefix,
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 		);
 
 		// Salvar hash do token no banco
-		await db.insert(tokensApi).values({
+		await db.insert(apiTokens).values({
 			id: tokenId,
 			userId: session.user.id,
 			name,

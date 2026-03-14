@@ -1,7 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { preLancamentos, tokensApi } from "@/db/schema";
+import { apiTokens, inboxItems } from "@/db/schema";
 import { extractBearerToken, hashToken } from "@/shared/lib/auth/api-token";
 import { db } from "@/shared/lib/db";
 import { inboxItemSchema } from "@/shared/lib/schemas/inbox";
@@ -52,10 +52,10 @@ export async function POST(request: Request) {
 		const tokenHash = hashToken(token);
 
 		// Buscar token no banco
-		const tokenRecord = await db.query.tokensApi.findFirst({
+		const tokenRecord = await db.query.apiTokens.findFirst({
 			where: and(
-				eq(tokensApi.tokenHash, tokenHash),
-				isNull(tokensApi.revokedAt),
+				eq(apiTokens.tokenHash, tokenHash),
+				isNull(apiTokens.revokedAt),
 			),
 		});
 
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
 
 		// Inserir item na inbox
 		const [inserted] = await db
-			.insert(preLancamentos)
+			.insert(inboxItems)
 			.values({
 				userId: tokenRecord.userId,
 				sourceApp: data.sourceApp,
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
 				parsedAmount: data.parsedAmount?.toString(),
 				status: "pending",
 			})
-			.returning({ id: preLancamentos.id });
+			.returning({ id: inboxItems.id });
 
 		// Atualizar último uso do token
 		const clientIp =
@@ -101,12 +101,12 @@ export async function POST(request: Request) {
 			null;
 
 		await db
-			.update(tokensApi)
+			.update(apiTokens)
 			.set({
 				lastUsedAt: new Date(),
 				lastUsedIp: clientIp,
 			})
-			.where(eq(tokensApi.id, tokenRecord.id));
+			.where(eq(apiTokens.id, tokenRecord.id));
 
 		return NextResponse.json(
 			{
