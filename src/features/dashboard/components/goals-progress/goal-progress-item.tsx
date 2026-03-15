@@ -26,7 +26,7 @@ export function GoalProgressItem({
 	const percentageDelta = item.usedPercentage - 100;
 
 	return (
-		<li className="border-b border-dashed py-2 last:border-b-0 last:pb-0">
+		<div className="transition-all duration-300 py-2">
 			<div className="flex items-start justify-between gap-3">
 				<div className="flex min-w-0 flex-1 items-start gap-2">
 					<CategoryIconBadge
@@ -52,9 +52,9 @@ export function GoalProgressItem({
 					</span>
 					<Button
 						type="button"
-						variant="ghost"
+						variant="outline"
 						size="icon-sm"
-						className="size-7 text-muted-foreground hover:text-foreground"
+						className="text-muted-foreground hover:text-foreground"
 						onClick={() => onEdit(item)}
 						aria-label={`Editar orçamento de ${item.categoryName}`}
 					>
@@ -65,6 +65,6 @@ export function GoalProgressItem({
 			<div className="ml-11 mt-1.5">
 				<Progress value={progressValue} />
 			</div>
-		</li>
+		</div>
 	);
 }

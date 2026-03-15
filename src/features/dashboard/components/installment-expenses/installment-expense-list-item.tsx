@@ -26,7 +26,7 @@ export function InstallmentExpenseListItem({
 	} = buildInstallmentExpenseDisplay(expense);
 
 	return (
-		<li className="flex items-center gap-3 border-b border-dashed pb-3 last:border-b-0 last:pb-0">
+		<div className="flex items-center gap-3 transition-all duration-300 py-2">
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex min-w-0 items-center gap-2">
@@ -71,6 +71,6 @@ export function InstallmentExpenseListItem({
 
 				<Progress value={progress} className="mt-1 h-2" />
 			</div>
-		</li>
+		</div>
 	);
 }

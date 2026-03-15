@@ -27,12 +27,12 @@ export function MyAccountsWidget({
 
 	return (
 		<>
-			<div className="flex justify-between py-2">
+			<div className="flex justify-between py-1">
 				Saldo Total
 				<MoneyValues className="text-2xl" amount={totalBalance} />
 			</div>
 
-			<div className="py-2 px-0">
+			<div>
 				{displayedAccounts.length === 0 ? (
 					<div className="-mt-10">
 						<WidgetEmptyState
@@ -49,12 +49,12 @@ export function MyAccountsWidget({
 							const logoSrc = resolveLogoSrc(account.logo);
 
 							return (
-								<li
+								<div
 									key={account.id}
-									className="flex items-center justify-between gap-2 border-b border-dashed py-2 last:border-0"
+									className="flex items-center justify-between transition-all duration-300 py-1.5 "
 								>
-									<div className="flex min-w-0 flex-1 items-center gap-3">
-										<div className="relative size-10 overflow-hidden">
+									<div className="flex min-w-0 flex-1 items-center gap-2 py-1">
+										<div className="relative size-9.5 overflow-hidden">
 											{logoSrc ? (
 												<Image
 													src={logoSrc}
@@ -88,7 +88,7 @@ export function MyAccountsWidget({
 									<div className="flex flex-col items-end gap-0.5 text-right">
 										<MoneyValues amount={account.balance} />
 									</div>
-								</li>
+								</div>
 							);
 						})}
 					</ul>

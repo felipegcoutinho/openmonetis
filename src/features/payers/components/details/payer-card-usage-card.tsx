@@ -42,10 +42,7 @@ export function PayerCardUsageCard({ items }: PagadorCardUsageCardProps) {
 					const logoPath = resolveLogoSrc(item.logo);
 					const initials = buildInitials(item.name);
 					return (
-						<li
-							key={item.id}
-							className="flex items-center justify-between border-b border-dashed last:border-b-0 last:pb-0"
-						>
+						<div key={item.id} className="flex items-center justify-between">
 							<div className="flex min-w-0 flex-1 items-center gap-2 py-2">
 								<div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full">
 									{logoPath ? (
@@ -72,7 +69,7 @@ export function PayerCardUsageCard({ items }: PagadorCardUsageCardProps) {
 								</div>
 							</div>
 							<MoneyValues amount={item.amount} />
-						</li>
+						</div>
 					);
 				})}
 			</ul>

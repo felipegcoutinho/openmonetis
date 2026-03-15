@@ -56,8 +56,6 @@ const VARIANT_CONFIG = {
 			increase: "text-success",
 			decrease: "text-destructive",
 		},
-		listItemClassName:
-			"flex flex-col gap-1.5 py-2 border-b border-dashed last:border-0",
 		includeBudgetAmount: true,
 	},
 	expense: {
@@ -70,8 +68,6 @@ const VARIANT_CONFIG = {
 			increase: "text-destructive",
 			decrease: "text-success",
 		},
-		listItemClassName:
-			"flex flex-col py-2 border-b border-dashed last:border-0",
 		includeBudgetAmount: false,
 	},
 } as const;
@@ -194,7 +190,7 @@ export function CategoryBreakdownWidgetView({
 			</div>
 
 			<TabsContent value="list" className="mt-0">
-				<div className="flex flex-col px-0">
+				<div>
 					{data.categories.map((category, index) => {
 						const hasIncrease =
 							category.percentageChange !== null &&
@@ -218,11 +214,8 @@ export function CategoryBreakdownWidgetView({
 								: "text-muted-foreground";
 
 						return (
-							<div
-								key={category.categoryId}
-								className={config.listItemClassName}
-							>
-								<div className="flex items-center justify-between gap-3">
+							<div key={category.categoryId}>
+								<div className="flex items-center justify-between gap-3 transition-all duration-300 py-2">
 									<div className="flex min-w-0 flex-1 items-center gap-2">
 										<CategoryIconBadge
 											icon={category.categoryIcon}
@@ -245,7 +238,7 @@ export function CategoryBreakdownWidgetView({
 													/>
 												</Link>
 											</div>
-											<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
 												<span>
 													{formatPercentage(
 														category.percentageOfTotal,
@@ -253,6 +246,36 @@ export function CategoryBreakdownWidgetView({
 													)}{" "}
 													da {config.shareLabel}
 												</span>
+												{hasBudget && category.budgetUsedPercentage !== null ? (
+													<>
+														<span aria-hidden>·</span>
+														<span
+															className={`flex items-center gap-1 ${budgetExceeded ? "text-destructive" : "text-info"}`}
+														>
+															<RiWallet3Line className="size-3 shrink-0" />
+															{budgetExceeded ? (
+																<>
+																	excedeu{" "}
+																	<span className="font-medium">
+																		{formatCurrency(exceededAmount)}
+																	</span>
+																</>
+															) : (
+																<>
+																	{formatPercentage(
+																		category.budgetUsedPercentage,
+																		config.percentageDigits,
+																	)}{" "}
+																	do limite
+																	{config.includeBudgetAmount &&
+																	category.budgetAmount !== null
+																		? ` ${formatCurrency(category.budgetAmount)}`
+																		: ""}
+																</>
+															)}
+														</span>
+													</>
+												) : null}
 											</div>
 										</div>
 									</div>
@@ -280,48 +303,6 @@ export function CategoryBreakdownWidgetView({
 										) : null}
 									</div>
 								</div>
-
-								{hasBudget && category.budgetUsedPercentage !== null ? (
-									<div className="ml-11 flex items-center gap-1.5 text-xs">
-										<RiWallet3Line
-											className={`size-3 ${
-												budgetExceeded ? "text-destructive" : "text-info"
-											}`}
-										/>
-										<span
-											className={
-												budgetExceeded ? "text-destructive" : "text-info"
-											}
-										>
-											{budgetExceeded ? (
-												<>
-													{formatPercentage(
-														category.budgetUsedPercentage,
-														config.percentageDigits,
-													)}{" "}
-													do limite
-													{config.includeBudgetAmount &&
-													category.budgetAmount !== null
-														? ` ${formatCurrency(category.budgetAmount)}`
-														: ""}{" "}
-													- excedeu em {formatCurrency(exceededAmount)}
-												</>
-											) : (
-												<>
-													{formatPercentage(
-														category.budgetUsedPercentage,
-														config.percentageDigits,
-													)}{" "}
-													do limite
-													{config.includeBudgetAmount &&
-													category.budgetAmount !== null
-														? ` ${formatCurrency(category.budgetAmount)}`
-														: ""}
-												</>
-											)}
-										</span>
-									</div>
-								) : null}
 							</div>
 						);
 					})}

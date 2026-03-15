@@ -9,6 +9,7 @@ import { EstabelecimentoLogo } from "@/features/transactions/components/shared/e
 import MoneyValues from "@/shared/components/money-values";
 import { CardContent } from "@/shared/components/ui/card";
 import { Progress } from "@/shared/components/ui/progress";
+import { Separator } from "@/shared/components/ui/separator";
 import { WidgetEmptyState } from "@/shared/components/widget-empty-state";
 import type {
 	PayerBoletoItem,
@@ -41,10 +42,7 @@ export function PayerBoletoCard({ items }: PagadorBoletoCardProps) {
 				{items.map((item) => {
 					const statusLabel = buildBillStatusLabel(item);
 					return (
-						<li
-							key={item.id}
-							className="flex items-center justify-between border-b border-dashed last:border-b-0 last:pb-0"
-						>
+						<div key={item.id} className="flex items-center justify-between">
 							<div className="flex min-w-0 flex-1 items-center gap-3 py-2">
 								<EstabelecimentoLogo name={item.name} size={36} />
 								<div className="min-w-0">
@@ -64,7 +62,7 @@ export function PayerBoletoCard({ items }: PagadorBoletoCardProps) {
 								</div>
 							</div>
 							<MoneyValues amount={item.amount} />
-						</li>
+						</div>
 					);
 				})}
 			</ul>
@@ -105,7 +103,9 @@ export function PayerPaymentStatusCard({
 					<span className="text-sm font-medium text-foreground">Pago</span>
 					<MoneyValues amount={paidAmount} />
 				</div>
+
 				<Progress value={paidPercentage} className="h-2" />
+
 				<div className="flex items-center justify-between gap-4 text-sm">
 					<div className="flex items-center gap-1.5">
 						<RiCheckboxCircleLine className="size-3 text-success" />
@@ -117,7 +117,7 @@ export function PayerPaymentStatusCard({
 				</div>
 			</div>
 
-			<div className="border-t border-dashed" />
+			<Separator />
 
 			<div className="space-y-2">
 				<div className="flex items-center justify-between">

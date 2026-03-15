@@ -23,7 +23,7 @@ export function NoteListItem({
 	const createdAtLabel = formatNoteCreatedAt(note.createdAt);
 
 	return (
-		<li className="flex items-center justify-between gap-2 border-b border-dashed py-2 last:border-b-0 last:pb-0">
+		<div className="flex items-center justify-between gap-2 transition-all duration-300 py-2">
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-sm font-medium text-foreground">
 					{displayTitle}
@@ -40,9 +40,9 @@ export function NoteListItem({
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center">
+			<div className="flex shrink-0 items-center gap-1">
 				<Button
-					variant="ghost"
+					variant="outline"
 					size="icon-sm"
 					className="text-muted-foreground hover:text-foreground"
 					onClick={() => onOpenEdit(note)}
@@ -51,7 +51,7 @@ export function NoteListItem({
 					<RiPencilLine className="size-4" />
 				</Button>
 				<Button
-					variant="ghost"
+					variant="outline"
 					size="icon-sm"
 					className="text-muted-foreground hover:text-foreground"
 					onClick={() => onOpenDetails(note)}
@@ -60,6 +60,6 @@ export function NoteListItem({
 					<RiFileList2Line className="size-4" />
 				</Button>
 			</div>
-		</li>
+		</div>
 	);
 }

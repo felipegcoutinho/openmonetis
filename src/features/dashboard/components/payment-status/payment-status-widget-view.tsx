@@ -34,7 +34,7 @@ export function PaymentStatusWidgetView({
 				pending={data.income.pending}
 			/>
 
-			<div className="border-t border-dashed" />
+			<div className="border-t" />
 
 			<PaymentStatusCategorySection
 				title="A Pagar"

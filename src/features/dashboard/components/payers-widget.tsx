@@ -48,7 +48,7 @@ export function PayersWidget({ payers }: PayersWidgetProps) {
 					description="Quando houver despesas associadas a pagadores, eles aparecerão aqui."
 				/>
 			) : (
-				<ul className="flex flex-col">
+				<div className="flex flex-col">
 					{payers.map((payer) => {
 						const initials = buildInitials(payer.name);
 						const hasValidPercentageChange =
@@ -59,12 +59,12 @@ export function PayersWidget({ payers }: PayersWidgetProps) {
 							: null;
 
 						return (
-							<li
+							<div
 								key={payer.id}
-								className="flex items-center justify-between border-b border-dashed last:border-b-0 last:pb-0"
+								className="flex items-center justify-between transition-all duration-300 py-1.5"
 							>
-								<div className="flex min-w-0 flex-1 items-center gap-2 py-2">
-									<Avatar className="size-10 shrink-0">
+								<div className="flex min-w-0 flex-1 items-center gap-2 py-1">
+									<Avatar className="size-9.5 shrink-0">
 										<AvatarImage
 											src={getAvatarSrc(payer.avatarUrl)}
 											alt={`Avatar de ${payer.name}`}
@@ -118,10 +118,10 @@ export function PayersWidget({ payers }: PayersWidgetProps) {
 										</span>
 									)}
 								</div>
-							</li>
+							</div>
 						);
 					})}
-				</ul>
+				</div>
 			)}
 		</CardContent>
 	);

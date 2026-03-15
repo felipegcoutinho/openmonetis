@@ -85,9 +85,7 @@ export function TopExpensesWidget({
 					htmlFor="card-only-toggle"
 					className="text-sm text-muted-foreground"
 				>
-					{cardOnly
-						? "Somente cartões de crédito ou débito."
-						: "Todas as despesas"}
+					Apenas cartões
 				</label>
 				<Switch
 					id="card-only-toggle"
@@ -107,12 +105,12 @@ export function TopExpensesWidget({
 					/>
 				</div>
 			) : (
-				<ul className="flex flex-col">
+				<div className="flex flex-col">
 					{data.expenses.map((expense) => {
 						return (
-							<li
+							<div
 								key={expense.id}
-								className="flex items-center justify-between gap-3 border-b border-dashed py-2 last:border-b-0 last:pb-0"
+								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
 							>
 								<div className="flex min-w-0 flex-1 items-center gap-3">
 									<EstabelecimentoLogo name={expense.name} size={37} />
@@ -130,10 +128,10 @@ export function TopExpensesWidget({
 								<div className="shrink-0 text-foreground">
 									<MoneyValues amount={expense.amount} />
 								</div>
-							</li>
+							</div>
 						);
 					})}
-				</ul>
+				</div>
 			)}
 		</div>
 	);

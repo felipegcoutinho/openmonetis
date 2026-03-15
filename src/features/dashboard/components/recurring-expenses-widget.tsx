@@ -30,36 +30,34 @@ export function RecurringExpensesWidget({
 	}
 
 	return (
-		<div className="flex flex-col gap-4 px-0">
-			<ul className="flex flex-col gap-2">
-				{data.expenses.map((expense) => {
-					return (
-						<li
-							key={expense.id}
-							className="flex items-center gap-3 border-b border-dashed pb-2 last:border-b-0 last:pb-0"
-						>
-							<EstabelecimentoLogo name={expense.name} size={37} />
+		<div className="flex flex-col">
+			{data.expenses.map((expense) => {
+				return (
+					<div
+						key={expense.id}
+						className="flex items-center gap-2 transition-all duration-300 py-1.5"
+					>
+						<EstabelecimentoLogo name={expense.name} size={37} />
 
-							<div className="min-w-0 flex-1">
-								<div className="flex items-center justify-between">
-									<p className="truncate text-foreground text-sm font-medium">
-										{expense.name}
-									</p>
+						<div className="min-w-0 flex-1">
+							<div className="flex items-center justify-between">
+								<p className="truncate text-foreground text-sm font-medium">
+									{expense.name}
+								</p>
 
-									<MoneyValues amount={expense.amount} />
-								</div>
-
-								<div className="flex items-center justify-between text-xs text-muted-foreground">
-									<span className="inline-flex items-center gap-1">
-										{expense.paymentMethod}
-									</span>
-									<span>{formatOccurrences(expense.recurrenceCount)}</span>
-								</div>
+								<MoneyValues amount={expense.amount} />
 							</div>
-						</li>
-					);
-				})}
-			</ul>
+
+							<div className="flex items-center justify-between text-xs text-muted-foreground">
+								<span className="inline-flex items-center gap-1">
+									{expense.paymentMethod}
+								</span>
+								<span>{formatOccurrences(expense.recurrenceCount)}</span>
+							</div>
+						</div>
+					</div>
+				);
+			})}
 		</div>
 	);
 }

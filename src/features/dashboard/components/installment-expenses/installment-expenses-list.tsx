@@ -21,7 +21,7 @@ export function InstallmentExpensesList({
 	}
 
 	return (
-		<ul className="flex flex-col gap-2">
+		<ul className="flex flex-col">
 			{expenses.map((expense) => (
 				<InstallmentExpenseListItem key={expense.id} expense={expense} />
 			))}
