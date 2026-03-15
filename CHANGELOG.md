@@ -17,6 +17,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Autenticação: os cards de login e cadastro agora compartilham uma base visual com `dot pattern` suave e leve brilho em `primary`, reaproveitando a mesma linguagem aplicada na navbar sem prejudicar a legibilidade do formulário.
 - Autenticação: login e cadastro foram reequilibrados com espaçamentos mais consistentes, conteúdo centralizado em largura útil fixa, cabeçalhos com descrição e sidebar com composição mais harmônica, sem alterar a estrutura principal das telas.
 - Interface e textos: labels que ainda misturavam inglês com português foram padronizados em formulários, tabelas, relatórios e estados vazios, junto de pequenos ajustes de ícones e acabamentos visuais.
+- Skeletons e loadings: os estados de carregamento ficaram com cantos menos arredondados em todo o dashboard e páginas relacionadas, e o loading da home passou a espelhar a estrutura atual com boas-vindas, navegação mensal, cards de métricas e toolbar de widgets.
+- Faturas: o card de resumo da fatura foi refinado com hierarquia mais clara para valor, vencimento e status, metadados em blocos discretos e uma faixa de ação mais contextual para pagamento e edição da data.
 
 ### Corrigido
 
