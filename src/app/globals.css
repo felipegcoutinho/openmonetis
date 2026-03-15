@@ -3,20 +3,19 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --spacing-custom-height-card: 30rem;
-  --spacing-8xl: 88rem;
-  --spacing-9xl: 96rem;
+  --spacing-custom-height-card: 29rem;
+  --spacing-8xl: 90rem;
 }
 
 :root {
-  --background: oklch(97.036% 0.00276 84.303);
+  --background: oklch(97.412% 0.00332 67.032);
   --foreground: oklch(27% 0.008 45);
-  --card: var(--background);
+  --card: oklch(99% 0.002 67);
   --card-foreground: var(--foreground);
   --popover: oklch(100% 0 0);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(72.085% 0.16286 50.705);
+  --primary: oklch(72.069% 0.18335 44.069);
   --primary-foreground: oklch(98% 0.008 80);
 
   --secondary: oklch(96.2% 0.005 70);
@@ -28,24 +27,23 @@
   --accent: oklch(94.8% 0.009 65);
   --accent-foreground: var(--foreground);
 
-  --success: oklch(61.654% 0.14385 157.131);
+  --success: oklch(61.685% 0.13077 162.978);
   --success-foreground: oklch(98% 0.01 150);
-  --warning: oklch(69.913% 0.1798 49.649);
+  --warning: oklch(78.357% 0.15147 68.301);
   --warning-foreground: oklch(20% 0.04 85);
   --info: oklch(55% 0.17 250);
   --info-foreground: oklch(98% 0.01 250);
-
   --destructive: oklch(55% 0.22 27);
   --destructive-foreground: oklch(98% 0.005 30);
 
-  --border: oklch(84.567% 0.00583 84.468);
-  --input: oklch(84.567% 0.00583 84.468);
+  --border: oklch(90.274% 0.01362 60.342);
+  --input: var(--border);
   --ring: var(--primary);
 
   --chart-1: var(--color-emerald-500);
-  --chart-2: var(--color-orange-500);
-  --chart-3: var(--color-indigo-500);
-  --chart-4: var(--color-amber-500);
+  --chart-2: var(--color-red-500);
+  --chart-3: var(--color-amber-500);
+  --chart-4: var(--color-blue-500);
   --chart-5: var(--color-pink-500);
   --chart-6: var(--color-stone-500);
   --chart-7: var(--color-teal-500);
@@ -62,7 +60,7 @@
   --sidebar-border: oklch(91% 0.004 70);
   --sidebar-ring: var(--primary);
 
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 
   --shadow-2xs: 0 1px 2px 0px oklch(35% 0.02 45 / 0.04);
   --shadow-xs: 0 1px 3px 0px oklch(35% 0.02 45 / 0.06);
@@ -83,37 +81,36 @@
 }
 
 .dark {
-  --background: oklch(20.5% 0.004 55);
+  --background: oklch(22% 0.004 55);
   --foreground: oklch(93% 0.008 80);
-  --card: oklch(23% 0.004 55);
+  --card: oklch(25.5% 0.004 55);
   --card-foreground: var(--foreground);
-  --popover: oklch(25% 0.004 55);
+  --popover: oklch(28% 0.004 55);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(72.085% 0.16286 50.705);
+  --primary: oklch(66% 0.15 45.139);
   --primary-foreground: oklch(16% 0.004 60);
 
-  --secondary: oklch(26% 0.004 55);
+  --secondary: oklch(29% 0.004 55);
   --secondary-foreground: var(--foreground);
 
-  --muted: oklch(28.5% 0.0035 55);
+  --muted: oklch(32% 0.0035 55);
   --muted-foreground: oklch(73% 0.006 75);
 
-  --accent: oklch(30% 0.005 55);
+  --accent: oklch(33% 0.005 55);
   --accent-foreground: var(--foreground);
 
-  --success: oklch(65% 0.19 150);
+  --success: oklch(62% 0.16 150);
   --success-foreground: oklch(15% 0.02 150);
   --warning: oklch(69.913% 0.1798 49.649);
   --warning-foreground: oklch(15% 0.04 85);
   --info: oklch(65% 0.17 250);
   --info-foreground: oklch(15% 0.02 250);
-
   --destructive: oklch(62% 0.2 28);
   --destructive-foreground: oklch(98% 0.005 30);
 
-  --border: oklch(33% 0.004 55);
-  --input: oklch(30% 0.004 55);
+  --border: oklch(35% 0.004 55);
+  --input: var(--border);
   --ring: var(--primary);
 
   --chart-1: var(--color-emerald-500);
@@ -127,16 +124,16 @@
   --chart-9: var(--color-cyan-500);
   --chart-10: var(--color-lime-500);
 
-  --sidebar: oklch(18% 0.004 55);
+  --sidebar: oklch(19.5% 0.004 55);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(27% 0.004 55);
+  --sidebar-accent: oklch(30% 0.004 55);
   --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: oklch(31% 0.004 55);
+  --sidebar-border: oklch(34% 0.004 55);
   --sidebar-ring: var(--primary);
 
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 
   --shadow-2xs: 0 1px 2px 0px oklch(0% 0 0 / 0.3);
   --shadow-xs: 0 1px 3px 0px oklch(0% 0 0 / 0.4);

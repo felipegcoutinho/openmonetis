@@ -195,37 +195,41 @@ export function LoginForm({ className, ...props }: DivProps) {
 						</FieldSeparator>
 
 						<Field>
-							<GoogleAuthButton
-								onClick={handleGoogle}
-								loading={loadingGoogle}
-								disabled={
-									loadingEmail ||
-									loadingGoogle ||
-									loadingPasskey ||
-									!isGoogleAvailable
-								}
-								text="Entrar com Google"
-							/>
-						</Field>
+							<div
+								className={cn(
+									passkeySupported ? "grid grid-cols-2 gap-2" : "flex",
+								)}
+							>
+								<GoogleAuthButton
+									onClick={handleGoogle}
+									loading={loadingGoogle}
+									disabled={
+										loadingEmail ||
+										loadingGoogle ||
+										loadingPasskey ||
+										!isGoogleAvailable
+									}
+									text="Google"
+								/>
 
-						{passkeySupported && (
-							<Field>
-								<Button
-									variant="outline"
-									type="button"
-									onClick={handlePasskey}
-									disabled={loadingEmail || loadingGoogle || loadingPasskey}
-									className="w-full gap-2"
-								>
-									{loadingPasskey ? (
-										<RiLoader4Line className="h-4 w-4 animate-spin" />
-									) : (
-										<RiFingerprintLine className="h-5 w-5" />
-									)}
-									<span>Entrar com passkey</span>
-								</Button>
-							</Field>
-						)}
+								{passkeySupported && (
+									<Button
+										variant="outline"
+										type="button"
+										onClick={handlePasskey}
+										disabled={loadingEmail || loadingGoogle || loadingPasskey}
+										className="w-full gap-2"
+									>
+										{loadingPasskey ? (
+											<RiLoader4Line className="h-4 w-4 animate-spin" />
+										) : (
+											<RiFingerprintLine className="h-5 w-5" />
+										)}
+										<span>Passkey</span>
+									</Button>
+								)}
+							</div>
+						</Field>
 
 						<FieldDescription className="pt-1 text-center">
 							Não tem uma conta?{" "}

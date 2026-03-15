@@ -68,12 +68,13 @@ export function ExpandableWidgetCard({
 					hasOverflow ? (
 						<div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-linear-to-t from-card to-transparent pt-12 pb-6">
 							<Button
-								variant="secondary"
-								className="pointer-events-auto rounded-full text-xs backdrop-blur-sm bg-primary/10"
+								variant="outline"
+								className="pointer-events-auto text-xs"
 								onClick={() => setIsOpen(true)}
 								aria-label="Expandir para ver todo o conteúdo"
 							>
-								Ver tudo <RiExpandDiagonalLine size={10} aria-hidden="true" />
+								Ver tudo{" "}
+								<RiExpandDiagonalLine className="size-3" aria-hidden="true" />
 							</Button>
 						</div>
 					) : null

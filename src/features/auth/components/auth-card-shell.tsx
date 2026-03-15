@@ -5,7 +5,7 @@ import AuthSidebar from "./auth-sidebar";
 
 export function AuthCardShell({ children }: PropsWithChildren) {
 	return (
-		<Card className="relative overflow-hidden rounded-2xl border-primary/10 bg-card p-0 shadow-none">
+		<Card className="relative overflow-hidden p-0">
 			<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
 				<DotPattern
 					width={17}

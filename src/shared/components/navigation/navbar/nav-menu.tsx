@@ -1,6 +1,7 @@
 "use client";
 
 import { RiDashboardLine, RiMenuLine } from "@remixicon/react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { CalculatorDialogContent } from "@/shared/components/calculator/calculator-dialog";
 import { Button } from "@/shared/components/ui/button";
@@ -23,10 +24,11 @@ import { MobileLink, MobileSectionLabel } from "./mobile-link";
 import { NavDropdown } from "./nav-dropdown";
 import { NAV_SECTIONS } from "./nav-items";
 import { NavPill } from "./nav-pill";
-import { triggerClass } from "./nav-styles";
+import { triggerActiveClass, triggerClass } from "./nav-styles";
 import { MobileTools, NavToolsDropdown } from "./nav-tools";
 
 export function NavMenu() {
+	const pathname = usePathname();
 	const [sheetOpen, setSheetOpen] = useState(false);
 	const [calculatorOpen, setCalculatorOpen] = useState(false);
 	const close = () => setSheetOpen(false);
@@ -44,16 +46,25 @@ export function NavMenu() {
 							</NavPill>
 						</NavigationMenuItem>
 
-						{NAV_SECTIONS.map((section) => (
-							<NavigationMenuItem key={section.label}>
-								<NavigationMenuTrigger className={triggerClass}>
-									{section.label}
-								</NavigationMenuTrigger>
-								<NavigationMenuContent>
-									<NavDropdown items={section.items} />
-								</NavigationMenuContent>
-							</NavigationMenuItem>
-						))}
+						{NAV_SECTIONS.map((section) => {
+							const isSectionActive = section.items.some(
+								(item) =>
+									pathname === item.href ||
+									pathname.startsWith(`${item.href}/`),
+							);
+							return (
+								<NavigationMenuItem key={section.label}>
+									<NavigationMenuTrigger
+										className={`${triggerClass} ${isSectionActive ? triggerActiveClass : ""}`}
+									>
+										{section.label}
+									</NavigationMenuTrigger>
+									<NavigationMenuContent>
+										<NavDropdown items={section.items} />
+									</NavigationMenuContent>
+								</NavigationMenuItem>
+							);
+						})}
 
 						<NavigationMenuItem>
 							<NavigationMenuTrigger className={triggerClass}>
@@ -109,6 +120,7 @@ export function NavMenu() {
 											onClick={close}
 											badge={item.badge}
 											preservePeriod={item.preservePeriod}
+											description={item.description}
 										>
 											{item.label}
 										</MobileLink>

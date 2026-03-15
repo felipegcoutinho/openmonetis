@@ -26,7 +26,7 @@ function AuthSidebar() {
 					<h2 className="text-[2rem] font-semibold leading-[1.04] tracking-[-0.03em] text-black/84 lg:text-[2.35rem]">
 						Controle suas finanças com clareza e foco diário.
 					</h2>
-					<p className="max-w-[18rem] text-sm leading-6 text-black/68">
+					<p className="max-w-2xs text-sm leading-6 text-black/68">
 						Centralize despesas, organize cartões e acompanhe metas mensais em
 						um painel inteligente feito para o seu dia a dia.
 					</p>

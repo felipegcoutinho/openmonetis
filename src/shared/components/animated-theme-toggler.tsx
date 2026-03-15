@@ -87,7 +87,7 @@ export const AnimatedThemeToggler = ({
 						buttonVariants({ variant: "ghost", size: "icon-sm" }),
 						"group relative text-muted-foreground transition-all duration-200",
 						"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
-						"data-[state=open]:bg-accent/60 data-[state=open]:text-foreground border",
+						"data-[state=open]:bg-accent/60 data-[state=open]:text-foreground",
 						className,
 					)}
 					{...props}

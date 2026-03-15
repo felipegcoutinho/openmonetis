@@ -30,7 +30,7 @@ export function AppNavbar({
 	notificationsSnapshot,
 }: AppNavbarProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 flex h-16 shrink-0 items-center border-b border-black/6 bg-primary">
+		<header className="fixed top-0 left-0 right-0 z-50 flex h-16 shrink-0 items-center bg-primary">
 			<div className="pointer-events-none absolute inset-0 overflow-hidden">
 				<DotPattern
 					width={20}
@@ -38,7 +38,7 @@ export function AppNavbar({
 					cx={1.25}
 					cy={1.25}
 					cr={1.25}
-					className="text-black/10 mask-[linear-gradient(to_right,transparent,black_6%,black_60%,transparent)]"
+					className="text-black/5 mask-[linear-gradient(to_right,transparent,black_5%,black_55%,transparent)]"
 				/>
 				<div className="absolute inset-0 bg-linear-to-b from-white/8 via-transparent to-black/6" />
 			</div>

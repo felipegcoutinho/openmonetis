@@ -3,7 +3,6 @@
 import { RiCalculatorLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import { usePrivacyMode } from "@/shared/components/providers/privacy-provider";
 import { Badge } from "@/shared/components/ui/badge";
-import { cn } from "@/shared/utils/ui";
 
 const itemClass =
 	"flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-accent transition-colors cursor-pointer";
@@ -16,29 +15,35 @@ export function NavToolsDropdown({ onOpenCalculator }: NavToolsDropdownProps) {
 	const { privacyMode, toggle } = usePrivacyMode();
 
 	return (
-		<ul className="grid w-52 gap-0.5 p-2">
+		<ul className="grid w-72 gap-0.5 p-2">
 			<li>
-				<button
-					type="button"
-					className={cn(itemClass)}
-					onClick={onOpenCalculator}
-				>
-					<span className="text-muted-foreground shrink-0">
+				<button type="button" className={itemClass} onClick={onOpenCalculator}>
+					<span className="text-primary shrink-0">
 						<RiCalculatorLine className="size-4" />
 					</span>
-					<span className="flex-1 text-left">calculadora</span>
+					<span className="flex flex-col flex-1 text-left">
+						<span className="font-medium">calculadora</span>
+						<span className="text-xs text-muted-foreground lowercase">
+							Faça cálculos rápidos
+						</span>
+					</span>
 				</button>
 			</li>
 			<li>
-				<button type="button" onClick={toggle} className={cn(itemClass)}>
-					<span className="text-muted-foreground shrink-0">
+				<button type="button" onClick={toggle} className={itemClass}>
+					<span className="text-primary shrink-0">
 						{privacyMode ? (
 							<RiEyeOffLine className="size-4" />
 						) : (
 							<RiEyeLine className="size-4" />
 						)}
 					</span>
-					<span className="flex-1 text-left">privacidade</span>
+					<span className="flex flex-col flex-1 text-left">
+						<span className="font-medium">privacidade</span>
+						<span className="text-xs text-muted-foreground lowercase">
+							Oculta valores na tela
+						</span>
+					</span>
 					{privacyMode && (
 						<Badge
 							variant="secondary"

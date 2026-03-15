@@ -12,6 +12,7 @@ type MobileLinkProps = {
 	onClick?: () => void;
 	badge?: number;
 	preservePeriod?: boolean;
+	description?: string;
 };
 
 export function MobileLink({
@@ -21,6 +22,7 @@ export function MobileLink({
 	onClick,
 	badge,
 	preservePeriod,
+	description,
 }: MobileLinkProps) {
 	const pathname = usePathname();
 
@@ -40,8 +42,22 @@ export function MobileLink({
 				isActive && "bg-primary/10 text-primary font-medium",
 			)}
 		>
-			<span className="text-muted-foreground shrink-0">{icon}</span>
-			<span className="flex-1">{children}</span>
+			<span
+				className={cn(
+					"shrink-0",
+					isActive ? "text-primary" : "text-muted-foreground",
+				)}
+			>
+				{icon}
+			</span>
+			<span className="flex-1 flex flex-col gap-0.5">
+				<span>{children}</span>
+				{description && (
+					<span className="text-[11px] text-muted-foreground leading-snug">
+						{description}
+					</span>
+				)}
+			</span>
 			{badge && badge > 0 ? (
 				<Badge variant="secondary" className="text-xs px-1.5 py-0">
 					{badge}

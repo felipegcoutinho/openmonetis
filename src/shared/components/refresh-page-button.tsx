@@ -38,7 +38,7 @@ export function RefreshPageButton({
 					className={cn(
 						buttonVariants({ variant: "ghost", size: "icon-sm" }),
 						"size-8 text-muted-foreground transition-all duration-200",
-						"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 border",
+						"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
 						"disabled:pointer-events-none disabled:opacity-50",
 						className,
 					)}

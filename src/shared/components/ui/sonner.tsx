@@ -17,6 +17,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 		<Sonner
 			theme={theme as ToasterProps["theme"]}
 			className="toaster group"
+			offset={{ top: 60 }}
 			icons={{
 				success: <RiCheckboxCircleLine className="size-4" />,
 				info: <RiInformationLine className="size-4" />,
