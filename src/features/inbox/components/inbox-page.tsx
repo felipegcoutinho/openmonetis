@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
 	bulkDeleteInboxItemsAction,
+	bulkDeleteSelectedInboxItemsAction,
+	bulkDiscardInboxItemsAction,
 	deleteInboxItemAction,
 	discardInboxItemAction,
 	markInboxAsProcessedAction,
@@ -71,6 +73,19 @@ export function InboxPage({
 	const [bulkDeleteStatus, setBulkDeleteStatus] = useState<
 		"processed" | "discarded"
 	>("processed");
+
+	const [selectedPendingIds, setSelectedPendingIds] = useState<string[]>([]);
+	const [selectedProcessedIds, setSelectedProcessedIds] = useState<string[]>(
+		[],
+	);
+	const [selectedDiscardedIds, setSelectedDiscardedIds] = useState<string[]>(
+		[],
+	);
+
+	const [selectionBulkOpen, setSelectionBulkOpen] = useState(false);
+	const [selectionBulkStatus, setSelectionBulkStatus] = useState<
+		"pending" | "processed" | "discarded"
+	>("pending");
 
 	const sortedPending = useMemo(
 		() =>
@@ -208,6 +223,52 @@ export function InboxPage({
 		throw new Error(result.error);
 	};
 
+	const toggleSelection = (
+		ids: string[],
+		setIds: (v: string[]) => void,
+		id: string,
+	) => {
+		setIds(ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
+	};
+
+	const handleSelectionBulkRequest = (
+		status: "pending" | "processed" | "discarded",
+	) => {
+		setSelectionBulkStatus(status);
+		setSelectionBulkOpen(true);
+	};
+
+	const handleSelectionBulkConfirm = async () => {
+		if (selectionBulkStatus === "pending") {
+			const result = await bulkDiscardInboxItemsAction({
+				inboxItemIds: selectedPendingIds,
+			});
+			if (result.success) {
+				toast.success(result.message);
+				setSelectedPendingIds([]);
+				return;
+			}
+			toast.error(result.error);
+			throw new Error(result.error);
+		} else {
+			const ids =
+				selectionBulkStatus === "processed"
+					? selectedProcessedIds
+					: selectedDiscardedIds;
+			const result = await bulkDeleteSelectedInboxItemsAction({
+				inboxItemIds: ids,
+			});
+			if (result.success) {
+				toast.success(result.message);
+				if (selectionBulkStatus === "processed") setSelectedProcessedIds([]);
+				else setSelectedDiscardedIds([]);
+				return;
+			}
+			toast.error(result.error);
+			throw new Error(result.error);
+		}
+	};
+
 	const handleBulkDeleteOpenChange = (open: boolean) => {
 		setBulkDeleteOpen(open);
 	};
@@ -291,7 +352,12 @@ export function InboxPage({
 		</Card>
 	);
 
-	const renderGrid = (list: InboxItem[], readonly?: boolean) =>
+	const renderGrid = (
+		list: InboxItem[],
+		readonly?: boolean,
+		selectedIds?: string[],
+		onToggle?: (id: string) => void,
+	) =>
 		list.length === 0 ? (
 			renderEmptyState(
 				readonly
@@ -311,6 +377,8 @@ export function InboxPage({
 						onViewDetails={readonly ? undefined : handleDetailsRequest}
 						onDelete={readonly ? handleDeleteRequest : undefined}
 						onRestoreToPending={readonly ? handleRestoreRequest : undefined}
+						selected={selectedIds?.includes(item.id)}
+						onSelectToggle={onToggle}
 					/>
 				))}
 			</div>
@@ -344,11 +412,35 @@ export function InboxPage({
 				</TabsList>
 
 				<TabsContent value="pending" className="mt-4">
-					{renderGrid(sortedPending)}
+					{selectedPendingIds.length > 0 && (
+						<div className="mb-4 flex justify-end">
+							<Button
+								variant="destructive"
+								size="sm"
+								onClick={() => handleSelectionBulkRequest("pending")}
+							>
+								<RiDeleteBinLine className="mr-1.5 size-4" />
+								Descartar selecionados ({selectedPendingIds.length})
+							</Button>
+						</div>
+					)}
+					{renderGrid(sortedPending, false, selectedPendingIds, (id) =>
+						toggleSelection(selectedPendingIds, setSelectedPendingIds, id),
+					)}
 				</TabsContent>
 				<TabsContent value="processed" className="mt-4">
 					{sortedProcessed.length > 0 && (
-						<div className="mb-4 flex justify-end">
+						<div className="mb-4 flex items-center justify-end gap-2">
+							{selectedProcessedIds.length > 0 && (
+								<Button
+									variant="destructive"
+									size="sm"
+									onClick={() => handleSelectionBulkRequest("processed")}
+								>
+									<RiDeleteBinLine className="mr-1.5 size-4" />
+									Excluir selecionados ({selectedProcessedIds.length})
+								</Button>
+							)}
 							<Button
 								variant="outline"
 								size="sm"
@@ -359,11 +451,23 @@ export function InboxPage({
 							</Button>
 						</div>
 					)}
-					{renderGrid(sortedProcessed, true)}
+					{renderGrid(sortedProcessed, true, selectedProcessedIds, (id) =>
+						toggleSelection(selectedProcessedIds, setSelectedProcessedIds, id),
+					)}
 				</TabsContent>
 				<TabsContent value="discarded" className="mt-4">
 					{sortedDiscarded.length > 0 && (
-						<div className="mb-4 flex justify-end">
+						<div className="mb-4 flex items-center justify-end gap-2">
+							{selectedDiscardedIds.length > 0 && (
+								<Button
+									variant="destructive"
+									size="sm"
+									onClick={() => handleSelectionBulkRequest("discarded")}
+								>
+									<RiDeleteBinLine className="mr-1.5 size-4" />
+									Excluir selecionados ({selectedDiscardedIds.length})
+								</Button>
+							)}
 							<Button
 								variant="outline"
 								size="sm"
@@ -374,7 +478,9 @@ export function InboxPage({
 							</Button>
 						</div>
 					)}
-					{renderGrid(sortedDiscarded, true)}
+					{renderGrid(sortedDiscarded, true, selectedDiscardedIds, (id) =>
+						toggleSelection(selectedDiscardedIds, setSelectedDiscardedIds, id),
+					)}
 				</TabsContent>
 			</Tabs>
 
@@ -445,6 +551,29 @@ export function InboxPage({
 				confirmVariant="destructive"
 				pendingLabel="Excluindo..."
 				onConfirm={handleBulkDeleteConfirm}
+			/>
+
+			<ConfirmActionDialog
+				open={selectionBulkOpen}
+				onOpenChange={setSelectionBulkOpen}
+				title={
+					selectionBulkStatus === "pending"
+						? "Descartar selecionados?"
+						: "Excluir selecionados?"
+				}
+				description={
+					selectionBulkStatus === "pending"
+						? `${selectedPendingIds.length} item(s) serão descartados.`
+						: `${selectionBulkStatus === "processed" ? selectedProcessedIds.length : selectedDiscardedIds.length} item(s) serão excluídos permanentemente.`
+				}
+				confirmLabel={
+					selectionBulkStatus === "pending" ? "Descartar" : "Excluir"
+				}
+				confirmVariant="destructive"
+				pendingLabel={
+					selectionBulkStatus === "pending" ? "Descartando..." : "Excluindo..."
+				}
+				onConfirm={handleSelectionBulkConfirm}
 			/>
 		</>
 	);

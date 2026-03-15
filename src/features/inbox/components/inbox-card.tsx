@@ -21,6 +21,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/shared/components/ui/card";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -39,6 +40,8 @@ interface InboxCardProps {
 	onViewDetails?: (item: InboxItem) => void;
 	onDelete?: (item: InboxItem) => void;
 	onRestoreToPending?: (item: InboxItem) => void | Promise<void>;
+	selected?: boolean;
+	onSelectToggle?: (id: string) => void;
 }
 
 function findMatchingLogo(
@@ -71,6 +74,8 @@ export function InboxCard({
 	onViewDetails,
 	onDelete,
 	onRestoreToPending,
+	selected,
+	onSelectToggle,
 }: InboxCardProps) {
 	const matchedLogo = appLogoMap
 		? findMatchingLogo(item.sourceAppName, appLogoMap)
@@ -112,7 +117,9 @@ export function InboxCard({
 		: null;
 
 	return (
-		<Card className="flex flex-col gap-0 py-0 h-54">
+		<Card
+			className={`flex flex-col gap-0 py-0 h-54 transition-colors ${selected ? "ring-2 ring-primary" : ""}`}
+		>
 			{/* Header com app e valor */}
 			<CardHeader className="pt-4">
 				<div className="flex items-center justify-between">
@@ -217,6 +224,13 @@ export function InboxCard({
 								<RiDeleteBinLine className="size-4" />
 							</Button>
 						)}
+						{onSelectToggle && (
+							<Checkbox
+								checked={!!selected}
+								onCheckedChange={() => onSelectToggle(item.id)}
+								aria-label="Selecionar item"
+							/>
+						)}
 					</div>
 				</CardFooter>
 			) : (
@@ -239,6 +253,13 @@ export function InboxCard({
 					>
 						<RiDeleteBinLine className="size-4" />
 					</Button>
+					{onSelectToggle && (
+						<Checkbox
+							checked={!!selected}
+							onCheckedChange={() => onSelectToggle(item.id)}
+							aria-label="Selecionar item"
+						/>
+					)}
 				</CardFooter>
 			)}
 		</Card>

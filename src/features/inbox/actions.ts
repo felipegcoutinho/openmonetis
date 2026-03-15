@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { z } from "zod";
 import { inboxItems } from "@/db/schema";
 import {
@@ -33,6 +33,10 @@ const deleteInboxSchema = z.object({
 
 const bulkDeleteInboxSchema = z.object({
 	status: z.enum(["processed", "discarded"]),
+});
+
+const bulkDeleteSelectedInboxSchema = z.object({
+	inboxItemIds: z.array(z.string().uuid()).min(1, "Selecione ao menos um item"),
 });
 
 function revalidateInbox() {
@@ -259,6 +263,36 @@ export async function deleteInboxItemAction(
 		revalidateInbox();
 
 		return { success: true, message: "Item excluído." };
+	} catch (error) {
+		return handleActionError(error);
+	}
+}
+
+export async function bulkDeleteSelectedInboxItemsAction(
+	input: z.infer<typeof bulkDeleteSelectedInboxSchema>,
+): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = bulkDeleteSelectedInboxSchema.parse(input);
+
+		const result = await db
+			.delete(inboxItems)
+			.where(
+				and(
+					inArray(inboxItems.id, data.inboxItemIds),
+					eq(inboxItems.userId, user.id),
+					ne(inboxItems.status, "pending"),
+				),
+			)
+			.returning({ id: inboxItems.id });
+
+		revalidateInbox();
+
+		const count = result.length;
+		return {
+			success: true,
+			message: `${count} item(s) excluído(s).`,
+		};
 	} catch (error) {
 		return handleActionError(error);
 	}
