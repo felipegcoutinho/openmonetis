@@ -23,16 +23,16 @@ export function CategoryReportSkeleton() {
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<div className="flex flex-wrap items-center gap-2">
 						{/* Category MultiSelect */}
-						<Skeleton className="h-10 w-[200px] rounded-2xl bg-foreground/10" />
+						<Skeleton className="h-10 w-[200px] rounded-md bg-foreground/10" />
 						{/* Start Period */}
-						<Skeleton className="h-10 w-[150px] rounded-2xl bg-foreground/10" />
+						<Skeleton className="h-10 w-[150px] rounded-md bg-foreground/10" />
 						{/* End Period */}
-						<Skeleton className="h-10 w-[150px] rounded-2xl bg-foreground/10" />
+						<Skeleton className="h-10 w-[150px] rounded-md bg-foreground/10" />
 						{/* Clear Button */}
-						<Skeleton className="h-8 w-16 rounded-2xl bg-foreground/10" />
+						<Skeleton className="h-8 w-16 rounded-md bg-foreground/10" />
 					</div>
 					{/* Export Button */}
-					<Skeleton className="h-10 w-[120px] rounded-2xl bg-foreground/10" />
+					<Skeleton className="h-10 w-[120px] rounded-md bg-foreground/10" />
 				</div>
 			</div>
 
@@ -40,8 +40,8 @@ export function CategoryReportSkeleton() {
 			<Tabs value="table" className="w-full">
 				<TabsList>
 					<div className="flex gap-1">
-						<Skeleton className="h-10 w-[100px] rounded-2xl bg-foreground/10" />
-						<Skeleton className="h-10 w-[100px] rounded-2xl bg-foreground/10" />
+						<Skeleton className="h-10 w-[100px] rounded-md bg-foreground/10" />
+						<Skeleton className="h-10 w-[100px] rounded-md bg-foreground/10" />
 					</div>
 				</TabsList>
 
@@ -58,11 +58,11 @@ export function CategoryReportSkeleton() {
 								<div className="space-y-3">
 									{/* Category name with icon */}
 									<div className="flex items-center gap-2">
-										<Skeleton className="size-4 rounded-2xl bg-foreground/10" />
-										<Skeleton className="h-5 w-32 rounded-2xl bg-foreground/10" />
+										<Skeleton className="size-4 rounded-md bg-foreground/10" />
+										<Skeleton className="h-5 w-32 rounded-md bg-foreground/10" />
 									</div>
 									{/* Type badge */}
-									<Skeleton className="h-6 w-20 rounded-2xl bg-foreground/10" />
+									<Skeleton className="h-6 w-20 rounded-md bg-foreground/10" />
 									{/* Values */}
 									<div className="space-y-2">
 										{Array.from({ length: 3 }).map((_, j) => (
@@ -70,8 +70,8 @@ export function CategoryReportSkeleton() {
 												key={j}
 												className="flex items-center justify-between"
 											>
-												<Skeleton className="h-4 w-24 rounded-2xl bg-foreground/10" />
-												<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+												<Skeleton className="h-4 w-24 rounded-md bg-foreground/10" />
+												<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 											</div>
 										))}
 									</div>
@@ -87,17 +87,17 @@ export function CategoryReportSkeleton() {
 						<div className="space-y-4">
 							{/* Chart title area */}
 							<div className="flex items-center justify-between">
-								<Skeleton className="h-6 w-48 rounded-2xl bg-foreground/10" />
-								<Skeleton className="h-8 w-32 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-6 w-48 rounded-md bg-foreground/10" />
+								<Skeleton className="h-8 w-32 rounded-md bg-foreground/10" />
 							</div>
 							{/* Chart area */}
-							<Skeleton className="h-[400px] w-full rounded-2xl bg-foreground/10" />
+							<Skeleton className="h-[400px] w-full rounded-md bg-foreground/10" />
 							{/* Legend */}
 							<div className="flex flex-wrap gap-4 justify-center">
 								{Array.from({ length: 6 }).map((_, i) => (
 									<div key={i} className="flex items-center gap-2">
 										<Skeleton className="size-3 rounded-full bg-foreground/10" />
-										<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+										<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 									</div>
 								))}
 							</div>
@@ -124,17 +124,17 @@ function CategoryReportTableSkeleton() {
 					<TableRow>
 						{/* Category */}
 						<TableHead className="w-[280px] min-w-[280px]">
-							<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+							<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 						</TableHead>
 						{/* Period columns */}
 						{Array.from({ length: periodColumns }).map((_, i) => (
 							<TableHead key={i} className="text-right min-w-[120px]">
-								<Skeleton className="h-4 w-16 rounded-2xl bg-foreground/10 ml-auto" />
+								<Skeleton className="h-4 w-16 rounded-md bg-foreground/10 ml-auto" />
 							</TableHead>
 						))}
 						{/* Total */}
 						<TableHead className="text-right min-w-[120px]">
-							<Skeleton className="h-4 w-10 rounded-2xl bg-foreground/10 ml-auto" />
+							<Skeleton className="h-4 w-10 rounded-md bg-foreground/10 ml-auto" />
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -146,24 +146,24 @@ function CategoryReportTableSkeleton() {
 							<TableCell>
 								<div className="flex items-center gap-2">
 									<Skeleton className="size-2 rounded-full bg-foreground/10" />
-									<Skeleton className="size-4 rounded-2xl bg-foreground/10" />
-									<Skeleton className="h-4 w-32 rounded-2xl bg-foreground/10" />
+									<Skeleton className="size-4 rounded-md bg-foreground/10" />
+									<Skeleton className="h-4 w-32 rounded-md bg-foreground/10" />
 								</div>
 							</TableCell>
 							{/* Period values */}
 							{Array.from({ length: periodColumns }).map((_, colIndex) => (
 								<TableCell key={colIndex} className="text-right">
 									<div className="flex flex-col items-end gap-1">
-										<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+										<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 										{colIndex > 0 && (
-											<Skeleton className="h-3 w-16 rounded-2xl bg-foreground/10" />
+											<Skeleton className="h-3 w-16 rounded-md bg-foreground/10" />
 										)}
 									</div>
 								</TableCell>
 							))}
 							{/* Total */}
 							<TableCell className="text-right">
-								<Skeleton className="h-4 w-24 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-4 w-24 rounded-md bg-foreground/10" />
 							</TableCell>
 						</TableRow>
 					))}
@@ -173,17 +173,17 @@ function CategoryReportTableSkeleton() {
 					<TableRow>
 						{/* Total label */}
 						<TableCell className="font-bold">
-							<Skeleton className="h-5 w-16 rounded-2xl bg-foreground/10" />
+							<Skeleton className="h-5 w-16 rounded-md bg-foreground/10" />
 						</TableCell>
 						{/* Period totals */}
 						{Array.from({ length: periodColumns }).map((_, i) => (
 							<TableCell key={i} className="text-right">
-								<Skeleton className="h-5 w-24 rounded-2xl bg-foreground/10 ml-auto" />
+								<Skeleton className="h-5 w-24 rounded-md bg-foreground/10 ml-auto" />
 							</TableCell>
 						))}
 						{/* Grand total */}
 						<TableCell className="text-right">
-							<Skeleton className="h-5 w-28 rounded-2xl bg-foreground/10 ml-auto" />
+							<Skeleton className="h-5 w-28 rounded-md bg-foreground/10 ml-auto" />
 						</TableCell>
 					</TableRow>
 				</TableFooter>

@@ -6,23 +6,23 @@ export default function ContasLoading() {
 			<div className="space-y-6 pt-4">
 				{/* Header */}
 				<div className="flex items-center justify-between">
-					<Skeleton className="h-8 w-32 rounded-2xl bg-foreground/10" />
-					<Skeleton className="h-10 w-40 rounded-2xl bg-foreground/10" />
+					<Skeleton className="h-8 w-32 rounded-md bg-foreground/10" />
+					<Skeleton className="h-10 w-40 rounded-md bg-foreground/10" />
 				</div>
 
 				{/* Grid de contas */}
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{Array.from({ length: 6 }).map((_, i) => (
-						<div key={i} className="rounded-2xl border p-6 space-y-4">
+						<div key={i} className="rounded-md border p-6 space-y-4">
 							<div className="flex items-center justify-between">
-								<Skeleton className="size-10 rounded-2xl bg-foreground/10" />
-								<Skeleton className="h-8 w-16 rounded-2xl bg-foreground/10" />
+								<Skeleton className="size-10 rounded-md bg-foreground/10" />
+								<Skeleton className="h-8 w-16 rounded-md bg-foreground/10" />
 							</div>
-							<Skeleton className="h-6 w-32 rounded-2xl bg-foreground/10" />
-							<Skeleton className="h-4 w-full rounded-2xl bg-foreground/10" />
+							<Skeleton className="h-6 w-32 rounded-md bg-foreground/10" />
+							<Skeleton className="h-4 w-full rounded-md bg-foreground/10" />
 							<div className="flex gap-2">
-								<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
-								<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
+								<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 							</div>
 						</div>
 					))}

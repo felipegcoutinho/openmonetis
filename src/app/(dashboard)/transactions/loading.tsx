@@ -12,13 +12,13 @@ export default function LancamentosLoading() {
 	return (
 		<main className="flex flex-col gap-6">
 			{/* Month Picker placeholder */}
-			<div className="h-[60px] animate-pulse rounded-2xl bg-foreground/10" />
+			<div className="h-[60px] animate-pulse rounded-md bg-foreground/10" />
 
 			<div className="space-y-6 pt-4">
 				{/* Header com título e botão */}
 				<div className="flex items-center justify-between">
-					<Skeleton className="h-8 w-48 rounded-2xl bg-foreground/10" />
-					<Skeleton className="h-10 w-40 rounded-2xl bg-foreground/10" />
+					<Skeleton className="h-8 w-48 rounded-md bg-foreground/10" />
+					<Skeleton className="h-10 w-40 rounded-md bg-foreground/10" />
 				</div>
 
 				{/* Filtros */}

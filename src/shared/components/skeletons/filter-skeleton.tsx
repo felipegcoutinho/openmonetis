@@ -10,11 +10,11 @@ export function FilterSkeleton() {
 			{Array.from({ length: 6 }).map((_, i) => (
 				<Skeleton
 					key={i}
-					className="h-10 w-[130px] rounded-2xl bg-foreground/10"
+					className="h-10 w-[130px] rounded-md bg-foreground/10"
 				/>
 			))}
-			<Skeleton className="h-10 w-[150px] rounded-2xl bg-foreground/10" />
-			<Skeleton className="h-8 w-16 rounded-2xl bg-foreground/10" />
+			<Skeleton className="h-10 w-[150px] rounded-md bg-foreground/10" />
+			<Skeleton className="h-8 w-16 rounded-md bg-foreground/10" />
 		</div>
 	);
 }

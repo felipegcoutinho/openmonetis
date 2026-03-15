@@ -1,34 +1,35 @@
-import { Card, CardFooter, CardHeader } from "@/shared/components/ui/card";
+import {
+	Card,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
-/**
- * Skeleton fiel aos cards de métricas do dashboard (DashboardMetricsCards)
- * Mantém o mesmo layout de 4 colunas responsivo
- */
 export function DashboardMetricsCardsSkeleton() {
 	return (
-		<div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+		<div className="grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
 			{Array.from({ length: 4 }).map((_, index) => (
-				<Card key={index} className="@container/card gap-2">
+				<Card
+					key={index}
+					className="@container/card flex flex-col justify-between min-h-32"
+				>
 					<CardHeader>
-						<div className="space-y-3">
-							{/* Título com ícone */}
-							<div className="flex items-center gap-1">
-								<Skeleton className="size-4 rounded-2xl bg-foreground/10" />
-								<Skeleton className="h-5 w-20 rounded-2xl bg-foreground/10" />
-							</div>
-
-							{/* Valor principal */}
-							<Skeleton className="h-8 w-32 rounded-2xl bg-foreground/10" />
-
-							{/* Badge de tendência */}
-							<Skeleton className="h-6 w-16 rounded-2xl bg-foreground/10" />
+						<CardTitle className="flex items-center gap-1">
+							<Skeleton className="size-4 rounded-md bg-foreground/10" />
+							<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
+						</CardTitle>
+						<div className="flex items-baseline gap-2 mt-auto pt-4">
+							<Skeleton className="h-9 w-32 rounded-md bg-foreground/10" />
+							<Skeleton className="h-4 w-12 rounded-md bg-foreground/10" />
 						</div>
 					</CardHeader>
 
-					<CardFooter className="flex-col items-start gap-1.5 text-sm">
-						<Skeleton className="h-4 w-24 rounded-2xl bg-foreground/10" />
-						<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+					<CardFooter className="text-sm">
+						<div className="flex items-center gap-1.5">
+							<Skeleton className="h-3 w-20 rounded-md bg-foreground/10" />
+							<Skeleton className="h-3 w-16 rounded-md bg-foreground/10" />
+						</div>
 					</CardFooter>
 				</Card>
 			))}

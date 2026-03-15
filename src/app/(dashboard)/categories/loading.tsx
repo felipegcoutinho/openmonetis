@@ -7,8 +7,8 @@ export default function CategoriasLoading() {
 			<div className="w-full space-y-6">
 				{/* Header */}
 				<div className="flex items-center justify-between">
-					<Skeleton className="h-8 w-32 rounded-2xl bg-foreground/10" />
-					<Skeleton className="h-10 w-40 rounded-2xl bg-foreground/10" />
+					<Skeleton className="h-8 w-32 rounded-md bg-foreground/10" />
+					<Skeleton className="h-10 w-40 rounded-md bg-foreground/10" />
 				</div>
 
 				{/* Tabs */}
@@ -17,7 +17,7 @@ export default function CategoriasLoading() {
 						{Array.from({ length: 3 }).map((_, i) => (
 							<Skeleton
 								key={i}
-								className="h-10 w-32 rounded-t-2xl bg-foreground/10"
+								className="h-10 w-32 rounded-t-md bg-foreground/10"
 							/>
 						))}
 					</div>
@@ -40,7 +40,7 @@ export default function CategoriasLoading() {
 										key={i}
 										className="flex items-center gap-4 border-b border-dashed px-2 py-3 last:border-b-0"
 									>
-										<Skeleton className="size-8 rounded-lg bg-foreground/10" />
+										<Skeleton className="size-8 rounded-md bg-foreground/10" />
 										<Skeleton
 											className="h-4 rounded bg-foreground/10"
 											style={{ width: `${100 + (i % 4) * 30}px` }}

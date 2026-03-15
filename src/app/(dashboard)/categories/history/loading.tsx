@@ -25,7 +25,7 @@ export default function Loading() {
 					</div>
 
 					{/* Chart */}
-					<Skeleton className="h-[450px] w-full rounded-lg" />
+					<Skeleton className="h-[450px] w-full rounded-md" />
 				</CardContent>
 			</Card>
 		</main>

@@ -14,7 +14,7 @@ import {
  */
 export function TransactionsTableSkeleton() {
 	return (
-		<div className="rounded-2xl border">
+		<div className="rounded-md border">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -24,8 +24,8 @@ export function TransactionsTableSkeleton() {
 						<TableHead className="w-[120px]">Valor</TableHead>
 						<TableHead className="w-[120px]">Condição</TableHead>
 						<TableHead className="w-[120px]">Pagamento</TableHead>
-						<TableHead className="w-[140px]">Payer</TableHead>
-						<TableHead className="w-[140px]">Category</TableHead>
+						<TableHead className="w-[140px]">Pagador</TableHead>
+						<TableHead className="w-[140px]">Categoria</TableHead>
 						<TableHead className="w-[140px]">Conta/Cartão</TableHead>
 						<TableHead className="w-[80px]">Ações</TableHead>
 					</TableRow>
@@ -34,45 +34,45 @@ export function TransactionsTableSkeleton() {
 					{Array.from({ length: 8 }).map((_, i) => (
 						<TableRow key={i}>
 							<TableCell>
-								<Skeleton className="h-4 w-full rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-4 w-full rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-4 w-16 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-4 w-16 rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-6 w-20 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-6 w-20 rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-6 w-16 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-6 w-16 rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-6 w-20 rounded-2xl bg-foreground/10" />
+								<Skeleton className="h-6 w-20 rounded-md bg-foreground/10" />
 							</TableCell>
 							<TableCell>
 								<div className="flex items-center gap-2">
 									<Skeleton className="size-6 rounded-full bg-foreground/10" />
-									<Skeleton className="h-4 w-16 rounded-2xl bg-foreground/10" />
+									<Skeleton className="h-4 w-16 rounded-md bg-foreground/10" />
 								</div>
 							</TableCell>
 							<TableCell>
 								<div className="flex items-center gap-2">
-									<Skeleton className="size-4 rounded-2xl bg-foreground/10" />
-									<Skeleton className="h-4 w-16 rounded-2xl bg-foreground/10" />
+									<Skeleton className="size-4 rounded-md bg-foreground/10" />
+									<Skeleton className="h-4 w-16 rounded-md bg-foreground/10" />
 								</div>
 							</TableCell>
 							<TableCell>
 								<div className="flex items-center gap-2">
-									<Skeleton className="size-6 rounded-2xl bg-foreground/10" />
-									<Skeleton className="h-4 w-20 rounded-2xl bg-foreground/10" />
+									<Skeleton className="size-6 rounded-md bg-foreground/10" />
+									<Skeleton className="h-4 w-20 rounded-md bg-foreground/10" />
 								</div>
 							</TableCell>
 							<TableCell>
 								<div className="flex gap-1">
-									<Skeleton className="size-8 rounded-2xl bg-foreground/10" />
-									<Skeleton className="size-8 rounded-2xl bg-foreground/10" />
+									<Skeleton className="size-8 rounded-md bg-foreground/10" />
+									<Skeleton className="size-8 rounded-md bg-foreground/10" />
 								</div>
 							</TableCell>
 						</TableRow>
