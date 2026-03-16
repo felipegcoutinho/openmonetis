@@ -44,7 +44,7 @@ export function PayerSection({
 					>
 						<SelectTrigger
 							id="payer"
-							className={formState.isSplit ? "w-[55%]" : "w-full"}
+							className={formState.isSplit ? "min-w-0 flex-1" : "w-full"}
 						>
 							<SelectValue placeholder="Selecione">
 								{formState.payerId &&

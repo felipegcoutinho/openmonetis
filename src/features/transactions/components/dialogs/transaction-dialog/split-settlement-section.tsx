@@ -21,7 +21,7 @@ export function SplitAndSettlementSection({
 					<div>
 						<p className="text-sm text-foreground">Dividir lançamento</p>
 						<p className="text-xs text-muted-foreground">
-							Selecione para atribuir parte do valor a outro pagador.
+							Atribuir parte do valor a outro pagador.
 						</p>
 					</div>
 					<Checkbox
@@ -40,7 +40,7 @@ export function SplitAndSettlementSection({
 						<div>
 							<p className="text-sm text-foreground">Marcar como pago</p>
 							<p className="text-xs text-muted-foreground">
-								Indica que o lançamento já foi pago ou recebido.
+								Indica que o valor já foi pago.
 							</p>
 						</div>
 						<Checkbox

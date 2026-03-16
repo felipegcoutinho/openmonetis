@@ -44,7 +44,7 @@ function InlinePeriodPicker({
 				<PopoverTrigger asChild>
 					<button
 						type="button"
-						className="text-xs text-primary underline-offset-2 hover:underline cursor-pointer lowercase"
+						className="cursor-pointer text-xs text-primary underline-offset-2 hover:underline lowercase"
 					>
 						{displayPeriod(period)}
 					</button>
@@ -82,7 +82,6 @@ export function PaymentMethodSection({
 		"Transferência bancária",
 	].includes(formState.paymentMethod);
 
-	// Filtrar contas apenas do tipo "Pré-Pago | VR/VA" quando forma de pagamento for "Pré-Pago | VR/VA"
 	const filteredContaOptions =
 		formState.paymentMethod === "Pré-Pago | VR/VA"
 			? accountOptions.filter(
@@ -90,270 +89,159 @@ export function PaymentMethodSection({
 				)
 			: accountOptions;
 
+	const hasSecondaryColumn = isCartaoSelected || showContaSelect;
+
 	return (
-		<>
+		<div className="flex w-full flex-col gap-2 md:flex-row">
 			{!isUpdateMode ? (
-				<div className="flex w-full flex-col gap-2 md:flex-row">
-					<div
-						className={cn(
-							"space-y-1 w-full",
-							isCartaoSelected || showContaSelect ? "md:w-1/2" : "md:w-full",
-						)}
+				<div
+					className={cn(
+						"w-full space-y-1",
+						hasSecondaryColumn ? "md:w-1/2" : "md:w-full",
+					)}
+				>
+					<Label htmlFor="paymentMethod">Forma de pagamento</Label>
+					<Select
+						value={formState.paymentMethod}
+						onValueChange={(value) => onFieldChange("paymentMethod", value)}
+						disabled={disablePaymentMethod}
 					>
-						<Label htmlFor="paymentMethod">Forma de pagamento</Label>
-						<Select
-							value={formState.paymentMethod}
-							onValueChange={(value) => onFieldChange("paymentMethod", value)}
+						<SelectTrigger
+							id="paymentMethod"
+							className="w-full"
 							disabled={disablePaymentMethod}
 						>
-							<SelectTrigger
-								id="paymentMethod"
-								className="w-full"
-								disabled={disablePaymentMethod}
-							>
-								<SelectValue placeholder="Selecione" className="w-full">
-									{formState.paymentMethod && (
-										<PaymentMethodSelectContent
-											label={formState.paymentMethod}
+							<SelectValue placeholder="Selecione" className="w-full">
+								{formState.paymentMethod && (
+									<PaymentMethodSelectContent label={formState.paymentMethod} />
+								)}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							{PAYMENT_METHODS.map((method) => (
+								<SelectItem key={method} value={method}>
+									<PaymentMethodSelectContent label={method} />
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+			) : null}
+
+			{isCartaoSelected ? (
+				<div
+					className={cn(
+						"w-full space-y-1",
+						!isUpdateMode ? "md:w-1/2" : "md:w-full",
+					)}
+				>
+					<Label htmlFor="cartao">Cartão</Label>
+					<Select
+						value={formState.cardId}
+						onValueChange={(value) => onFieldChange("cardId", value)}
+						disabled={disableCardSelect}
+					>
+						<SelectTrigger
+							id="cartao"
+							className="w-full"
+							disabled={disableCardSelect}
+						>
+							<SelectValue placeholder="Selecione">
+								{formState.cardId &&
+									(() => {
+										const selectedOption = cardOptions.find(
+											(opt) => opt.value === formState.cardId,
+										);
+										return selectedOption ? (
+											<AccountCardSelectContent
+												label={selectedOption.label}
+												logo={selectedOption.logo}
+												isCartao={true}
+											/>
+										) : null;
+									})()}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							{cardOptions.length === 0 ? (
+								<div className="px-2 py-6 text-center">
+									<p className="text-sm text-muted-foreground">
+										Nenhum cartão cadastrado
+									</p>
+								</div>
+							) : (
+								cardOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										<AccountCardSelectContent
+											label={option.label}
+											logo={option.logo}
+											isCartao={true}
 										/>
-									)}
-								</SelectValue>
-							</SelectTrigger>
-							<SelectContent>
-								{PAYMENT_METHODS.map((method) => (
-									<SelectItem key={method} value={method}>
-										<PaymentMethodSelectContent label={method} />
 									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
-					{isCartaoSelected ? (
-						<div className="space-y-1 w-full md:w-1/2">
-							<Label htmlFor="cartao">Cartão</Label>
-							<Select
-								value={formState.cardId}
-								onValueChange={(value) => onFieldChange("cardId", value)}
-								disabled={disableCardSelect}
-							>
-								<SelectTrigger
-									id="cartao"
-									className="w-full"
-									disabled={disableCardSelect}
-								>
-									<SelectValue placeholder="Selecione">
-										{formState.cardId &&
-											(() => {
-												const selectedOption = cardOptions.find(
-													(opt) => opt.value === formState.cardId,
-												);
-												return selectedOption ? (
-													<AccountCardSelectContent
-														label={selectedOption.label}
-														logo={selectedOption.logo}
-														isCartao={true}
-													/>
-												) : null;
-											})()}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{cardOptions.length === 0 ? (
-										<div className="px-2 py-6 text-center">
-											<p className="text-sm text-muted-foreground">
-												Nenhum cartão cadastrado
-											</p>
-										</div>
-									) : (
-										cardOptions.map((option) => (
-											<SelectItem key={option.value} value={option.value}>
-												<AccountCardSelectContent
-													label={option.label}
-													logo={option.logo}
-													isCartao={true}
-												/>
-											</SelectItem>
-										))
-									)}
-								</SelectContent>
-							</Select>
-							{formState.cardId ? (
-								<InlinePeriodPicker
-									period={formState.period}
-									onPeriodChange={(value) => onFieldChange("period", value)}
-								/>
-							) : null}
-						</div>
-					) : null}
-
-					{!isCartaoSelected && showContaSelect ? (
-						<div
-							className={cn(
-								"space-y-1 w-full",
-								!isUpdateMode ? "md:w-1/2" : "md:w-full",
+								))
 							)}
-						>
-							<Label htmlFor="conta">Conta</Label>
-							<Select
-								value={formState.accountId}
-								onValueChange={(value) => onFieldChange("accountId", value)}
-							>
-								<SelectTrigger id="conta" className="w-full">
-									<SelectValue placeholder="Selecione">
-										{formState.accountId &&
-											(() => {
-												const selectedOption = filteredContaOptions.find(
-													(opt) => opt.value === formState.accountId,
-												);
-												return selectedOption ? (
-													<AccountCardSelectContent
-														label={selectedOption.label}
-														logo={selectedOption.logo}
-														isCartao={false}
-													/>
-												) : null;
-											})()}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{filteredContaOptions.length === 0 ? (
-										<div className="px-2 py-6 text-center">
-											<p className="text-sm text-muted-foreground">
-												Nenhuma conta cadastrada
-											</p>
-										</div>
-									) : (
-										filteredContaOptions.map((option) => (
-											<SelectItem key={option.value} value={option.value}>
-												<AccountCardSelectContent
-													label={option.label}
-													logo={option.logo}
-													isCartao={false}
-												/>
-											</SelectItem>
-										))
-									)}
-								</SelectContent>
-							</Select>
-						</div>
+						</SelectContent>
+					</Select>
+					{formState.cardId ? (
+						<InlinePeriodPicker
+							period={formState.period}
+							onPeriodChange={(value) => onFieldChange("period", value)}
+						/>
 					) : null}
 				</div>
 			) : null}
 
-			{isUpdateMode ? (
-				<div className="flex w-full flex-col gap-2 md:flex-row">
-					{isCartaoSelected ? (
-						<div
-							className={cn(
-								"space-y-1 w-full",
-								!isUpdateMode ? "md:w-1/2" : "md:w-full",
+			{!isCartaoSelected && showContaSelect ? (
+				<div
+					className={cn(
+						"w-full space-y-1",
+						!isUpdateMode ? "md:w-1/2" : "md:w-full",
+					)}
+				>
+					<Label htmlFor="conta">Conta</Label>
+					<Select
+						value={formState.accountId}
+						onValueChange={(value) => onFieldChange("accountId", value)}
+					>
+						<SelectTrigger id="conta" className="w-full">
+							<SelectValue placeholder="Selecione">
+								{formState.accountId &&
+									(() => {
+										const selectedOption = filteredContaOptions.find(
+											(opt) => opt.value === formState.accountId,
+										);
+										return selectedOption ? (
+											<AccountCardSelectContent
+												label={selectedOption.label}
+												logo={selectedOption.logo}
+												isCartao={false}
+											/>
+										) : null;
+									})()}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							{filteredContaOptions.length === 0 ? (
+								<div className="px-2 py-6 text-center">
+									<p className="text-sm text-muted-foreground">
+										Nenhuma conta cadastrada
+									</p>
+								</div>
+							) : (
+								filteredContaOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										<AccountCardSelectContent
+											label={option.label}
+											logo={option.logo}
+											isCartao={false}
+										/>
+									</SelectItem>
+								))
 							)}
-						>
-							<Label htmlFor="cartaoUpdate">Cartão</Label>
-							<Select
-								value={formState.cardId}
-								onValueChange={(value) => onFieldChange("cardId", value)}
-							>
-								<SelectTrigger id="cartaoUpdate" className="w-full">
-									<SelectValue placeholder="Selecione">
-										{formState.cardId &&
-											(() => {
-												const selectedOption = cardOptions.find(
-													(opt) => opt.value === formState.cardId,
-												);
-												return selectedOption ? (
-													<AccountCardSelectContent
-														label={selectedOption.label}
-														logo={selectedOption.logo}
-														isCartao={true}
-													/>
-												) : null;
-											})()}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{cardOptions.length === 0 ? (
-										<div className="px-2 py-6 text-center">
-											<p className="text-sm text-muted-foreground">
-												Nenhum cartão cadastrado
-											</p>
-										</div>
-									) : (
-										cardOptions.map((option) => (
-											<SelectItem key={option.value} value={option.value}>
-												<AccountCardSelectContent
-													label={option.label}
-													logo={option.logo}
-													isCartao={true}
-												/>
-											</SelectItem>
-										))
-									)}
-								</SelectContent>
-							</Select>
-							{formState.cardId ? (
-								<InlinePeriodPicker
-									period={formState.period}
-									onPeriodChange={(value) => onFieldChange("period", value)}
-								/>
-							) : null}
-						</div>
-					) : null}
-
-					{!isCartaoSelected && showContaSelect ? (
-						<div
-							className={cn(
-								"space-y-1 w-full",
-								!isUpdateMode ? "md:w-1/2" : "md:w-full",
-							)}
-						>
-							<Label htmlFor="contaUpdate">Conta</Label>
-							<Select
-								value={formState.accountId}
-								onValueChange={(value) => onFieldChange("accountId", value)}
-							>
-								<SelectTrigger id="contaUpdate" className="w-full">
-									<SelectValue placeholder="Selecione">
-										{formState.accountId &&
-											(() => {
-												const selectedOption = filteredContaOptions.find(
-													(opt) => opt.value === formState.accountId,
-												);
-												return selectedOption ? (
-													<AccountCardSelectContent
-														label={selectedOption.label}
-														logo={selectedOption.logo}
-														isCartao={false}
-													/>
-												) : null;
-											})()}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{filteredContaOptions.length === 0 ? (
-										<div className="px-2 py-6 text-center">
-											<p className="text-sm text-muted-foreground">
-												Nenhuma conta cadastrada
-											</p>
-										</div>
-									) : (
-										filteredContaOptions.map((option) => (
-											<SelectItem key={option.value} value={option.value}>
-												<AccountCardSelectContent
-													label={option.label}
-													logo={option.logo}
-													isCartao={false}
-												/>
-											</SelectItem>
-										))
-									)}
-								</SelectContent>
-							</Select>
-						</div>
-					) : null}
+						</SelectContent>
+					</Select>
 				</div>
 			) : null}
-		</>
+		</div>
 	);
 }

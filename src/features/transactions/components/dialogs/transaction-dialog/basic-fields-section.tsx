@@ -16,14 +16,14 @@ export function BasicFieldsSection({
 	return (
 		<div className="space-y-3">
 			<div className="space-y-1">
-				<Label htmlFor="name">Estabelecimento</Label>
+				<Label htmlFor="name">Descrição</Label>
 				<EstabelecimentoInput
 					id="name"
 					value={formState.name}
 					onChange={(value) => onFieldChange("name", value)}
 					estabelecimentos={estabelecimentos}
 					placeholder="Ex.: Restaurante do Zé"
-					maxLength={20}
+					maxLength={60}
 					required
 				/>
 			</div>

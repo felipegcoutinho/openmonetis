@@ -418,92 +418,92 @@ export function TransactionDialog({
 				</DialogHeader>
 
 				<form
-					className="space-y-3 -mx-6 max-h-[80vh] overflow-y-auto px-6 pb-1"
+					className="flex flex-col gap-0"
 					onSubmit={handleSubmit}
 					noValidate
 				>
-					<BasicFieldsSection
-						formState={formState}
-						onFieldChange={handleFieldChange}
-						estabelecimentos={estabelecimentos}
-					/>
+					<div className="space-y-3 -mx-6 max-h-[70vh] overflow-y-auto px-6 pb-1">
+						<BasicFieldsSection
+							formState={formState}
+							onFieldChange={handleFieldChange}
+							estabelecimentos={estabelecimentos}
+						/>
 
-					<CategorySection
-						formState={formState}
-						onFieldChange={handleFieldChange}
-						categoryOptions={categoryOptions}
-						categoryGroups={categoryGroups}
-						isUpdateMode={isUpdateMode}
-						hideTransactionType={
-							Boolean(isNewWithType) && !forceShowTransactionType
-						}
-					/>
+						<CategorySection
+							formState={formState}
+							onFieldChange={handleFieldChange}
+							categoryOptions={categoryOptions}
+							categoryGroups={categoryGroups}
+							isUpdateMode={isUpdateMode}
+							hideTransactionType={
+								Boolean(isNewWithType) && !forceShowTransactionType
+							}
+						/>
 
-					{!isUpdateMode ? (
 						<SplitAndSettlementSection
 							formState={formState}
 							onFieldChange={handleFieldChange}
 							showSettledToggle={showSettledToggle}
 						/>
-					) : null}
 
-					<PayerSection
-						formState={formState}
-						onFieldChange={handleFieldChange}
-						payerOptions={payerOptions}
-						secondaryPayerOptions={secondaryPayerOptions}
-						totalAmount={totalAmount}
-					/>
-
-					<PaymentMethodSection
-						formState={formState}
-						onFieldChange={handleFieldChange}
-						accountOptions={accountOptions}
-						cardOptions={cardOptions}
-						isUpdateMode={isUpdateMode}
-						disablePaymentMethod={disablePaymentMethod}
-						disableCardSelect={disableCardSelect}
-					/>
-
-					{showDueDate ? (
-						<BoletoFieldsSection
+						<PayerSection
 							formState={formState}
 							onFieldChange={handleFieldChange}
-							showPaymentDate={showPaymentDate}
+							payerOptions={payerOptions}
+							secondaryPayerOptions={secondaryPayerOptions}
+							totalAmount={totalAmount}
 						/>
-					) : null}
 
-					<Collapsible
-						defaultOpen={
-							formState.condition !== "À vista" || formState.note.length > 0
-						}
-					>
-						<CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer [&[data-state=open]>svg]:rotate-180 mt-4">
-							<RiArrowDropDownLine className="text-primary size-4 transition-transform duration-200" />
-							Condições e anotações
-						</CollapsibleTrigger>
-						<CollapsibleContent className="space-y-3 pt-3">
-							{!isUpdateMode ? (
-								<ConditionSection
-									formState={formState}
-									onFieldChange={handleFieldChange}
-									showInstallments={showInstallments}
-									showRecurrence={showRecurrence}
-								/>
-							) : null}
+						<PaymentMethodSection
+							formState={formState}
+							onFieldChange={handleFieldChange}
+							accountOptions={accountOptions}
+							cardOptions={cardOptions}
+							isUpdateMode={isUpdateMode}
+							disablePaymentMethod={disablePaymentMethod}
+							disableCardSelect={disableCardSelect}
+						/>
 
+						{showDueDate ? (
+							<BoletoFieldsSection
+								formState={formState}
+								onFieldChange={handleFieldChange}
+								showPaymentDate={showPaymentDate}
+							/>
+						) : null}
+
+						{isUpdateMode ? (
 							<NoteSection
 								formState={formState}
 								onFieldChange={handleFieldChange}
 							/>
-						</CollapsibleContent>
-					</Collapsible>
+						) : (
+							<Collapsible defaultOpen={formState.condition !== "À vista"}>
+								<CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer [&[data-state=open]>svg]:rotate-180 mt-4">
+									<RiArrowDropDownLine className="text-primary size-4 transition-transform duration-200" />
+									Condições e anotações
+								</CollapsibleTrigger>
+								<CollapsibleContent className="space-y-3 pt-3">
+									<ConditionSection
+										formState={formState}
+										onFieldChange={handleFieldChange}
+										showInstallments={showInstallments}
+										showRecurrence={showRecurrence}
+									/>
+									<NoteSection
+										formState={formState}
+										onFieldChange={handleFieldChange}
+									/>
+								</CollapsibleContent>
+							</Collapsible>
+						)}
+					</div>
 
 					{errorMessage ? (
-						<p className="text-sm text-destructive">{errorMessage}</p>
+						<p className="mt-3 text-sm text-destructive">{errorMessage}</p>
 					) : null}
 
-					<DialogFooter>
+					<DialogFooter className="mt-4">
 						<Button
 							type="button"
 							variant="outline"

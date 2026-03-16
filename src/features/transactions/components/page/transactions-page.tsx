@@ -506,6 +506,7 @@ export function TransactionsPage({
 					}
 				}}
 				transaction={detailsOpen ? selectedTransaction : null}
+				onEdit={handleEdit}
 			/>
 
 			<ConfirmActionDialog

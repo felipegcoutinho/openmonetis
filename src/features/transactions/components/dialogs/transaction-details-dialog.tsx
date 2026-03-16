@@ -7,17 +7,15 @@ import {
 	formatPeriod,
 } from "@/features/transactions/formatting-helpers";
 import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import {
-	CardContent,
-	CardDescription,
-	CardHeader,
-} from "@/shared/components/ui/card";
 import {
 	Dialog,
 	DialogClose,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
+	DialogHeader,
 	DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Separator } from "@/shared/components/ui/separator";
@@ -30,12 +28,14 @@ interface TransactionDetailsDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	transaction: TransactionItem | null;
+	onEdit?: (transaction: TransactionItem) => void;
 }
 
 export function TransactionDetailsDialog({
 	open,
 	onOpenChange,
 	transaction,
+	onEdit,
 }: TransactionDetailsDialogProps) {
 	if (!transaction) return null;
 
@@ -54,139 +54,163 @@ export function TransactionDetailsDialog({
 		? valorParcela * (totalParcelas - parcelaAtual)
 		: 0;
 
+	const isBoleto = transaction.paymentMethod === "Boleto";
+
+	const handleEdit = () => {
+		onOpenChange(false);
+		onEdit?.(transaction);
+	};
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 sm:max-w-xl sm:border-0 sm:p-2">
-				<div className="gap-2 space-y-4 py-4">
-					<CardHeader className="flex flex-row items-start border-b sm:border-b-0">
-						<div>
-							<DialogTitle className="group flex items-center gap-2 text-lg">
-								#{transaction.id}
-							</DialogTitle>
-							<CardDescription>
-								{formatDate(transaction.purchaseDate)}
-							</CardDescription>
-						</div>
-					</CardHeader>
+			<DialogContent className="sm:max-w-xl">
+				<DialogHeader>
+					<DialogTitle>{transaction.name}</DialogTitle>
+					<DialogDescription>
+						{formatDate(transaction.purchaseDate)}
+					</DialogDescription>
+				</DialogHeader>
 
-					<CardContent className="text-sm">
-						<div className="grid gap-3">
-							<ul className="grid gap-3">
-								<DetailRow label="Descrição" value={transaction.name} />
+				<div className="max-h-[60vh] overflow-y-auto text-sm">
+					<div className="grid gap-3">
+						<ul className="grid gap-3">
+							<DetailRow
+								label="Período"
+								value={formatPeriod(transaction.period)}
+							/>
 
-								<DetailRow
-									label="Período"
-									value={formatPeriod(transaction.period)}
+							<li className="flex items-center justify-between">
+								<span className="text-muted-foreground">
+									Forma de Pagamento
+								</span>
+								<span className="flex items-center gap-1.5">
+									{getPaymentMethodIcon(transaction.paymentMethod)}
+									<span>{transaction.paymentMethod}</span>
+								</span>
+							</li>
+
+							<DetailRow
+								label={transaction.cartaoName ? "Cartão" : "Conta"}
+								value={transaction.cartaoName ?? transaction.contaName ?? "—"}
+							/>
+
+							<DetailRow
+								label="Categoria"
+								value={transaction.categoriaName ?? "—"}
+							/>
+
+							<li className="flex items-center justify-between">
+								<span className="text-muted-foreground">Tipo de Transação</span>
+								<TransactionTypeBadge
+									kind={
+										transaction.categoriaName === "Saldo inicial"
+											? "Saldo inicial"
+											: transaction.transactionType
+									}
 								/>
+							</li>
 
+							<DetailRow
+								label="Condição"
+								value={formatCondition(transaction.condition)}
+							/>
+
+							<li className="flex items-center justify-between">
+								<span className="text-muted-foreground">Responsável</span>
+								<span>{transaction.pagadorName}</span>
+							</li>
+
+							<li className="flex items-center justify-between">
+								<span className="text-muted-foreground">Status</span>
+								<Badge
+									variant="secondary"
+									className={
+										transaction.isSettled
+											? "text-success bg-success/10"
+											: "text-muted-foreground"
+									}
+								>
+									{transaction.isSettled ? "Pago" : "Pendente"}
+								</Badge>
+							</li>
+
+							{isBoleto && transaction.dueDate && (
+								<DetailRow
+									label="Vencimento"
+									value={formatDate(transaction.dueDate)}
+								/>
+							)}
+
+							{transaction.isDivided && (
 								<li className="flex items-center justify-between">
-									<span className="text-muted-foreground">
-										Forma de Pagamento
-									</span>
-									<span className="flex items-center gap-1.5">
-										{getPaymentMethodIcon(transaction.paymentMethod)}
-										<span className="capitalize">
-											{transaction.paymentMethod}
-										</span>
-									</span>
+									<span className="text-muted-foreground">Divisão</span>
+									<Badge variant="outline">Dividido</Badge>
 								</li>
+							)}
 
-								<DetailRow
-									label={transaction.cartaoName ? "Cartão" : "Conta"}
-									value={transaction.cartaoName ?? transaction.contaName ?? "—"}
-								/>
+							{transaction.note && (
+								<li className="flex flex-col gap-1">
+									<span className="text-muted-foreground">Notas</span>
+									<span className="text-foreground">{transaction.note}</span>
+								</li>
+							)}
+						</ul>
 
-								<DetailRow
-									label="Categoria"
-									value={transaction.categoriaName ?? "—"}
-								/>
-
-								<li className="flex items-center justify-between">
-									<span className="text-muted-foreground">
-										Tipo de Transação
-									</span>
-									<TransactionTypeBadge
-										kind={
-											transaction.categoriaName === "Saldo inicial"
-												? "Saldo inicial"
-												: transaction.transactionType
-										}
+						<ul className="mb-2 grid gap-3">
+							{isInstallment && (
+								<li className="mt-4">
+									<InstallmentTimeline
+										purchaseDate={parseLocalDateString(
+											transaction.purchaseDate,
+										)}
+										currentInstallment={parcelaAtual}
+										totalInstallments={totalParcelas}
+										period={transaction.period}
 									/>
 								</li>
+							)}
 
+							<DetailRow
+								label={isInstallment ? "Valor da Parcela" : "Valor"}
+								value={currencyFormatter.format(valorParcela)}
+							/>
+
+							{isInstallment && (
 								<DetailRow
-									label="Condição"
-									value={formatCondition(transaction.condition)}
+									label="Valor Restante"
+									value={currencyFormatter.format(valorRestante)}
 								/>
+							)}
 
-								<li className="flex items-center justify-between">
-									<span className="text-muted-foreground">Responsável</span>
-									<span className="flex items-center gap-2 capitalize">
-										<span>{transaction.pagadorName}</span>
-									</span>
-								</li>
-
+							{transaction.recurrenceCount && (
 								<DetailRow
-									label="Status"
-									value={transaction.isSettled ? "Pago" : "Pendente"}
+									label="Quantidade de Recorrências"
+									value={`${transaction.recurrenceCount} meses`}
 								/>
+							)}
 
-								{transaction.note && (
-									<DetailRow label="Notas" value={transaction.note} />
-								)}
-							</ul>
+							{!isInstallment && <Separator className="my-2" />}
 
-							<ul className="mb-6 grid gap-3">
-								{isInstallment && (
-									<li className="mt-4">
-										<InstallmentTimeline
-											purchaseDate={parseLocalDateString(
-												transaction.purchaseDate,
-											)}
-											currentInstallment={parcelaAtual}
-											totalInstallments={totalParcelas}
-											period={transaction.period}
-										/>
-									</li>
-								)}
-
-								<DetailRow
-									label={isInstallment ? "Valor da Parcela" : "Valor"}
-									value={currencyFormatter.format(valorParcela)}
-								/>
-
-								{isInstallment && (
-									<DetailRow
-										label="Valor Restante"
-										value={currencyFormatter.format(valorRestante)}
-									/>
-								)}
-
-								{transaction.recurrenceCount && (
-									<DetailRow
-										label="Quantidade de Recorrências"
-										value={`${transaction.recurrenceCount} meses`}
-									/>
-								)}
-
-								{!isInstallment && <Separator className="my-2" />}
-
-								<li className="flex items-center justify-between font-semibold">
-									<span className="text-muted-foreground">Total da Compra</span>
-									<span className="text-lg">
-										{currencyFormatter.format(valorTotal)}
-									</span>
-								</li>
-							</ul>
-						</div>
-
-						<DialogFooter>
-							<DialogClose asChild>
-								<Button type="button">Entendi</Button>
-							</DialogClose>
-						</DialogFooter>
-					</CardContent>
+							<li className="flex items-center justify-between font-semibold">
+								<span className="text-muted-foreground">Total da Compra</span>
+								<span className="text-lg">
+									{currencyFormatter.format(valorTotal)}
+								</span>
+							</li>
+						</ul>
+					</div>
 				</div>
+
+				<DialogFooter>
+					{onEdit && !transaction.readonly && (
+						<Button variant="outline" onClick={handleEdit}>
+							Editar
+						</Button>
+					)}
+					<DialogClose asChild>
+						<Button type="button">Fechar</Button>
+					</DialogClose>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
@@ -201,7 +225,7 @@ function DetailRow({ label, value }: DetailRowProps) {
 	return (
 		<li className="flex items-center justify-between">
 			<span className="text-muted-foreground">{label}</span>
-			<span className="capitalize">{value}</span>
+			<span>{value}</span>
 		</li>
 	);
 }
