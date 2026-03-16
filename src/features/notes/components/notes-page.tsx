@@ -1,7 +1,7 @@
 "use client";
 
 import { RiAddFill, RiTodoLine } from "@remixicon/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { archiveNoteAction, deleteNoteAction } from "@/features/notes/actions";
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
@@ -36,22 +36,8 @@ export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
 	const [arquivarOpen, setArquivarOpen] = useState(false);
 	const [noteToArquivar, setNoteToArquivar] = useState<Note | null>(null);
 
-	const sortedNotes = useMemo(
-		() =>
-			[...notes].sort(
-				(a, b) =>
-					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-			),
-		[notes],
-	);
-	const sortedArchivedNotes = useMemo(
-		() =>
-			[...archivedNotes].sort(
-				(a, b) =>
-					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-			),
-		[archivedNotes],
-	);
+	const sortedNotes = notes;
+	const sortedArchivedNotes = archivedNotes;
 
 	const isArquivadas = activeTab === "arquivadas";
 
@@ -242,6 +228,7 @@ export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
 				note={noteDetails}
 				open={detailsOpen}
 				onOpenChange={handleDetailsOpenChange}
+				onEdit={handleEditRequest}
 			/>
 
 			<ConfirmActionDialog

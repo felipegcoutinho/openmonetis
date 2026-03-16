@@ -8,7 +8,10 @@ import {
 	RiInboxUnarchiveLine,
 	RiPencilLine,
 } from "@remixicon/react";
-import { buildNoteDisplayTitle } from "@/features/notes/lib/formatters";
+import {
+	buildNoteDisplayTitle,
+	formatNoteCreatedAt,
+} from "@/features/notes/lib/formatters";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
 import { type Note, sortTasksByStatus } from "./types";
@@ -31,6 +34,7 @@ export function NoteCard({
 	isArquivadas = false,
 }: NoteCardProps) {
 	const displayTitle = buildNoteDisplayTitle(note.title);
+	const createdAtLabel = formatNoteCreatedAt(note.createdAt);
 	const isTask = note.type === "tarefa";
 	const tasks = note.tasks || [];
 	const sortedTasks = sortTasksByStatus(tasks);
@@ -39,46 +43,51 @@ export function NoteCard({
 
 	const actions = [
 		{
-			label: "editar",
+			label: "Editar",
 			icon: <RiPencilLine className="size-4" aria-hidden />,
 			onClick: onEdit,
-			variant: "default" as const,
+			destructive: false,
 		},
 		{
-			label: "detalhes",
+			label: "Detalhes",
 			icon: <RiFileList2Line className="size-4" aria-hidden />,
 			onClick: onDetails,
-			variant: "default" as const,
+			destructive: false,
 		},
 		{
-			label: isArquivadas ? "desarquivar" : "arquivar",
+			label: isArquivadas ? "Desarquivar" : "Arquivar",
 			icon: isArquivadas ? (
 				<RiInboxUnarchiveLine className="size-4" aria-hidden />
 			) : (
 				<RiArchiveLine className="size-4" aria-hidden />
 			),
 			onClick: onArquivar,
-			variant: "default" as const,
+			destructive: false,
 		},
 		{
-			label: "remover",
+			label: "Remover",
 			icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
 			onClick: onRemove,
-			variant: "destructive" as const,
+			destructive: true,
 		},
 	].filter((action) => typeof action.onClick === "function");
 
 	return (
-		<Card className="flex h-[300px] w-full flex-col gap-0">
+		<Card className="flex h-[340px] w-full flex-col gap-0">
 			<CardContent className="flex min-h-0 flex-1 flex-col gap-4">
 				<div className="flex shrink-0 items-start justify-between gap-3">
-					<div className="flex flex-col gap-2">
+					<div className="flex min-w-0 flex-col gap-1">
 						<h3 className="text-lg font-semibold leading-tight text-foreground wrap-break-word">
 							{displayTitle}
 						</h3>
+						{createdAtLabel && (
+							<span className="text-xs text-muted-foreground">
+								{createdAtLabel}
+							</span>
+						)}
 					</div>
 					{isTask && (
-						<Badge variant="outline" className="text-xs">
+						<Badge variant="outline" className="shrink-0 text-xs">
 							{completedCount}/{totalCount} concluídas
 						</Badge>
 					)}
@@ -112,7 +121,7 @@ export function NoteCard({
 						))}
 						{tasks.length > 5 && (
 							<p className="text-xs text-muted-foreground pl-5 py-1">
-								+{tasks.length - 5}
+								+{tasks.length - 5}{" "}
 								{tasks.length - 5 === 1 ? "tarefa" : "tarefas"}...
 							</p>
 						)}
@@ -126,14 +135,12 @@ export function NoteCard({
 
 			{actions.length > 0 ? (
 				<CardFooter className="flex shrink-0 flex-wrap gap-3 px-6 pt-3 text-sm">
-					{actions.map(({ label, icon, onClick, variant }) => (
+					{actions.map(({ label, icon, onClick, destructive }) => (
 						<button
 							key={label}
 							type="button"
 							onClick={() => onClick?.(note)}
-							className={`flex items-center gap-1 font-medium transition-opacity hover:opacity-80 ${
-								variant === "destructive" ? "text-destructive" : "text-primary"
-							}`}
+							className={`flex items-center gap-1 font-medium transition-opacity hover:opacity-80 ${destructive ? "text-destructive" : "text-primary"}`}
 							aria-label={`${label} anotação`}
 						>
 							{icon}

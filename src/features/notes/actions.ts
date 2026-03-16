@@ -189,7 +189,7 @@ export async function archiveNoteAction(
 		return {
 			success: true,
 			message: data.archived
-				? "Anotação archived com sucesso."
+				? "Anotação arquivada com sucesso."
 				: "Anotação desarquivada com sucesso.",
 		};
 	} catch (error) {

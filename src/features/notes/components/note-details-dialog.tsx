@@ -7,7 +7,6 @@ import {
 } from "@/features/notes/lib/formatters";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import { Card } from "@/shared/components/ui/card";
 import {
 	Dialog,
 	DialogClose,
@@ -23,12 +22,14 @@ interface NoteDetailsDialogProps {
 	note: Note | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onEdit?: (note: Note) => void;
 }
 
 export function NoteDetailsDialog({
 	note,
 	open,
 	onOpenChange,
+	onEdit,
 }: NoteDetailsDialogProps) {
 	if (!note) {
 		return null;
@@ -58,14 +59,14 @@ export function NoteDetailsDialog({
 				</DialogHeader>
 
 				{isTask ? (
-					<Card className="max-h-[320px] overflow-auto gap-2 p-2">
+					<div className="max-h-[320px] overflow-auto rounded-md border p-1">
 						{sortedTasks.map((task) => (
 							<div
 								key={task.id}
-								className="flex items-center gap-3 px-3 py-1.5 space-y-1 rounded-md hover:bg-muted/50"
+								className="flex items-center gap-3 rounded-md px-3 py-1.5"
 							>
 								<div
-									className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
+									className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
 										task.completed
 											? "bg-success border-success"
 											: "border-input"
@@ -86,7 +87,7 @@ export function NoteDetailsDialog({
 								</span>
 							</div>
 						))}
-					</Card>
+					</div>
 				) : (
 					<div className="max-h-[320px] overflow-auto whitespace-pre-line wrap-break-word text-sm text-foreground">
 						{note.description}
@@ -94,6 +95,18 @@ export function NoteDetailsDialog({
 				)}
 
 				<DialogFooter>
+					{onEdit && (
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => {
+								onOpenChange(false);
+								onEdit(note);
+							}}
+						>
+							Editar
+						</Button>
+					)}
 					<DialogClose asChild>
 						<Button type="button" variant="outline">
 							Fechar

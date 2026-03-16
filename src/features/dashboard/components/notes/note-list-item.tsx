@@ -23,7 +23,7 @@ export function NoteListItem({
 	const createdAtLabel = formatNoteCreatedAt(note.createdAt);
 
 	return (
-		<div className="flex items-center justify-between gap-2 transition-all duration-300 py-2">
+		<div className="group flex items-center justify-between gap-2 transition-all duration-300 py-2">
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-sm font-medium text-foreground">
 					{displayTitle}
@@ -44,7 +44,7 @@ export function NoteListItem({
 				<Button
 					variant="outline"
 					size="icon-sm"
-					className="text-muted-foreground hover:text-foreground"
+					className="opacity-30 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
 					onClick={() => onOpenEdit(note)}
 					aria-label={`Editar anotação ${displayTitle}`}
 				>
@@ -53,7 +53,7 @@ export function NoteListItem({
 				<Button
 					variant="outline"
 					size="icon-sm"
-					className="text-muted-foreground hover:text-foreground"
+					className="opacity-30 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
 					onClick={() => onOpenDetails(note)}
 					aria-label={`Ver detalhes da anotação ${displayTitle}`}
 				>

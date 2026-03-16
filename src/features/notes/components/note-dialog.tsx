@@ -24,10 +24,10 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { useControlledState } from "@/shared/hooks/use-controlled-state";
 import { useFormState } from "@/shared/hooks/use-form-state";
+import { cn } from "@/shared/utils/ui";
 import {
 	type Note,
 	type NoteFormValues,
@@ -98,7 +98,9 @@ export function NoteDialog({
 	const description =
 		mode === "create"
 			? "Crie uma nota simples ou uma lista de tarefas."
-			: "Altere o conteúdo desta anotação.";
+			: note?.type === "tarefa"
+				? "Editando lista de tarefas."
+				: "Editando nota.";
 	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const titleCount = formState.title.length;
@@ -231,6 +233,7 @@ export function NoteDialog({
 				</DialogHeader>
 
 				<form
+					id="note-form"
 					className="space-y-3 -mx-6 max-h-[80vh] overflow-y-auto px-6 pb-1"
 					onSubmit={handleSubmit}
 					onKeyDown={handleKeyDown}
@@ -239,38 +242,51 @@ export function NoteDialog({
 					{mode === "create" && (
 						<div className="space-y-1">
 							<Label>Tipo de anotação</Label>
-							<RadioGroup
-								value={formState.type}
-								onValueChange={(value) =>
-									updateField("type", value as "nota" | "tarefa")
-								}
-								disabled={isPending}
-								className="flex gap-4"
-							>
-								<div className="flex items-center gap-2">
-									<RadioGroupItem value="nota" id="tipo-nota" />
-									<Label
-										htmlFor="tipo-nota"
-										className="font-normal cursor-pointer"
-									>
-										Nota
-									</Label>
-								</div>
-								<div className="flex items-center gap-2">
-									<RadioGroupItem value="tarefa" id="tipo-tarefa" />
-									<Label
-										htmlFor="tipo-tarefa"
-										className="font-normal cursor-pointer"
-									>
-										Tarefas
-									</Label>
-								</div>
-							</RadioGroup>
+							<div className="grid grid-cols-2 overflow-hidden rounded-md border">
+								<button
+									type="button"
+									onClick={() => updateField("type", "nota")}
+									disabled={isPending}
+									className={cn(
+										"py-1.5 text-sm transition-colors",
+										formState.type === "nota"
+											? "bg-primary text-primary-foreground"
+											: "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+									)}
+								>
+									Nota
+								</button>
+								<button
+									type="button"
+									onClick={() => updateField("type", "tarefa")}
+									disabled={isPending}
+									className={cn(
+										"border-l py-1.5 text-sm transition-colors",
+										formState.type === "tarefa"
+											? "bg-primary text-primary-foreground"
+											: "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+									)}
+								>
+									Tarefas
+								</button>
+							</div>
 						</div>
 					)}
 
 					<div className="space-y-1">
-						<Label htmlFor="note-title">Título</Label>
+						<div className="flex items-center justify-between">
+							<Label htmlFor="note-title">Título</Label>
+							<span
+								className={cn(
+									"text-xs",
+									titleCount > MAX_TITLE
+										? "text-destructive"
+										: "text-muted-foreground",
+								)}
+							>
+								{titleCount}/{MAX_TITLE}
+							</span>
+						</div>
 						<Input
 							id="note-title"
 							ref={titleRef}
@@ -279,7 +295,7 @@ export function NoteDialog({
 							placeholder={
 								isNote ? "Ex.: Revisar metas do mês" : "Ex.: Tarefas da semana"
 							}
-							maxLength={MAX_TITLE}
+							maxLength={MAX_TITLE + 10}
 							disabled={isPending}
 							required
 						/>
@@ -287,7 +303,19 @@ export function NoteDialog({
 
 					{isNote && (
 						<div className="space-y-1">
-							<Label htmlFor="note-description">Conteúdo</Label>
+							<div className="flex items-center justify-between">
+								<Label htmlFor="note-description">Conteúdo</Label>
+								<span
+									className={cn(
+										"text-xs",
+										descCount > MAX_DESC
+											? "text-destructive"
+											: "text-muted-foreground",
+									)}
+								>
+									{descCount}/{MAX_DESC}
+								</span>
+							</div>
 							<Textarea
 								id="note-description"
 								className="field-sizing-fixed"
@@ -296,10 +324,13 @@ export function NoteDialog({
 								onChange={(e) => updateField("description", e.target.value)}
 								placeholder="Detalhe sua anotação..."
 								rows={5}
-								maxLength={MAX_DESC}
+								maxLength={MAX_DESC + 10}
 								disabled={isPending}
 								required
 							/>
+							<p className="text-xs text-muted-foreground">
+								Ctrl+Enter para salvar
+							</p>
 						</div>
 					)}
 
@@ -327,19 +358,20 @@ export function NoteDialog({
 										variant="outline"
 										onClick={handleAddTask}
 										disabled={isPending || !normalize(newTaskText)}
-										className="shrink-0"
+										className="shrink-0 gap-1.5"
 									>
 										<RiAddCircleFill className="h-4 w-4" />
+										Adicionar
 									</Button>
 								</div>
 							</div>
 
 							{sortedTasks.length > 0 && (
-								<div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 mt-4 rounded-md p-2 bg-card ">
+								<div className="mt-4 max-h-[300px] space-y-1 overflow-y-auto rounded-md bg-card p-2 pr-1">
 									{sortedTasks.map((task) => (
 										<div
 											key={task.id}
-											className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-muted/50"
+											className="flex items-center gap-3 rounded-md px-3 py-1.5 hover:bg-muted/50"
 										>
 											<Checkbox
 												className="data-[state=checked]:bg-success data-[state=checked]:border-success"
@@ -351,11 +383,12 @@ export function NoteDialog({
 												}`}
 											/>
 											<span
-												className={`flex-1 text-sm wrap-break-word ${
+												className={cn(
+													"flex-1 text-sm wrap-break-word",
 													task.completed
 														? "text-muted-foreground line-through"
-														: "text-foreground"
-												}`}
+														: "text-foreground",
+												)}
 											>
 												{task.text}
 											</span>
@@ -391,19 +424,7 @@ export function NoteDialog({
 					>
 						Cancelar
 					</Button>
-					<Button
-						type="submit"
-						disabled={disableSubmit}
-						onClick={(e) => {
-							const form = (
-								e.currentTarget.closest("[role=dialog]") as HTMLElement
-							)?.querySelector("form");
-							if (form) {
-								e.preventDefault();
-								form.requestSubmit();
-							}
-						}}
-					>
+					<Button type="submit" form="note-form" disabled={disableSubmit}>
 						{isPending ? "Salvando..." : submitLabel}
 					</Button>
 				</DialogFooter>
