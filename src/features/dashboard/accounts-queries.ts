@@ -1,8 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
-import { financialAccounts, payers, transactions } from "@/db/schema";
+import { financialAccounts, transactions } from "@/db/schema";
 import { INITIAL_BALANCE_NOTE } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
 
 type RawDashboardAccount = {
@@ -34,6 +34,8 @@ export type DashboardAccountsSnapshot = {
 export async function fetchDashboardAccounts(
 	userId: string,
 ): Promise<DashboardAccountsSnapshot> {
+	const adminPayerId = await getAdminPayerId(userId);
+
 	const rows = await db
 		.select({
 			id: financialAccounts.id,
@@ -62,15 +64,12 @@ export async function fetchDashboardAccounts(
 				eq(transactions.accountId, financialAccounts.id),
 				eq(transactions.userId, userId),
 				eq(transactions.isSettled, true),
+				adminPayerId
+					? eq(transactions.payerId, adminPayerId)
+					: sql`false`,
 			),
 		)
-		.leftJoin(payers, eq(transactions.payerId, payers.id))
-		.where(
-			and(
-				eq(financialAccounts.userId, userId),
-				sql`(${transactions.id} IS NULL OR ${payers.role} = ${PAYER_ROLE_ADMIN})`,
-			),
-		)
+		.where(eq(financialAccounts.userId, userId))
 		.groupBy(
 			financialAccounts.id,
 			financialAccounts.name,

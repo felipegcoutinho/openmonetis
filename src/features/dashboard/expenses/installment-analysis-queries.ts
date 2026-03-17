@@ -1,11 +1,11 @@
 import { and, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
-import { cards, payers, transactions } from "@/db/schema";
+import { cards, transactions } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import {
 	buildDateOnlyStringFromPeriodDay,
 	parseLocalDateString,
@@ -65,6 +65,12 @@ export type InstallmentAnalysisData = {
 export async function fetchInstallmentAnalysis(
 	userId: string,
 ): Promise<InstallmentAnalysisData> {
+	const adminPayerId = await getAdminPayerId(userId);
+
+	if (!adminPayerId) {
+		return { installmentGroups: [], totalPendingInstallments: 0 };
+	}
+
 	// 1. Buscar todos os lançamentos parcelados não antecipados do pagador admin
 	const installmentRows = await db
 		.select({
@@ -87,15 +93,14 @@ export async function fetchInstallmentAnalysis(
 		})
 		.from(transactions)
 		.leftJoin(cards, eq(transactions.cardId, cards.id))
-		.leftJoin(payers, eq(transactions.payerId, payers.id))
 		.where(
 			and(
 				eq(transactions.userId, userId),
+				eq(transactions.payerId, adminPayerId),
 				eq(transactions.transactionType, "Despesa"),
 				eq(transactions.condition, "Parcelado"),
 				eq(transactions.isAnticipated, false),
 				isNotNull(transactions.seriesId),
-				eq(payers.role, PAYER_ROLE_ADMIN),
 				or(
 					isNull(transactions.note),
 					and(

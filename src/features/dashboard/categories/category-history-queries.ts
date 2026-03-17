@@ -1,8 +1,8 @@
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { categories, payers, transactions } from "@/db/schema";
+import { categories, transactions } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { CATEGORY_COLORS } from "@/shared/utils/category-colors";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
 import {
@@ -85,6 +85,17 @@ export async function fetchCategoryHistory(
 	// Fetch all categories for the selector
 	const allCategories = await fetchAllCategories(userId);
 
+	const adminPayerId = await getAdminPayerId(userId);
+
+	if (!adminPayerId) {
+		return {
+			months: monthLabels,
+			categories: [],
+			chartData: monthLabels.map((month) => ({ month })),
+			allCategories,
+		};
+	}
+
 	// Fetch monthly data for ALL categories with transactions
 	const monthlyDataQuery = (await db
 		.select({
@@ -98,13 +109,12 @@ export async function fetchCategoryHistory(
 		})
 		.from(transactions)
 		.innerJoin(categories, eq(transactions.categoryId, categories.id))
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
 		.where(
 			and(
 				eq(transactions.userId, userId),
 				eq(categories.userId, userId),
 				inArray(transactions.period, periods),
-				eq(payers.role, PAYER_ROLE_ADMIN),
+				eq(transactions.payerId, adminPayerId),
 				or(
 					isNull(transactions.note),
 					sql`${
