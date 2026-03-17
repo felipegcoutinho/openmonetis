@@ -634,6 +634,12 @@ export const transactions = pgTable(
 			table.payerId,
 			table.period,
 		),
+		// Índice composto para o filtro quente do dashboard: userId + payerId + period
+		userIdPayerIdPeriodIdx: index("lancamentos_user_id_pagador_id_period_idx").on(
+			table.userId,
+			table.payerId,
+			table.period,
+		),
 		// Índice para queries ordenadas por data de compra
 		userIdPurchaseDateIdx: index("lancamentos_user_id_purchase_date_idx").on(
 			table.userId,

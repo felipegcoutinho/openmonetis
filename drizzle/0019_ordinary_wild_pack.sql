@@ -1,0 +1,1 @@
+CREATE INDEX "lancamentos_user_id_pagador_id_period_idx" ON "lancamentos" USING btree ("user_id","pagador_id","periodo");
