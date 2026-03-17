@@ -2,7 +2,7 @@ import { RiSettings2Line } from "@remixicon/react";
 import PageDescription from "@/shared/components/page-description";
 
 export const metadata = {
-	title: "Ajustes | OpenMonetis",
+	title: "Ajustes",
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@ import { RiStore2Line } from "@remixicon/react";
 import PageDescription from "@/shared/components/page-description";
 
 export const metadata = {
-	title: "Top Estabelecimentos | OpenMonetis",
+	title: "Top Estabelecimentos",
 };
 
 export default function RootLayout({

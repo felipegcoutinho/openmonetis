@@ -11,7 +11,9 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
 	metadataBase: new URL(BASE_URL),
-	title: TITLE,
+	title: {
+		absolute: TITLE,
+	},
 	description: DESCRIPTION,
 	keywords: [
 		"finanças pessoais",

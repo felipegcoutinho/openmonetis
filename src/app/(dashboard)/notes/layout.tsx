@@ -2,7 +2,7 @@ import { RiTodoLine } from "@remixicon/react";
 import PageDescription from "@/shared/components/page-description";
 
 export const metadata = {
-	title: "Anotações | OpenMonetis",
+	title: "Anotações",
 };
 
 export default function RootLayout({

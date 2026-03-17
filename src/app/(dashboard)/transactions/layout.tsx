@@ -2,7 +2,7 @@ import { RiArrowLeftRightLine } from "@remixicon/react";
 import PageDescription from "@/shared/components/page-description";
 
 export const metadata = {
-	title: "Lançamentos | OpenMonetis",
+	title: "Lançamentos",
 };
 
 export default function RootLayout({
