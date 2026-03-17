@@ -1,6 +1,5 @@
 "use client";
 import {
-	RiAddCircleFill,
 	RiAddFill,
 	RiArrowLeftDoubleLine,
 	RiArrowLeftRightLine,
@@ -15,6 +14,7 @@ import {
 	RiDeleteBin5Line,
 	RiFileCopyLine,
 	RiFileList2Line,
+	RiFlashlightFill,
 	RiGroupLine,
 	RiHistoryLine,
 	RiMoreFill,
@@ -35,9 +35,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CategoryIcon } from "@/features/categories/components/category-icon";
 import { DEFAULT_LANCAMENTOS_COLUMN_ORDER } from "@/features/transactions/column-order";
 import { EmptyState } from "@/shared/components/empty-state";
+import {
+	CategoryIconBadge,
+	EstablishmentLogo,
+} from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
 import {
@@ -83,7 +86,6 @@ import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import { formatDate } from "@/shared/utils/date";
 import { getConditionIcon, getPaymentMethodIcon } from "@/shared/utils/icons";
 import { cn } from "@/shared/utils/ui";
-import { EstabelecimentoLogo } from "../shared/establishment-logo";
 import { TransactionsExport } from "../transactions-export";
 import type {
 	AccountCardFilterOption,
@@ -192,7 +194,7 @@ const buildColumns = ({
 
 				return (
 					<span className="flex items-center gap-2">
-						<EstabelecimentoLogo name={name} size={28} />
+						<EstablishmentLogo name={name} size={28} />
 						<span className="flex flex-col">
 							<span className="text-[11px] text-muted-foreground">
 								{formatDate(purchaseDate)}
@@ -375,7 +377,11 @@ const buildColumns = ({
 
 				return (
 					<span className="flex items-center gap-2">
-						<CategoryIcon name={categoriaIcon} className="size-4" />
+						<CategoryIconBadge
+							icon={categoriaIcon}
+							name={categoriaName}
+							size="sm"
+						/>
 						<span>{categoriaName}</span>
 					</span>
 				);
@@ -909,7 +915,7 @@ export function TransactionsTable({
 											size="icon"
 											className="hidden size-9 sm:inline-flex"
 										>
-											<RiAddCircleFill className="size-4" />
+											<RiFlashlightFill className="size-4" />
 											<span className="sr-only">
 												Adicionar múltiplos lançamentos
 											</span>
@@ -1043,7 +1049,7 @@ export function TransactionsTable({
 														row.original.dueDate &&
 														!row.original.isSettled &&
 														new Date(row.original.dueDate) < new Date()
-														? "bg-destructive/[0.03] hover:bg-destructive/[0.05]"
+														? "bg-destructive/3 hover:bg-destructive/5"
 														: undefined,
 												)}
 											>

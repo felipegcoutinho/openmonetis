@@ -177,7 +177,6 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 																<CategoryIconBadge
 																	icon={category.icon}
 																	name={category.name}
-																	colorIndex={index}
 																	size="md"
 																/>
 															</TableCell>

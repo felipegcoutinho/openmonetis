@@ -16,7 +16,7 @@
   --popover-foreground: var(--foreground);
 
   --primary: oklch(72.069% 0.18335 44.069);
-  --primary-foreground: oklch(98% 0.008 80);
+  --primary-foreground: oklch(16% 0.004 60);
 
   --secondary: oklch(96.2% 0.005 70);
   --secondary-foreground: oklch(30% 0.01 45);
@@ -50,6 +50,18 @@
   --chart-8: var(--color-violet-500);
   --chart-9: var(--color-cyan-500);
   --chart-10: var(--color-lime-500);
+
+  /* Data palette — análoga quente (hue 0–120), família do primary */
+  --data-1:  oklch(58% 0.22 18);  /* vermelho-tijolo */
+  --data-2:  oklch(64% 0.22 30);  /* vermelho-laranja */
+  --data-3:  oklch(69% 0.21 42);  /* laranja (≈ primary) */
+  --data-4:  oklch(74% 0.18 55);  /* âmbar */
+  --data-5:  oklch(78% 0.16 68);  /* âmbar-dourado */
+  --data-6:  oklch(76% 0.15 82);  /* amarelo-quente */
+  --data-7:  oklch(70% 0.17 95);  /* amarelo-lima */
+  --data-8:  oklch(65% 0.18 108); /* lima-verde */
+  --data-9:  oklch(62% 0.17 120); /* verde-oliva claro */
+  --data-10: oklch(56% 0.15 10);  /* terracota escuro */
 
   --sidebar: oklch(99.3% 0.0015 75);
   --sidebar-foreground: var(--foreground);
@@ -88,7 +100,7 @@
   --popover: oklch(28% 0.004 55);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(66% 0.15 45.139);
+  --primary:  oklch(72.069% 0.18335 44.069);
   --primary-foreground: oklch(16% 0.004 60);
 
   --secondary: oklch(29% 0.004 55);
@@ -123,6 +135,19 @@
   --chart-8: var(--color-violet-500);
   --chart-9: var(--color-cyan-500);
   --chart-10: var(--color-lime-500);
+
+  /* Data palette — dark mode (ligeiramente mais vivos) */
+  /* Data palette dark — ligeiramente mais vivos para contrastar no fundo escuro */
+  --data-1:  oklch(66% 0.22 18);
+  --data-2:  oklch(72% 0.22 30);
+  --data-3:  oklch(76% 0.21 42);
+  --data-4:  oklch(81% 0.18 55);
+  --data-5:  oklch(84% 0.16 68);
+  --data-6:  oklch(82% 0.15 82);
+  --data-7:  oklch(77% 0.17 95);
+  --data-8:  oklch(72% 0.18 108);
+  --data-9:  oklch(69% 0.17 120);
+  --data-10: oklch(63% 0.15 10);
 
   --sidebar: oklch(19.5% 0.004 55);
   --sidebar-foreground: var(--foreground);

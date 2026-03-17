@@ -1,8 +1,8 @@
 "use client";
 
 import { RiPieChartLine } from "@remixicon/react";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
 import type { CardDetailData } from "@/features/reports/cards-report-queries";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import {
 	Card,
@@ -61,7 +61,6 @@ export function CardCategoryBreakdown({ data }: CardCategoryBreakdownProps) {
 									<CategoryIconBadge
 										icon={category.icon}
 										name={category.name}
-										colorIndex={index}
 									/>
 
 									{/* Name and percentage */}

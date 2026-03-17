@@ -1,6 +1,6 @@
 import { RiStore2Line } from "@remixicon/react";
 import type { TopEstablishmentsData } from "@/features/dashboard/top-establishments-queries";
-import { EstabelecimentoLogo } from "@/features/transactions/components/shared/establishment-logo";
+import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { WidgetEmptyState } from "@/shared/components/widget-empty-state";
 
@@ -35,7 +35,7 @@ export function TopEstablishmentsWidget({
 								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
 							>
 								<div className="flex min-w-0 flex-1 items-center gap-3">
-									<EstabelecimentoLogo name={establishment.name} size={37} />
+									<EstablishmentLogo name={establishment.name} size={37} />
 
 									<div className="min-w-0">
 										<p className="truncate text-sm font-medium text-foreground">

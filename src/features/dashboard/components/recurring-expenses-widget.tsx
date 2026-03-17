@@ -1,6 +1,6 @@
 import { RiRefreshLine } from "@remixicon/react";
 import type { RecurringExpensesData } from "@/features/dashboard/expenses/recurring-expenses-queries";
-import { EstabelecimentoLogo } from "@/features/transactions/components/shared/establishment-logo";
+import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { WidgetEmptyState } from "@/shared/components/widget-empty-state";
 
@@ -37,7 +37,7 @@ export function RecurringExpensesWidget({
 						key={expense.id}
 						className="flex items-center gap-2 transition-all duration-300 py-1.5"
 					>
-						<EstabelecimentoLogo name={expense.name} size={37} />
+						<EstablishmentLogo name={expense.name} size={37} />
 
 						<div className="min-w-0 flex-1">
 							<div className="flex items-center justify-between">

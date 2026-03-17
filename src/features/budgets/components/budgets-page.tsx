@@ -137,7 +137,6 @@ export function BudgetsPage({
 							<BudgetCard
 								key={budget.id}
 								budget={budget}
-								colorIndex={index}
 								periodLabel={periodLabel}
 								onEdit={handleEdit}
 								onRemove={handleRemoveRequest}

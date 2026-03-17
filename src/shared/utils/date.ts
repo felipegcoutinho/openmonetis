@@ -297,6 +297,23 @@ export function addMonthsToDate(value: Date, offset: number): Date {
 // ============================================================================
 
 /**
+ * Formats a UTC date/datetime to short display format (weekday + day + month), capitalized.
+ * Use this for timestamps stored as UTC (e.g. transaction dates from the DB).
+ * @example
+ * formatTransactionDate("2024-11-14T00:00:00Z") // "Qui 14 nov"
+ */
+export function formatTransactionDate(date: Date | string): string {
+	const d = date instanceof Date ? date : new Date(date);
+	const formatted = new Intl.DateTimeFormat("pt-BR", {
+		weekday: "short",
+		day: "2-digit",
+		month: "short",
+		timeZone: "UTC",
+	}).format(d);
+	return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+/**
  * Formats a date value to short display format
  * @example
  * formatDate("2024-11-14") // "qui 14 nov"

@@ -33,20 +33,10 @@ export function CategoryReportTable({ data }: CategoryReportTableProps) {
 	return (
 		<div className="flex flex-col gap-6">
 			{/* Despesas Table */}
-			<CategoryTable
-				title="Despesas"
-				categories={despesas}
-				periods={periods}
-				colorIndexOffset={0}
-			/>
+			<CategoryTable title="Despesas" categories={despesas} periods={periods} />
 
 			{/* Receitas Table */}
-			<CategoryTable
-				title="Receitas"
-				categories={receitas}
-				periods={periods}
-				colorIndexOffset={despesas.length}
-			/>
+			<CategoryTable title="Receitas" categories={receitas} periods={periods} />
 		</div>
 	);
 }

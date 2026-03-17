@@ -12,8 +12,8 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Pie, PieChart, Tooltip } from "recharts";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
 import type { DashboardCategoryBreakdownData } from "@/features/dashboard/categories/category-breakdown";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { type ChartConfig, ChartContainer } from "@/shared/components/ui/chart";
 import {
@@ -220,7 +220,6 @@ export function CategoryBreakdownWidgetView({
 										<CategoryIconBadge
 											icon={category.categoryIcon}
 											name={category.categoryName}
-											colorIndex={index}
 										/>
 
 										<div className="min-w-0 flex-1">

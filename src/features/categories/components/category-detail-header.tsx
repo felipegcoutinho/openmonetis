@@ -77,7 +77,6 @@ export function CategoryDetailHeader({
 					<CategoryIconBadge
 						icon={category.icon}
 						name={category.name}
-						colorIndex={0}
 						size="lg"
 					/>
 					<div className="space-y-2">

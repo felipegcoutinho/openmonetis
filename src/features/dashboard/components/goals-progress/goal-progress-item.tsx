@@ -1,11 +1,10 @@
 import { RiPencilLine } from "@remixicon/react";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
 import {
 	clampGoalProgress,
 	formatGoalProgressPercentage,
-	getGoalProgressStatusColorClass,
 } from "@/features/dashboard/goals-progress-helpers";
 import type { GoalProgressItem as GoalProgressItemData } from "@/features/dashboard/goals-progress-queries";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Button } from "@/shared/components/ui/button";
 import { Progress } from "@/shared/components/ui/progress";
@@ -21,10 +20,14 @@ export function GoalProgressItem({
 	index,
 	onEdit,
 }: GoalProgressItemProps) {
-	const statusColor = getGoalProgressStatusColorClass(item.status);
 	const progressValue = clampGoalProgress(item.usedPercentage, 0, 100);
 	const percentageDelta = item.usedPercentage - 100;
-
+	const deltaColor =
+		percentageDelta > 0
+			? "text-destructive"
+			: percentageDelta < 0
+				? "text-success"
+				: "text-muted-foreground";
 	const isExceeded = item.status === "exceeded";
 
 	return (
@@ -34,7 +37,6 @@ export function GoalProgressItem({
 					<CategoryIconBadge
 						icon={item.categoryIcon}
 						name={item.categoryName}
-						colorIndex={index}
 						size="md"
 					/>
 					<div className="min-w-0 flex-1">
@@ -44,19 +46,19 @@ export function GoalProgressItem({
 						<p className="mt-0.5 text-xs text-muted-foreground">
 							<MoneyValues amount={item.spentAmount} /> de{" "}
 							<MoneyValues amount={item.budgetAmount} />
+							<span className={`ml-1.5 font-medium ${deltaColor}`}>
+								{formatGoalProgressPercentage(percentageDelta, true)}
+							</span>
 						</p>
 					</div>
 				</div>
 
 				<div className="flex shrink-0 items-center gap-2">
-					<span className={`text-xs font-medium ${statusColor}`}>
-						{formatGoalProgressPercentage(percentageDelta, true)}
-					</span>
 					<Button
 						type="button"
-						variant="outline"
+						variant="link"
 						size="icon-sm"
-						className="opacity-30 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+						className="transition-opacity text-primary hover:opacity-80"
 						onClick={() => onEdit(item)}
 						aria-label={`Editar orçamento de ${item.categoryName}`}
 					>
@@ -69,7 +71,7 @@ export function GoalProgressItem({
 					value={progressValue}
 					className={
 						isExceeded
-							? "[&_[data-slot=progress-indicator]]:bg-destructive bg-destructive/20"
+							? "**:data-[slot=progress-indicator]:bg-destructive bg-destructive/20"
 							: undefined
 					}
 				/>

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
 import { formatPeriodLabel } from "@/features/reports/utils";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import StatusDot from "@/shared/components/status-dot";
 import { Card } from "@/shared/components/ui/card";
 import {
@@ -24,14 +24,12 @@ export interface CategoryTableProps {
 	title: string;
 	categories: CategoryReportItem[];
 	periods: string[];
-	colorIndexOffset: number;
 }
 
 export function CategoryTable({
 	title,
 	categories,
 	periods,
-	colorIndexOffset,
 }: CategoryTableProps) {
 	// Calculate section totals
 	const sectionTotals = useMemo(() => {
@@ -86,7 +84,6 @@ export function CategoryTable({
 
 				<TableBody>
 					{categories.map((category, index) => {
-						const colorIndex = colorIndexOffset + index;
 						const periodParam = formatPeriodForUrl(periods[periods.length - 1]);
 
 						return (
@@ -104,7 +101,6 @@ export function CategoryTable({
 										<CategoryIconBadge
 											icon={category.icon}
 											name={category.name}
-											colorIndex={colorIndex}
 										/>
 										<Link
 											href={`/categories/${category.categoryId}?periodo=${periodParam}`}

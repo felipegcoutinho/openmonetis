@@ -7,6 +7,8 @@ interface LogoProps {
 	className?: string;
 	showVersion?: boolean;
 	invertTextOnDark?: boolean;
+	/** Exibe o ícone na cor original, sem filtro preto */
+	colorIcon?: boolean;
 }
 
 export function Logo({
@@ -14,6 +16,7 @@ export function Logo({
 	className,
 	showVersion = false,
 	invertTextOnDark = true,
+	colorIcon = false,
 }: LogoProps) {
 	if (variant === "compact") {
 		return (
@@ -23,7 +26,7 @@ export function Logo({
 					alt="OpenMonetis"
 					width={32}
 					height={32}
-					className="object-contain brightness-0 saturate-0"
+					className={cn("object-contain", !colorIcon && "brightness-0 saturate-0")}
 					priority
 				/>
 				<Image

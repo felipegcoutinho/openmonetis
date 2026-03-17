@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
 import { formatPeriodLabel } from "@/features/reports/utils";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import {
 	Card,
 	CardContent,
@@ -26,15 +26,9 @@ interface CategoryCardProps {
 	category: CategoryReportItem;
 	periods: string[];
 	periodCount: number;
-	colorIndex: number;
 }
 
-function CategoryCard({
-	category,
-	periods,
-	periodCount,
-	colorIndex,
-}: CategoryCardProps) {
+function CategoryCard({ category, periods, periodCount }: CategoryCardProps) {
 	const periodParam = formatPeriodForUrl(periods[periods.length - 1]);
 	const averageMonthlyTotal = category.total / periodCount;
 
@@ -42,11 +36,7 @@ function CategoryCard({
 		<Card>
 			<CardHeader className="pb-3">
 				<CardTitle className="flex items-center gap-3">
-					<CategoryIconBadge
-						icon={category.icon}
-						name={category.name}
-						colorIndex={colorIndex}
-					/>
+					<CategoryIconBadge icon={category.icon} name={category.name} />
 					<Link
 						href={`/categories/${category.categoryId}?periodo=${periodParam}`}
 						className="flex-1 truncate hover:underline underline-offset-2"
@@ -95,7 +85,6 @@ interface SectionProps {
 	categories: CategoryReportItem[];
 	periods: string[];
 	periodCount: number;
-	colorIndexOffset: number;
 	total: number;
 }
 
@@ -104,7 +93,6 @@ function Section({
 	categories,
 	periods,
 	periodCount,
-	colorIndexOffset,
 	total,
 }: SectionProps) {
 	if (categories.length === 0) {
@@ -134,7 +122,6 @@ function Section({
 					category={category}
 					periods={periods}
 					periodCount={periodCount}
-					colorIndex={colorIndexOffset + index}
 				/>
 			))}
 		</div>
@@ -173,7 +160,6 @@ export function CategoryReportCards({ data }: CategoryReportCardsProps) {
 				categories={despesas}
 				periods={periods}
 				periodCount={periodCount}
-				colorIndexOffset={0}
 				total={despesasTotal}
 			/>
 
@@ -183,7 +169,6 @@ export function CategoryReportCards({ data }: CategoryReportCardsProps) {
 				categories={receitas}
 				periods={periods}
 				periodCount={periodCount}
-				colorIndexOffset={despesas.length}
 				total={receitasTotal}
 			/>
 		</div>

@@ -3,7 +3,7 @@
 import { RiArrowDownSFill, RiStore3Line } from "@remixicon/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PurchasesByCategoryData } from "@/features/dashboard/purchases-by-category-queries";
-import { EstabelecimentoLogo } from "@/features/transactions/components/shared/establishment-logo";
+import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import {
 	Select,
@@ -14,23 +14,10 @@ import {
 } from "@/shared/components/ui/select";
 import { WidgetEmptyState } from "@/shared/components/widget-empty-state";
 import { CATEGORY_TYPE_LABEL } from "@/shared/lib/categories/constants";
+import { formatTransactionDate } from "@/shared/utils/date";
 
 type PurchasesByCategoryWidgetProps = {
 	data: PurchasesByCategoryData;
-};
-
-const formatTransactionDate = (date: Date | string) => {
-	const d = date instanceof Date ? date : new Date(date);
-	const formatter = new Intl.DateTimeFormat("pt-BR", {
-		weekday: "short",
-		day: "2-digit",
-		month: "short",
-		timeZone: "UTC",
-	});
-
-	const formatted = formatter.format(d);
-	// Capitaliza a primeira letra do dia da semana
-	return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 const STORAGE_KEY = "purchases-by-category-selected";
@@ -178,7 +165,7 @@ export function PurchasesByCategoryWidget({
 								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
 							>
 								<div className="flex min-w-0 flex-1 items-center gap-3">
-									<EstabelecimentoLogo name={transaction.name} size={37} />
+									<EstablishmentLogo name={transaction.name} size={37} />
 
 									<div className="min-w-0">
 										<p className="truncate text-sm font-medium text-foreground">

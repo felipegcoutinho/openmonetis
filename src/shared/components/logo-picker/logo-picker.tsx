@@ -142,7 +142,7 @@ export function LogoPickerDialog({
 						Nenhum logo encontrado para &ldquo;{search}&rdquo;
 					</p>
 				) : (
-					<div className="grid max-h-custom-height-card grid-cols-4 gap-2 overflow-y-auto p-1 sm:grid-cols-4 md:grid-cols-5">
+					<div className="grid max-h-custom-height-card grid-cols-4 gap-2 overflow-y-auto p-1 md:grid-cols-5">
 						{filteredLogos.map((logo) => {
 							const isActive = value === logo;
 							const logoLabel = deriveNameFromLogo(logo);
@@ -151,13 +151,10 @@ export function LogoPickerDialog({
 								<button
 									type="button"
 									key={logo}
-									onClick={(e) => {
-										e.stopPropagation();
-										e.preventDefault();
-										onSelect(logo);
-									}}
+									onClick={() => onSelect(logo)}
 									onPointerDown={(e) => e.stopPropagation()}
-									onTouchStart={(e) => e.stopPropagation()}
+									aria-label={`Selecionar logo ${logoLabel || logo}`}
+									aria-pressed={isActive}
 									className={cn(
 										"flex flex-col items-center gap-1 rounded-md bg-card p-2 text-center text-xs transition-all hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 										isActive &&

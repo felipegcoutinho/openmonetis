@@ -6,7 +6,7 @@ import {
 	RiPencilLine,
 } from "@remixicon/react";
 import Link from "next/link";
-import { CategoryIconBadge } from "@/features/categories/components/category-icon-badge";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
 import { Progress } from "@/shared/components/ui/progress";
@@ -15,7 +15,6 @@ import type { Budget } from "./types";
 
 interface BudgetCardProps {
 	budget: Budget;
-	colorIndex: number;
 	periodLabel: string;
 	onEdit: (budget: Budget) => void;
 	onRemove: (budget: Budget) => void;
@@ -34,7 +33,6 @@ const formatCategoryName = (budget: Budget) =>
 
 export function BudgetCard({
 	budget,
-	colorIndex,
 	periodLabel,
 	onEdit,
 	onRemove,
@@ -51,7 +49,6 @@ export function BudgetCard({
 					<CategoryIconBadge
 						icon={budget.category?.icon ?? undefined}
 						name={formatCategoryName(budget)}
-						colorIndex={colorIndex}
 						size="lg"
 					/>
 					<div className="space-y-1">

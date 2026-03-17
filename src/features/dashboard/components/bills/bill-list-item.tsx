@@ -4,7 +4,7 @@ import {
 	isBillOverdue,
 } from "@/features/dashboard/bills-helpers";
 import type { DashboardBill } from "@/features/dashboard/bills-queries";
-import { EstabelecimentoLogo } from "@/features/transactions/components/shared/establishment-logo";
+import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/utils/ui";
@@ -21,7 +21,7 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 	return (
 		<li className="flex items-center justify-between transition-all duration-300 py-1.5">
 			<div className="flex min-w-0 flex-1 items-center gap-2 py-1">
-				<EstabelecimentoLogo name={bill.name} size={37} />
+				<EstablishmentLogo name={bill.name} size={37} />
 
 				<div className="min-w-0">
 					<span className="block truncate text-sm font-medium text-foreground">

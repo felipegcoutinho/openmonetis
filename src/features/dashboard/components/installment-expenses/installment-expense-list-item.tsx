@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { InstallmentExpense } from "@/features/dashboard/expenses/installment-expenses-queries";
 import { buildInstallmentExpenseDisplay } from "@/features/dashboard/installment-expenses-helpers";
+import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Progress } from "@/shared/components/ui/progress";
 import {
@@ -8,7 +9,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { getPaymentMethodIcon } from "@/shared/utils/icons";
 
 type InstallmentExpenseListItemProps = {
 	expense: InstallmentExpense;
@@ -28,9 +28,7 @@ export function InstallmentExpenseListItem({
 
 	return (
 		<div className="flex items-center gap-3 transition-all duration-300 py-2">
-			<div className="flex size-9.5 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
-				{getPaymentMethodIcon(expense.paymentMethod)}
-			</div>
+			<EstablishmentLogo name={expense.name} size={37} />
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between gap-3">
