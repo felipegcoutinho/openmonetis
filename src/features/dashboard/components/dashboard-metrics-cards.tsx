@@ -95,7 +95,7 @@ const getPercentChange = (current: number, previous: number): string => {
 };
 
 const getTrendBadgeClass = (trend: Trend, invertTrend: boolean): string => {
-	if (trend === "flat") return "bg-muted text-muted-foreground";
+	if (trend === "flat") return "text-muted-foreground";
 	const isPositive = invertTrend ? trend === "down" : trend === "up";
 	return isPositive ? "text-success" : "text-destructive";
 };
@@ -120,10 +120,7 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 								<div className="flex items-start justify-between">
 									<div>
 										<CardTitle className="flex items-center gap-1 tracking-tight">
-											<Icon
-												className={cn("size-4", iconClass)}
-												aria-hidden
-											/>
+											<Icon className={cn("size-4", iconClass)} aria-hidden />
 											{label}
 										</CardTitle>
 										<CardDescription className="mt-1.5 tracking-tight">

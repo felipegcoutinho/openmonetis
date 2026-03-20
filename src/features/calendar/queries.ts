@@ -1,4 +1,4 @@
-import { and, eq, gte, lte, ne, or } from "drizzle-orm";
+import { and, eq, gte, lte, ne, or, sql } from "drizzle-orm";
 import { cards, transactions } from "@/db/schema";
 import {
 	buildOptionSets,
@@ -10,7 +10,7 @@ import {
 	fetchTransactionFilterSources,
 } from "@/features/transactions/queries";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import type { CalendarData, CalendarEvent } from "@/shared/lib/types/calendar";
 import { formatDateKey } from "@/shared/utils/calendar";
 import { parsePeriod } from "@/shared/utils/period";
@@ -45,11 +45,13 @@ export const fetchCalendarData = async ({
 	const rangeEnd = new Date(Date.UTC(year, monthIndex + 1, 0));
 	const rangeStartKey = formatDateKey(rangeStart);
 	const rangeEndKey = formatDateKey(rangeEnd);
+	const adminPayerId = await getAdminPayerId(userId);
 
 	const [transactionRows, cardRows, filterSources] = await Promise.all([
 		db.query.transactions.findMany({
 			where: and(
 				eq(transactions.userId, userId),
+				adminPayerId ? eq(transactions.payerId, adminPayerId) : sql`false`,
 				ne(transactions.transactionType, TRANSACTION_TYPE_TRANSFERENCIA),
 				or(
 					// Lançamentos cuja data de compra esteja no período do calendário
@@ -88,11 +90,7 @@ export const fetchCalendarData = async ({
 
 	const cardTotals = new Map<string, number>();
 	for (const item of transactionData) {
-		if (
-			!item.cardId ||
-			item.period !== period ||
-			item.pagadorRole !== PAYER_ROLE_ADMIN
-		) {
+		if (!item.cardId || item.period !== period) {
 			continue;
 		}
 		const amount = Math.abs(item.amount ?? 0);
@@ -101,12 +99,10 @@ export const fetchCalendarData = async ({
 
 	for (const item of transactionData) {
 		const isBoleto = item.paymentMethod === PAYMENT_METHOD_BOLETO;
-		const isAdminPagador = item.pagadorRole === PAYER_ROLE_ADMIN;
 
-		// Para boletos, exibir apenas na data de vencimento e apenas se for pagador admin
+		// Para boletos, exibir apenas na data de vencimento
 		if (isBoleto) {
 			if (
-				isAdminPagador &&
 				item.dueDate &&
 				isWithinRange(item.dueDate, rangeStartKey, rangeEndKey)
 			) {
@@ -119,9 +115,6 @@ export const fetchCalendarData = async ({
 			}
 		} else {
 			// Para outros tipos de lançamento, exibir na data de compra
-			if (!isAdminPagador) {
-				continue;
-			}
 			const purchaseDateKey = item.purchaseDate.slice(0, 10);
 			if (isWithinRange(purchaseDateKey, rangeStartKey, rangeEndKey)) {
 				events.push({
@@ -134,7 +127,7 @@ export const fetchCalendarData = async ({
 		}
 	}
 
-	// Exibir vencimentos apenas de cartões com lançamentos do pagador admin
+	// Exibir vencimentos apenas de cartões com lançamentos do período
 	for (const card of cardRows) {
 		if (!cardTotals.has(card.id)) {
 			continue;

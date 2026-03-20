@@ -1,11 +1,8 @@
-import { fetchDashboardNotifications } from "@/features/dashboard/notifications-queries";
-import { fetchPendingInboxCount } from "@/features/inbox/queries";
+import { fetchDashboardNavbarData } from "@/features/dashboard/navbar-queries";
 import { AppNavbar } from "@/shared/components/navigation/navbar/app-navbar";
 import { PrivacyProvider } from "@/shared/components/providers/privacy-provider";
 import { DotPattern } from "@/shared/components/ui/dot-pattern";
 import { getUserSession } from "@/shared/lib/auth/server";
-import { fetchPayersWithAccess } from "@/shared/lib/payers/access";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
 import { parsePeriodParam } from "@/shared/utils/period";
 
 export default async function DashboardLayout({
@@ -16,12 +13,6 @@ export default async function DashboardLayout({
 	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }>) {
 	const session = await getUserSession();
-	const payerList = await fetchPayersWithAccess(session.user.id);
-
-	// Encontrar o pagador admin do usuário
-	const adminPagador = payerList.find(
-		(p) => p.role === PAYER_ROLE_ADMIN && p.userId === session.user.id,
-	);
 
 	// Buscar notificações para o período atual
 	const resolvedSearchParams = searchParams ? await searchParams : undefined;
@@ -35,18 +26,18 @@ export default async function DashboardLayout({
 	const { period: currentPeriod } = parsePeriodParam(
 		singlePeriodoParam ?? null,
 	);
-	const [notificationsSnapshot, preLancamentosCount] = await Promise.all([
-		fetchDashboardNotifications(session.user.id, currentPeriod),
-		fetchPendingInboxCount(session.user.id),
-	]);
+	const navbarData = await fetchDashboardNavbarData(
+		session.user.id,
+		currentPeriod,
+	);
 
 	return (
 		<PrivacyProvider>
 			<AppNavbar
 				user={{ ...session.user, image: session.user.image ?? null }}
-				pagadorAvatarUrl={adminPagador?.avatarUrl ?? null}
-				preLancamentosCount={preLancamentosCount}
-				notificationsSnapshot={notificationsSnapshot}
+				pagadorAvatarUrl={navbarData.pagadorAvatarUrl}
+				preLancamentosCount={navbarData.preLancamentosCount}
+				notificationsSnapshot={navbarData.notificationsSnapshot}
 			/>
 			<div className="relative flex flex-1 flex-col pt-16">
 				<div className="pointer-events-none absolute inset-x-0 top-0 h-80 overflow-hidden">

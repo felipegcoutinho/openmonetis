@@ -38,7 +38,7 @@ export function InstallmentAnalysisPage({
 		return allInstallmentsSelected && data.installmentGroups.length > 0;
 	}, [selectedInstallments, data]);
 
-	// Função para selecionar/desselecionar tudo
+	// Função para selecionar/desmarcar tudo
 	const toggleSelectAll = () => {
 		if (isAllSelected) {
 			// Desmarcar tudo
@@ -59,7 +59,7 @@ export function InstallmentAnalysisPage({
 		}
 	};
 
-	// Função para selecionar/desselecionar um grupo de parcelas
+	// Função para selecionar/desmarcar um grupo de parcelas
 	const toggleGroupSelection = (seriesId: string, installmentIds: string[]) => {
 		const newMap = new Map(selectedInstallments);
 		const current = newMap.get(seriesId) || new Set<string>();
@@ -75,7 +75,7 @@ export function InstallmentAnalysisPage({
 		setSelectedInstallments(newMap);
 	};
 
-	// Função para selecionar/desselecionar parcela individual
+	// Função para selecionar/desmarcar parcela individual
 	const toggleInstallmentSelection = (
 		seriesId: string,
 		installmentId: string,

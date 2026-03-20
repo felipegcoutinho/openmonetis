@@ -5,6 +5,7 @@ import {
 	eq,
 	gte,
 	ilike,
+	inArray,
 	isNull,
 	lte,
 	ne,
@@ -13,23 +14,17 @@ import {
 	sql,
 	sum,
 } from "drizzle-orm";
-import {
-	categories,
-	financialAccounts,
-	payers,
-	transactions,
-} from "@/db/schema";
+import { categories, financialAccounts, transactions } from "@/db/schema";
 import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber } from "@/shared/utils/number";
 import { getPreviousPeriod } from "@/shared/utils/period";
 
 const DESPESA = "Despesa";
-const TRANSFERENCIA = "Transferência";
 
 export type EstablishmentData = {
 	name: string;
@@ -81,6 +76,48 @@ export async function fetchTopEstablishmentsData(
 	const months = parseInt(periodFilter, 10);
 	const periods = buildPeriodRange(currentPeriod, months);
 	const startPeriod = periods[0];
+	const adminPayerId = await getAdminPayerId(userId);
+	const periodLabel =
+		months === 3
+			? "Últimos 3 meses"
+			: months === 6
+				? "Últimos 6 meses"
+				: "Últimos 12 meses";
+
+	if (!adminPayerId) {
+		return {
+			establishments: [],
+			topCategories: [],
+			summary: {
+				totalEstablishments: 0,
+				totalTransactions: 0,
+				totalSpent: 0,
+				avgPerTransaction: 0,
+				mostFrequent: null,
+				highestSpending: null,
+			},
+			periodLabel,
+		};
+	}
+
+	const baseExpenseConditions = [
+		eq(transactions.userId, userId),
+		gte(transactions.period, startPeriod),
+		lte(transactions.period, currentPeriod),
+		eq(transactions.payerId, adminPayerId),
+		eq(transactions.transactionType, DESPESA),
+	] as const;
+	const exclusionConditions = [
+		or(
+			isNull(transactions.note),
+			not(ilike(transactions.note, `${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`)),
+		),
+		or(
+			ne(transactions.note, INITIAL_BALANCE_NOTE),
+			isNull(financialAccounts.excludeInitialBalanceFromIncome),
+			eq(financialAccounts.excludeInitialBalanceFromIncome, false),
+		),
+	] as const;
 
 	// Fetch establishments with transaction count and total amount
 	const establishmentsData = await db
@@ -90,57 +127,41 @@ export async function fetchTopEstablishmentsData(
 			totalAmount: sum(transactions.amount).as("total"),
 		})
 		.from(transactions)
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
 		.leftJoin(
 			financialAccounts,
 			eq(transactions.accountId, financialAccounts.id),
 		)
-		.where(
-			and(
-				eq(transactions.userId, userId),
-				gte(transactions.period, startPeriod),
-				lte(transactions.period, currentPeriod),
-				eq(payers.role, PAYER_ROLE_ADMIN),
-				eq(transactions.transactionType, DESPESA),
-				ne(transactions.transactionType, TRANSFERENCIA),
-				or(
-					isNull(transactions.note),
-					not(ilike(transactions.note, `${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`)),
-				),
-				or(
-					ne(transactions.note, INITIAL_BALANCE_NOTE),
-					isNull(financialAccounts.excludeInitialBalanceFromIncome),
-					eq(financialAccounts.excludeInitialBalanceFromIncome, false),
-				),
-			),
-		)
+		.where(and(...baseExpenseConditions, ...exclusionConditions))
 		.groupBy(transactions.name)
 		.orderBy(desc(sql`count`))
 		.limit(50);
 
-	// Fetch categories for each establishment
-	const _establishmentNames = establishmentsData.map(
-		(e: (typeof establishmentsData)[0]) => e.name,
-	);
+	const establishmentNames = establishmentsData
+		.map((est) => est.name)
+		.filter((name): name is string => !!name);
 
-	const categoriesByEstablishment = await db
-		.select({
-			establishmentName: transactions.name,
-			categoryId: transactions.categoryId,
-			count: count().as("count"),
-		})
-		.from(transactions)
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
-		.where(
-			and(
-				eq(transactions.userId, userId),
-				gte(transactions.period, startPeriod),
-				lte(transactions.period, currentPeriod),
-				eq(payers.role, PAYER_ROLE_ADMIN),
-				eq(transactions.transactionType, DESPESA),
-			),
-		)
-		.groupBy(transactions.name, transactions.categoryId);
+	const categoriesByEstablishment =
+		establishmentNames.length > 0
+			? await db
+					.select({
+						establishmentName: transactions.name,
+						categoryId: transactions.categoryId,
+						count: count().as("count"),
+					})
+					.from(transactions)
+					.leftJoin(
+						financialAccounts,
+						eq(transactions.accountId, financialAccounts.id),
+					)
+					.where(
+						and(
+							...baseExpenseConditions,
+							...exclusionConditions,
+							inArray(transactions.name, establishmentNames),
+						),
+					)
+					.groupBy(transactions.name, transactions.categoryId)
+			: [];
 
 	// Fetch all category names
 	const allCategories = await db
@@ -159,23 +180,33 @@ export async function fetchTopEstablishmentsData(
 
 	// Build establishment data with categories
 	type EstablishmentRow = (typeof establishmentsData)[0];
-	type CategoryByEstRow = (typeof categoriesByEstablishment)[0];
+	const categoriesByEstablishmentMap = new Map<
+		string,
+		Array<{ name: string; count: number }>
+	>();
+
+	for (const categoryRow of categoriesByEstablishment) {
+		if (!categoryRow.establishmentName || !categoryRow.categoryId) {
+			continue;
+		}
+
+		const current =
+			categoriesByEstablishmentMap.get(categoryRow.establishmentName) ?? [];
+		current.push({
+			name:
+				categoryMap.get(categoryRow.categoryId as string)?.name ||
+				"Sem categoria",
+			count: Number(categoryRow.count) || 0,
+		});
+		categoriesByEstablishmentMap.set(categoryRow.establishmentName, current);
+	}
 
 	const establishments: EstablishmentData[] = establishmentsData.map(
 		(est: EstablishmentRow) => {
 			const cnt = Number(est.count) || 0;
 			const total = Math.abs(safeToNumber(est.totalAmount));
 
-			const estCategories = categoriesByEstablishment
-				.filter(
-					(c: CategoryByEstRow) =>
-						c.establishmentName === est.name && c.categoryId,
-				)
-				.map((c: CategoryByEstRow) => ({
-					name:
-						categoryMap.get(c.categoryId as string)?.name || "Sem categoria",
-					count: Number(c.count) || 0,
-				}))
+			const estCategories = (categoriesByEstablishmentMap.get(est.name) ?? [])
 				.sort(
 					(
 						a: { name: string; count: number },
@@ -202,29 +233,11 @@ export async function fetchTopEstablishmentsData(
 			count: count().as("count"),
 		})
 		.from(transactions)
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
 		.leftJoin(
 			financialAccounts,
 			eq(transactions.accountId, financialAccounts.id),
 		)
-		.where(
-			and(
-				eq(transactions.userId, userId),
-				gte(transactions.period, startPeriod),
-				lte(transactions.period, currentPeriod),
-				eq(payers.role, PAYER_ROLE_ADMIN),
-				eq(transactions.transactionType, DESPESA),
-				or(
-					isNull(transactions.note),
-					not(ilike(transactions.note, `${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`)),
-				),
-				or(
-					ne(transactions.note, INITIAL_BALANCE_NOTE),
-					isNull(financialAccounts.excludeInitialBalanceFromIncome),
-					eq(financialAccounts.excludeInitialBalanceFromIncome, false),
-				),
-			),
-		)
+		.where(and(...baseExpenseConditions, ...exclusionConditions))
 		.groupBy(transactions.categoryId)
 		.orderBy(sql`total ASC`)
 		.limit(10);
@@ -256,13 +269,6 @@ export async function fetchTopEstablishmentsData(
 	);
 	const highestSpending =
 		sortedBySpending.length > 0 ? sortedBySpending[0].name : null;
-
-	const periodLabel =
-		months === 3
-			? "Últimos 3 meses"
-			: months === 6
-				? "Últimos 6 meses"
-				: "Últimos 12 meses";
 
 	return {
 		establishments,

@@ -64,9 +64,7 @@ export async function fetchDashboardAccounts(
 				eq(transactions.accountId, financialAccounts.id),
 				eq(transactions.userId, userId),
 				eq(transactions.isSettled, true),
-				adminPayerId
-					? eq(transactions.payerId, adminPayerId)
-					: sql`false`,
+				adminPayerId ? eq(transactions.payerId, adminPayerId) : sql`false`,
 			),
 		)
 		.where(eq(financialAccounts.userId, userId))

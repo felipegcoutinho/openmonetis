@@ -69,7 +69,7 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 						<HoverCard openDelay={150}>
 							<HoverCardTrigger asChild>{linkNode}</HoverCardTrigger>
 							<HoverCardContent align="start" className="w-72 space-y-3">
-								<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+								<p className="text-xs text-muted-foreground">
 									Distribuição por pagador
 								</p>
 								<ul className="space-y-2">

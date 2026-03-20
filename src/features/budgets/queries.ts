@@ -1,8 +1,8 @@
 import { and, asc, eq, inArray, isNull, or, sql, sum } from "drizzle-orm";
-import { budgets, categories, payers, transactions } from "@/db/schema";
+import { budgets, categories, transactions } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 
 const toNumber = (value: string | number | null | undefined) => {
 	if (typeof value === "number") return value;
@@ -39,6 +39,8 @@ export async function fetchBudgetsForUser(
 	budgets: BudgetData[];
 	categoriesOptions: CategoryOption[];
 }> {
+	const adminPayerId = await getAdminPayerId(userId);
+
 	const [budgetRows, categoryRows] = await Promise.all([
 		db.query.budgets.findMany({
 			where: and(
@@ -66,20 +68,19 @@ export async function fetchBudgetsForUser(
 
 	let totalsByCategory = new Map<string, number>();
 
-	if (categoryIds.length > 0) {
+	if (categoryIds.length > 0 && adminPayerId) {
 		const totals = await db
 			.select({
 				categoryId: transactions.categoryId,
 				totalAmount: sum(transactions.amount).as("totalAmount"),
 			})
 			.from(transactions)
-			.innerJoin(payers, eq(transactions.payerId, payers.id))
 			.where(
 				and(
 					eq(transactions.userId, userId),
 					eq(transactions.period, selectedPeriod),
 					eq(transactions.transactionType, "Despesa"),
-					eq(payers.role, PAYER_ROLE_ADMIN),
+					eq(transactions.payerId, adminPayerId),
 					inArray(transactions.categoryId, categoryIds),
 					or(
 						isNull(transactions.note),

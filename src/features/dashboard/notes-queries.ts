@@ -18,39 +18,18 @@ export type DashboardNote = {
 	createdAt: string;
 };
 
-const parseTasks = (value: string | null): DashboardTask[] | undefined => {
+function parseTasks(value: string | null): DashboardTask[] | undefined {
 	if (!value) {
 		return undefined;
 	}
 
 	try {
 		const parsed = JSON.parse(value);
-		if (!Array.isArray(parsed)) {
-			return undefined;
-		}
-
-		return parsed
-			.filter((item): item is DashboardTask => {
-				if (!item || typeof item !== "object") {
-					return false;
-				}
-				const candidate = item as Partial<DashboardTask>;
-				return (
-					typeof candidate.id === "string" &&
-					typeof candidate.text === "string" &&
-					typeof candidate.completed === "boolean"
-				);
-			})
-			.map((task) => ({
-				id: task.id,
-				text: task.text,
-				completed: task.completed,
-			}));
-	} catch (error) {
-		console.error("Failed to parse dashboard note tasks", error);
+		return Array.isArray(parsed) ? parsed : undefined;
+	} catch {
 		return undefined;
 	}
-};
+}
 
 export async function fetchDashboardNotes(
 	userId: string,

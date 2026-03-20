@@ -7,9 +7,6 @@ import { RefreshPageButton } from "@/shared/components/refresh-page-button";
 import { NavMenu } from "./nav-menu";
 import { NavbarUser } from "./navbar-user";
 
-const navbarActionClassName =
-	"border-black/10 bg-transparent text-black/75 shadow-none hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-black/20 data-[state=open]:bg-black/10 data-[state=open]:text-black";
-
 type AppNavbarProps = {
 	user: {
 		id: string;
@@ -22,6 +19,9 @@ type AppNavbarProps = {
 	notificationsSnapshot: DashboardNotificationsSnapshot;
 };
 
+const navbarActionClassName =
+	"border-black/10 bg-transparent text-black/75 shadow-none hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-black/20 data-[state=open]:bg-black/10 data-[state=open]:text-black";
+
 export function AppNavbar({
 	user,
 	pagadorAvatarUrl,
@@ -30,10 +30,6 @@ export function AppNavbar({
 }: AppNavbarProps) {
 	return (
 		<header className="fixed top-0 left-0 right-0 z-50 flex h-16 shrink-0 items-center bg-primary">
-			<div className="pointer-events-none absolute inset-0 overflow-hidden">
-				<div className="absolute inset-0 bg-linear-to-b from-white/8 via-transparent to-black/6" />
-			</div>
-
 			<div className="relative z-10 mx-auto flex h-full w-full max-w-8xl items-center gap-4 px-4">
 				<Link href="/dashboard" className="shrink-0 mr-1">
 					<Logo variant="compact" invertTextOnDark={false} />

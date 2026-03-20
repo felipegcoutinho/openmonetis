@@ -1,17 +1,8 @@
 import { DashboardGridEditable } from "@/features/dashboard/components/dashboard-grid-editable";
 import { DashboardMetricsCards } from "@/features/dashboard/components/dashboard-metrics-cards";
 import { DashboardWelcome } from "@/features/dashboard/components/dashboard-welcome";
-import { fetchDashboardData } from "@/features/dashboard/fetch-dashboard-data";
-import { fetchUserDashboardPreferences } from "@/features/dashboard/preferences-queries";
-import {
-	buildOptionSets,
-	buildSluggedFilters,
-	getSingleParam,
-} from "@/features/transactions/page-helpers";
-import {
-	fetchRecentEstablishments,
-	fetchTransactionFilterSources,
-} from "@/features/transactions/queries";
+import { fetchDashboardPageData } from "@/features/dashboard/page-data-queries";
+import { getSingleParam } from "@/features/transactions/page-helpers";
 import MonthNavigation from "@/shared/components/month-picker/month-navigation";
 import { getUser } from "@/shared/lib/auth/server";
 import { parsePeriodParam } from "@/shared/utils/period";
@@ -28,26 +19,9 @@ export default async function Page({ searchParams }: PageProps) {
 	const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
 	const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
-	const [dashboardData, preferences, filterSources, estabelecimentos] =
-		await Promise.all([
-			fetchDashboardData(user.id, selectedPeriod),
-			fetchUserDashboardPreferences(user.id),
-			fetchTransactionFilterSources(user.id),
-			fetchRecentEstablishments(user.id),
-		]);
+	const { dashboardData, preferences, quickActionOptions } =
+		await fetchDashboardPageData(user.id, selectedPeriod);
 	const { dashboardWidgets } = preferences;
-	const sluggedFilters = buildSluggedFilters(filterSources);
-	const {
-		payerOptions,
-		splitPayerOptions,
-		defaultPayerId,
-		accountOptions,
-		cardOptions,
-		categoryOptions,
-	} = buildOptionSets({
-		...sluggedFilters,
-		payerRows: filterSources.payerRows,
-	});
 
 	return (
 		<main className="flex flex-col gap-4">
@@ -58,15 +32,7 @@ export default async function Page({ searchParams }: PageProps) {
 				data={dashboardData}
 				period={selectedPeriod}
 				initialPreferences={dashboardWidgets}
-				quickActionOptions={{
-					payerOptions,
-					splitPayerOptions,
-					defaultPayerId,
-					accountOptions,
-					cardOptions,
-					categoryOptions,
-					estabelecimentos,
-				}}
+				quickActionOptions={quickActionOptions}
 			/>
 		</main>
 	);

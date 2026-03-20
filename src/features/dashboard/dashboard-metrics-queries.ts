@@ -63,7 +63,6 @@ const ensurePeriodTotals = (
 };
 
 // Re-export for backward compatibility
-export { getPreviousPeriod };
 
 export async function fetchDashboardCardMetrics(
 	userId: string,

@@ -18,21 +18,26 @@ export type NoteData = {
 	createdAt: string;
 };
 
-function toNoteData(note: Note): NoteData {
-	let tasks: Task[] | undefined;
-	if (note.tasks) {
-		try {
-			tasks = JSON.parse(note.tasks);
-		} catch (error) {
-			console.error("Failed to parse tasks for note", note.id, error);
-		}
+function parseTasks(value: string | null): Task[] | undefined {
+	if (!value) {
+		return undefined;
 	}
+
+	try {
+		const parsed = JSON.parse(value);
+		return Array.isArray(parsed) ? parsed : undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+function toNoteData(note: Note): NoteData {
 	return {
 		id: note.id,
 		title: (note.title ?? "").trim(),
 		description: (note.description ?? "").trim(),
 		type: (note.type ?? "nota") as "nota" | "tarefa",
-		tasks,
+		tasks: parseTasks(note.tasks),
 		archived: note.archived,
 		createdAt: note.createdAt.toISOString(),
 	};
