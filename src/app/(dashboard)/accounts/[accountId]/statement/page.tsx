@@ -5,7 +5,7 @@ import { AccountStatementCard } from "@/features/accounts/components/account-sta
 import type { Account } from "@/features/accounts/components/types";
 import {
 	fetchAccountData,
-	fetchAccountLancamentos,
+	fetchAccountLancamentosPage,
 	fetchAccountSummary,
 } from "@/features/accounts/statement-queries";
 import { fetchUserPreferences } from "@/features/settings/queries";
@@ -19,6 +19,7 @@ import {
 	getSingleParam,
 	mapTransactionsData,
 	type ResolvedSearchParams,
+	resolveTransactionPagination,
 } from "@/features/transactions/page-helpers";
 import {
 	fetchRecentEstablishments,
@@ -53,6 +54,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 	} = parsePeriodParam(periodoParamRaw);
 
 	const searchFilters = extractTransactionSearchFilters(resolvedSearchParams);
+	const pagination = resolveTransactionPagination(resolvedSearchParams);
 
 	const account = await fetchAccountData(userId, accountId);
 
@@ -84,9 +86,12 @@ export default async function Page({ params, searchParams }: PageProps) {
 		accountId: account.id,
 	});
 
-	const transactionRows = await fetchAccountLancamentos(filters);
+	const transactionsPage = await fetchAccountLancamentosPage(
+		filters,
+		pagination,
+	);
 
-	const transactionData = mapTransactionsData(transactionRows);
+	const transactionData = mapTransactionsData(transactionsPage.rows);
 
 	const { openingBalance, currentBalance, totalIncomes, totalExpenses } =
 		accountSummary;
@@ -169,6 +174,19 @@ export default async function Page({ params, searchParams }: PageProps) {
 					accountCardFilterOptions={accountCardFilterOptions}
 					selectedPeriod={selectedPeriod}
 					estabelecimentos={estabelecimentos}
+					pagination={{
+						page: transactionsPage.page,
+						pageSize: transactionsPage.pageSize,
+						totalItems: transactionsPage.totalItems,
+						totalPages: transactionsPage.totalPages,
+					}}
+					exportContext={{
+						source: "account-statement",
+						period: selectedPeriod,
+						filters: searchFilters,
+						accountId: account.id,
+						settledOnly: true,
+					}}
 					allowCreate={false}
 					noteAsColumn={userPreferences?.statementNoteAsColumn ?? false}
 					columnOrder={userPreferences?.transactionsColumnOrder ?? null}

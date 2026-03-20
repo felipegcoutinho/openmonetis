@@ -20,8 +20,8 @@ export const LANCAMENTOS_COLUMN_LABELS: Record<string, string> = {
 	amount: "Valor",
 	condition: "Condição",
 	paymentMethod: "Forma de Pagamento",
-	categoriaName: "Category",
-	pagadorName: "Payer",
+	categoriaName: "Categoria",
+	pagadorName: "Pagador",
 	note: "Anotação",
 	contaCartao: "Conta/Cartão",
 };

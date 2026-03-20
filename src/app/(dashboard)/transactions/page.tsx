@@ -9,11 +9,12 @@ import {
 	getSingleParam,
 	mapTransactionsData,
 	type ResolvedSearchParams,
+	resolveTransactionPagination,
 } from "@/features/transactions/page-helpers";
 import {
 	fetchRecentEstablishments,
 	fetchTransactionFilterSources,
-	fetchTransactions,
+	fetchTransactionsPage,
 } from "@/features/transactions/queries";
 import MonthNavigation from "@/shared/components/month-picker/month-navigation";
 import { getUserId } from "@/shared/lib/auth/server";
@@ -33,6 +34,7 @@ export default async function Page({ searchParams }: PageProps) {
 	const { period: selectedPeriod } = parsePeriodParam(periodoParamRaw);
 
 	const searchFilters = extractTransactionSearchFilters(resolvedSearchParams);
+	const pagination = resolveTransactionPagination(resolvedSearchParams);
 
 	const [filterSources, userPreferences] = await Promise.all([
 		fetchTransactionFilterSources(userId),
@@ -49,11 +51,11 @@ export default async function Page({ searchParams }: PageProps) {
 		slugMaps,
 	});
 
-	const [transactionRows, estabelecimentos] = await Promise.all([
-		fetchTransactions(filters),
+	const [transactionsPage, estabelecimentos] = await Promise.all([
+		fetchTransactionsPage(filters, pagination),
 		fetchRecentEstablishments(userId),
 	]);
-	const transactionData = mapTransactionsData(transactionRows);
+	const transactionData = mapTransactionsData(transactionsPage.rows);
 
 	const {
 		payerOptions,
@@ -87,6 +89,17 @@ export default async function Page({ searchParams }: PageProps) {
 				accountCardFilterOptions={accountCardFilterOptions}
 				selectedPeriod={selectedPeriod}
 				estabelecimentos={estabelecimentos}
+				pagination={{
+					page: transactionsPage.page,
+					pageSize: transactionsPage.pageSize,
+					totalItems: transactionsPage.totalItems,
+					totalPages: transactionsPage.totalPages,
+				}}
+				exportContext={{
+					source: "transactions",
+					period: selectedPeriod,
+					filters: searchFilters,
+				}}
 				noteAsColumn={userPreferences?.statementNoteAsColumn ?? false}
 				columnOrder={userPreferences?.transactionsColumnOrder ?? null}
 			/>

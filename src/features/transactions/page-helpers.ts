@@ -29,6 +29,9 @@ export type ResolvedSearchParams =
 	| Record<string, string | string[] | undefined>
 	| undefined;
 
+export const TRANSACTIONS_DEFAULT_PAGE_SIZE = 30;
+export const TRANSACTIONS_PAGE_SIZE_OPTIONS = [5, 10, 20, 30, 40, 50, 100];
+
 export type TransactionSearchFilters = {
 	transactionFilter: string | null;
 	conditionFilter: string | null;
@@ -125,6 +128,26 @@ export const extractTransactionSearchFilters = (
 	accountCardFilter: getSingleParam(params, "accountCard"),
 	searchFilter: getSingleParam(params, "q"),
 });
+
+export const resolveTransactionPagination = (
+	params: ResolvedSearchParams,
+): {
+	page: number;
+	pageSize: number;
+} => {
+	const pageParam = Number.parseInt(getSingleParam(params, "page") ?? "", 10);
+	const pageSizeParam = Number.parseInt(
+		getSingleParam(params, "pageSize") ?? "",
+		10,
+	);
+
+	const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+	const pageSize = TRANSACTIONS_PAGE_SIZE_OPTIONS.includes(pageSizeParam)
+		? pageSizeParam
+		: TRANSACTIONS_DEFAULT_PAGE_SIZE;
+
+	return { page, pageSize };
+};
 
 const normalizeLabel = (value: string | null | undefined) =>
 	value?.trim().length ? value.trim() : "Sem descrição";

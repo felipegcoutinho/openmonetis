@@ -6,11 +6,8 @@ import {
 	RiFilePdfLine,
 	RiFileTextLine,
 } from "@remixicon/react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { useState } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 import {
 	formatPercentageChange,
 	formatPeriodLabel,
@@ -35,6 +32,17 @@ interface CategoryReportExportProps {
 	data: CategoryReportData;
 	filters: FilterState;
 }
+
+const loadXlsx = () => import("xlsx");
+
+const loadPdfDeps = async () => {
+	const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+		import("jspdf"),
+		import("jspdf-autotable"),
+	]);
+
+	return { jsPDF, autoTable };
+};
 
 export function CategoryReportExport({
 	data,
@@ -123,9 +131,10 @@ export function CategoryReportExport({
 		}
 	};
 
-	const exportToExcel = () => {
+	const exportToExcel = async () => {
 		try {
 			setIsExporting(true);
+			const XLSX = await loadXlsx();
 
 			// Build data array
 			const headers = [
@@ -197,6 +206,7 @@ export function CategoryReportExport({
 	const exportToPDF = async () => {
 		try {
 			setIsExporting(true);
+			const { jsPDF, autoTable } = await loadPdfDeps();
 
 			// Create PDF
 			const doc = new jsPDF({ orientation: "landscape" });

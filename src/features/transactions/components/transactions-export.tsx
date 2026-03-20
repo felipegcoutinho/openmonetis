@@ -6,11 +6,10 @@ import {
 	RiFilePdfLine,
 	RiFileTextLine,
 } from "@remixicon/react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { useState } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import { exportTransactionsDataAction } from "@/features/transactions/actions";
+import type { TransactionsExportContext } from "@/features/transactions/export-types";
 import { formatCurrency } from "@/features/transactions/formatting-helpers";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -30,11 +29,24 @@ import type { TransactionItem } from "./types";
 interface LancamentosExportProps {
 	lancamentos: TransactionItem[];
 	period: string;
+	exportContext?: TransactionsExportContext;
 }
+
+const loadXlsx = () => import("xlsx");
+
+const loadPdfDeps = async () => {
+	const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+		import("jspdf"),
+		import("jspdf-autotable"),
+	]);
+
+	return { jsPDF, autoTable };
+};
 
 export function TransactionsExport({
 	lancamentos,
 	period,
+	exportContext,
 }: LancamentosExportProps) {
 	const [isExporting, setIsExporting] = useState(false);
 
@@ -69,9 +81,24 @@ export function TransactionsExport({
 		return `${transaction.name} (${transaction.currentInstallment ?? 1}/${transaction.installmentCount})`;
 	};
 
-	const exportToCSV = () => {
+	const loadTransactions = async () => {
+		if (!exportContext) {
+			return lancamentos;
+		}
+
+		const result = await exportTransactionsDataAction(exportContext);
+
+		if (!result.success) {
+			throw new Error(result.error);
+		}
+
+		return result.data?.transactions ?? [];
+	};
+
+	const exportToCSV = async () => {
 		try {
 			setIsExporting(true);
+			const transactions = await loadTransactions();
 
 			const headers = [
 				"Data",
@@ -86,7 +113,7 @@ export function TransactionsExport({
 			];
 			const rows: string[][] = [];
 
-			lancamentos.forEach((lancamento) => {
+			transactions.forEach((lancamento) => {
 				const row = [
 					formatDate(lancamento.purchaseDate),
 					getNameWithInstallment(lancamento),
@@ -127,9 +154,11 @@ export function TransactionsExport({
 		}
 	};
 
-	const exportToExcel = () => {
+	const exportToExcel = async () => {
 		try {
 			setIsExporting(true);
+			const transactions = await loadTransactions();
+			const XLSX = await loadXlsx();
 
 			const headers = [
 				"Data",
@@ -144,7 +173,7 @@ export function TransactionsExport({
 			];
 			const rows: (string | number)[][] = [];
 
-			lancamentos.forEach((lancamento) => {
+			transactions.forEach((lancamento) => {
 				const row = [
 					formatDate(lancamento.purchaseDate),
 					getNameWithInstallment(lancamento),
@@ -189,6 +218,8 @@ export function TransactionsExport({
 	const exportToPDF = async () => {
 		try {
 			setIsExporting(true);
+			const transactions = await loadTransactions();
+			const { jsPDF, autoTable } = await loadPdfDeps();
 
 			const doc = new jsPDF({ orientation: "landscape" });
 			const primaryColor = getPrimaryPdfColor();
@@ -245,7 +276,7 @@ export function TransactionsExport({
 				],
 			];
 
-			const body = lancamentos.map((lancamento) => [
+			const body = transactions.map((lancamento) => [
 				formatDate(lancamento.purchaseDate),
 				getNameWithInstallment(lancamento),
 				lancamento.transactionType,
@@ -285,7 +316,7 @@ export function TransactionsExport({
 				},
 				didParseCell: (cellData) => {
 					if (cellData.section === "body" && cellData.column.index === 5) {
-						const lancamento = lancamentos[cellData.row.index];
+						const lancamento = transactions[cellData.row.index];
 						if (lancamento) {
 							if (lancamento.transactionType === "Despesa") {
 								cellData.cell.styles.textColor = [220, 38, 38];

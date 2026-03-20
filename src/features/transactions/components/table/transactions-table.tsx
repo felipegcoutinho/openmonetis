@@ -34,8 +34,13 @@ import {
 } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { DEFAULT_LANCAMENTOS_COLUMN_ORDER } from "@/features/transactions/column-order";
+import type {
+	TransactionsExportContext,
+	TransactionsPaginationState,
+} from "@/features/transactions/export-types";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
 	CategoryIconBadge,
@@ -289,7 +294,7 @@ const buildColumns = ({
 								<TooltipContent
 									side="top"
 									align="start"
-									className="max-w-xs whitespace-pre-line text-sm"
+									className="max-w-xs whitespace-pre-line"
 								>
 									{note}
 								</TooltipContent>
@@ -743,6 +748,8 @@ type LancamentosTableProps = {
 	categoryFilterOptions?: TransactionFilterOption[];
 	accountCardFilterOptions?: AccountCardFilterOption[];
 	selectedPeriod?: string;
+	pagination?: TransactionsPaginationState;
+	exportContext?: TransactionsExportContext;
 	onCreate?: (type: "Despesa" | "Receita") => void;
 	onMassAdd?: () => void;
 	onEdit?: (item: TransactionItem) => void;
@@ -769,6 +776,8 @@ export function TransactionsTable({
 	categoryFilterOptions = [],
 	accountCardFilterOptions = [],
 	selectedPeriod,
+	pagination: serverPagination,
+	exportContext,
 	onCreate,
 	onMassAdd,
 	onEdit,
@@ -785,6 +794,9 @@ export function TransactionsTable({
 	showActions = true,
 	showFilters = true,
 }: LancamentosTableProps) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const [sorting, setSorting] = useState<SortingState>([
 		{ id: "purchaseDate", desc: true },
 	]);
@@ -796,6 +808,7 @@ export function TransactionsTable({
 		pageSize: 30,
 	});
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+	const isServerPaginated = Boolean(serverPagination);
 
 	const columns = useMemo(() => {
 		const built = buildColumns({
@@ -835,30 +848,53 @@ export function TransactionsTable({
 	const table = useReactTable({
 		data,
 		columns,
-		state: {
-			sorting,
-			columnVisibility,
-			pagination,
-			rowSelection,
-		},
+		state: isServerPaginated
+			? {
+					sorting,
+					columnVisibility,
+					rowSelection,
+				}
+			: {
+					sorting,
+					columnVisibility,
+					pagination,
+					rowSelection,
+				},
 		onSortingChange: setSorting,
-		onPaginationChange: setPagination,
+		onPaginationChange: isServerPaginated ? undefined : setPagination,
 		onRowSelectionChange: setRowSelection,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
+		getPaginationRowModel: isServerPaginated
+			? undefined
+			: getPaginationRowModel(),
+		manualPagination: isServerPaginated,
+		pageCount: serverPagination?.totalPages,
 		enableRowSelection: true,
 	});
 
 	const rowModel = table.getRowModel();
 	const hasRows = rowModel.rows.length > 0;
-	const totalRows = table.getCoreRowModel().rows.length;
+	const totalRows = isServerPaginated
+		? (serverPagination?.totalItems ?? 0)
+		: table.getCoreRowModel().rows.length;
 	const selectedRows = table.getFilteredSelectedRowModel().rows;
 	const selectedCount = selectedRows.length;
 	const selectedTotal = selectedRows.reduce(
 		(total, row) => total + (row.original.amount ?? 0),
 		0,
 	);
+	const currentPage = isServerPaginated
+		? (serverPagination?.page ?? 1)
+		: table.getState().pagination.pageIndex + 1;
+	const currentPageSize = isServerPaginated
+		? (serverPagination?.pageSize ?? pagination.pageSize)
+		: pagination.pageSize;
+	const totalPages = isServerPaginated
+		? Math.max(serverPagination?.totalPages ?? 1, 1)
+		: Math.max(table.getPageCount(), 1);
+	const canPreviousPage = currentPage > 1;
+	const canNextPage = currentPage < totalPages;
 
 	// Check if there's any data from other users
 	const hasOtherUserData = data.some((item) => item.userId !== currentUserId);
@@ -881,6 +917,28 @@ export function TransactionsTable({
 
 	const showTopControls =
 		Boolean(onCreate) || Boolean(onMassAdd) || showFilters;
+
+	const navigateToPage = (nextPage: number, nextPageSize = currentPageSize) => {
+		const nextParams = new URLSearchParams(searchParams.toString());
+
+		if (nextPage <= 1) {
+			nextParams.delete("page");
+		} else {
+			nextParams.set("page", nextPage.toString());
+		}
+
+		if (nextPageSize === 30) {
+			nextParams.delete("pageSize");
+		} else {
+			nextParams.set("pageSize", nextPageSize.toString());
+		}
+
+		const target = nextParams.toString()
+			? `${pathname}?${nextParams.toString()}`
+			: pathname;
+		router.replace(target, { scroll: false });
+		setRowSelection({});
+	};
 
 	return (
 		<TooltipProvider>
@@ -943,6 +1001,7 @@ export function TransactionsTable({
 									<TransactionsExport
 										lancamentos={data}
 										period={selectedPeriod}
+										exportContext={exportContext}
 									/>
 								) : null
 							}
@@ -1073,9 +1132,15 @@ export function TransactionsTable({
 										{totalRows} lançamentos
 									</span>
 									<Select
-										value={pagination.pageSize.toString()}
+										value={currentPageSize.toString()}
 										onValueChange={(value) => {
-											table.setPageSize(Number(value));
+											const nextPageSize = Number(value);
+											if (isServerPaginated) {
+												navigateToPage(1, nextPageSize);
+												return;
+											}
+
+											table.setPageSize(nextPageSize);
 										}}
 									>
 										<SelectTrigger className="w-max">
@@ -1094,15 +1159,18 @@ export function TransactionsTable({
 								</div>
 								<div className="flex items-center gap-2">
 									<span className="text-sm text-muted-foreground">
-										Página {table.getState().pagination.pageIndex + 1} de{" "}
-										{Math.max(table.getPageCount(), 1)}
+										Página {currentPage} de {totalPages}
 									</span>
 									<div className="flex items-center gap-1">
 										<Button
 											variant="outline"
 											size="icon-sm"
-											onClick={() => table.setPageIndex(0)}
-											disabled={!table.getCanPreviousPage()}
+											onClick={() =>
+												isServerPaginated
+													? navigateToPage(1)
+													: table.setPageIndex(0)
+											}
+											disabled={!canPreviousPage}
 											aria-label="Primeira página"
 										>
 											<RiArrowLeftDoubleLine className="size-4" />
@@ -1110,8 +1178,12 @@ export function TransactionsTable({
 										<Button
 											variant="outline"
 											size="icon-sm"
-											onClick={() => table.previousPage()}
-											disabled={!table.getCanPreviousPage()}
+											onClick={() =>
+												isServerPaginated
+													? navigateToPage(currentPage - 1)
+													: table.previousPage()
+											}
+											disabled={!canPreviousPage}
 											aria-label="Página anterior"
 										>
 											<RiArrowLeftSLine className="size-4" />
@@ -1119,8 +1191,12 @@ export function TransactionsTable({
 										<Button
 											variant="outline"
 											size="icon-sm"
-											onClick={() => table.nextPage()}
-											disabled={!table.getCanNextPage()}
+											onClick={() =>
+												isServerPaginated
+													? navigateToPage(currentPage + 1)
+													: table.nextPage()
+											}
+											disabled={!canNextPage}
 											aria-label="Próxima página"
 										>
 											<RiArrowRightSLine className="size-4" />
@@ -1129,9 +1205,11 @@ export function TransactionsTable({
 											variant="outline"
 											size="icon-sm"
 											onClick={() =>
-												table.setPageIndex(table.getPageCount() - 1)
+												isServerPaginated
+													? navigateToPage(totalPages)
+													: table.setPageIndex(table.getPageCount() - 1)
 											}
-											disabled={!table.getCanNextPage()}
+											disabled={!canNextPage}
 											aria-label="Última página"
 										>
 											<RiArrowRightDoubleLine className="size-4" />

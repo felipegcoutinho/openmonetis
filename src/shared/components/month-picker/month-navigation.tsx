@@ -22,14 +22,9 @@ export default function MonthNavigation() {
 	const returnTarget = buildHref(defaultPeriod);
 	const isDifferentFromCurrent = period !== defaultPeriod;
 
-	// Prefetch otimizado: apenas meses adjacentes (M-1, M+1) e mês atual
-	// Isso melhora a performance da navegação sem sobrecarregar o cliente
 	useEffect(() => {
-		// Prefetch do mês anterior e próximo para navegação instantânea
 		router.prefetch(prevTarget);
 		router.prefetch(nextTarget);
-
-		// Prefetch do mês atual se não estivermos nele
 		if (isDifferentFromCurrent) {
 			router.prefetch(returnTarget);
 		}

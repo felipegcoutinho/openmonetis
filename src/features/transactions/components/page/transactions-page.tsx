@@ -11,7 +11,10 @@ import {
 	updateTransactionBulkAction,
 } from "@/features/transactions/actions";
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
-
+import type {
+	TransactionsExportContext,
+	TransactionsPaginationState,
+} from "../../export-types";
 import { AnticipateInstallmentsDialog } from "../dialogs/anticipate-installments-dialog/anticipate-installments-dialog";
 import { AnticipationHistoryDialog } from "../dialogs/anticipate-installments-dialog/anticipation-history-dialog";
 import {
@@ -54,6 +57,8 @@ interface TransactionsPageProps {
 	defaultPaymentMethod?: string | null;
 	lockCardSelection?: boolean;
 	lockPaymentMethod?: boolean;
+	pagination?: TransactionsPaginationState;
+	exportContext?: TransactionsExportContext;
 	// Opções específicas para o dialog de importação (quando visualizando dados de outro usuário)
 	importPayerOptions?: SelectOption[];
 	importSplitPayerOptions?: SelectOption[];
@@ -84,6 +89,8 @@ export function TransactionsPage({
 	defaultPaymentMethod,
 	lockCardSelection,
 	lockPaymentMethod,
+	pagination,
+	exportContext,
 	importPayerOptions,
 	importSplitPayerOptions,
 	importDefaultPayerId,
@@ -393,6 +400,8 @@ export function TransactionsPage({
 				categoryFilterOptions={categoryFilterOptions}
 				accountCardFilterOptions={accountCardFilterOptions}
 				selectedPeriod={selectedPeriod}
+				pagination={pagination}
+				exportContext={exportContext}
 				onCreate={allowCreate ? handleCreate : undefined}
 				onMassAdd={allowCreate ? handleMassAdd : undefined}
 				onEdit={handleEdit}

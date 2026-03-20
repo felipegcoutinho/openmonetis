@@ -1,8 +1,12 @@
-import { and, desc, eq, lt, type SQL, sql } from "drizzle-orm";
-import { financialAccounts, payers, transactions } from "@/db/schema";
+import { and, eq, lt, type SQL, sql } from "drizzle-orm";
+import { financialAccounts, transactions } from "@/db/schema";
+import {
+	fetchTransactionsPageWithRelations,
+	fetchTransactionsWithRelations,
+} from "@/features/transactions/queries";
 import { INITIAL_BALANCE_NOTE } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 
 export type AccountSummaryData = {
 	openingBalance: number;
@@ -36,6 +40,22 @@ export async function fetchAccountSummary(
 	accountId: string,
 	selectedPeriod: string,
 ): Promise<AccountSummaryData> {
+	const account = await fetchAccountData(userId, accountId);
+	if (!account) {
+		throw new Error("Account not found");
+	}
+
+	const adminPayerId = await getAdminPayerId(userId);
+	if (!adminPayerId) {
+		const initialBalance = Number(account.initialBalance ?? 0);
+		return {
+			openingBalance: initialBalance,
+			currentBalance: initialBalance,
+			totalIncomes: 0,
+			totalExpenses: 0,
+		};
+	}
+
 	const [periodSummary] = await db
 		.select({
 			netAmount: sql<number>`
@@ -75,14 +95,13 @@ export async function fetchAccountSummary(
       `,
 		})
 		.from(transactions)
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
 		.where(
 			and(
 				eq(transactions.userId, userId),
 				eq(transactions.accountId, accountId),
 				eq(transactions.period, selectedPeriod),
 				eq(transactions.isSettled, true),
-				eq(payers.role, PAYER_ROLE_ADMIN),
+				eq(transactions.payerId, adminPayerId),
 			),
 		);
 
@@ -101,21 +120,15 @@ export async function fetchAccountSummary(
       `,
 		})
 		.from(transactions)
-		.innerJoin(payers, eq(transactions.payerId, payers.id))
 		.where(
 			and(
 				eq(transactions.userId, userId),
 				eq(transactions.accountId, accountId),
 				lt(transactions.period, selectedPeriod),
 				eq(transactions.isSettled, true),
-				eq(payers.role, PAYER_ROLE_ADMIN),
+				eq(transactions.payerId, adminPayerId),
 			),
 		);
-
-	const account = await fetchAccountData(userId, accountId);
-	if (!account) {
-		throw new Error("Account not found");
-	}
 
 	const initialBalance = Number(account.initialBalance ?? 0);
 	const previousMovements = Number(previousRow?.previousMovements ?? 0);
@@ -137,18 +150,33 @@ export async function fetchAccountLancamentos(
 	filters: SQL[],
 	settledOnly = true,
 ) {
-	const allFilters = settledOnly
-		? [...filters, eq(transactions.isSettled, true)]
-		: filters;
+	const extraFilters = settledOnly ? [eq(transactions.isSettled, true)] : [];
 
-	return db.query.transactions.findMany({
-		where: and(...allFilters),
-		with: {
-			payer: true,
-			financialAccount: true,
-			card: true,
-			category: true,
-		},
-		orderBy: desc(transactions.purchaseDate),
+	return fetchTransactionsWithRelations({
+		filters,
+		extraFilters,
+		excludeInitialBalanceFromIncome: false,
+	});
+}
+
+export async function fetchAccountLancamentosPage(
+	filters: SQL[],
+	{
+		page,
+		pageSize,
+	}: {
+		page: number;
+		pageSize: number;
+	},
+	settledOnly = true,
+) {
+	const extraFilters = settledOnly ? [eq(transactions.isSettled, true)] : [];
+
+	return fetchTransactionsPageWithRelations({
+		filters,
+		extraFilters,
+		excludeInitialBalanceFromIncome: false,
+		page,
+		pageSize,
 	});
 }

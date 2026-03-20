@@ -162,10 +162,13 @@ export function TransactionsFilters({
 				nextParams.delete(key);
 			}
 
+			nextParams.delete("page");
+
 			startTransition(() => {
-				router.replace(`${pathname}?${nextParams.toString()}`, {
-					scroll: false,
-				});
+				const target = nextParams.toString()
+					? `${pathname}?${nextParams.toString()}`
+					: pathname;
+				router.replace(target, { scroll: false });
 			});
 		},
 		[searchParams, pathname, router],
@@ -193,9 +196,13 @@ export function TransactionsFilters({
 
 	const handleReset = () => {
 		const periodValue = searchParams.get("periodo");
+		const pageSizeValue = searchParams.get("pageSize");
 		const nextParams = new URLSearchParams();
 		if (periodValue) {
 			nextParams.set("periodo", periodValue);
+		}
+		if (pageSizeValue) {
+			nextParams.set("pageSize", pageSizeValue);
 		}
 		setSearchValue("");
 		setCategoryOpen(false);

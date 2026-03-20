@@ -28,6 +28,7 @@ export function useMonthPeriod() {
 	const buildHref = (targetPeriod: string) => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.set(PERIOD_PARAM, formatPeriodForUrl(targetPeriod));
+		params.delete("page");
 
 		return `${pathname}?${params.toString()}`;
 	};
