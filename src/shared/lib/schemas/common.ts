@@ -15,18 +15,21 @@ export const uuidSchema = (entityName: string = "ID") =>
 /**
  * Optional/nullable decimal string schema
  */
-export const optionalDecimalSchema = z
-	.string()
-	.trim()
-	.optional()
-	.transform((value) =>
-		value && value.length > 0 ? value.replace(",", ".") : null,
-	)
-	.refine(
-		(value) => value === null || !Number.isNaN(Number.parseFloat(value)),
-		"Informe um valor numérico válido.",
-	)
-	.transform((value) => (value === null ? null : Number.parseFloat(value)));
+export const optionalDecimalSchema = z.union([
+	z.number().nullable(),
+	z
+		.string()
+		.trim()
+		.optional()
+		.transform((value) =>
+			value && value.length > 0 ? value.replace(",", ".") : null,
+		)
+		.refine(
+			(value) => value === null || !Number.isNaN(Number.parseFloat(value)),
+			"Informe um valor numérico válido.",
+		)
+		.transform((value) => (value === null ? null : Number.parseFloat(value))),
+]);
 
 /**
  * Day of month schema (1-31)

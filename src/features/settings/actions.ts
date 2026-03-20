@@ -2,14 +2,22 @@
 
 import { createHash, randomBytes } from "node:crypto";
 import { verifyPassword } from "better-auth/crypto";
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, isNull, ne, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { account, apiTokens, payers } from "@/db/schema";
+import { revalidateForEntity } from "@/shared/lib/actions/helpers";
 import { auth } from "@/shared/lib/auth/config";
+import { DEFAULT_CATEGORIES } from "@/shared/lib/categories/defaults";
 import { db, schema } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import {
+	DEFAULT_PAYER_AVATAR,
+	PAYER_ROLE_ADMIN,
+	PAYER_STATUS_OPTIONS,
+} from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
+import { normalizeNameFromEmail } from "@/shared/lib/payers/utils";
 
 type ActionResponse<T = void> = {
 	success: boolean;
@@ -50,10 +58,95 @@ const deleteAccountSchema = z.object({
 	confirmation: z.literal("DELETAR"),
 });
 
+const resetAccountSchema = z.object({
+	confirmation: z.literal("ZERAR"),
+});
+
 const updatePreferencesSchema = z.object({
 	statementNoteAsColumn: z.boolean(),
 	transactionsColumnOrder: z.array(z.string()).nullable(),
 });
+
+type ResettableUser = {
+	name: string | null;
+	email: string | null;
+	image: string | null;
+};
+
+async function resetUserAppData(
+	userId: string,
+	user: ResettableUser,
+): Promise<void> {
+	const payerName =
+		(user.name && user.name.trim().length > 0
+			? user.name.trim()
+			: normalizeNameFromEmail(user.email)) || "Payer principal";
+	const avatarUrl = user.image ?? DEFAULT_PAYER_AVATAR;
+	const defaultPayerStatus = PAYER_STATUS_OPTIONS[0];
+
+	await db.transaction(async (tx: typeof db) => {
+		await tx
+			.delete(schema.payerShares)
+			.where(
+				or(
+					eq(schema.payerShares.sharedWithUserId, userId),
+					eq(schema.payerShares.createdByUserId, userId),
+				),
+			);
+
+		await tx
+			.delete(schema.userPreferences)
+			.where(eq(schema.userPreferences.userId, userId));
+		await tx
+			.delete(schema.apiTokens)
+			.where(eq(schema.apiTokens.userId, userId));
+		await tx
+			.delete(schema.savedInsights)
+			.where(eq(schema.savedInsights.userId, userId));
+		await tx.delete(schema.notes).where(eq(schema.notes.userId, userId));
+		await tx
+			.delete(schema.inboxItems)
+			.where(eq(schema.inboxItems.userId, userId));
+		await tx.delete(schema.budgets).where(eq(schema.budgets.userId, userId));
+		await tx
+			.delete(schema.installmentAnticipations)
+			.where(eq(schema.installmentAnticipations.userId, userId));
+		await tx
+			.delete(schema.transactions)
+			.where(eq(schema.transactions.userId, userId));
+		await tx.delete(schema.invoices).where(eq(schema.invoices.userId, userId));
+		await tx.delete(schema.cards).where(eq(schema.cards.userId, userId));
+		await tx
+			.delete(schema.financialAccounts)
+			.where(eq(schema.financialAccounts.userId, userId));
+		await tx.delete(schema.payers).where(eq(schema.payers.userId, userId));
+		await tx
+			.delete(schema.categories)
+			.where(eq(schema.categories.userId, userId));
+
+		if (DEFAULT_CATEGORIES.length > 0) {
+			await tx.insert(schema.categories).values(
+				DEFAULT_CATEGORIES.map((category) => ({
+					name: category.name,
+					type: category.type,
+					icon: category.icon,
+					userId,
+				})),
+			);
+		}
+
+		await tx.insert(schema.payers).values({
+			name: payerName,
+			email: user.email,
+			avatarUrl,
+			status: defaultPayerStatus,
+			note: null,
+			role: PAYER_ROLE_ADMIN,
+			isAutoSend: false,
+			userId,
+		});
+	});
+}
 
 // Actions
 
@@ -74,6 +167,7 @@ export async function updateNameAction(
 
 		const validated = updateNameSchema.parse(data);
 		const fullName = `${validated.firstName} ${validated.lastName}`;
+		const adminPayerId = await getAdminPayerId(session.user.id);
 
 		// Atualizar nome do usuário
 		await db
@@ -82,15 +176,14 @@ export async function updateNameAction(
 			.where(eq(schema.user.id, session.user.id));
 
 		// Sincronizar nome com o pagador admin
-		await db
-			.update(payers)
-			.set({ name: fullName })
-			.where(
-				and(
-					eq(payers.userId, session.user.id),
-					eq(payers.role, PAYER_ROLE_ADMIN),
-				),
-			);
+		if (adminPayerId) {
+			await db
+				.update(payers)
+				.set({ name: fullName })
+				.where(
+					and(eq(payers.userId, session.user.id), eq(payers.id, adminPayerId)),
+				);
+		}
 
 		// Revalidar o layout do dashboard para atualizar a sidebar
 		revalidatePath("/", "layout");
@@ -251,7 +344,7 @@ export async function updateEmailAction(
 			if (!storedHash) {
 				return {
 					success: false,
-					error: "FinancialAccount de credencial não encontrada.",
+					error: "Conta de credencial não encontrada.",
 				};
 			}
 
@@ -348,7 +441,7 @@ export async function deleteAccountAction(
 
 		return {
 			success: true,
-			message: "FinancialAccount deletada com sucesso",
+			message: "Conta deletada com sucesso.",
 		};
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -362,6 +455,75 @@ export async function deleteAccountAction(
 		return {
 			success: false,
 			error: "Erro ao deletar conta. Tente novamente.",
+		};
+	}
+}
+
+export async function resetAccountAction(
+	data: z.infer<typeof resetAccountSchema>,
+): Promise<ActionResponse> {
+	try {
+		const session = await auth.api.getSession({
+			headers: await headers(),
+		});
+
+		if (!session?.user?.id) {
+			return {
+				success: false,
+				error: "Não autenticado",
+			};
+		}
+
+		resetAccountSchema.parse(data);
+
+		const currentUser = await db.query.user.findFirst({
+			columns: {
+				name: true,
+				email: true,
+				image: true,
+			},
+			where: eq(schema.user.id, session.user.id),
+		});
+
+		if (!currentUser) {
+			return {
+				success: false,
+				error: "Usuário não encontrado.",
+			};
+		}
+
+		await resetUserAppData(session.user.id, currentUser);
+
+		revalidateForEntity("accounts", session.user.id);
+		revalidateForEntity("cards", session.user.id);
+		revalidateForEntity("categories", session.user.id);
+		revalidateForEntity("budgets", session.user.id);
+		revalidateForEntity("payers", session.user.id);
+		revalidateForEntity("notes", session.user.id);
+		revalidateForEntity("transactions", session.user.id);
+		revalidateForEntity("inbox", session.user.id);
+		revalidatePath("/settings");
+		revalidatePath("/insights");
+		revalidatePath("/reports");
+		revalidatePath("/calendar");
+		revalidatePath("/", "layout");
+
+		return {
+			success: true,
+			message: "Conta zerada com sucesso.",
+		};
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: error.issues[0]?.message || "Dados inválidos",
+			};
+		}
+
+		console.error("Erro ao zerar conta:", error);
+		return {
+			success: false,
+			error: "Erro ao zerar conta. Tente novamente.",
 		};
 	}
 }
@@ -557,7 +719,12 @@ export async function revokeApiTokenAction(
 			.set({
 				revokedAt: new Date(),
 			})
-			.where(eq(apiTokens.id, validated.tokenId));
+			.where(
+				and(
+					eq(apiTokens.id, validated.tokenId),
+					eq(apiTokens.userId, session.user.id),
+				),
+			);
 
 		revalidatePath("/settings");
 

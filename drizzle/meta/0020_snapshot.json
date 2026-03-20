@@ -1,6 +1,6 @@
 {
-	"id": "34a2c0b7-802d-46f0-8e8e-cb7b935703d4",
-	"prevId": "853b7f42-7b0e-43a6-8665-918ec5ec6608",
+	"id": "870444cf-b280-40bd-9fff-90ed881454df",
+	"prevId": "34a2c0b7-802d-46f0-8e8e-cb7b935703d4",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -282,6 +282,33 @@
 						}
 					],
 					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"orcamentos_user_id_categoria_id_periodo_key": {
+					"name": "orcamentos_user_id_categoria_id_periodo_key",
+					"columns": [
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "categoria_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "periodo",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -1059,6 +1086,33 @@
 						}
 					],
 					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"faturas_user_id_cartao_id_periodo_key": {
+					"name": "faturas_user_id_cartao_id_periodo_key",
+					"columns": [
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "cartao_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "periodo",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}

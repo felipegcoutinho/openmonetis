@@ -20,7 +20,10 @@ interface AccountFormFieldsProps {
 	values: AccountFormValues;
 	accountTypes: string[];
 	accountStatuses: string[];
-	onChange: (field: keyof AccountFormValues, value: string) => void;
+	onChange: <K extends keyof AccountFormValues>(
+		field: K,
+		value: AccountFormValues[K],
+	) => void;
 	showInitialBalance?: boolean;
 }
 
@@ -112,7 +115,7 @@ export function AccountFormFields({
 						id="exclude-from-balance"
 						checked={Boolean(values.excludeFromBalance)}
 						onCheckedChange={(checked) =>
-							onChange("excludeFromBalance", checked ? "true" : "false")
+							onChange("excludeFromBalance", checked === true)
 						}
 					/>
 					<Label
@@ -129,10 +132,7 @@ export function AccountFormFields({
 						id="exclude-initial-balance-from-income"
 						checked={Boolean(values.excludeInitialBalanceFromIncome)}
 						onCheckedChange={(checked) =>
-							onChange(
-								"excludeInitialBalanceFromIncome",
-								checked ? "true" : "false",
-							)
+							onChange("excludeInitialBalanceFromIncome", checked === true)
 						}
 					/>
 					<Label

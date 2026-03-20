@@ -2,7 +2,10 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteAccountAction } from "@/features/settings/actions";
+import {
+	deleteAccountAction,
+	resetAccountAction,
+} from "@/features/settings/actions";
 import { Button } from "@/shared/components/ui/button";
 import {
 	Dialog,
@@ -16,68 +19,145 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { authClient } from "@/shared/lib/auth/client";
 
+const RESET_CONFIRMATION = "ZERAR";
+const DELETE_CONFIRMATION = "DELETAR";
+
+type DangerAction = "reset" | "delete";
+
 export function DeleteAccountForm() {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [dangerAction, setDangerAction] = useState<DangerAction | null>(null);
 	const [confirmation, setConfirmation] = useState("");
 
-	const handleDelete = () => {
+	const handleAction = () => {
+		if (!dangerAction) return;
+
+		const currentAction = dangerAction;
+
 		startTransition(async () => {
-			const result = await deleteAccountAction({
-				confirmation: confirmation as "DELETAR",
-			});
+			const result =
+				currentAction === "reset"
+					? await resetAccountAction({
+							confirmation: confirmation as typeof RESET_CONFIRMATION,
+						})
+					: await deleteAccountAction({
+							confirmation: confirmation as typeof DELETE_CONFIRMATION,
+						});
 
 			if (result.success) {
 				toast.success(result.message);
-				// Fazer logout e redirecionar para página de login
-				await authClient.signOut();
-				router.push("/");
+
+				if (currentAction === "delete") {
+					await authClient.signOut();
+					router.push("/");
+					return;
+				}
+
+				setConfirmation("");
+				setDangerAction(null);
+				router.refresh();
 			} else {
 				toast.error(result.error);
 			}
 		});
 	};
 
-	const handleOpenModal = () => {
+	const handleOpenModal = (action: DangerAction) => {
 		setConfirmation("");
-		setIsModalOpen(true);
+		setDangerAction(action);
 	};
 
 	const handleCloseModal = () => {
 		if (isPending) return;
 		setConfirmation("");
-		setIsModalOpen(false);
+		setDangerAction(null);
 	};
+
+	const confirmationWord =
+		dangerAction === "reset" ? RESET_CONFIRMATION : DELETE_CONFIRMATION;
+	const isResetAction = dangerAction === "reset";
 
 	return (
 		<>
 			<div className="flex flex-col space-y-6">
-				<div className="space-y-4 max-w-md">
-					<ul className="list-disc list-inside text-sm text-destructive space-y-1">
-						<li>Lançamentos, orçamentos e anotações</li>
-						<li>Contas, cartões e categorias</li>
-						<li>Pagadores (incluindo o pagador padrão)</li>
-						<li>Preferências e configurações</li>
-						<li className="font-bold">
-							Resumindo tudo, sua conta será permanentemente removida
-						</li>
-					</ul>
+				<div className="rounded-lg border p-4">
+					<div className="space-y-4">
+						<div>
+							<h3 className="font-semibold">Zerar conta</h3>
+							<p className="text-sm text-muted-foreground">
+								Apaga todos os dados do OpenMonetis e deixa sua conta no estado
+								inicial, mantendo seu login e credenciais de acesso.
+							</p>
+						</div>
+
+						<ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+							<li>Lançamentos, faturas, antecipações e pré-lançamentos</li>
+							<li>Contas, cartões, orçamentos e anotações</li>
+							<li>Pagadores próprios e compartilhamentos recebidos</li>
+							<li>
+								Preferências do app, insights salvos e tokens do Companion
+							</li>
+							<li className="font-medium text-foreground">
+								Categorias padrão e pagador admin serão recriados
+								automaticamente
+							</li>
+						</ul>
+
+						<div className="flex justify-end">
+							<Button
+								variant="outline"
+								onClick={() => handleOpenModal("reset")}
+								disabled={isPending}
+								className="w-fit border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+							>
+								Zerar conta
+							</Button>
+						</div>
+					</div>
 				</div>
 
-				<div className="flex justify-end">
-					<Button
-						variant="destructive"
-						onClick={handleOpenModal}
-						disabled={isPending}
-						className="w-fit"
-					>
-						Deletar conta
-					</Button>
+				<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+					<div className="space-y-4">
+						<div>
+							<h3 className="font-semibold text-destructive">Deletar conta</h3>
+							<p className="text-sm text-muted-foreground">
+								Remove seu usuário e todos os dados associados de forma
+								permanente.
+							</p>
+						</div>
+
+						<ul className="list-disc list-inside text-sm text-destructive space-y-1">
+							<li>Lançamentos, orçamentos e anotações</li>
+							<li>Contas, cartões e categorias</li>
+							<li>Pagadores, credenciais e configurações</li>
+							<li className="font-bold">
+								Resumindo tudo, sua conta será permanentemente removida
+							</li>
+						</ul>
+
+						<div className="flex justify-end">
+							<Button
+								variant="destructive"
+								onClick={() => handleOpenModal("delete")}
+								disabled={isPending}
+								className="w-fit"
+							>
+								Deletar conta
+							</Button>
+						</div>
+					</div>
 				</div>
 			</div>
 
-			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+			<Dialog
+				open={dangerAction !== null}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) {
+						handleCloseModal();
+					}
+				}}
+			>
 				<DialogContent
 					className="max-w-md"
 					onEscapeKeyDown={(e) => {
@@ -88,24 +168,28 @@ export function DeleteAccountForm() {
 					}}
 				>
 					<DialogHeader>
-						<DialogTitle>Você tem certeza?</DialogTitle>
+						<DialogTitle>
+							{isResetAction ? "Zerar sua conta?" : "Você tem certeza?"}
+						</DialogTitle>
 						<DialogDescription>
-							Essa ação não pode ser desfeita. Isso irá deletar permanentemente
-							sua conta e remover seus dados de nossos servidores.
+							{isResetAction
+								? "Essa ação não pode ser desfeita. Todos os dados do app serão apagados e sua conta voltará ao estado inicial, mas seu login continuará existindo."
+								: "Essa ação não pode ser desfeita. Isso irá deletar permanentemente sua conta e remover seus dados de nossos servidores."}
 						</DialogDescription>
 					</DialogHeader>
 
 					<div className="space-y-4 py-4">
 						<div className="space-y-2">
 							<Label htmlFor="confirmation">
-								Para confirmar, digite <strong>DELETAR</strong> no campo abaixo.
+								Para confirmar, digite <strong>{confirmationWord}</strong> no
+								campo abaixo.
 							</Label>
 							<Input
 								id="confirmation"
 								value={confirmation}
 								onChange={(e) => setConfirmation(e.target.value)}
 								disabled={isPending}
-								placeholder="DELETAR"
+								placeholder={confirmationWord}
 								autoComplete="off"
 							/>
 						</div>
@@ -122,11 +206,22 @@ export function DeleteAccountForm() {
 						</Button>
 						<Button
 							type="button"
-							variant="destructive"
-							onClick={handleDelete}
-							disabled={isPending || confirmation !== "DELETAR"}
+							variant={isResetAction ? "outline" : "destructive"}
+							onClick={handleAction}
+							disabled={isPending || confirmation !== confirmationWord}
+							className={
+								isResetAction
+									? "border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+									: undefined
+							}
 						>
-							{isPending ? "Deletando..." : "Deletar"}
+							{isPending
+								? isResetAction
+									? "Zerando..."
+									: "Deletando..."
+								: isResetAction
+									? "Zerar conta"
+									: "Deletar"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

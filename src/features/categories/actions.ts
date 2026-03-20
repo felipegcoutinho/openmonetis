@@ -56,7 +56,7 @@ export async function createCategoryAction(
 			userId: user.id,
 		});
 
-		revalidateForEntity("categories");
+		revalidateForEntity("categories", user.id);
 
 		return { success: true, message: "Category criada com sucesso." };
 	} catch (error) {
@@ -114,7 +114,7 @@ export async function updateCategoryAction(
 			};
 		}
 
-		revalidateForEntity("categories");
+		revalidateForEntity("categories", user.id);
 
 		return { success: true, message: "Category atualizada com sucesso." };
 	} catch (error) {
@@ -167,7 +167,7 @@ export async function deleteCategoryAction(
 			};
 		}
 
-		revalidateForEntity("categories");
+		revalidateForEntity("categories", user.id);
 
 		return { success: true, message: "Category removida com sucesso." };
 	} catch (error) {

@@ -352,6 +352,9 @@ export const invoices = pgTable(
 			table.cardId,
 			table.period,
 		),
+		userIdCardIdPeriodUnique: uniqueIndex(
+			"faturas_user_id_cartao_id_periodo_key",
+		).on(table.userId, table.cardId, table.period),
 	}),
 );
 
@@ -380,6 +383,9 @@ export const budgets = pgTable(
 			table.userId,
 			table.period,
 		),
+		userIdCategoryIdPeriodUnique: uniqueIndex(
+			"orcamentos_user_id_categoria_id_periodo_key",
+		).on(table.userId, table.categoryId, table.period),
 	}),
 );
 
@@ -635,11 +641,9 @@ export const transactions = pgTable(
 			table.period,
 		),
 		// Índice composto para o filtro quente do dashboard: userId + payerId + period
-		userIdPayerIdPeriodIdx: index("lancamentos_user_id_pagador_id_period_idx").on(
-			table.userId,
-			table.payerId,
-			table.period,
-		),
+		userIdPayerIdPeriodIdx: index(
+			"lancamentos_user_id_pagador_id_period_idx",
+		).on(table.userId, table.payerId, table.period),
 		// Índice para queries ordenadas por data de compra
 		userIdPurchaseDateIdx: index("lancamentos_user_id_purchase_date_idx").on(
 			table.userId,

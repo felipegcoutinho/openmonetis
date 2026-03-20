@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { budgets, categories } from "@/db/schema";
 import {
@@ -52,6 +52,28 @@ type BudgetCopyRow = {
 	amount: unknown;
 };
 
+const BUDGET_DUPLICATE_ERROR =
+	"Já existe um orçamento para esta categoria no período selecionado.";
+const BUDGET_UNIQUE_CONSTRAINT = "orcamentos_user_id_categoria_id_periodo_key";
+
+const hasUniqueConstraintError = (error: unknown, constraint: string) => {
+	if (!error || typeof error !== "object") {
+		return false;
+	}
+
+	const candidate = error as {
+		code?: string;
+		constraint?: string;
+		cause?: { code?: string; constraint?: string };
+	};
+
+	return (
+		(candidate.code === "23505" && candidate.constraint === constraint) ||
+		(candidate.cause?.code === "23505" &&
+			candidate.cause.constraint === constraint)
+	);
+};
+
 const ensureCategory = async (userId: string, categoryId: string) => {
 	const category = await db.query.categories.findFirst({
 		columns: {
@@ -79,36 +101,37 @@ export async function createBudgetAction(
 
 		await ensureCategory(user.id, data.categoryId);
 
-		const duplicateConditions = [
-			eq(budgets.userId, user.id),
-			eq(budgets.period, data.period),
-			eq(budgets.categoryId, data.categoryId),
-		] as const;
+		const [createdBudget] = await db
+			.insert(budgets)
+			.values({
+				amount: formatDecimalForDbRequired(data.amount),
+				period: data.period,
+				userId: user.id,
+				categoryId: data.categoryId,
+			})
+			.onConflictDoNothing({
+				target: [budgets.userId, budgets.categoryId, budgets.period],
+			})
+			.returning({ id: budgets.id });
 
-		const duplicate = await db.query.budgets.findFirst({
-			columns: { id: true },
-			where: and(...duplicateConditions),
-		});
-
-		if (duplicate) {
+		if (!createdBudget) {
 			return {
 				success: false,
-				error:
-					"Já existe um orçamento para esta categoria no período selecionado.",
+				error: BUDGET_DUPLICATE_ERROR,
 			};
 		}
 
-		await db.insert(budgets).values({
-			amount: formatDecimalForDbRequired(data.amount),
-			period: data.period,
-			userId: user.id,
-			categoryId: data.categoryId,
-		});
-
-		revalidateForEntity("budgets");
+		revalidateForEntity("budgets", user.id);
 
 		return { success: true, message: "Orçamento criado com sucesso." };
 	} catch (error) {
+		if (hasUniqueConstraintError(error, BUDGET_UNIQUE_CONSTRAINT)) {
+			return {
+				success: false,
+				error: BUDGET_DUPLICATE_ERROR,
+			};
+		}
+
 		return handleActionError(error);
 	}
 }
@@ -121,26 +144,6 @@ export async function updateBudgetAction(
 		const data = updateBudgetSchema.parse(input);
 
 		await ensureCategory(user.id, data.categoryId);
-
-		const duplicateConditions = [
-			eq(budgets.userId, user.id),
-			eq(budgets.period, data.period),
-			eq(budgets.categoryId, data.categoryId),
-			ne(budgets.id, data.id),
-		] as const;
-
-		const duplicate = await db.query.budgets.findFirst({
-			columns: { id: true },
-			where: and(...duplicateConditions),
-		});
-
-		if (duplicate) {
-			return {
-				success: false,
-				error:
-					"Já existe um orçamento para esta categoria no período selecionado.",
-			};
-		}
 
 		const [updated] = await db
 			.update(budgets)
@@ -159,10 +162,17 @@ export async function updateBudgetAction(
 			};
 		}
 
-		revalidateForEntity("budgets");
+		revalidateForEntity("budgets", user.id);
 
 		return { success: true, message: "Orçamento atualizado com sucesso." };
 	} catch (error) {
+		if (hasUniqueConstraintError(error, BUDGET_UNIQUE_CONSTRAINT)) {
+			return {
+				success: false,
+				error: BUDGET_DUPLICATE_ERROR,
+			};
+		}
+
 		return handleActionError(error);
 	}
 }
@@ -186,7 +196,7 @@ export async function deleteBudgetAction(
 			};
 		}
 
-		revalidateForEntity("budgets");
+		revalidateForEntity("budgets", user.id);
 
 		return { success: true, message: "Orçamento removido com sucesso." };
 	} catch (error) {
@@ -247,21 +257,35 @@ export async function duplicatePreviousMonthBudgetsAction(
 			};
 		}
 
-		// Inserir novos orçamentos
-		await db.insert(budgets).values(
-			budgetsToCopy.map((b) => ({
-				amount: b.amount as string,
-				period: data.period,
-				userId: user.id,
-				categoryId: b.categoryId as string,
-			})),
-		);
+		// Inserir novos orçamentos sem falhar se houver corrida com outro request.
+		const insertedBudgets = await db
+			.insert(budgets)
+			.values(
+				budgetsToCopy.map((b) => ({
+					amount: b.amount as string,
+					period: data.period,
+					userId: user.id,
+					categoryId: b.categoryId as string,
+				})),
+			)
+			.onConflictDoNothing({
+				target: [budgets.userId, budgets.categoryId, budgets.period],
+			})
+			.returning({ id: budgets.id });
 
-		revalidateForEntity("budgets");
+		if (insertedBudgets.length === 0) {
+			return {
+				success: false,
+				error:
+					"Todas as categories do mês anterior já possuem orçamento neste mês.",
+			};
+		}
+
+		revalidateForEntity("budgets", user.id);
 
 		return {
 			success: true,
-			message: `${budgetsToCopy.length} orçamento${budgetsToCopy.length > 1 ? "s" : ""} duplicado${budgetsToCopy.length > 1 ? "s" : ""} com sucesso.`,
+			message: `${insertedBudgets.length} orçamento${insertedBudgets.length > 1 ? "s" : ""} duplicado${insertedBudgets.length > 1 ? "s" : ""} com sucesso.`,
 		};
 	} catch (error) {
 		return handleActionError(error);

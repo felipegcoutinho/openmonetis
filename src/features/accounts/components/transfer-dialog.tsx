@@ -157,7 +157,7 @@ export function TransferDialog({
 						</div>
 
 						<div className="flex flex-col gap-2 sm:col-span-2">
-							<Label htmlFor="from-account">FinancialAccount de origem</Label>
+							<Label htmlFor="from-account">Conta de origem</Label>
 							<Select value={fromAccountId} disabled>
 								<SelectTrigger id="from-account" className="w-full">
 									<SelectValue>
@@ -185,7 +185,7 @@ export function TransferDialog({
 						</div>
 
 						<div className="flex flex-col gap-2 sm:col-span-2">
-							<Label htmlFor="to-account">FinancialAccount de destino</Label>
+							<Label htmlFor="to-account">Conta de destino</Label>
 							{availableAccounts.length === 0 ? (
 								<div className="rounded-md border border-border bg-muted p-3 text-sm text-muted-foreground">
 									É necessário ter mais de uma conta cadastrada para realizar

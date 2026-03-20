@@ -65,7 +65,7 @@ async function assertAccountOwnership(userId: string, accountId: string) {
 	});
 
 	if (!account) {
-		throw new Error("FinancialAccount vinculada não encontrada.");
+		throw new Error("Conta vinculada não encontrada.");
 	}
 }
 
@@ -93,7 +93,7 @@ export async function createCardAction(
 			userId: user.id,
 		});
 
-		revalidateForEntity("cards");
+		revalidateForEntity("cards", user.id);
 
 		return { success: true, message: "Cartão criado com sucesso." };
 	} catch (error) {
@@ -135,7 +135,7 @@ export async function updateCardAction(
 			};
 		}
 
-		revalidateForEntity("cards");
+		revalidateForEntity("cards", user.id);
 
 		return { success: true, message: "Cartão atualizado com sucesso." };
 	} catch (error) {
@@ -162,7 +162,7 @@ export async function deleteCardAction(
 			};
 		}
 
-		revalidateForEntity("cards");
+		revalidateForEntity("cards", user.id);
 
 		return { success: true, message: "Cartão removido com sucesso." };
 	} catch (error) {

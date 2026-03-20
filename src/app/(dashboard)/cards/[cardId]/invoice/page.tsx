@@ -105,7 +105,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 	const cardDialogAccounts = filterSources.accountRows.map(
 		(financialAccount: FinancialAccount) => ({
 			id: financialAccount.id,
-			name: financialAccount.name ?? "FinancialAccount",
+			name: financialAccount.name ?? "Conta",
 			logo: financialAccount.logo ?? null,
 		}),
 	);
@@ -114,7 +114,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 		filterSources.accountRows.find(
 			(financialAccount: FinancialAccount) =>
 				financialAccount.id === card.accountId,
-		)?.name ?? "FinancialAccount";
+		)?.name ?? "Conta";
 
 	const cardDialogData: Card = {
 		id: card.id,

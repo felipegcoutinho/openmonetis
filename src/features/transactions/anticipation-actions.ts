@@ -263,10 +263,15 @@ export async function createInstallmentAnticipationAction(
 					anticipationId: anticipation.id,
 					amount: "0", // Zera o valor para não contar em dobro
 				})
-				.where(inArray(transactions.id, data.installmentIds));
+				.where(
+					and(
+						inArray(transactions.id, data.installmentIds),
+						eq(transactions.userId, user.id),
+					),
+				);
 		});
 
-		revalidateForEntity("transactions");
+		revalidateForEntity("transactions", user.id);
 
 		return {
 			success: true,
@@ -418,24 +423,37 @@ export async function cancelInstallmentAnticipationAction(
 					amount: formatDecimalForDbRequired(originalValuePerInstallment),
 				})
 				.where(
-					inArray(
-						transactions.id,
-						anticipation.anticipatedInstallmentIds as string[],
+					and(
+						inArray(
+							transactions.id,
+							anticipation.anticipatedInstallmentIds as string[],
+						),
+						eq(transactions.userId, user.id),
 					),
 				);
 
 			// 5. Deletar lançamento de antecipação
 			await tx
 				.delete(transactions)
-				.where(eq(transactions.id, anticipation.transactionId));
+				.where(
+					and(
+						eq(transactions.id, anticipation.transactionId),
+						eq(transactions.userId, user.id),
+					),
+				);
 
 			// 6. Deletar registro de antecipação
 			await tx
 				.delete(installmentAnticipations)
-				.where(eq(installmentAnticipations.id, data.anticipationId));
+				.where(
+					and(
+						eq(installmentAnticipations.id, data.anticipationId),
+						eq(installmentAnticipations.userId, user.id),
+					),
+				);
 		});
 
-		revalidateForEntity("transactions");
+		revalidateForEntity("transactions", user.id);
 
 		return {
 			success: true,

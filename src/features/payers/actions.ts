@@ -81,7 +81,7 @@ type ShareDeleteInput = z.infer<typeof shareDeleteSchema>;
 type ShareCodeJoinInput = z.infer<typeof shareCodeJoinSchema>;
 type ShareCodeRegenerateInput = z.infer<typeof shareCodeRegenerateSchema>;
 
-const revalidate = () => revalidateForEntity("payers");
+const revalidate = (userId: string) => revalidateForEntity("payers", userId);
 
 const generateShareCode = () => {
 	// base64url já retorna apenas [a-zA-Z0-9_-]
@@ -108,7 +108,7 @@ export async function createPayerAction(
 			userId: user.id,
 		});
 
-		revalidate();
+		revalidate(user.id);
 
 		return { success: true, message: "Payer criado com sucesso." };
 	} catch (error) {
@@ -158,7 +158,7 @@ export async function updatePayerAction(
 			revalidatePath("/", "layout");
 		}
 
-		revalidate();
+		revalidate(currentUser.id);
 
 		return { success: true, message: "Payer atualizado com sucesso." };
 	} catch (error) {
@@ -195,7 +195,7 @@ export async function deletePayerAction(
 			.delete(payers)
 			.where(and(eq(payers.id, data.id), eq(payers.userId, user.id)));
 
-		revalidate();
+		revalidate(user.id);
 
 		return { success: true, message: "Payer removido com sucesso." };
 	} catch (error) {
@@ -246,7 +246,7 @@ export async function joinPayerByShareCodeAction(
 			createdByUserId: pagadorRow.userId,
 		});
 
-		revalidate();
+		revalidate(user.id);
 
 		return { success: true, message: "Payer adicionado à sua lista." };
 	} catch (error) {
@@ -291,7 +291,7 @@ export async function deletePayerShareAction(
 
 		await db.delete(payerShares).where(eq(payerShares.id, data.shareId));
 
-		revalidate();
+		revalidate(user.id);
 		revalidatePath(`/payers/${existing.payerId}`);
 
 		return { success: true, message: "Compartilhamento removido." };
@@ -325,7 +325,7 @@ export async function regeneratePayerShareCodeAction(
 					.set({ shareCode: newCode })
 					.where(and(eq(payers.id, data.payerId), eq(payers.userId, user.id)));
 
-				revalidate();
+				revalidate(user.id);
 				revalidatePath(`/payers/${data.payerId}`);
 				return {
 					success: true,

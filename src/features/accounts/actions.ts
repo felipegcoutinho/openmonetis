@@ -2,12 +2,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import {
-	categories,
-	financialAccounts,
-	payers,
-	transactions,
-} from "@/db/schema";
+import { categories, financialAccounts, transactions } from "@/db/schema";
 import {
 	INITIAL_BALANCE_CATEGORY_NAME,
 	INITIAL_BALANCE_CONDITION,
@@ -22,7 +17,7 @@ import {
 } from "@/shared/lib/actions/helpers";
 import { getUser } from "@/shared/lib/auth/server";
 import { db } from "@/shared/lib/db";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { noteSchema, uuidSchema } from "@/shared/lib/schemas/common";
 import {
 	TRANSFER_CATEGORY_NAME,
@@ -54,14 +49,20 @@ const accountBaseSchema = z.object({
 		.trim()
 		.min(1, "Selecione um logo."),
 	initialBalance: z
-		.string()
-		.trim()
-		.transform((value) => (value.length === 0 ? "0" : value.replace(",", ".")))
-		.refine(
-			(value) => !Number.isNaN(Number.parseFloat(value)),
-			"Informe um saldo inicial válido.",
-		)
-		.transform((value) => Number.parseFloat(value)),
+		.union([
+			z.number(),
+			z
+				.string()
+				.trim()
+				.transform((value) =>
+					value.length === 0 ? "0" : value.replace(",", "."),
+				)
+				.refine(
+					(value) => !Number.isNaN(Number.parseFloat(value)),
+					"Informe um saldo inicial válido.",
+				)
+				.transform((value) => Number.parseFloat(value)),
+		]),
 	excludeFromBalance: z
 		.union([z.boolean(), z.string()])
 		.transform((value) => value === true || value === "true"),
@@ -93,6 +94,15 @@ export async function createAccountAction(
 
 		const normalizedInitialBalance = Math.abs(data.initialBalance);
 		const hasInitialBalance = normalizedInitialBalance > 0;
+		const adminPayerId = hasInitialBalance
+			? await getAdminPayerId(user.id)
+			: null;
+
+		if (hasInitialBalance && !adminPayerId) {
+			throw new Error(
+				"Payer com papel administrador não encontrado. Crie um pagador admin antes de definir um saldo inicial.",
+			);
+		}
 
 		await db.transaction(async (tx: typeof db) => {
 			const [createdAccount] = await tx
@@ -118,7 +128,7 @@ export async function createAccountAction(
 				return;
 			}
 
-			const [category, adminPagador] = await Promise.all([
+			const [category] = await Promise.all([
 				tx.query.categories.findFirst({
 					columns: { id: true },
 					where: and(
@@ -126,24 +136,11 @@ export async function createAccountAction(
 						eq(categories.name, INITIAL_BALANCE_CATEGORY_NAME),
 					),
 				}),
-				tx.query.payers.findFirst({
-					columns: { id: true },
-					where: and(
-						eq(payers.userId, user.id),
-						eq(payers.role, PAYER_ROLE_ADMIN),
-					),
-				}),
 			]);
 
 			if (!category) {
 				throw new Error(
 					'Category "Saldo inicial" não encontrada. Crie-a antes de definir um saldo inicial.',
-				);
-			}
-
-			if (!adminPagador) {
-				throw new Error(
-					"Payer com papel administrador não encontrado. Crie um pagador admin antes de definir um saldo inicial.",
 				);
 			}
 
@@ -162,15 +159,15 @@ export async function createAccountAction(
 				userId: user.id,
 				accountId: createdAccount.id,
 				categoryId: category.id,
-				payerId: adminPagador.id,
+				payerId: adminPayerId,
 			});
 		});
 
-		revalidateForEntity("accounts");
+		revalidateForEntity("accounts", user.id);
 
 		return {
 			success: true,
-			message: "FinancialAccount criada com sucesso.",
+			message: "Conta criada com sucesso.",
 		};
 	} catch (error) {
 		return handleActionError(error);
@@ -209,15 +206,15 @@ export async function updateAccountAction(
 		if (!updated) {
 			return {
 				success: false,
-				error: "FinancialAccount não encontrada.",
+				error: "Conta não encontrada.",
 			};
 		}
 
-		revalidateForEntity("accounts");
+		revalidateForEntity("accounts", user.id);
 
 		return {
 			success: true,
-			message: "FinancialAccount atualizada com sucesso.",
+			message: "Conta atualizada com sucesso.",
 		};
 	} catch (error) {
 		return handleActionError(error);
@@ -244,15 +241,15 @@ export async function deleteAccountAction(
 		if (!deleted) {
 			return {
 				success: false,
-				error: "FinancialAccount não encontrada.",
+				error: "Conta não encontrada.",
 			};
 		}
 
-		revalidateForEntity("accounts");
+		revalidateForEntity("accounts", user.id);
 
 		return {
 			success: true,
-			message: "FinancialAccount removida com sucesso.",
+			message: "Conta removida com sucesso.",
 		};
 	} catch (error) {
 		return handleActionError(error);
@@ -261,8 +258,8 @@ export async function deleteAccountAction(
 
 // Transfer between accounts
 const transferSchema = z.object({
-	fromAccountId: uuidSchema("FinancialAccount de origem"),
-	toAccountId: uuidSchema("FinancialAccount de destino"),
+	fromAccountId: uuidSchema("Conta de origem"),
+	toAccountId: uuidSchema("Conta de destino"),
 	amount: z
 		.string()
 		.trim()
@@ -299,6 +296,13 @@ export async function transferBetweenAccountsAction(
 
 		// Generate a unique transfer ID to link both transactions
 		const transferId = crypto.randomUUID();
+		const adminPayerId = await getAdminPayerId(user.id);
+
+		if (!adminPayerId) {
+			throw new Error(
+				"Payer administrador não encontrado. Por favor, crie um pagador admin.",
+			);
+		}
 
 		await db.transaction(async (tx: typeof db) => {
 			// Verify both accounts exist and belong to the user
@@ -320,21 +324,23 @@ export async function transferBetweenAccountsAction(
 			]);
 
 			if (!fromAccount) {
-				throw new Error("FinancialAccount de origem não encontrada.");
+				throw new Error("Conta de origem não encontrada.");
 			}
 
 			if (!toAccount) {
-				throw new Error("FinancialAccount de destino não encontrada.");
+				throw new Error("Conta de destino não encontrada.");
 			}
 
-			// Get the transfer category
-			const transferCategory = await tx.query.categories.findFirst({
-				columns: { id: true },
-				where: and(
-					eq(categories.userId, user.id),
-					eq(categories.name, TRANSFER_CATEGORY_NAME),
-				),
-			});
+			// Get the transfer category and admin payer in parallel
+			const [transferCategory] = await Promise.all([
+				tx.query.categories.findFirst({
+					columns: { id: true },
+					where: and(
+						eq(categories.userId, user.id),
+						eq(categories.name, TRANSFER_CATEGORY_NAME),
+					),
+				}),
+			]);
 
 			if (!transferCategory) {
 				throw new Error(
@@ -342,62 +348,41 @@ export async function transferBetweenAccountsAction(
 				);
 			}
 
-			// Get the admin payer
-			const adminPagador = await tx.query.payers.findFirst({
-				columns: { id: true },
-				where: and(
-					eq(payers.userId, user.id),
-					eq(payers.role, PAYER_ROLE_ADMIN),
-				),
-			});
-
-			if (!adminPagador) {
-				throw new Error(
-					"Payer administrador não encontrado. Por favor, crie um pagador admin.",
-				);
-			}
-
 			const transferNote = `de ${fromAccount.name} -> ${toAccount.name}`;
 
-			// Create outgoing transaction (transfer from source account)
-			await tx.insert(transactions).values({
+			const sharedFields = {
 				condition: TRANSFER_CONDITION,
-				name: TRANSFER_ESTABLISHMENT_SAIDA,
 				paymentMethod: TRANSFER_PAYMENT_METHOD,
 				note: transferNote,
-				amount: formatDecimalForDbRequired(-Math.abs(data.amount)),
 				purchaseDate: data.date,
-				transactionType: "Transferência",
+				transactionType: "Transferência" as const,
 				period: data.period,
 				isSettled: true,
 				userId: user.id,
-				accountId: fromAccount.id,
 				categoryId: transferCategory.id,
-				payerId: adminPagador.id,
+				payerId: adminPayerId,
 				transferId,
-			});
+			};
 
-			// Create incoming transaction (transfer to destination account)
-			await tx.insert(transactions).values({
-				condition: TRANSFER_CONDITION,
-				name: TRANSFER_ESTABLISHMENT_ENTRADA,
-				paymentMethod: TRANSFER_PAYMENT_METHOD,
-				note: transferNote,
-				amount: formatDecimalForDbRequired(Math.abs(data.amount)),
-				purchaseDate: data.date,
-				transactionType: "Transferência",
-				period: data.period,
-				isSettled: true,
-				userId: user.id,
-				accountId: toAccount.id,
-				categoryId: transferCategory.id,
-				payerId: adminPagador.id,
-				transferId,
-			});
+			// Create both transactions in a single batch insert
+			await tx.insert(transactions).values([
+				{
+					...sharedFields,
+					name: TRANSFER_ESTABLISHMENT_SAIDA,
+					amount: formatDecimalForDbRequired(-Math.abs(data.amount)),
+					accountId: fromAccount.id,
+				},
+				{
+					...sharedFields,
+					name: TRANSFER_ESTABLISHMENT_ENTRADA,
+					amount: formatDecimalForDbRequired(Math.abs(data.amount)),
+					accountId: toAccount.id,
+				},
+			]);
 		});
 
-		revalidateForEntity("accounts");
-		revalidateForEntity("transactions");
+		revalidateForEntity("accounts", user.id);
+		revalidateForEntity("transactions", user.id);
 
 		return {
 			success: true,

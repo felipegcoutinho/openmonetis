@@ -155,11 +155,11 @@ export default async function Page() {
 						<div className="space-y-4">
 							<div>
 								<h2 className="text-lg font-bold mb-1 text-destructive">
-									Deletar conta
+									Ações perigosas
 								</h2>
 								<p className="text-sm text-muted-foreground mb-4">
-									Ao prosseguir, sua conta e todos os dados associados serão
-									excluídos de forma irreversível.
+									Você pode zerar os dados do OpenMonetis e manter seu acesso,
+									ou excluir sua conta inteira de forma irreversível.
 								</p>
 							</div>
 							<DeleteAccountForm />

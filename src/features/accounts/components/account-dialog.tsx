@@ -33,10 +33,10 @@ import { AccountFormFields } from "./account-form-fields";
 import type { Account, AccountFormValues } from "./types";
 
 const DEFAULT_ACCOUNT_TYPES = [
-	"FinancialAccount Corrente",
-	"FinancialAccount Poupança",
+	"Conta Corrente",
+	"Conta Poupança",
 	"Carteira Digital",
-	"FinancialAccount Investimento",
+	"Conta Investimento",
 	"Pré-Pago | VR/VA",
 ] as const;
 
@@ -167,7 +167,7 @@ export function AccountDialog({
 		const accountId = account?.id;
 
 		if (mode === "update" && !accountId) {
-			const message = "FinancialAccount inválida.";
+			const message = "Conta inválida.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;

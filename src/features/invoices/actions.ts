@@ -2,7 +2,7 @@
 
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { cards, categories, invoices, payers, transactions } from "@/db/schema";
+import { cards, categories, invoices, transactions } from "@/db/schema";
 import { buildInvoicePaymentNote } from "@/shared/lib/accounts/constants";
 import { revalidateForEntity } from "@/shared/lib/actions/helpers";
 import { getUser } from "@/shared/lib/auth/server";
@@ -13,7 +13,7 @@ import {
 	type InvoicePaymentStatus,
 	PERIOD_FORMAT_REGEX,
 } from "@/shared/lib/invoices";
-import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
+import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import {
 	getBusinessTodayDate,
 	parseLocalDateString,
@@ -60,6 +60,7 @@ export async function updateInvoicePaymentStatusAction(
 	try {
 		const user = await getUser();
 		const data = updateInvoicePaymentStatusSchema.parse(input);
+		const adminPayerId = await getAdminPayerId(user.id);
 
 		await db.transaction(async (tx: typeof db) => {
 			const card = await tx.query.cards.findFirst({
@@ -71,32 +72,20 @@ export async function updateInvoicePaymentStatusAction(
 				throw new Error("Cartão não encontrado.");
 			}
 
-			const existingInvoice = await tx.query.invoices.findFirst({
-				columns: {
-					id: true,
-				},
-				where: and(
-					eq(invoices.cardId, data.cardId),
-					eq(invoices.userId, user.id),
-					eq(invoices.period, data.period),
-				),
-			});
-
-			if (existingInvoice) {
-				await tx
-					.update(invoices)
-					.set({
-						paymentStatus: data.status,
-					})
-					.where(eq(invoices.id, existingInvoice.id));
-			} else {
-				await tx.insert(invoices).values({
+			await tx
+				.insert(invoices)
+				.values({
 					cardId: data.cardId,
 					period: data.period,
 					paymentStatus: data.status,
 					userId: user.id,
+				})
+				.onConflictDoUpdate({
+					target: [invoices.userId, invoices.cardId, invoices.period],
+					set: {
+						paymentStatus: data.status,
+					},
 				});
-			}
 
 			const shouldMarkAsPaid = data.status === INVOICE_PAYMENT_STATUS.PAID;
 
@@ -114,38 +103,26 @@ export async function updateInvoicePaymentStatusAction(
 			const invoiceNote = buildInvoicePaymentNote(card.id, data.period);
 
 			if (shouldMarkAsPaid) {
-				const [adminShareRow] = await tx
-					.select({
-						total: sql<number>`
-              coalesce(
-                sum(${transactions.amount}),
-                0
-              )
-            `,
-					})
-					.from(transactions)
-					.leftJoin(payers, eq(transactions.payerId, payers.id))
-					.where(
-						and(
-							eq(transactions.userId, user.id),
-							eq(transactions.cardId, card.id),
-							eq(transactions.period, data.period),
-							eq(payers.role, PAYER_ROLE_ADMIN),
-						),
-					);
+				const [adminShareRow] = adminPayerId
+					? await tx
+							.select({
+								total: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
+							})
+							.from(transactions)
+							.where(
+								and(
+									eq(transactions.userId, user.id),
+									eq(transactions.cardId, card.id),
+									eq(transactions.period, data.period),
+									eq(transactions.payerId, adminPayerId),
+								),
+							)
+					: [{ total: 0 }];
 
 				const adminShare = Number(adminShareRow?.total ?? 0);
 				const adminPayableAmount = Math.abs(Math.min(adminShare, 0));
 
-				if (adminPayableAmount > 0 && card.accountId) {
-					const adminPagador = await tx.query.payers.findFirst({
-						columns: { id: true },
-						where: and(
-							eq(payers.userId, user.id),
-							eq(payers.role, PAYER_ROLE_ADMIN),
-						),
-					});
-
+				if (card.accountId && adminPayerId) {
 					const paymentCategory = await tx.query.categories.findFirst({
 						columns: { id: true },
 						where: and(
@@ -154,45 +131,43 @@ export async function updateInvoicePaymentStatusAction(
 						),
 					});
 
-					if (adminPagador) {
-						// Usar a data customizada ou a data atual como data de pagamento
-						const invoiceDate = data.paymentDate
-							? parseLocalDateString(data.paymentDate)
-							: getBusinessTodayDate();
+					// Usar a data customizada ou a data atual como data de pagamento
+					const invoiceDate = data.paymentDate
+						? parseLocalDateString(data.paymentDate)
+						: getBusinessTodayDate();
 
-						const amount = `-${formatDecimal(adminPayableAmount)}`;
-						const payload = {
-							condition: "À vista",
-							name: `Pagamento fatura - ${card.name}`,
-							paymentMethod: "Pix",
-							note: invoiceNote,
-							amount,
-							purchaseDate: invoiceDate,
-							transactionType: "Despesa" as const,
-							period: data.period,
-							isSettled: true,
-							userId: user.id,
-							accountId: card.accountId,
-							categoryId: paymentCategory?.id ?? null,
-							payerId: adminPagador.id,
-						};
+					const amount = `-${formatDecimal(adminPayableAmount)}`;
+					const payload = {
+						condition: "À vista",
+						name: `Pagamento fatura - ${card.name}`,
+						paymentMethod: "Pix",
+						note: invoiceNote,
+						amount,
+						purchaseDate: invoiceDate,
+						transactionType: "Despesa" as const,
+						period: data.period,
+						isSettled: true,
+						userId: user.id,
+						accountId: card.accountId,
+						categoryId: paymentCategory?.id ?? null,
+						payerId: adminPayerId,
+					};
 
-						const existingPayment = await tx.query.transactions.findFirst({
-							columns: { id: true },
-							where: and(
-								eq(transactions.userId, user.id),
-								eq(transactions.note, invoiceNote),
-							),
-						});
+					const existingPayment = await tx.query.transactions.findFirst({
+						columns: { id: true },
+						where: and(
+							eq(transactions.userId, user.id),
+							eq(transactions.note, invoiceNote),
+						),
+					});
 
-						if (existingPayment) {
-							await tx
-								.update(transactions)
-								.set(payload)
-								.where(eq(transactions.id, existingPayment.id));
-						} else {
-							await tx.insert(transactions).values(payload);
-						}
+					if (existingPayment) {
+						await tx
+							.update(transactions)
+							.set(payload)
+							.where(eq(transactions.id, existingPayment.id));
+					} else {
+						await tx.insert(transactions).values(payload);
 					}
 				}
 			} else {
@@ -207,7 +182,7 @@ export async function updateInvoicePaymentStatusAction(
 			}
 		});
 
-		revalidateForEntity("cards");
+		revalidateForEntity("cards", user.id);
 
 		return { success: true, message: successMessageByStatus[data.status] };
 	} catch (error) {
@@ -278,7 +253,7 @@ export async function updatePaymentDateAction(
 				.where(eq(transactions.id, existingPayment.id));
 		});
 
-		revalidateForEntity("cards");
+		revalidateForEntity("cards", user.id);
 
 		return { success: true, message: "Data de pagamento atualizada." };
 	} catch (error) {

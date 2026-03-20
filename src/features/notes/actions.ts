@@ -84,7 +84,7 @@ export async function createNoteAction(
 			userId: user.id,
 		});
 
-		revalidateForEntity("notes");
+		revalidateForEntity("notes", user.id);
 
 		return { success: true, message: "Anotação criada com sucesso." };
 	} catch (error) {
@@ -120,7 +120,7 @@ export async function updateNoteAction(
 			};
 		}
 
-		revalidateForEntity("notes");
+		revalidateForEntity("notes", user.id);
 
 		return { success: true, message: "Anotação atualizada com sucesso." };
 	} catch (error) {
@@ -147,7 +147,7 @@ export async function deleteNoteAction(
 			};
 		}
 
-		revalidateForEntity("notes");
+		revalidateForEntity("notes", user.id);
 
 		return { success: true, message: "Anotação removida com sucesso." };
 	} catch (error) {
@@ -184,7 +184,7 @@ export async function archiveNoteAction(
 			};
 		}
 
-		revalidateForEntity("notes");
+		revalidateForEntity("notes", user.id);
 
 		return {
 			success: true,

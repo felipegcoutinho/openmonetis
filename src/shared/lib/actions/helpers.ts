@@ -49,16 +49,17 @@ const DASHBOARD_ENTITIES: ReadonlySet<string> = new Set([
 
 /**
  * Revalidates paths for a specific entity.
- * Also invalidates the dashboard "use cache" tag for financial entities.
+ * Also invalidates the user-scoped dashboard cache tag for financial entities.
  * @param entity - The entity type
  */
 export function revalidateForEntity(
 	entity: keyof typeof revalidateConfig,
+	userId: string,
 ): void {
 	revalidateConfig[entity].forEach((path) => revalidatePath(path));
 
-	// Invalidate dashboard cache for financial mutations
+	// Invalidate dashboard cache for financial mutations.
 	if (DASHBOARD_ENTITIES.has(entity)) {
-		revalidateTag("dashboard", "max");
+		revalidateTag(`dashboard-${userId}`, "max");
 	}
 }
