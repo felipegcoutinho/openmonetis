@@ -27,12 +27,23 @@ fi
 if [ -f .env.example ]; then
   cp .env.example .env
   echo "✅ Arquivo .env criado a partir de .env.example"
-  echo ""
-  echo "⚠️  IMPORTANTE: Edite o arquivo .env e configure:"
-  echo "   - DATABASE_URL"
-  echo "   - BETTER_AUTH_SECRET (gere com: openssl rand -base64 32)"
-  echo "   - Outras variáveis necessárias"
 else
   echo "❌ Erro: .env.example não encontrado!"
   exit 1
 fi
+
+# Gerar BETTER_AUTH_SECRET automaticamente
+if command -v openssl &> /dev/null; then
+  SECRET=$(openssl rand -base64 32)
+  sed -i.bak "s|BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=$SECRET|" .env && rm -f .env.bak
+  echo "✅ BETTER_AUTH_SECRET gerado automaticamente"
+else
+  echo "⚠️  openssl não encontrado — configure BETTER_AUTH_SECRET manualmente:"
+  echo "   openssl rand -base64 32"
+fi
+
+echo ""
+echo "⚠️  IMPORTANTE: Edite o arquivo .env e configure:"
+echo "   - DATABASE_URL"
+echo "   - BETTER_AUTH_URL"
+echo "   - Demais variáveis opcionais (OAuth, e-mail, IA)"

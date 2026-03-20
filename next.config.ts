@@ -10,9 +10,6 @@ const nextConfig: NextConfig = {
 		turbopackFileSystemCacheForDev: true,
 	},
 	reactCompiler: true,
-	typescript: {
-		ignoreBuildErrors: true,
-	},
 	images: {
 		remotePatterns: [new URL("https://lh3.googleusercontent.com/**")],
 	},

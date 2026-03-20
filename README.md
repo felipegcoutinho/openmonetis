@@ -6,10 +6,9 @@
   Projeto pessoal de gestão financeira. Self-hosted, manual e open source.
 </p>
 
-> **📢 Este projeto foi renomeado de OpenSheets para OpenMonetis.** Se você conhecia o projeto pelo nome anterior, é o mesmo — só mudou o nome!
-
 > **⚠️ Não há versão online hospedada.** Você precisa clonar o repositório e rodar localmente ou no seu próprio servidor.
 
+[![Version](https://img.shields.io/badge/version-2.0.0-blue?style=flat-square)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -29,7 +28,8 @@
 ## 📖 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
-- [Início Rápido](#-início-rápido)
+- [Instalação via Script](#-instalação-via-script)
+- [Início Rápido (manual)](#-início-rápido)
 - [Scripts Disponíveis](#-scripts-disponíveis)
 - [Docker](#-docker)
 - [Variáveis de Ambiente](#-variáveis-de-ambiente)
@@ -60,7 +60,7 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 
 💰 **Contas e transações** — Contas bancárias, cartões, dinheiro. Receitas, despesas e transferências. Categorização, extratos detalhados e importação em massa.
 
-📊 **Dashboard e relatórios** — 20+ widgets interativos, gráficos de evolução, comparativos por categoria, tendências, uso de cartões, top estabelecimentos. Exportação em PDF e Excel.
+📊 **Dashboard e relatórios** — Widgets interativos de métricas, gráficos de evolução, comparativos por categoria, tendências, uso de cartões, top estabelecimentos. Exportação em PDF e Excel.
 
 💳 **Faturas de cartão** — Acompanhe faturas por período, controle limites e vencimentos.
 
@@ -78,13 +78,13 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 
 📲 **OpenMonetis Companion** — App Android que captura notificações bancárias (Nubank, Itaú, Bradesco, Inter, C6 e outros) e envia como pré-lançamentos para revisão. [Repositório](https://github.com/felipegcoutinho/openmonetis-companion).
 
-⚙️ **Personalização** — Tema dark/light, modo privacidade e preferências por usuário.
+⚙️ **Personalização** — Tema dark/light e modo privacidade.
 
 ### Stack técnica
 
 - **Next.js** (App Router, Turbopack) + **React** + **TypeScript**
 - **PostgreSQL** + **Drizzle ORM**
-- **Better Auth** (email/senha + OAuth)
+- **Better Auth** (email/senha, OAuth, Passkeys/WebAuthn)
 - **shadcn/ui** (Radix UI) + **Tailwind CSS**
 - **Docker** (multi-stage build)
 - **Biome** (linting + formatting)
@@ -92,7 +92,30 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 
 ---
 
-## 🚀 Início Rápido
+## ⚡ Instalação via Script
+
+A forma mais rápida de instalar. O script verifica dependências, configura o `.env` interativamente e sobe o banco automaticamente.
+
+**Pré-requisito:** Node.js 22+
+
+```bash
+# Mac / Linux / WSL
+curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/setup.mjs -o setup.mjs && node setup.mjs
+
+# Windows (PowerShell)
+curl -o setup.mjs https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/setup.mjs ; node setup.mjs
+```
+
+O script irá:
+- Verificar Node, pnpm, Git e Docker
+- Perguntar se quer banco local (Docker) ou remoto (Supabase, Neon, etc.)
+- Gerar o `BETTER_AUTH_SECRET` automaticamente
+- Configurar opcionais: Google OAuth, e-mail, IA, domínio público
+- Clonar o repositório, instalar dependências e aplicar o schema
+
+---
+
+## 🚀 Início Rápido (manual)
 
 ### Pré-requisitos
 
@@ -251,32 +274,49 @@ OPENROUTER_API_KEY=
 
 ## 🏗️ Arquitetura
 
+O projeto segue arquitetura **feature-first** dentro de `src/`:
+
 ```
 openmonetis/
-├── app/                           # Next.js App Router
-│   ├── api/                       # API Routes (auth, health, inbox)
-│   ├── (auth)/                    # Login e cadastro
-│   ├── (dashboard)/               # Rotas protegidas
-│   └── (landing-page)/            # Página inicial pública
+├── src/
+│   ├── app/                       # Next.js App Router (rotas finas)
+│   │   ├── api/                   # API Routes (auth, health, inbox)
+│   │   ├── (auth)/                # Login e cadastro
+│   │   ├── (dashboard)/           # Rotas protegidas (transactions, cards, accounts, etc.)
+│   │   └── (landing-page)/        # Página inicial pública
+│   │
+│   ├── features/                  # Código de domínio por feature
+│   │   ├── dashboard/             # Widgets, queries e métricas
+│   │   ├── transactions/          # Lançamentos, ações em lote, exportação
+│   │   ├── cards/                 # Cartões de crédito
+│   │   ├── invoices/              # Faturas
+│   │   ├── accounts/              # Contas bancárias
+│   │   ├── categories/            # Categorias e histórico
+│   │   ├── budgets/               # Orçamentos
+│   │   ├── payers/                # Pagadores e compartilhamento
+│   │   ├── inbox/                 # Pré-lançamentos do Companion
+│   │   ├── insights/              # Análises com IA
+│   │   ├── reports/               # Relatórios e exportações
+│   │   ├── notes/                 # Anotações
+│   │   ├── calendar/              # Calendário financeiro
+│   │   ├── settings/              # Ajustes do usuário
+│   │   ├── landing/               # Landing page
+│   │   └── auth/                  # Formulários de autenticação
+│   │
+│   ├── shared/                    # Código reutilizado entre features
+│   │   ├── components/            # UI compartilhada (shadcn/ui, navigation, skeletons...)
+│   │   ├── hooks/                 # React hooks globais
+│   │   ├── lib/                   # Helpers de domínio (auth, db, payers, schemas, email...)
+│   │   └── utils/                 # Utilitários (currency, date, period, math, string...)
+│   │
+│   └── db/
+│       └── schema.ts              # Drizzle schema (fonte única de verdade)
 │
-├── components/                    # React Components (~200 arquivos)
-│   ├── ui/                        # shadcn/ui (40+ componentes)
-│   ├── dashboard/                 # Widgets do dashboard (20+)
-│   └── [feature]/                 # Componentes por feature
-│
-├── lib/                           # Lógica de negócio
-│   ├── auth/                      # Auth helpers
-│   ├── dashboard/                 # Fetchers do dashboard
-│   ├── actions/                   # Server Actions helpers
-│   ├── schemas/                   # Zod schemas
-│   └── utils/                     # Currency, date, period utils
-│
-├── db/schema.ts                   # Drizzle schema
-├── hooks/                         # React hooks customizados
-├── public/                        # Assets estáticos
-├── scripts/                       # Scripts utilitários
-├── Dockerfile                     # Multi-stage build
-├── docker-compose.yml             # Orquestração
+├── public/                        # Assets estáticos (imagens, logos, fontes)
+├── drizzle/                       # Migrations geradas
+├── scripts/                       # Scripts utilitários (migrations, dev)
+├── Dockerfile                     # Multi-stage build (~200MB, non-root)
+├── docker-compose.yml             # Orquestração app + PostgreSQL
 └── proxy.ts                       # Middleware (auth + multi-domínio)
 ```
 
@@ -291,7 +331,7 @@ openmonetis/
 5. **Push:** `git push origin feature/minha-feature`
 6. Abra um **Pull Request**
 
-Use TypeScript, commits semânticos e documente features novas.
+Antes de começar, leia o [`CLAUDE.md`](CLAUDE.md) — ele documenta a arquitetura, convenções de nomenclatura, regras de queries e o checklist para novas features. Use TypeScript, commits semânticos e mantenha o `CHANGELOG.md` atualizado.
 
 ---
 

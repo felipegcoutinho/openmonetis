@@ -104,11 +104,10 @@ docker-compose.override.yml
 .claude/
 .gemini/
 .cursor/
-CLAUDE.md
-AGENTS.md
 QWEN.md
-claude.md
-agents.md
+AGENTS.md
+# === Backups locais ===
+/backup/
 
 # === Backups e Temporários ===
 *.bak
