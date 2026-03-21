@@ -1,5 +1,6 @@
 "use client";
 
+import { RiInformationLine } from "@remixicon/react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { formatPeriodLabel } from "@/features/reports/utils";
@@ -15,6 +16,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/shared/components/ui/table";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import type { CategoryReportItem } from "@/shared/lib/types/reports";
 import { formatCurrency } from "@/shared/utils/currency";
 import { formatPeriodForUrl } from "@/shared/utils/period";
@@ -35,7 +41,6 @@ export function CategoryTable({
 	const sectionTotals = useMemo(() => {
 		const totalsMap = new Map<string, number>();
 		let grandTotal = 0;
-		const periodCount = Math.max(periods.length, 1);
 
 		for (const category of categories) {
 			grandTotal += category.total;
@@ -46,10 +51,15 @@ export function CategoryTable({
 			}
 		}
 
+		const nonZeroPeriodCount = periods.filter(
+			(p) => (totalsMap.get(p) ?? 0) > 0,
+		).length;
+
 		return {
 			totalsMap,
 			grandTotal,
-			averageMonthlyTotal: grandTotal / periodCount,
+			averageMonthlyTotal:
+				nonZeroPeriodCount > 0 ? grandTotal / nonZeroPeriodCount : 0,
 		};
 	}, [categories, periods]);
 
@@ -74,7 +84,21 @@ export function CategoryTable({
 							</TableHead>
 						))}
 						<TableHead className="text-right min-w-[140px] font-bold">
-							Média
+							<div className="flex items-center justify-end gap-1">
+								Média
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="cursor-default inline-flex">
+											<RiInformationLine className="size-3.5 text-muted-foreground" />
+										</span>
+									</TooltipTrigger>
+									<TooltipContent side="top" className="max-w-[280px]">
+										A média considera apenas os meses com gastos registrados
+										(valores maiores que zero). Meses sem movimentação não
+										entram no cálculo.
+									</TooltipContent>
+								</Tooltip>
+							</div>
 						</TableHead>
 						<TableHead className="text-right min-w-[120px] font-bold">
 							Total
@@ -126,7 +150,14 @@ export function CategoryTable({
 									);
 								})}
 								<TableCell className="text-right font-semibold text-info">
-									{formatCurrency(category.total / Math.max(periods.length, 1))}
+									{(() => {
+										const nonZeroCount = periods.filter(
+											(p) => (category.monthlyData.get(p)?.amount ?? 0) > 0,
+										).length;
+										return formatCurrency(
+											nonZeroCount > 0 ? category.total / nonZeroCount : 0,
+										);
+									})()}
 								</TableCell>
 								<TableCell className="text-right font-semibold">
 									{formatCurrency(category.total)}
