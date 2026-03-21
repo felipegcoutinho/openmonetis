@@ -51,10 +51,6 @@ export default async function Page() {
 		<div className="flex min-h-screen flex-col">
 			{/* Navigation */}
 			<header className="sticky top-0 z-50 flex h-16 shrink-0 items-center bg-primary">
-				<div className="pointer-events-none absolute inset-0 overflow-hidden">
-					<div className="absolute inset-0 bg-linear-to-b from-white/8 via-transparent to-black/6" />
-				</div>
-
 				<div className="relative z-10 max-w-8xl mx-auto px-4 w-full flex h-full items-center justify-between">
 					<Logo variant="compact" invertTextOnDark={false} />
 
