@@ -9,7 +9,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Adicionado
 
-- Infraestrutura: script `scripts/backup.sh` para backup automático do banco PostgreSQL (Supabase) em dois formatos (`.dump` e `.sql.gz`), com upload para Google Drive via `rclone` e retenção de 7 dias local e 30 dias na nuvem; disponível via `pnpm backup` e agendado diariamente às 00:01 (horário de Brasília) via cron.
+- Infraestrutura: script `scripts/backup.sh` para backup automático do banco PostgreSQL com upload para Google Drive via `rclone`, agendado diariamente às 00:01; disponível via `pnpm backup`
+- Importação de extratos OFX e XLS/XLSX com tela de revisão, detecção automática de categoria por histórico de uso, deduplicação por FITID e acesso direto pela tabela de transações
 
 ### Alterado
 
@@ -46,6 +47,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Corrigido
 
+- Relatório de tendências: a coluna Média agora considera apenas os meses com gastos registrados (valores > 0), ignorando meses sem movimentação no cálculo
+- Dashboard: ícones de seta nos cards de métricas (receita/despesa) estavam invertidos; cor do card de saldo ajustada para `cyan-600`
+- Landing page: gradiente sobreposto removido da hero section
 - Lançamentos: o schema compartilhado de observação voltou a aceitar `null`, corrigindo o erro `Invalid input: expected string, received null` ao salvar novos lançamentos sem anotação.
 - Cartões/Faturas: o pagamento da fatura passou a usar o valor líquido do período no cartão, evitando que o extrato da conta registre o total bruto das despesas quando houver receitas como estornos ou créditos na mesma fatura.
 - Hooks e sincronização: o provider de privacidade voltou a reagir corretamente às mudanças do modo privado, e o resumo de fatura agora reseta a data de pagamento quando a prop inicial deixa de existir.
