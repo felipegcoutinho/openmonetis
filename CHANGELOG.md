@@ -9,7 +9,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Adicionado
 
-- Infraestrutura: script `scripts/backup.sh` para backup automático do banco PostgreSQL; configuração de destino (rclone, cron, retenção) feita separadamente
+- Infraestrutura: script `scripts/backup.sh` para backup automático do banco PostgreSQL; configuração de destino (rclone, cron, retenção) feita separadamente; passa a gerar também `*.data.sql.gz` com dados puros de todas as tabelas públicas (`--data-only --schema=public`)
 - Importação de extratos OFX e XLS/XLSX com tela de revisão, detecção automática de categoria por histórico de uso, deduplicação por FITID e acesso direto pela tabela de transações
 
 ### Alterado
