@@ -15,6 +15,7 @@ import {
 	RiFileCopyLine,
 	RiFileList2Line,
 	RiFlashlightFill,
+	RiFileExcel2Line,
 	RiGroupLine,
 	RiHistoryLine,
 	RiMoreFill,
@@ -984,6 +985,22 @@ export function TransactionsTable({
 									</TooltipContent>
 								</Tooltip>
 							) : null}
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										onClick={() => router.push("/transactions/import")}
+										variant="outline"
+										size="icon"
+										className="hidden size-9 sm:inline-flex"
+									>
+										<RiFileExcel2Line className="size-4" />
+										<span className="sr-only">Importar extrato</span>
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Importar extrato</p>
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					) : (
 						<span className={showFilters ? "hidden sm:block" : ""} />

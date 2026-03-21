@@ -8,6 +8,7 @@ import {
 	jsonb,
 	numeric,
 	pgTable,
+	primaryKey,
 	smallint,
 	text,
 	timestamp,
@@ -622,6 +623,8 @@ export const transactions = pgTable(
 		}),
 		seriesId: uuid("series_id"),
 		transferId: uuid("transfer_id"),
+		ofxFitId: text("ofx_fit_id"),
+		importBatchId: text("import_batch_id"),
 	},
 	(table) => ({
 		// Índice composto mais importante: userId + period (usado em quase todas as queries do dashboard)
@@ -663,6 +666,10 @@ export const transactions = pgTable(
 			table.cardId,
 			table.period,
 		),
+		// Dedup OFX: garante FITID único por usuário
+		ofxFitIdUserIdIdx: uniqueIndex("lancamentos_ofx_fit_id_user_id_idx")
+			.on(table.userId, table.ofxFitId)
+			.where(sql`ofx_fit_id IS NOT NULL`),
 	}),
 );
 
@@ -857,6 +864,25 @@ export const installmentAnticipationsRelations = relations(
 	}),
 );
 
+export const importCategoryMappings = pgTable(
+	"import_category_mappings",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		descriptionKey: text("description_key").notNull(),
+		categoryId: uuid("category_id")
+			.notNull()
+			.references(() => categories.id, { onDelete: "cascade" }),
+		updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.descriptionKey] }),
+	}),
+);
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Account = typeof account.$inferSelect;
@@ -880,3 +906,4 @@ export type ApiToken = typeof apiTokens.$inferSelect;
 export type NewApiToken = typeof apiTokens.$inferInsert;
 export type InboxItem = typeof inboxItems.$inferSelect;
 export type NewInboxItem = typeof inboxItems.$inferInsert;
+export type ImportCategoryMapping = typeof importCategoryMappings.$inferSelect;
