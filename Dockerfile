@@ -67,7 +67,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copiar arquivos do Drizzle (migrations e schema)
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/db ./db
+COPY --from=builder --chown=nextjs:nodejs /app/src/db ./src/db
 
 # Copiar node_modules para ter drizzle-kit disponível para migrations
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
