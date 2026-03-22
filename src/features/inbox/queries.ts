@@ -89,15 +89,14 @@ export async function fetchInboxSourceApps(
 	status: InboxStatus,
 ): Promise<string[]> {
 	const rows = await db
-		.select({ name: inboxItems.sourceAppName })
+		.selectDistinct({ name: inboxItems.sourceAppName })
 		.from(inboxItems)
 		.where(and(eq(inboxItems.userId, userId), eq(inboxItems.status, status)));
 
-	const seen = new Set<string>();
-	for (const row of rows) {
-		if (row.name) seen.add(row.name);
-	}
-	return [...seen].sort();
+	return rows
+		.map((row) => row.name)
+		.filter((name): name is string => name !== null)
+		.sort();
 }
 
 export async function fetchInboxStatusCounts(

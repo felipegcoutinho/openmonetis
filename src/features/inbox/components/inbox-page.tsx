@@ -13,7 +13,13 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useTransition,
+} from "react";
 import { toast } from "sonner";
 import {
 	bulkDeleteInboxItemsAction,
@@ -57,18 +63,25 @@ import type {
 	SelectOption,
 } from "./types";
 
-const BRASILIA_OFFSET_MS = 3 * 60 * 60 * 1000;
 const DEFAULT_INBOX_APP_LOGO = "/avatars/default_icon.png";
 
-function getDateKey(date: Date): string {
-	const adjusted = new Date(date.getTime() + BRASILIA_OFFSET_MS);
-	return adjusted.toISOString().slice(0, 10);
+// O Companion envia hora local de Brasília com 'Z' literal (não converte para UTC).
+// Por isso, o timestamp armazenado no DB já tem a data correta de Brasília como componente UTC.
+// Basta fatiar o ISO string sem nenhum ajuste para obter a data de Brasília do item.
+function getItemDateKey(date: Date): string {
+	return date.toISOString().slice(0, 10);
+}
+
+// Para "hoje" e "ontem", precisamos da data real de Brasília (UTC-3).
+function getBrasiliaDateKey(date: Date): string {
+	const BRASILIA_OFFSET_MS = 3 * 60 * 60 * 1000;
+	return new Date(date.getTime() - BRASILIA_OFFSET_MS).toISOString().slice(0, 10);
 }
 
 function getGroupLabel(dateKey: string): string {
 	const now = new Date();
-	const todayKey = getDateKey(now);
-	const yesterdayKey = getDateKey(
+	const todayKey = getBrasiliaDateKey(now);
+	const yesterdayKey = getBrasiliaDateKey(
 		new Date(now.getTime() - 24 * 60 * 60 * 1000),
 	);
 	if (dateKey === todayKey) return "Hoje";
@@ -84,7 +97,7 @@ function groupItemsByDay(
 ): { label: string; items: InboxItem[] }[] {
 	const groups = new Map<string, InboxItem[]>();
 	for (const item of items) {
-		const key = getDateKey(new Date(item.notificationTimestamp));
+		const key = getItemDateKey(new Date(item.notificationTimestamp));
 		const group = groups.get(key);
 		if (group) {
 			group.push(item);
@@ -234,20 +247,20 @@ export function InboxPage({
 		}
 	};
 
-	const handleProcessRequest = (item: InboxItem) => {
+	const handleProcessRequest = useCallback((item: InboxItem) => {
 		setItemToProcess(item);
 		setProcessOpen(true);
-	};
+	}, []);
 
-	const handleDetailsRequest = (item: InboxItem) => {
+	const handleDetailsRequest = useCallback((item: InboxItem) => {
 		setItemDetails(item);
 		setDetailsOpen(true);
-	};
+	}, []);
 
-	const handleDiscardRequest = (item: InboxItem) => {
+	const handleDiscardRequest = useCallback((item: InboxItem) => {
 		setItemToDiscard(item);
 		setDiscardOpen(true);
-	};
+	}, []);
 
 	const handleDiscardConfirm = async () => {
 		if (!itemToDiscard) return;
@@ -272,10 +285,10 @@ export function InboxPage({
 		}
 	};
 
-	const handleDeleteRequest = (item: InboxItem) => {
+	const handleDeleteRequest = useCallback((item: InboxItem) => {
 		setItemToDelete(item);
 		setDeleteOpen(true);
-	};
+	}, []);
 
 	const handleDeleteConfirm = async () => {
 		if (!itemToDelete) return;
@@ -300,10 +313,10 @@ export function InboxPage({
 		}
 	};
 
-	const handleRestoreRequest = (item: InboxItem) => {
+	const handleRestoreRequest = useCallback((item: InboxItem) => {
 		setItemToRestore(item);
 		setRestoreOpen(true);
-	};
+	}, []);
 
 	const handleRestoreToPendingConfirm = async () => {
 		if (!itemToRestore) return;
@@ -326,13 +339,13 @@ export function InboxPage({
 		setSelectedIds((current) => current.filter((id) => visibleIds.has(id)));
 	}, [items]);
 
-	const toggleSelection = (id: string) => {
+	const toggleSelection = useCallback((id: string) => {
 		setSelectedIds((current) =>
 			current.includes(id)
 				? current.filter((value) => value !== id)
 				: [...current, id],
 		);
-	};
+	}, []);
 
 	const allSelected = items.length > 0 && selectedIds.length === items.length;
 

@@ -9,6 +9,7 @@ import {
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Image from "next/image";
+import { memo } from "react";
 import MoneyValues from "@/shared/components/money-values";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -62,7 +63,7 @@ interface InboxCardProps {
 	onSelectToggle?: (id: string) => void;
 }
 
-export function InboxCard({
+export const InboxCard = memo(function InboxCard({
 	item,
 	readonly,
 	appLogoMap,
@@ -222,4 +223,4 @@ export function InboxCard({
 			)}
 		</Card>
 	);
-}
+});

@@ -86,12 +86,10 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const { items } = inboxBatchSchema.parse(body);
 
-		// Processar cada item
-		const results: BatchResult[] = [];
-
-		for (const item of items) {
-			try {
-				const [inserted] = await db
+		// Processar todos os itens em paralelo
+		const settled = await Promise.allSettled(
+			items.map((item) =>
+				db
 					.insert(inboxItems)
 					.values({
 						userId: tokenRecord.userId,
@@ -104,22 +102,26 @@ export async function POST(request: Request) {
 						parsedAmount: item.parsedAmount?.toString(),
 						status: "pending",
 					})
-					.returning({ id: inboxItems.id });
+					.returning({ id: inboxItems.id }),
+			),
+		);
 
-				results.push({
-					clientId: item.clientId,
-					serverId: inserted.id,
+		const results: BatchResult[] = settled.map((result, i) => {
+			const item = items[i];
+			if (result.status === "fulfilled") {
+				return {
+					clientId: item?.clientId,
+					serverId: result.value[0]?.id,
 					success: true,
-				});
-			} catch (error) {
-				console.error("[API] Error processing batch item:", error);
-				results.push({
-					clientId: item.clientId,
-					success: false,
-					error: "Erro ao processar notificação",
-				});
+				};
 			}
-		}
+			console.error("[API] Error processing batch item:", result.reason);
+			return {
+				clientId: item?.clientId,
+				success: false,
+				error: "Erro ao processar notificação",
+			};
+		});
 
 		// Atualizar último uso do token
 		const clientIp =
