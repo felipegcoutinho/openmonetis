@@ -5,6 +5,36 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+## [2.0.2] - 2026-03-25
+
+### Adicionado
+
+- Scripts: novo comando `mockup` no `package.json` para executar `scripts/mock-data.ts`
+- Navbar: novo estado persistido para notificações do sino, permitindo marcar alertas de fatura, boleto e orçamento como lidos ou arquivados por usuário
+
+### Alterado
+
+- Navbar: o snapshot global de notificações deixa de depender do `periodo` da URL atual e passa a usar o período corrente do negócio; itens lidos saem do badge e itens arquivados somem da lista padrão do sino
+- Navbar: dropdown de notificações agora permite mostrar itens arquivados e reverter ações de leitura e arquivamento diretamente em cada item
+- Navbar: filtro da lista de notificações no sino foi refinado para um seletor explícito entre `Ativas` e `Arquivadas`, com destaque visual mais forte para a aba ativa
+- Navbar: componente `notification-bell` foi desmembrado em hook e componentes locais menores, reduzindo acoplamento e facilitando manutenção
+- Dashboard: detalhamento por categoria agora oculta categorias sem movimentação no período, reduzindo ruído visual no card
+- UI: arte decorativa do topo da dashboard foi restrita à faixa do cabeçalho de boas-vindas, evitando que o `dot pattern` e o gradiente claro alterem a leitura visual do month picker
+- Lançamentos em série: a edição em lote agora também permite propagar o status de pagamento (`isSettled`) para transações não feitas no cartão de crédito
+- Seed de conta vazia: `scripts/mock-data.ts` agora processa `--help` antes de exigir `DATABASE_URL` e só cria categorias/pagador admin depois de validar que a conta está financeiramente vazia
+
+### Corrigido
+
+- Navbar: ao desarquivar a última notificação no modo de arquivadas, o dropdown volta automaticamente para a listagem padrão e o toggle deixa de ficar travado
+- Filtros financeiros: transações de conta com observação nula, como compras parceladas no Pix, deixam de ser ocultadas indevidamente em `/transactions`, dashboard e relatórios quando a conta está configurada para desconsiderar o saldo inicial
+- Backup: geração do arquivo `*.data.sql.gz` volta a usar a saída correta do `pg_restore`
+
+### Removido
+
+- DB: colunas `system_font` e `money_font` da tabela `preferencias_usuario`, que não são mais utilizadas no código
+
 ## [2.0.1] - 2026-03-21
 
 ### Corrigido
