@@ -111,6 +111,7 @@ export async function fetchCategoryDetails(
 						sanitizedNote,
 						eq(transactions.period, previousPeriod),
 						or(
+							isNull(transactions.note),
 							ne(transactions.note, INITIAL_BALANCE_NOTE),
 							isNull(financialAccounts.excludeInitialBalanceFromIncome),
 							eq(financialAccounts.excludeInitialBalanceFromIncome, false),

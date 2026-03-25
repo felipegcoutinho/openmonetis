@@ -705,6 +705,7 @@ export const updateBulkSchema = z.object({
 		})
 		.optional()
 		.nullable(),
+	isSettled: z.boolean().nullable().optional(),
 });
 
 export type UpdateBulkInput = z.infer<typeof updateBulkSchema>;

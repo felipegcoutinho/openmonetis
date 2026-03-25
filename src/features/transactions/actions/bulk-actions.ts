@@ -172,6 +172,7 @@ export async function updateTransactionBulkAction(
 			payerId: data.payerId ?? null,
 			accountId: data.accountId ?? null,
 			cardId: data.cardId ?? null,
+			...(data.isSettled !== undefined && { isSettled: data.isSettled }),
 		};
 
 		if (data.amount !== undefined) {

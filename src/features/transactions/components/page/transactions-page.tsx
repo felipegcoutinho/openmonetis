@@ -129,6 +129,7 @@ export function TransactionsPage({
 		amount: number;
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
+		isSettled: boolean | null;
 		transaction: TransactionItem;
 	} | null>(null);
 	const [pendingDeleteData, setPendingDeleteData] =
@@ -182,7 +183,7 @@ export function TransactionsPage({
 			toast.success(
 				nextValue
 					? `"${item.name}" marcado como pago`
-					: `"${item.name}" desmarcado`,
+					: `"${item.name}" marcado como não pago`,
 			);
 		} catch (error) {
 			const message =
@@ -244,6 +245,7 @@ export function TransactionsPage({
 		amount: number;
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
+		isSettled: boolean | null;
 	}) => {
 		if (!selectedTransaction) {
 			return;
@@ -274,6 +276,7 @@ export function TransactionsPage({
 			amount: pendingEditData.amount,
 			dueDate: pendingEditData.dueDate,
 			boletoPaymentDate: pendingEditData.boletoPaymentDate,
+			isSettled: pendingEditData.isSettled ?? undefined,
 		});
 
 		if (!result.success) {

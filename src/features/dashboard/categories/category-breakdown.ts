@@ -111,10 +111,11 @@ export function buildCategoryBreakdownData({
 		});
 	}
 
-	categories.sort((a, b) => b.currentAmount - a.currentAmount);
+	const filtered = categories.filter((c) => c.currentAmount > 0);
+	filtered.sort((a, b) => b.currentAmount - a.currentAmount);
 
 	return {
-		categories,
+		categories: filtered,
 		currentTotal,
 		previousTotal,
 	};

@@ -113,6 +113,7 @@ export async function fetchTopEstablishmentsData(
 			not(ilike(transactions.note, `${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`)),
 		),
 		or(
+			isNull(transactions.note),
 			ne(transactions.note, INITIAL_BALANCE_NOTE),
 			isNull(financialAccounts.excludeInitialBalanceFromIncome),
 			eq(financialAccounts.excludeInitialBalanceFromIncome, false),

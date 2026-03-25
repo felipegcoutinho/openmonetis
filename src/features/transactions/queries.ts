@@ -43,6 +43,7 @@ const DEFAULT_EXCLUDE_INITIAL_BALANCE = true;
 
 const buildInitialBalanceVisibilityFilter = () =>
 	or(
+		isNull(transactions.note),
 		ne(transactions.note, INITIAL_BALANCE_NOTE),
 		isNull(financialAccounts.excludeInitialBalanceFromIncome),
 		eq(financialAccounts.excludeInitialBalanceFromIncome, false),

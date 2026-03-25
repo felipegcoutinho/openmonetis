@@ -346,6 +346,10 @@ export function TransactionDialog({
 						mode === "update" && formState.paymentMethod === "Boleto"
 							? formState.boletoPaymentDate || null
 							: null,
+					isSettled:
+						formState.paymentMethod === "Cartão de crédito"
+							? null
+							: Boolean(formState.isSettled),
 				});
 				return;
 			}

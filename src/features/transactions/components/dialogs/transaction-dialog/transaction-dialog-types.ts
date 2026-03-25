@@ -41,6 +41,7 @@ export interface TransactionDialogProps {
 		amount: number;
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
+		isSettled: boolean | null;
 	}) => void;
 }
 
