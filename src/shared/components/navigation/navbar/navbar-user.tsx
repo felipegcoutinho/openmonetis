@@ -63,7 +63,7 @@ export function NavbarUser({ user, pagadorAvatarUrl }: NavbarUserProps) {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<button
-						className="relative flex size-9 items-center justify-center overflow-hidden rounded-full shadow-none transition-colors focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:outline-none"
+						className="relative flex size-9 items-center justify-center overflow-hidden rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:outline-none"
 						aria-label="Menu do usuário"
 					>
 						<Image

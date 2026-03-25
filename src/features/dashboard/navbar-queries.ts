@@ -4,6 +4,7 @@ import { payers } from "@/db/schema";
 import { fetchPendingInboxCount } from "@/features/inbox/queries";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
+import { getBusinessDateString } from "@/shared/utils/date";
 import {
 	type DashboardNotificationsSnapshot,
 	fetchDashboardNotifications,
@@ -36,8 +37,8 @@ async function fetchAdminPayerAvatarUrl(
 
 async function fetchDashboardNavbarDataInternal(
 	userId: string,
-	currentPeriod: string,
 ): Promise<DashboardNavbarData> {
+	const currentPeriod = getBusinessDateString().slice(0, 7);
 	const [pagadorAvatarUrl, notificationsSnapshot, preLancamentosCount] =
 		await Promise.all([
 			fetchAdminPayerAvatarUrl(userId),
@@ -52,12 +53,11 @@ async function fetchDashboardNavbarDataInternal(
 	};
 }
 
-export function fetchDashboardNavbarData(
-	userId: string,
-	currentPeriod: string,
-) {
+export function fetchDashboardNavbarData(userId: string) {
+	const currentPeriod = getBusinessDateString().slice(0, 7);
+
 	return unstable_cache(
-		() => fetchDashboardNavbarDataInternal(userId, currentPeriod),
+		() => fetchDashboardNavbarDataInternal(userId),
 		[`dashboard-navbar-${userId}-${currentPeriod}`],
 		{
 			tags: [`dashboard-${userId}`],

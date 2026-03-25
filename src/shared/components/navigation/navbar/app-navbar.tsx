@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { DashboardNotificationsSnapshot } from "@/features/dashboard/notifications-queries";
 import { AnimatedThemeToggler } from "@/shared/components/animated-theme-toggler";
 import { Logo } from "@/shared/components/logo";
 import { NotificationBell } from "@/shared/components/navigation/navbar/notification-bell";
 import { RefreshPageButton } from "@/shared/components/refresh-page-button";
+import type { DashboardNotificationsSnapshot } from "@/shared/lib/types/notifications";
 import { NavMenu } from "./nav-menu";
 import { NavbarUser } from "./navbar-user";
 
@@ -40,7 +40,8 @@ export function AppNavbar({
 				<div className="ml-auto flex items-center gap-2">
 					<NotificationBell
 						notifications={notificationsSnapshot.notifications}
-						totalCount={notificationsSnapshot.totalCount}
+						unreadCount={notificationsSnapshot.unreadCount}
+						visibleCount={notificationsSnapshot.visibleCount}
 						budgetNotifications={notificationsSnapshot.budgetNotifications}
 						preLancamentosCount={preLancamentosCount}
 					/>

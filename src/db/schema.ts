@@ -132,8 +132,6 @@ export const userPreferences = pgTable("preferencias_usuario", {
 	statementNoteAsColumn: boolean("extrato_note_as_column")
 		.notNull()
 		.default(false),
-	systemFont: text("system_font").notNull().default("ai-sans"),
-	moneyFont: text("money_font").notNull().default("ai-sans"),
 	transactionsColumnOrder: jsonb("lancamentos_column_order").$type<
 		string[] | null
 	>(),
@@ -524,6 +522,40 @@ export const inboxItems = pgTable(
 			table.userId,
 			table.createdAt,
 		),
+	}),
+);
+
+export const dashboardNotificationStates = pgTable(
+	"dashboard_notification_states",
+	{
+		id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		notificationKey: text("notification_key").notNull(),
+		fingerprint: text("fingerprint").notNull(),
+		readAt: timestamp("read_at", {
+			mode: "date",
+			withTimezone: true,
+		}),
+		archivedAt: timestamp("archived_at", {
+			mode: "date",
+			withTimezone: true,
+		}),
+		createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => ({
+		userIdNotificationKeyUnique: uniqueIndex(
+			"dashboard_notification_states_user_id_key_unique",
+		).on(table.userId, table.notificationKey),
+		userIdArchivedAtIdx: index(
+			"dashboard_notification_states_user_id_archived_idx",
+		).on(table.userId, table.archivedAt),
 	}),
 );
 

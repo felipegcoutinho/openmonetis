@@ -3,33 +3,14 @@ import { AppNavbar } from "@/shared/components/navigation/navbar/app-navbar";
 import { PrivacyProvider } from "@/shared/components/providers/privacy-provider";
 import { DotPattern } from "@/shared/components/ui/dot-pattern";
 import { getUserSession } from "@/shared/lib/auth/server";
-import { parsePeriodParam } from "@/shared/utils/period";
 
 export default async function DashboardLayout({
 	children,
-	searchParams,
 }: Readonly<{
 	children: React.ReactNode;
-	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }>) {
 	const session = await getUserSession();
-
-	// Buscar notificações para o período atual
-	const resolvedSearchParams = searchParams ? await searchParams : undefined;
-	const periodoParam = resolvedSearchParams?.periodo;
-	const singlePeriodoParam =
-		typeof periodoParam === "string"
-			? periodoParam
-			: Array.isArray(periodoParam)
-				? periodoParam[0]
-				: null;
-	const { period: currentPeriod } = parsePeriodParam(
-		singlePeriodoParam ?? null,
-	);
-	const navbarData = await fetchDashboardNavbarData(
-		session.user.id,
-		currentPeriod,
-	);
+	const navbarData = await fetchDashboardNavbarData(session.user.id);
 
 	return (
 		<PrivacyProvider>
@@ -40,7 +21,7 @@ export default async function DashboardLayout({
 				notificationsSnapshot={navbarData.notificationsSnapshot}
 			/>
 			<div className="relative flex flex-1 flex-col pt-16">
-				<div className="pointer-events-none absolute inset-x-0 top-0 h-80 overflow-hidden">
+				<div className="pointer-events-none absolute inset-x-0 top-0 h-32 overflow-hidden md:h-36">
 					<DotPattern
 						width={20}
 						height={20}

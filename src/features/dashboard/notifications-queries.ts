@@ -1,16 +1,24 @@
 "use server";
 
-import { and, eq, lt, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, lt, ne, sql } from "drizzle-orm";
 import {
 	budgets,
 	cards,
 	categories,
+	dashboardNotificationStates,
 	invoices,
 	transactions,
 } from "@/db/schema";
+import { buildInvoiceDetailsHref } from "@/features/dashboard/invoices-helpers";
 import { db } from "@/shared/lib/db";
 import { INVOICE_PAYMENT_STATUS } from "@/shared/lib/invoices";
+import { isNotificationStatesTableMissing } from "@/shared/lib/notifications/is-table-missing";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
+import type {
+	BudgetNotification,
+	DashboardNotification,
+	DashboardNotificationsSnapshot,
+} from "@/shared/lib/types/notifications";
 import {
 	buildDateOnlyStringFromPeriodDay,
 	getBusinessDateString,
@@ -19,40 +27,64 @@ import {
 	toDateOnlyString,
 } from "@/shared/utils/date";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
+import { formatPeriodForUrl } from "@/shared/utils/period";
 
-export type NotificationType = "overdue" | "due_soon";
-
-export type DashboardNotification = {
-	id: string;
-	type: "invoice" | "boleto";
-	name: string;
-	dueDate: string;
-	status: NotificationType;
-	amount: number;
-	period?: string;
-	showAmount: boolean;
-	cardLogo?: string | null;
-};
-
-export type BudgetStatus = "exceeded" | "critical";
-
-export type BudgetNotification = {
-	id: string;
-	categoryName: string;
-	budgetAmount: number;
-	spentAmount: number;
-	usedPercentage: number;
-	status: BudgetStatus;
-};
-
-export type DashboardNotificationsSnapshot = {
-	notifications: DashboardNotification[];
-	totalCount: number;
-	budgetNotifications: BudgetNotification[];
-};
+export type {
+	BudgetNotification,
+	BudgetStatus,
+	DashboardNotification,
+	DashboardNotificationsSnapshot,
+	NotificationType,
+} from "@/shared/lib/types/notifications";
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
 const BUDGET_CRITICAL_THRESHOLD = 80;
+
+type PersistedNotificationState = {
+	notificationKey: string;
+	fingerprint: string;
+	readAt: Date | null;
+	archivedAt: Date | null;
+};
+
+const buildInvoiceNotificationKey = (cardId: string, period: string) =>
+	`invoice-${cardId}-${period}`;
+
+const buildBoletoNotificationKey = (transactionId: string) =>
+	`boleto-${transactionId}`;
+
+const buildBudgetNotificationKey = (
+	categoryId: string | null,
+	budgetId: string,
+	period: string,
+) => (categoryId ? `budget-${categoryId}-${period}` : `budget-${budgetId}`);
+
+function mergeNotificationState<
+	T extends {
+		notificationKey: string;
+		fingerprint: string;
+		isRead: boolean;
+		isArchived: boolean;
+		readAt: Date | null;
+		archivedAt: Date | null;
+	},
+>(items: T[], stateByKey: Map<string, PersistedNotificationState>): T[] {
+	return items.map((item) => {
+		const persisted = stateByKey.get(item.notificationKey);
+
+		if (!persisted || persisted.fingerprint !== item.fingerprint) {
+			return item;
+		}
+
+		return {
+			...item,
+			isRead: persisted.readAt !== null,
+			isArchived: persisted.archivedAt !== null,
+			readAt: persisted.readAt,
+			archivedAt: persisted.archivedAt,
+		};
+	});
+}
 
 /**
  * Busca todas as notificações do dashboard:
@@ -188,7 +220,9 @@ export async function fetchDashboardNotifications(
 			db
 				.select({
 					orcamentoId: budgets.id,
+					categoryId: budgets.categoryId,
 					budgetAmount: budgets.amount,
+					period: budgets.period,
 					categoriaName: categories.name,
 					spentAmount: sql<number>`COALESCE(SUM(ABS(${transactions.amount})), 0)`,
 				})
@@ -216,12 +250,12 @@ export async function fetchDashboardNotifications(
 		);
 		if (!dueDate) continue;
 		const amount = toNumber(invoice.totalAmount);
-		const notificationId = invoice.invoiceId
-			? `invoice-${invoice.invoiceId}`
-			: `invoice-${invoice.cardId}-${invoice.period}`;
+		const notificationKey = buildInvoiceNotificationKey(
+			invoice.cardId,
+			invoice.period,
+		);
 
 		notifications.push({
-			id: notificationId,
 			type: "invoice",
 			name: invoice.cardName,
 			dueDate,
@@ -230,6 +264,13 @@ export async function fetchDashboardNotifications(
 			period: invoice.period,
 			showAmount: true,
 			cardLogo: invoice.cardLogo,
+			notificationKey,
+			fingerprint: "overdue",
+			href: buildInvoiceDetailsHref(invoice.cardId, invoice.period),
+			isRead: false,
+			isArchived: false,
+			readAt: null,
+			archivedAt: null,
 		});
 	}
 
@@ -261,20 +302,28 @@ export async function fetchDashboardNotifications(
 		);
 		if (!invoiceIsOverdue && !invoiceIsDueSoon) continue;
 
-		const notificationId = invoice.invoiceId
-			? `invoice-${invoice.invoiceId}`
-			: `invoice-${invoice.cardId}-${invoice.period}`;
+		const notificationStatus = invoiceIsOverdue ? "overdue" : "due_soon";
+		const notificationKey = buildInvoiceNotificationKey(
+			invoice.cardId,
+			invoice.period,
+		);
 
 		notifications.push({
-			id: notificationId,
 			type: "invoice",
 			name: invoice.cardName,
 			dueDate,
-			status: invoiceIsOverdue ? "overdue" : "due_soon",
+			status: notificationStatus,
 			amount: Math.abs(amount),
 			period: invoice.period,
 			showAmount: invoiceIsOverdue,
 			cardLogo: invoice.cardLogo,
+			notificationKey,
+			fingerprint: notificationStatus,
+			href: buildInvoiceDetailsHref(invoice.cardId, invoice.period),
+			isRead: false,
+			isArchived: false,
+			readAt: null,
+			archivedAt: null,
 		});
 	}
 
@@ -292,10 +341,11 @@ export async function fetchDashboardNotifications(
 		const isOldPeriod = boleto.period < currentPeriod;
 		const isCurrentPeriod = boleto.period === currentPeriod;
 		const amount = toNumber(boleto.amount);
+		const href = `/transactions?periodo=${formatPeriodForUrl(boleto.period)}`;
+		const notificationKey = buildBoletoNotificationKey(boleto.id);
 
 		if (isOldPeriod) {
 			notifications.push({
-				id: `boleto-${boleto.id}`,
 				type: "boleto",
 				name: boleto.name,
 				dueDate,
@@ -303,17 +353,32 @@ export async function fetchDashboardNotifications(
 				amount: Math.abs(amount),
 				period: boleto.period,
 				showAmount: true,
+				notificationKey,
+				fingerprint: "overdue",
+				href,
+				isRead: false,
+				isArchived: false,
+				readAt: null,
+				archivedAt: null,
 			});
 		} else if (isCurrentPeriod && (boletoIsOverdue || boletoIsDueSoon)) {
+			const notificationStatus = boletoIsOverdue ? "overdue" : "due_soon";
+
 			notifications.push({
-				id: `boleto-${boleto.id}`,
 				type: "boleto",
 				name: boleto.name,
 				dueDate,
-				status: boletoIsOverdue ? "overdue" : "due_soon",
+				status: notificationStatus,
 				amount: Math.abs(amount),
 				period: boleto.period,
 				showAmount: boletoIsOverdue,
+				notificationKey,
+				fingerprint: notificationStatus,
+				href,
+				isRead: false,
+				isArchived: false,
+				readAt: null,
+				archivedAt: null,
 			});
 		}
 	}
@@ -335,14 +400,26 @@ export async function fetchDashboardNotifications(
 
 		const usedPercentage = (spentAmount / budgetAmount) * 100;
 		if (usedPercentage < BUDGET_CRITICAL_THRESHOLD) continue;
+		const notificationStatus = usedPercentage >= 100 ? "exceeded" : "critical";
+		const notificationKey = buildBudgetNotificationKey(
+			row.categoryId,
+			row.orcamentoId,
+			row.period,
+		);
 
 		budgetNotifications.push({
-			id: `budget-${row.orcamentoId}`,
 			categoryName: row.categoriaName,
 			budgetAmount,
 			spentAmount,
 			usedPercentage,
-			status: usedPercentage >= 100 ? "exceeded" : "critical",
+			status: notificationStatus,
+			notificationKey,
+			fingerprint: notificationStatus,
+			href: `/budgets?periodo=${formatPeriodForUrl(row.period)}`,
+			isRead: false,
+			isArchived: false,
+			readAt: null,
+			archivedAt: null,
 		});
 	}
 
@@ -353,9 +430,68 @@ export async function fetchDashboardNotifications(
 		return b.usedPercentage - a.usedPercentage;
 	});
 
-	return {
-		notifications,
-		totalCount: notifications.length,
+	const notificationKeys = [
+		...notifications.map((notification) => notification.notificationKey),
+		...budgetNotifications.map((notification) => notification.notificationKey),
+	];
+
+	let persistedStates: PersistedNotificationState[] = [];
+
+	if (notificationKeys.length > 0) {
+		try {
+			persistedStates = await db
+				.select({
+					notificationKey: dashboardNotificationStates.notificationKey,
+					fingerprint: dashboardNotificationStates.fingerprint,
+					readAt: dashboardNotificationStates.readAt,
+					archivedAt: dashboardNotificationStates.archivedAt,
+				})
+				.from(dashboardNotificationStates)
+				.where(
+					and(
+						eq(dashboardNotificationStates.userId, userId),
+						inArray(
+							dashboardNotificationStates.notificationKey,
+							notificationKeys,
+						),
+					),
+				);
+		} catch (error) {
+			if (isNotificationStatesTableMissing(error)) {
+				console.warn(
+					"[DashboardNotifications] Tabela dashboard_notification_states ainda não existe. Voltando ao modo sem persistência.",
+				);
+			} else {
+				throw error;
+			}
+		}
+	}
+
+	const stateByKey = new Map(
+		persistedStates.map((state) => [state.notificationKey, state]),
+	);
+
+	const mergedNotifications = mergeNotificationState(notifications, stateByKey);
+	const mergedBudgetNotifications = mergeNotificationState(
 		budgetNotifications,
+		stateByKey,
+	);
+	const visibleNotifications = mergedNotifications.filter(
+		(notification) => !notification.isArchived,
+	);
+	const visibleBudgetNotifications = mergedBudgetNotifications.filter(
+		(notification) => !notification.isArchived,
+	);
+	const unreadCount = [
+		...visibleNotifications,
+		...visibleBudgetNotifications,
+	].filter((notification) => !notification.isRead).length;
+
+	return {
+		notifications: mergedNotifications,
+		budgetNotifications: mergedBudgetNotifications,
+		unreadCount,
+		visibleCount:
+			visibleNotifications.length + visibleBudgetNotifications.length,
 	};
 }

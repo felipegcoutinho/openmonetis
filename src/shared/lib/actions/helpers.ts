@@ -31,6 +31,7 @@ export const revalidateConfig = {
 	budgets: ["/budgets"],
 	payers: ["/payers"],
 	notes: ["/notes", "/notes/archived", "/dashboard"],
+	notifications: ["/dashboard"],
 	transactions: ["/transactions", "/accounts"],
 	inbox: ["/inbox", "/transactions", "/dashboard"],
 } as const;
@@ -43,6 +44,7 @@ const DASHBOARD_ENTITIES: ReadonlySet<string> = new Set([
 	"budgets",
 	"payers",
 	"notes",
+	"notifications",
 	"inbox",
 	"recurring",
 ]);
