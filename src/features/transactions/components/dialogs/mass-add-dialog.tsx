@@ -38,6 +38,7 @@ import {
 import { Separator } from "@/shared/components/ui/separator";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { getTodayDateString } from "@/shared/utils/date";
+import { createClientSafeId } from "@/shared/utils/id";
 import {
 	dateToPeriod,
 	displayPeriod,
@@ -120,6 +121,19 @@ interface TransactionRow {
 	payerId: string | undefined;
 }
 
+function createEmptyTransactionRow(
+	defaultPayerId?: string | null,
+): TransactionRow {
+	return {
+		id: createClientSafeId(),
+		purchaseDate: getTodayDateString(),
+		name: "",
+		amount: "",
+		categoryId: undefined,
+		payerId: defaultPayerId ?? undefined,
+	};
+}
+
 export function MassAddDialog({
 	open,
 	onOpenChange,
@@ -153,15 +167,8 @@ export function MassAddDialog({
 	const isCartaoSelected = paymentMethod === "Cartão de crédito";
 
 	// Transaction rows
-	const [transactions, setTransactions] = useState<TransactionRow[]>([
-		{
-			id: crypto.randomUUID(),
-			purchaseDate: getTodayDateString(),
-			name: "",
-			amount: "",
-			categoryId: undefined,
-			payerId: defaultPayerId ?? undefined,
-		},
+	const [transactions, setTransactions] = useState<TransactionRow[]>(() => [
+		createEmptyTransactionRow(defaultPayerId),
 	]);
 
 	// Categorias agrupadas e filtradas por tipo de transação
@@ -175,14 +182,7 @@ export function MassAddDialog({
 	const addTransaction = () => {
 		setTransactions([
 			...transactions,
-			{
-				id: crypto.randomUUID(),
-				purchaseDate: getTodayDateString(),
-				name: "",
-				amount: "",
-				categoryId: undefined,
-				payerId: defaultPayerId ?? undefined,
-			},
+			createEmptyTransactionRow(defaultPayerId),
 		]);
 	};
 
@@ -256,16 +256,7 @@ export function MassAddDialog({
 			setPeriod(selectedPeriod);
 			setContaId(undefined);
 			setCartaoId(defaultCardId ?? undefined);
-			setTransactions([
-				{
-					id: crypto.randomUUID(),
-					purchaseDate: getTodayDateString(),
-					name: "",
-					amount: "",
-					categoryId: undefined,
-					payerId: defaultPayerId ?? undefined,
-				},
-			]);
+			setTransactions([createEmptyTransactionRow(defaultPayerId)]);
 		} catch (_error) {
 			// Error is handled by the onSubmit function
 		} finally {

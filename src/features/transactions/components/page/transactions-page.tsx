@@ -575,7 +575,7 @@ export function TransactionsPage({
 				onConfirm={handleBulkEdit}
 			/>
 
-			{allowCreate ? (
+			{allowCreate && massAddOpen ? (
 				<MassAddDialog
 					open={massAddOpen}
 					onOpenChange={setMassAddOpen}

@@ -7,6 +7,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-03-26
+
+### Corrigido
+
+- Lançamentos: `/transactions` deixa de depender de `crypto.randomUUID()` no carregamento inicial, corrigindo a falha em ambientes self-hosted sem HTTPS ao abrir a página
+
 ## [2.0.2] - 2026-03-25
 
 ### Adicionado
