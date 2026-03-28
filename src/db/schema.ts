@@ -847,32 +847,36 @@ export const inboxItemsRelations = relations(inboxItems, ({ one }) => ({
 	}),
 }));
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-	user: one(user, {
-		fields: [transactions.userId],
-		references: [user.id],
+export const transactionsRelations = relations(
+	transactions,
+	({ one, many }) => ({
+		user: one(user, {
+			fields: [transactions.userId],
+			references: [user.id],
+		}),
+		card: one(cards, {
+			fields: [transactions.cardId],
+			references: [cards.id],
+		}),
+		financialAccount: one(financialAccounts, {
+			fields: [transactions.accountId],
+			references: [financialAccounts.id],
+		}),
+		category: one(categories, {
+			fields: [transactions.categoryId],
+			references: [categories.id],
+		}),
+		payer: one(payers, {
+			fields: [transactions.payerId],
+			references: [payers.id],
+		}),
+		anticipation: one(installmentAnticipations, {
+			fields: [transactions.anticipationId],
+			references: [installmentAnticipations.id],
+		}),
+		transactionAttachments: many(transactionAttachments),
 	}),
-	card: one(cards, {
-		fields: [transactions.cardId],
-		references: [cards.id],
-	}),
-	financialAccount: one(financialAccounts, {
-		fields: [transactions.accountId],
-		references: [financialAccounts.id],
-	}),
-	category: one(categories, {
-		fields: [transactions.categoryId],
-		references: [categories.id],
-	}),
-	payer: one(payers, {
-		fields: [transactions.payerId],
-		references: [payers.id],
-	}),
-	anticipation: one(installmentAnticipations, {
-		fields: [transactions.anticipationId],
-		references: [installmentAnticipations.id],
-	}),
-}));
+);
 
 export const installmentAnticipationsRelations = relations(
 	installmentAnticipations,
@@ -893,6 +897,40 @@ export const installmentAnticipationsRelations = relations(
 			fields: [installmentAnticipations.categoryId],
 			references: [categories.id],
 		}),
+	}),
+);
+
+// ===================== ATTACHMENTS =====================
+
+export const attachments = pgTable("anexos", {
+	id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	fileKey: text("chave_arquivo").notNull().unique(),
+	fileName: text("nome_arquivo").notNull(),
+	fileSize: integer("tamanho_bytes").notNull(),
+	mimeType: text("mime_type").notNull(),
+	createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+		.notNull()
+		.defaultNow(),
+});
+
+export const transactionAttachments = pgTable(
+	"lancamento_anexos",
+	{
+		transactionId: uuid("lancamento_id")
+			.notNull()
+			.references(() => transactions.id, { onDelete: "cascade" }),
+		attachmentId: uuid("anexo_id")
+			.notNull()
+			.references(() => attachments.id, { onDelete: "cascade" }),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.transactionId, table.attachmentId] }),
+		attachmentIdIdx: index("lancamento_anexos_anexo_id_idx").on(
+			table.attachmentId,
+		),
 	}),
 );
 
@@ -939,3 +977,28 @@ export type NewApiToken = typeof apiTokens.$inferInsert;
 export type InboxItem = typeof inboxItems.$inferSelect;
 export type NewInboxItem = typeof inboxItems.$inferInsert;
 export type ImportCategoryMapping = typeof importCategoryMappings.$inferSelect;
+
+export const attachmentsRelations = relations(attachments, ({ one, many }) => ({
+	user: one(user, {
+		fields: [attachments.userId],
+		references: [user.id],
+	}),
+	transactionAttachments: many(transactionAttachments),
+}));
+
+export const transactionAttachmentsRelations = relations(
+	transactionAttachments,
+	({ one }) => ({
+		transaction: one(transactions, {
+			fields: [transactionAttachments.transactionId],
+			references: [transactions.id],
+		}),
+		attachment: one(attachments, {
+			fields: [transactionAttachments.attachmentId],
+			references: [attachments.id],
+		}),
+	}),
+);
+
+export type Attachment = typeof attachments.$inferSelect;
+export type TransactionAttachment = typeof transactionAttachments.$inferSelect;

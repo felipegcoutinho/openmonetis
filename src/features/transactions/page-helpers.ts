@@ -402,6 +402,7 @@ type TransactionRowWithRelations = Partial<typeof transactions.$inferSelect> & {
 	financialAccount?: AccountRow | null;
 	card?: CardRow | null;
 	category?: CategoryRow | null;
+	hasAttachments?: boolean;
 };
 
 export const mapTransactionsData = (rows: TransactionRowWithRelations[]) =>
@@ -442,6 +443,7 @@ export const mapTransactionsData = (rows: TransactionRowWithRelations[]) =>
 		isAnticipated: item.isAnticipated ?? false,
 		anticipationId: item.anticipationId ?? null,
 		seriesId: item.seriesId ?? null,
+		hasAttachments: item.hasAttachments ?? false,
 		readonly:
 			Boolean(item.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX)) ||
 			item.category?.name === "Saldo inicial" ||

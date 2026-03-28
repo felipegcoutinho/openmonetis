@@ -6,6 +6,7 @@ import {
 	RiArrowLeftSLine,
 	RiArrowRightDoubleLine,
 	RiArrowRightSLine,
+	RiAttachment2,
 	RiBankCard2Line,
 	RiChat1Line,
 	RiCheckboxBlankCircleLine,
@@ -115,6 +116,14 @@ type BuildColumnsArgs = {
 	showActions: boolean;
 };
 
+function getPaymentMethodTableLabel(method: string) {
+	if (method === "Transferência bancária") {
+		return "Transf. bancária";
+	}
+
+	return method;
+}
+
 const buildColumns = ({
 	currentUserId,
 	noteAsColumn,
@@ -182,6 +191,7 @@ const buildColumns = ({
 					note,
 					isDivided,
 					isAnticipated,
+					hasAttachments,
 				} = row.original;
 
 				const installmentBadge =
@@ -191,7 +201,7 @@ const buildColumns = ({
 
 				const isBoleto = paymentMethod === "Boleto" && dueDate;
 				const dueDateLabel =
-					isBoleto && dueDate ? `Venc. ${formatDate(dueDate)}` : null;
+					isBoleto && dueDate ? `venc. ${formatDate(dueDate)}` : null;
 				const hasNote = Boolean(note?.trim().length);
 				const isLastInstallment =
 					currentInstallment === installmentCount &&
@@ -201,13 +211,18 @@ const buildColumns = ({
 				return (
 					<span className="flex items-center gap-2">
 						<EstablishmentLogo name={name} size={28} />
-						<span className="flex flex-col">
-							<span className="text-[11px] text-muted-foreground">
+
+						<span className="flex flex-col py-0.5">
+							<span className="text-xs text-muted-foreground flex items-center gap-2">
 								{formatDate(purchaseDate)}
+
+								{dueDateLabel ? (
+									<span className="text-primary">{dueDateLabel}</span>
+								) : null}
 							</span>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<span className="line-clamp-2 max-w-[160px] font-semibold truncate">
+									<span className="line-clamp-2 max-w-[180px] font-bold truncate">
 										{name}
 									</span>
 								</TooltipTrigger>
@@ -259,12 +274,6 @@ const buildColumns = ({
 							</Badge>
 						) : null}
 
-						{dueDateLabel ? (
-							<Badge variant="outline" className="px-2 text-xs">
-								{dueDateLabel}
-							</Badge>
-						) : null}
-
 						{isAnticipated && (
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -299,6 +308,21 @@ const buildColumns = ({
 								>
 									{note}
 								</TooltipContent>
+							</Tooltip>
+						) : null}
+
+						{hasAttachments ? (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span className="inline-flex rounded-full p-1">
+										<RiAttachment2
+											className="h-4 w-4 text-muted-foreground"
+											aria-hidden
+										/>
+										<span className="sr-only">Possui anexos</span>
+									</span>
+								</TooltipTrigger>
+								<TooltipContent side="top">Possui anexos</TooltipContent>
 							</Tooltip>
 						) : null}
 					</span>
@@ -366,7 +390,7 @@ const buildColumns = ({
 				return (
 					<span className="flex items-center gap-2">
 						{icon}
-						<span>{method}</span>
+						<span>{getPaymentMethodTableLabel(method)}</span>
 					</span>
 				);
 			},

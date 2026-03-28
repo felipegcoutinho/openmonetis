@@ -33,6 +33,7 @@ export type TransactionItem = {
 	isAnticipated: boolean;
 	anticipationId: string | null;
 	seriesId: string | null;
+	hasAttachments: boolean;
 	readonly?: boolean;
 };
 

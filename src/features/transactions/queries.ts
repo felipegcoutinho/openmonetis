@@ -15,6 +15,7 @@ import {
 	categories,
 	financialAccounts,
 	payers,
+	transactionAttachments,
 	transactions,
 } from "@/db/schema";
 import { INITIAL_BALANCE_NOTE } from "@/shared/lib/accounts/constants";
@@ -74,6 +75,7 @@ const mapTransactionRows = (
 		financialAccount: typeof financialAccounts.$inferSelect | null;
 		card: typeof cards.$inferSelect | null;
 		category: typeof categories.$inferSelect | null;
+		hasAttachments: boolean;
 	}[],
 ) =>
 	transactionRows.map((row) => ({
@@ -82,6 +84,7 @@ const mapTransactionRows = (
 		financialAccount: row.financialAccount,
 		card: row.card,
 		category: row.category,
+		hasAttachments: row.hasAttachments,
 	}));
 
 async function selectTransactionsWithRelations({
@@ -98,6 +101,10 @@ async function selectTransactionsWithRelations({
 			financialAccount: financialAccounts,
 			card: cards,
 			category: categories,
+			hasAttachments: sql<boolean>`EXISTS (
+				SELECT 1 FROM ${transactionAttachments}
+				WHERE ${transactionAttachments.transactionId} = ${transactions.id}
+			)`,
 		})
 		.from(transactions)
 		.leftJoin(payers, eq(transactions.payerId, payers.id))
