@@ -162,6 +162,13 @@
 			"when": 1748000000000,
 			"tag": "0022_import-category-mappings",
 			"breakpoints": true
+		},
+		{
+			"idx": 23,
+			"version": "7",
+			"when": 1774529878374,
+			"tag": "0023_sturdy_wolfpack",
+			"breakpoints": true
 		}
 	]
 }
