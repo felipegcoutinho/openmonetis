@@ -7,6 +7,10 @@ import {
 	updateTransactionAction,
 } from "@/features/transactions/actions";
 import {
+	confirmAttachmentUploadAction,
+	getPresignedUploadUrlAction,
+} from "@/features/transactions/actions/attachments";
+import {
 	filterSecondaryPayerOptions,
 	groupAndSortCategories,
 } from "@/features/transactions/category-helpers";
@@ -30,7 +34,10 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/shared/components/ui/dialog";
+import { Label } from "@/shared/components/ui/label";
 import { useControlledState } from "@/shared/hooks/use-controlled-state";
+import { AttachmentFilePicker } from "../../attachments/attachment-file-picker";
+import { AttachmentSection } from "../../attachments/attachment-section";
 import { BasicFieldsSection } from "./basic-fields-section";
 import { BoletoFieldsSection } from "./boleto-fields-section";
 import { CategorySection } from "./category-section";
@@ -90,6 +97,7 @@ export function TransactionDialog({
 	);
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [pendingFile, setPendingFile] = useState<File | null>(null);
 
 	useEffect(() => {
 		if (dialogOpen) {
@@ -126,6 +134,7 @@ export function TransactionDialog({
 
 			setFormState(initial);
 			setErrorMessage(null);
+			setPendingFile(null);
 		}
 	}, [
 		dialogOpen,
@@ -313,6 +322,29 @@ export function TransactionDialog({
 				const result = await createTransactionAction(payload);
 
 				if (result.success) {
+					if (pendingFile && result.data?.ids?.length) {
+						const firstId = result.data.ids[0];
+						const isNewSeries =
+							formState.condition === "Parcelado" ||
+							formState.condition === "Recorrente";
+						const presign = await getPresignedUploadUrlAction({
+							fileName: pendingFile.name,
+							mimeType: pendingFile.type,
+							fileSize: pendingFile.size,
+							transactionId: firstId,
+						});
+						if (presign.success) {
+							await fetch(presign.presignedUrl, {
+								method: "PUT",
+								body: pendingFile,
+								headers: { "Content-Type": pendingFile.type },
+							});
+							await confirmAttachmentUploadAction({
+								uploadToken: presign.uploadToken,
+								applyToSeries: isNewSeries,
+							});
+						}
+					}
 					toast.success(result.message);
 					onSuccess?.();
 					setDialogOpen(false);
@@ -415,18 +447,18 @@ export function TransactionDialog({
 	return (
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 			{trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-			<DialogContent>
+			<DialogContent className="min-w-0 overflow-x-hidden">
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>{description}</DialogDescription>
 				</DialogHeader>
 
 				<form
-					className="flex flex-col gap-0"
+					className="flex min-w-0 flex-col gap-0"
 					onSubmit={handleSubmit}
 					noValidate
 				>
-					<div className="space-y-3 -mx-6 max-h-[70vh] overflow-y-auto px-6 pb-1">
+					<div className="min-w-0 space-y-3 -mx-6 max-h-[90vh] overflow-x-hidden overflow-y-auto px-6 pb-1">
 						<BasicFieldsSection
 							formState={formState}
 							onFieldChange={handleFieldChange}
@@ -477,17 +509,31 @@ export function TransactionDialog({
 						) : null}
 
 						{isUpdateMode ? (
-							<NoteSection
-								formState={formState}
-								onFieldChange={handleFieldChange}
-							/>
+							<>
+								<NoteSection
+									formState={formState}
+									onFieldChange={handleFieldChange}
+								/>
+								<div className="space-y-2">
+									<Label className="text-xs font-medium leading-none">
+										Anexos
+									</Label>
+									<AttachmentSection
+										transactionId={transaction?.id ?? ""}
+										seriesId={transaction?.seriesId ?? null}
+									/>
+								</div>
+							</>
 						) : (
-							<Collapsible defaultOpen={formState.condition !== "À vista"}>
+							<Collapsible
+								defaultOpen={formState.condition !== "À vista"}
+								className="min-w-0"
+							>
 								<CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer [&[data-state=open]>svg]:rotate-180 mt-4">
 									<RiArrowDropDownLine className="text-primary size-4 transition-transform duration-200" />
-									Condições e anotações
+									Condições, anotações e anexos
 								</CollapsibleTrigger>
-								<CollapsibleContent className="space-y-3 pt-3">
+								<CollapsibleContent className="min-w-0 overflow-hidden space-y-3 pt-3">
 									<ConditionSection
 										formState={formState}
 										onFieldChange={handleFieldChange}
@@ -497,6 +543,10 @@ export function TransactionDialog({
 									<NoteSection
 										formState={formState}
 										onFieldChange={handleFieldChange}
+									/>
+									<AttachmentFilePicker
+										file={pendingFile}
+										onChange={setPendingFile}
 									/>
 								</CollapsibleContent>
 							</Collapsible>

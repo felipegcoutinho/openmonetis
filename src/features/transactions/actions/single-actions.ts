@@ -1,11 +1,18 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
-import { financialAccounts, transactions } from "@/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+	attachments,
+	financialAccounts,
+	invoices,
+	transactionAttachments,
+	transactions,
+} from "@/db/schema";
 import { handleActionError } from "@/shared/lib/actions/helpers";
 import { getUser } from "@/shared/lib/auth/server";
 import { db } from "@/shared/lib/db";
+import { INVOICE_PAYMENT_STATUS } from "@/shared/lib/invoices";
 import {
 	buildEntriesByPayer,
 	sendPayerAutoEmails,
@@ -16,6 +23,8 @@ import {
 	getBusinessTodayDate,
 	parseLocalDateString,
 } from "@/shared/utils/date";
+import { MONTH_NAMES } from "@/shared/utils/period";
+import { cleanupAttachmentsAfterTransactionDelete } from "./attachments";
 import {
 	buildLancamentoRecords,
 	buildShares,
@@ -37,7 +46,7 @@ import {
 
 export async function createTransactionAction(
 	input: CreateInput,
-): Promise<ActionResult> {
+): Promise<ActionResult<{ ids: string[] }>> {
 	try {
 		const user = await getUser();
 		const data = createSchema.parse(input);
@@ -102,7 +111,42 @@ export async function createTransactionAction(
 			throw new Error("Não foi possível criar os lançamentos solicitados.");
 		}
 
-		await db.insert(transactions).values(records);
+		if (data.cardId) {
+			const uniquePeriods = [
+				...new Set(
+					records.map((r) => r.period).filter((p): p is string => Boolean(p)),
+				),
+			];
+
+			const paidInvoices = await db.query.invoices.findMany({
+				columns: { period: true },
+				where: and(
+					eq(invoices.userId, user.id),
+					eq(invoices.cardId, data.cardId),
+					eq(invoices.paymentStatus, INVOICE_PAYMENT_STATUS.PAID),
+					inArray(invoices.period, uniquePeriods),
+				),
+			});
+
+			if (paidInvoices.length > 0) {
+				const labels = paidInvoices
+					.map((inv) => {
+						const [year, month] = (inv.period ?? "").split("-");
+						const monthName = MONTH_NAMES[Number(month) - 1] ?? month;
+						return `${monthName}/${year}`;
+					})
+					.join(", ");
+				return {
+					success: false,
+					error: `As faturas dos meses ${labels} já estão pagas. Desfaça o pagamento antes de adicionar este lançamento.`,
+				} as ActionResult<{ ids: string[] }>;
+			}
+		}
+
+		const inserted = await db
+			.insert(transactions)
+			.values(records)
+			.returning({ id: transactions.id });
 
 		const notificationEntries = buildEntriesByPayer(
 			records.map((record) => ({
@@ -128,9 +172,13 @@ export async function createTransactionAction(
 
 		revalidate(user.id);
 
-		return { success: true, message: "Lançamento criado com sucesso." };
+		return {
+			success: true,
+			message: "Lançamento criado com sucesso.",
+			data: { ids: inserted.map((r) => r.id) },
+		};
 	} catch (error) {
-		return handleActionError(error);
+		return handleActionError(error) as ActionResult<{ ids: string[] }>;
 	}
 }
 
@@ -329,11 +377,22 @@ export async function deleteTransactionAction(
 			};
 		}
 
+		const linkedAttachments = await db
+			.select({ id: attachments.id, fileKey: attachments.fileKey })
+			.from(transactionAttachments)
+			.innerJoin(
+				attachments,
+				eq(transactionAttachments.attachmentId, attachments.id),
+			)
+			.where(eq(transactionAttachments.transactionId, data.id));
+
 		await db
 			.delete(transactions)
 			.where(
 				and(eq(transactions.id, data.id), eq(transactions.userId, user.id)),
 			);
+
+		await cleanupAttachmentsAfterTransactionDelete(linkedAttachments);
 
 		if (existing.payerId) {
 			const notificationEntries = buildEntriesByPayer([
