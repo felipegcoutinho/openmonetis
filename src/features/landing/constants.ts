@@ -35,9 +35,6 @@ export type FeatureItem = {
 	colorVar: string;
 };
 
-export const navbarActionClassName =
-	"border-black/10 bg-transparent text-black/75 shadow-none hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-black/20 data-[state=open]:bg-black/10 data-[state=open]:text-black";
-
 export const navLinks = [
 	{ href: "#telas", label: "conheça as telas" },
 	{ href: "#funcionalidades", label: "funcionalidades" },

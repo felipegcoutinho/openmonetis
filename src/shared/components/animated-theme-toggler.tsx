@@ -1,5 +1,6 @@
 "use client";
 import { RiMoonClearLine, RiSunLine } from "@remixicon/react";
+import type { VariantProps } from "class-variance-authority";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { buttonVariants } from "@/shared/components/ui/button";
@@ -13,11 +14,13 @@ import { cn } from "@/shared/utils/ui";
 interface AnimatedThemeTogglerProps
 	extends React.ComponentPropsWithoutRef<"button"> {
 	duration?: number;
+	variant?: VariantProps<typeof buttonVariants>["variant"];
 }
 
 export const AnimatedThemeToggler = ({
 	className,
 	duration = 400,
+	variant = "ghost",
 	...props
 }: AnimatedThemeTogglerProps) => {
 	const [isDark, setIsDark] = useState(false);
@@ -84,10 +87,10 @@ export const AnimatedThemeToggler = ({
 					onClick={toggleTheme}
 					data-state={isDark ? "dark" : "light"}
 					className={cn(
-						buttonVariants({ variant: "ghost", size: "icon-sm" }),
-						"group relative text-muted-foreground transition-all duration-200",
-						"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
-						"data-[state=open]:bg-accent/60 data-[state=open]:text-foreground",
+						buttonVariants({ variant, size: "icon-sm" }),
+						"group relative transition-all duration-200",
+						variant === "ghost" &&
+							"text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 data-[state=open]:bg-accent/60 data-[state=open]:text-foreground",
 						className,
 					)}
 					{...props}

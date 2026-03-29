@@ -24,24 +24,18 @@ const navLinks = [
 interface MobileNavProps {
 	isPublicDomain: boolean;
 	isLoggedIn: boolean;
-	triggerClassName?: string;
 }
 
-export function MobileNav({
-	isPublicDomain,
-	isLoggedIn,
-	triggerClassName,
-}: MobileNavProps) {
+export function MobileNav({ isPublicDomain, isLoggedIn }: MobileNavProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
 		<div className="md:hidden">
 			<Button
-				variant="ghost"
-				size="icon"
+				variant="navbar"
+				size="icon-sm"
 				onClick={() => setOpen(true)}
 				aria-label="Abrir menu"
-				className={triggerClassName}
 			>
 				<RiMenuLine className="size-5" />
 			</Button>

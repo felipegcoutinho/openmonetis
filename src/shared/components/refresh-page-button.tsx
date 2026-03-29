@@ -1,6 +1,7 @@
 "use client";
 
 import { RiRefreshLine } from "@remixicon/react";
+import type { VariantProps } from "class-variance-authority";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { buttonVariants } from "@/shared/components/ui/button";
@@ -11,10 +12,12 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { cn } from "@/shared/utils/ui";
 
-type RefreshPageButtonProps = React.ComponentPropsWithoutRef<"button">;
+type RefreshPageButtonProps = React.ComponentPropsWithoutRef<"button"> &
+	Pick<VariantProps<typeof buttonVariants>, "variant">;
 
 export function RefreshPageButton({
 	className,
+	variant = "ghost",
 	...props
 }: RefreshPageButtonProps) {
 	const router = useRouter();
@@ -36,10 +39,10 @@ export function RefreshPageButton({
 					aria-label="Atualizar página"
 					title="Atualizar página"
 					className={cn(
-						buttonVariants({ variant: "ghost", size: "icon-sm" }),
-						"size-8 text-muted-foreground transition-all duration-200",
-						"hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
-						"disabled:pointer-events-none disabled:opacity-50",
+						buttonVariants({ variant, size: "icon-sm" }),
+						"transition-all duration-200",
+						variant === "ghost" &&
+							"text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40",
 						className,
 					)}
 					{...props}

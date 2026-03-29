@@ -20,12 +20,17 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/shared/components/ui/sheet";
+import { cn } from "@/shared/utils/ui";
 import { MobileLink, MobileSectionLabel } from "./mobile-link";
 import { NavDropdown } from "./nav-dropdown";
 import { NAV_SECTIONS } from "./nav-items";
 import { NavPill } from "./nav-pill";
-import { triggerActiveClass, triggerClass } from "./nav-styles";
 import { MobileTools, NavToolsDropdown } from "./nav-tools";
+
+const triggerClass =
+	"h-8! rounded-md! px-2! py-0! text-sm! font-medium! bg-transparent! shadow-none! lowercase! [&_svg]:text-current! text-black/75! hover:text-black! hover:bg-black/10! focus:text-black! focus:bg-black/10! focus-visible:ring-black/20! data-[state=open]:text-black! data-[state=open]:bg-black/10!";
+
+const triggerActiveClass = "bg-black/15! text-black!";
 
 export function NavMenu() {
 	const pathname = usePathname();
@@ -55,7 +60,10 @@ export function NavMenu() {
 							return (
 								<NavigationMenuItem key={section.label}>
 									<NavigationMenuTrigger
-										className={`${triggerClass} ${isSectionActive ? triggerActiveClass : ""}`}
+										className={cn(
+											triggerClass,
+											isSectionActive && triggerActiveClass,
+										)}
 									>
 										{section.label}
 									</NavigationMenuTrigger>
@@ -82,9 +90,9 @@ export function NavMenu() {
 			<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
 				<SheetTrigger asChild>
 					<Button
-						variant="ghost"
-						size="icon"
-						className="-order-1 border border-black/10 text-black/75 shadow-none md:hidden hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-black/20"
+						variant="navbar"
+						size="icon-sm"
+						className="-order-1 md:hidden"
 					>
 						<RiMenuLine className="size-5" />
 						<span className="sr-only">Abrir menu</span>

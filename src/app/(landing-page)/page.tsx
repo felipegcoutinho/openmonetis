@@ -17,7 +17,6 @@ import {
 	extraFeatures,
 	getMetricsItems,
 	mainFeatures,
-	navbarActionClassName,
 	navLinks,
 	pwaHighlights,
 	stackItems,
@@ -27,6 +26,7 @@ import { landingImages } from "@/features/landing/images";
 import { fetchGitHubStats } from "@/features/landing/queries";
 import { AnimatedThemeToggler } from "@/shared/components/animated-theme-toggler";
 import { Logo } from "@/shared/components/logo";
+import { NavbarShell } from "@/shared/components/navigation/navbar/navbar-shell";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -50,65 +50,60 @@ export default async function Page() {
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* Navigation */}
-			<header className="sticky top-0 z-50 flex h-16 shrink-0 items-center bg-primary">
-				<div className="relative z-10 max-w-8xl mx-auto px-4 w-full flex h-full items-center justify-between">
-					<Logo variant="compact" invertTextOnDark={false} />
+			<NavbarShell>
+				{/* Center Navigation Links */}
+				<nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+					{navLinks.map(({ href, label }) => (
+						<a
+							key={href}
+							href={href}
+							className="rounded-md px-2 py-1.5 text-sm font-medium text-black/75 hover:text-black hover:bg-black/10 transition-colors"
+						>
+							{label}
+						</a>
+					))}
+				</nav>
 
-					{/* Center Navigation Links */}
-					<nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-						{navLinks.map(({ href, label }) => (
-							<a
-								key={href}
-								href={href}
-								className="rounded-md px-2 py-1.5 text-sm font-medium text-black/75 hover:text-black hover:bg-black/10 transition-colors"
-							>
-								{label}
-							</a>
-						))}
-					</nav>
-
-					<nav className="flex items-center gap-2 md:gap-3">
-						<AnimatedThemeToggler className={navbarActionClassName} />
-						{!isPublicDomain &&
-							(session?.user ? (
-								<Link prefetch href="/dashboard" className="hidden md:block">
+				<nav className="ml-auto flex items-center gap-2 md:gap-3">
+					<AnimatedThemeToggler variant="navbar" />
+					{!isPublicDomain &&
+						(session?.user ? (
+							<Link prefetch href="/dashboard" className="hidden md:block">
+								<Button
+									variant="outline"
+									size="sm"
+									className="border-black/20 text-black/80 bg-transparent hover:bg-black/10 hover:text-black shadow-none"
+								>
+									Dashboard
+								</Button>
+							</Link>
+						) : (
+							<div className="hidden md:flex items-center gap-2">
+								<Link href="/login">
 									<Button
-										variant="outline"
+										variant="ghost"
 										size="sm"
-										className="border-black/20 text-black/80 bg-transparent hover:bg-black/10 hover:text-black shadow-none"
+										className="text-black/75 hover:bg-black/10 hover:text-black shadow-none"
 									>
-										Dashboard
+										Entrar
 									</Button>
 								</Link>
-							) : (
-								<div className="hidden md:flex items-center gap-2">
-									<Link href="/login">
-										<Button
-											variant="ghost"
-											size="sm"
-											className="text-black/75 hover:bg-black/10 hover:text-black shadow-none"
-										>
-											Entrar
-										</Button>
-									</Link>
-									<Link href="/signup">
-										<Button
-											size="sm"
-											className="bg-black/10 border border-black/20 text-black shadow-none hover:bg-black/20 gap-2"
-										>
-											Começar
-										</Button>
-									</Link>
-								</div>
-							))}
-						<MobileNav
-							isPublicDomain={isPublicDomain}
-							isLoggedIn={!!session?.user}
-							triggerClassName="border border-black/10 text-black/75 shadow-none hover:border-black/20 hover:bg-black/10 hover:text-black focus-visible:ring-black/20"
-						/>
-					</nav>
-				</div>
-			</header>
+								<Link href="/signup">
+									<Button
+										size="sm"
+										className="bg-black/10 border border-black/20 text-black shadow-none hover:bg-black/20 gap-2"
+									>
+										Começar
+									</Button>
+								</Link>
+							</div>
+						))}
+					<MobileNav
+						isPublicDomain={isPublicDomain}
+						isLoggedIn={!!session?.user}
+					/>
+				</nav>
+			</NavbarShell>
 
 			{/* Hero Section */}
 			<section className="relative overflow-hidden pt-14 md:pt-20 lg:pt-24 pb-0">
