@@ -12,7 +12,6 @@
 		"**/.next": true,
 		".next": true
 	},
-	"explorerExclude.backup": {},
 	"editor.defaultFormatter": "biomejs.biome",
 	"editor.formatOnSave": true,
 	"editor.codeActionsOnSave": {
@@ -25,9 +24,7 @@
 	"[json]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"eslint.enable": false,
 	"prettier.enable": false,
-	"typescript.preferences.organizeImportsCollation": "ordinal",
 	"editor.fontSize": 15,
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
