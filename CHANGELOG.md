@@ -7,6 +7,27 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-03-29
+
+### Adicionado
+
+- Navbar: novo componente `NavbarShell` que unifica a estrutura da barra de navegação entre o app e a landing page
+- UI: nova variante `navbar` no componente `Button`, centralizando os estilos de botões usados dentro da navbar
+- Analytics: integração com Umami self-hosted via script tag no layout raiz
+
+### Alterado
+
+- Navbar: `AnimatedThemeToggler` e `RefreshPageButton` passam a aceitar prop `variant` para adaptar estilos ao contexto (navbar ou sidebar)
+- Navbar: estilos inline duplicados de `nav-styles.ts` migrados para a variante `navbar` do Button
+- Logo: prop `showVersion` removida; prop `colorIcon` passa a aplicar filtro de cor também no variant `compact`
+- Scripts: `mockup` renomeado para `db:seed`; `db:enableExtensions` renomeado para `db:extensions`; script `dev-env` removido
+- Landing: `MobileNav` simplificado com a remoção da prop `triggerClassName`
+
+### Removido
+
+- Navbar: arquivo `nav-styles.ts` removido após migração dos estilos para a variante `navbar`
+- Dependências: `@vercel/analytics` e `@vercel/speed-insights` removidos (substituídos pelo Umami self-hosted)
+
 ## [2.1.0] - 2026-03-28
 
 ### Adicionado
