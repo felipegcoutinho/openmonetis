@@ -156,7 +156,7 @@ O script irá:
 
    ```bash
    docker compose up db -d
-   pnpm db:enableExtensions
+   pnpm db:extensions
    ```
 
 4. **Execute as migrations e inicie**
