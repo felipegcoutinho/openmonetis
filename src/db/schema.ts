@@ -135,6 +135,7 @@ export const userPreferences = pgTable("preferencias_usuario", {
 	transactionsColumnOrder: jsonb("lancamentos_column_order").$type<
 		string[] | null
 	>(),
+	attachmentMaxSizeMb: integer("attachment_max_size_mb").notNull().default(50),
 	dashboardWidgets: jsonb("dashboard_widgets").$type<{
 		order: string[];
 		hidden: string[];

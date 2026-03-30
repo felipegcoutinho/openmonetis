@@ -1,0 +1,1 @@
+ALTER TABLE "preferencias_usuario" ADD COLUMN "attachment_max_size_mb" integer DEFAULT 50 NOT NULL;
