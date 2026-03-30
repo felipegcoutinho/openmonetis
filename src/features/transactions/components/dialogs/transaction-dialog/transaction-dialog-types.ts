@@ -30,6 +30,8 @@ export interface TransactionDialogProps {
 	forceShowTransactionType?: boolean;
 	/** Called after successful create/update. Receives the action result. */
 	onSuccess?: () => void;
+	/** Max attachment file size in MB for this user */
+	maxSizeMb?: number;
 	onBulkEditRequest?: (data: {
 		id: string;
 		name: string;
@@ -42,6 +44,8 @@ export interface TransactionDialogProps {
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
 		isSettled: boolean | null;
+		pendingDetachIds: string[];
+		pendingUploadFiles: File[];
 	}) => void;
 }
 

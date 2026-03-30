@@ -1,7 +1,7 @@
 "use client";
 
 import { RiAttachment2 } from "@remixicon/react";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useTransition } from "react";
 import { toast } from "sonner";
 import {
 	confirmAttachmentUploadAction,
@@ -9,27 +9,25 @@ import {
 } from "@/features/transactions/actions/attachments";
 import {
 	ALLOWED_MIME_TYPES,
-	MAX_FILE_SIZE,
+	DEFAULT_MAX_FILE_SIZE_MB,
 } from "@/features/transactions/attachments-config";
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
 
 interface AttachmentUploadProps {
 	transactionId: string;
-	seriesId: string | null;
 	onUploaded: () => void;
+	onPendingUpload?: (file: File) => void;
+	maxSizeMb?: number;
 }
 
 export function AttachmentUpload({
 	transactionId,
-	seriesId,
 	onUploaded,
+	onPendingUpload,
+	maxSizeMb = DEFAULT_MAX_FILE_SIZE_MB,
 }: AttachmentUploadProps) {
+	const maxFileSizeBytes = maxSizeMb * 1024 * 1024;
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [isPending, startTransition] = useTransition();
-	const [applyToSeries, setApplyToSeries] = useState(false);
-	const [pendingFile, setPendingFile] = useState<File | null>(null);
 
 	function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const file = e.target.files?.[0];
@@ -49,19 +47,16 @@ export function AttachmentUpload({
 			return;
 		}
 
-		if (file.size > MAX_FILE_SIZE) {
-			toast.error("O arquivo deve ter no máximo 50MB.");
+		if (file.size > maxFileSizeBytes) {
+			toast.error(`O arquivo deve ter no máximo ${maxSizeMb}MB.`);
 			return;
 		}
 
-		if (seriesId) {
-			setPendingFile(file);
-		} else {
-			uploadFile(file, false);
+		if (onPendingUpload) {
+			onPendingUpload(file);
+			return;
 		}
-	}
 
-	function uploadFile(file: File, toSeries: boolean) {
 		startTransition(async () => {
 			const presignResult = await getPresignedUploadUrlAction({
 				fileName: file.name,
@@ -88,68 +83,15 @@ export function AttachmentUpload({
 
 			const confirmResult = await confirmAttachmentUploadAction({
 				uploadToken: presignResult.uploadToken,
-				applyToSeries: toSeries,
 			});
 
 			if (confirmResult.success) {
 				toast.success(confirmResult.message);
-				setPendingFile(null);
-				setApplyToSeries(false);
 				onUploaded();
 			} else {
 				toast.error(confirmResult.error);
 			}
 		});
-	}
-
-	function handleConfirmPending() {
-		if (pendingFile) uploadFile(pendingFile, applyToSeries);
-	}
-
-	function handleCancelPending() {
-		setPendingFile(null);
-		setApplyToSeries(false);
-	}
-
-	if (pendingFile) {
-		return (
-			<div className="min-w-0 space-y-2 rounded-md border border-dashed p-3 text-sm">
-				<div className="min-w-0 overflow-hidden">
-					<p className="truncate font-medium" title={pendingFile.name}>
-						{pendingFile.name}
-					</p>
-				</div>
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="apply-series"
-						checked={applyToSeries}
-						onCheckedChange={(v) => setApplyToSeries(Boolean(v))}
-					/>
-					<Label htmlFor="apply-series" className="cursor-pointer text-xs">
-						Aplicar a todas as parcelas da série
-					</Label>
-				</div>
-				<div className="flex gap-2">
-					<Button
-						type="button"
-						size="sm"
-						onClick={handleConfirmPending}
-						disabled={isPending}
-					>
-						{isPending ? "Enviando..." : "Confirmar"}
-					</Button>
-					<Button
-						type="button"
-						size="sm"
-						variant="outline"
-						onClick={handleCancelPending}
-						disabled={isPending}
-					>
-						Cancelar
-					</Button>
-				</div>
-			</div>
-		);
 	}
 
 	return (
@@ -172,7 +114,9 @@ export function AttachmentUpload({
 					{isPending ? "Enviando..." : "Adicionar anexo"}
 				</span>
 				{!isPending && (
-					<span className="text-xs">PDF, JPEG, PNG ou WebP · máx. 50 MB</span>
+					<span className="text-xs">
+						PDF, JPEG, PNG ou WebP · máx. {maxSizeMb} MB
+					</span>
 				)}
 			</button>
 		</>

@@ -125,6 +125,9 @@ interface AttachmentItemProps {
 	url: string;
 	onDeleted: () => void;
 	readonly?: boolean;
+	isPendingDelete?: boolean;
+	onPendingDelete?: (attachmentId: string) => void;
+	onUndoPendingDelete?: (attachmentId: string) => void;
 }
 
 export function AttachmentItem({
@@ -136,6 +139,9 @@ export function AttachmentItem({
 	url,
 	onDeleted,
 	readonly = false,
+	isPendingDelete = false,
+	onPendingDelete,
+	onUndoPendingDelete,
 }: AttachmentItemProps) {
 	const [isPending, startTransition] = useTransition();
 	const [previewOpen, setPreviewOpen] = useState(false);
@@ -145,6 +151,11 @@ export function AttachmentItem({
 		mimeType === "application/pdf" || mimeType.startsWith("image/");
 
 	function handleDelete() {
+		if (onPendingDelete) {
+			onPendingDelete(attachmentId);
+			setConfirmOpen(false);
+			return;
+		}
 		startTransition(async () => {
 			const result = await detachTransactionAttachmentAction({
 				attachmentId,
@@ -162,9 +173,18 @@ export function AttachmentItem({
 
 	return (
 		<>
-			<div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-md border px-3 py-2 text-sm">
+			<div
+				className={`flex min-w-0 items-center gap-2 overflow-hidden rounded-md border px-3 py-2 text-sm transition-opacity ${isPendingDelete ? "opacity-50 border-dashed" : ""}`}
+			>
 				<AttachmentIcon mimeType={mimeType} />
-				{canPreview ? (
+				{isPendingDelete ? (
+					<div className="flex-1 min-w-0">
+						<p className="truncate font-medium line-through">{fileName}</p>
+						<p className="text-xs text-muted-foreground">
+							Será removido ao salvar
+						</p>
+					</div>
+				) : canPreview ? (
 					<button
 						type="button"
 						className="min-w-0 flex-1 text-left"
@@ -184,29 +204,42 @@ export function AttachmentItem({
 						</p>
 					</div>
 				)}
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					className="size-7 shrink-0"
-					asChild
-				>
-					<a href={url} target="_blank" rel="noreferrer" download={fileName}>
-						<RiDownloadLine className="size-4" />
-					</a>
-				</Button>
-				{!readonly && (
+				{!isPendingDelete && (
 					<Button
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="size-7 shrink-0 text-destructive hover:text-destructive"
-						onClick={() => setConfirmOpen(true)}
-						disabled={isPending}
+						className="size-7 shrink-0"
+						asChild
 					>
-						<RiDeleteBinLine className="size-4" />
+						<a href={url} target="_blank" rel="noreferrer" download={fileName}>
+							<RiDownloadLine className="size-4" />
+						</a>
 					</Button>
 				)}
+				{!readonly &&
+					(isPendingDelete ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className="shrink-0 text-xs h-7 px-2"
+							onClick={() => onUndoPendingDelete?.(attachmentId)}
+						>
+							Desfazer
+						</Button>
+					) : (
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="size-7 shrink-0 text-destructive hover:text-destructive"
+							onClick={() => setConfirmOpen(true)}
+							disabled={isPending}
+						>
+							<RiDeleteBinLine className="size-4" />
+						</Button>
+					))}
 			</div>
 
 			{canPreview && (

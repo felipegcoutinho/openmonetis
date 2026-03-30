@@ -10,6 +10,11 @@ import {
 	toggleTransactionSettlementAction,
 	updateTransactionBulkAction,
 } from "@/features/transactions/actions";
+import {
+	confirmAttachmentUploadAction,
+	detachAttachmentBulkAction,
+	getPresignedUploadUrlAction,
+} from "@/features/transactions/actions/attachments";
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
 import type {
 	TransactionsExportContext,
@@ -59,6 +64,7 @@ interface TransactionsPageProps {
 	lockPaymentMethod?: boolean;
 	pagination?: TransactionsPaginationState;
 	exportContext?: TransactionsExportContext;
+	attachmentMaxSizeMb?: number;
 	// Opções específicas para o dialog de importação (quando visualizando dados de outro usuário)
 	importPayerOptions?: SelectOption[];
 	importSplitPayerOptions?: SelectOption[];
@@ -91,6 +97,7 @@ export function TransactionsPage({
 	lockPaymentMethod,
 	pagination,
 	exportContext,
+	attachmentMaxSizeMb,
 	importPayerOptions,
 	importSplitPayerOptions,
 	importDefaultPayerId,
@@ -130,6 +137,8 @@ export function TransactionsPage({
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
 		isSettled: boolean | null;
+		pendingDetachIds: string[];
+		pendingUploadFiles: File[];
 		transaction: TransactionItem;
 	} | null>(null);
 	const [pendingDeleteData, setPendingDeleteData] =
@@ -246,6 +255,8 @@ export function TransactionsPage({
 		dueDate: string | null;
 		boletoPaymentDate: string | null;
 		isSettled: boolean | null;
+		pendingDetachIds: string[];
+		pendingUploadFiles: File[];
 	}) => {
 		if (!selectedTransaction) {
 			return;
@@ -282,6 +293,36 @@ export function TransactionsPage({
 		if (!result.success) {
 			toast.error(result.error);
 			throw new Error(result.error);
+		}
+
+		// Propaga remoções de anexo pendentes com o mesmo escopo
+		for (const attachmentId of pendingEditData.pendingDetachIds) {
+			await detachAttachmentBulkAction({
+				attachmentId,
+				transactionId: pendingEditData.id,
+				scope,
+			});
+		}
+
+		// Faz upload dos arquivos pendentes e confirma com o escopo escolhido
+		for (const file of pendingEditData.pendingUploadFiles) {
+			const presign = await getPresignedUploadUrlAction({
+				fileName: file.name,
+				mimeType: file.type,
+				fileSize: file.size,
+				transactionId: pendingEditData.id,
+			});
+			if (presign.success) {
+				await fetch(presign.presignedUrl, {
+					method: "PUT",
+					body: file,
+					headers: { "Content-Type": file.type },
+				});
+				await confirmAttachmentUploadAction({
+					uploadToken: presign.uploadToken,
+					scope,
+				});
+			}
 		}
 
 		toast.success(result.message);
@@ -438,6 +479,7 @@ export function TransactionsPage({
 					lockCardSelection={lockCardSelection}
 					lockPaymentMethod={lockPaymentMethod}
 					defaultTransactionType={transactionTypeForCreate ?? undefined}
+					maxSizeMb={attachmentMaxSizeMb}
 				/>
 			) : null}
 
@@ -459,6 +501,7 @@ export function TransactionsPage({
 				estabelecimentos={estabelecimentos}
 				transaction={transactionToCopy ?? undefined}
 				defaultPeriod={selectedPeriod}
+				maxSizeMb={attachmentMaxSizeMb}
 			/>
 
 			<TransactionDialog
@@ -480,6 +523,7 @@ export function TransactionsPage({
 				transaction={transactionToImport ?? undefined}
 				defaultPeriod={selectedPeriod}
 				isImporting={true}
+				maxSizeMb={attachmentMaxSizeMb}
 			/>
 
 			<BulkImportDialog
@@ -507,6 +551,7 @@ export function TransactionsPage({
 				transaction={selectedTransaction ?? undefined}
 				defaultPeriod={selectedPeriod}
 				onBulkEditRequest={handleBulkEditRequest}
+				maxSizeMb={attachmentMaxSizeMb}
 			/>
 
 			<TransactionDetailsDialog

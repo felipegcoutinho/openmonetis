@@ -8,6 +8,7 @@ import {
 } from "@/features/transactions/actions";
 import {
 	confirmAttachmentUploadAction,
+	detachTransactionAttachmentAction,
 	getPresignedUploadUrlAction,
 } from "@/features/transactions/actions/attachments";
 import {
@@ -72,10 +73,11 @@ export function TransactionDialog({
 	defaultAmount,
 	lockCardSelection,
 	lockPaymentMethod,
-	isImporting = false,
+	isImporting,
 	defaultTransactionType,
-	forceShowTransactionType = false,
+	forceShowTransactionType,
 	onSuccess,
+	maxSizeMb,
 	onBulkEditRequest,
 }: TransactionDialogProps) {
 	const [dialogOpen, setDialogOpen] = useControlledState(
@@ -98,6 +100,8 @@ export function TransactionDialog({
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [pendingFile, setPendingFile] = useState<File | null>(null);
+	const [pendingDetachIds, setPendingDetachIds] = useState<string[]>([]);
+	const [pendingUploadFiles, setPendingUploadFiles] = useState<File[]>([]);
 
 	useEffect(() => {
 		if (dialogOpen) {
@@ -136,6 +140,8 @@ export function TransactionDialog({
 			setFormState(initial);
 			setErrorMessage(null);
 			setPendingFile(null);
+			setPendingDetachIds([]);
+			setPendingUploadFiles([]);
 		}
 	}, [
 		dialogOpen,
@@ -342,7 +348,7 @@ export function TransactionDialog({
 							});
 							await confirmAttachmentUploadAction({
 								uploadToken: presign.uploadToken,
-								applyToSeries: isNewSeries,
+								scope: isNewSeries ? "all" : "current",
 							});
 						}
 					}
@@ -357,11 +363,11 @@ export function TransactionDialog({
 				return;
 			}
 
-			// Update mode
 			const hasSeriesId = Boolean(transaction?.seriesId);
 
 			if (hasSeriesId && onBulkEditRequest) {
-				// Para lançamentos em série, abre o diálogo de bulk action
+				// Para lançamentos em série, passa os arquivos para a página confirmar
+				// o upload após o escopo ser escolhido (sem upload antecipado ao S3)
 				onBulkEditRequest({
 					id: transaction?.id ?? "",
 					name: formState.name.trim(),
@@ -383,11 +389,13 @@ export function TransactionDialog({
 						formState.paymentMethod === "Cartão de crédito"
 							? null
 							: Boolean(formState.isSettled),
+					pendingDetachIds,
+					pendingUploadFiles,
 				});
 				return;
 			}
 
-			// Atualização normal para lançamentos únicos ou todos os campos
+			// Atualização normal para lançamentos únicos
 			const updatePayload: UpdateTransactionInput = {
 				id: transaction?.id ?? "",
 				...payload,
@@ -396,6 +404,31 @@ export function TransactionDialog({
 			const result = await updateTransactionAction(updatePayload);
 
 			if (result.success) {
+				for (const attachmentId of pendingDetachIds) {
+					await detachTransactionAttachmentAction({
+						attachmentId,
+						transactionId: transaction?.id ?? "",
+					});
+				}
+				for (const file of pendingUploadFiles) {
+					const presign = await getPresignedUploadUrlAction({
+						fileName: file.name,
+						mimeType: file.type,
+						fileSize: file.size,
+						transactionId: transaction?.id ?? "",
+					});
+					if (presign.success) {
+						await fetch(presign.presignedUrl, {
+							method: "PUT",
+							body: file,
+							headers: { "Content-Type": file.type },
+						});
+						await confirmAttachmentUploadAction({
+							uploadToken: presign.uploadToken,
+							scope: "current",
+						});
+					}
+				}
 				toast.success(result.message);
 				onSuccess?.();
 				setDialogOpen(false);
@@ -521,7 +554,40 @@ export function TransactionDialog({
 									</Label>
 									<AttachmentSection
 										transactionId={transaction?.id ?? ""}
-										seriesId={transaction?.seriesId ?? null}
+										maxSizeMb={maxSizeMb}
+										pendingDetachIds={
+											transaction?.seriesId ? pendingDetachIds : undefined
+										}
+										onPendingDetach={
+											transaction?.seriesId
+												? (id) => setPendingDetachIds((prev) => [...prev, id])
+												: undefined
+										}
+										onUndoPendingDetach={
+											transaction?.seriesId
+												? (id) =>
+														setPendingDetachIds((prev) =>
+															prev.filter((x) => x !== id),
+														)
+												: undefined
+										}
+										pendingUploadFiles={
+											transaction?.seriesId ? pendingUploadFiles : undefined
+										}
+										onPendingUpload={
+											transaction?.seriesId
+												? (file) =>
+														setPendingUploadFiles((prev) => [...prev, file])
+												: undefined
+										}
+										onCancelPendingUpload={
+											transaction?.seriesId
+												? (file) =>
+														setPendingUploadFiles((prev) =>
+															prev.filter((f) => f !== file),
+														)
+												: undefined
+										}
 									/>
 								</div>
 							</>
@@ -548,6 +614,7 @@ export function TransactionDialog({
 									<AttachmentFilePicker
 										file={pendingFile}
 										onChange={setPendingFile}
+										maxSizeMb={maxSizeMb}
 									/>
 								</CollapsibleContent>
 							</Collapsible>

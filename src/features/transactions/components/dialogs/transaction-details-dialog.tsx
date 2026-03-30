@@ -223,7 +223,6 @@ export function TransactionDetailsDialog({
 								<div className="min-w-0">
 									<AttachmentSection
 										transactionId={transaction.id}
-										seriesId={transaction.seriesId}
 										readonly
 										onLoaded={setAttachmentCount}
 									/>

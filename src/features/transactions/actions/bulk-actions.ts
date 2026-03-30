@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { transactions } from "@/db/schema";
 import {
 	PAYMENT_METHODS,
@@ -80,6 +80,24 @@ export async function deleteTransactionBulkAction(
 			return { success: true, message: "Lançamento removido com sucesso." };
 		}
 
+		if (data.scope === "period") {
+			await db
+				.delete(transactions)
+				.where(
+					and(
+						eq(transactions.seriesId, existing.seriesId),
+						eq(transactions.userId, user.id),
+						eq(transactions.period, existing.period ?? ""),
+					),
+				);
+
+			revalidate(user.id);
+			return {
+				success: true,
+				message: "Todos os lançamentos do período foram removidos.",
+			};
+		}
+
 		if (data.scope === "future") {
 			await db
 				.delete(transactions)
@@ -147,6 +165,7 @@ export async function updateTransactionBulkAction(
 				condition: true,
 				transactionType: true,
 				purchaseDate: true,
+				payerId: true,
 			},
 			where: and(
 				eq(transactions.id, data.id),
@@ -169,7 +188,8 @@ export async function updateTransactionBulkAction(
 			name: data.name,
 			categoryId: data.categoryId ?? null,
 			note: data.note ?? null,
-			payerId: data.payerId ?? null,
+			// "period" atualiza todos os pagadores do mês — preserva o payerId de cada linha
+			...(data.scope !== "period" && { payerId: data.payerId ?? null }),
 			accountId: data.accountId ?? null,
 			cardId: data.cardId ?? null,
 			...(data.isSettled !== undefined && { isSettled: data.isSettled }),
@@ -309,6 +329,42 @@ export async function updateTransactionBulkAction(
 			return { success: true, message: "Lançamento atualizado com sucesso." };
 		}
 
+		if (data.scope === "period") {
+			if (!existing.period) {
+				return {
+					success: false,
+					error: "Período do lançamento não encontrado.",
+				};
+			}
+
+			const periodLancamentos = await db.query.transactions.findMany({
+				columns: { id: true, purchaseDate: true },
+				where: and(
+					eq(transactions.seriesId, existing.seriesId),
+					eq(transactions.userId, user.id),
+					eq(transactions.period, existing.period),
+				),
+				orderBy: asc(transactions.purchaseDate),
+			});
+
+			await applyUpdates(
+				periodLancamentos.map((item: (typeof periodLancamentos)[number]) => ({
+					id: item.id,
+					purchaseDate: item.purchaseDate ?? null,
+				})),
+			);
+
+			revalidate(user.id);
+			return {
+				success: true,
+				message: "Todos os lançamentos do período foram atualizados.",
+			};
+		}
+
+		const payerIdFilter = existing.payerId
+			? eq(transactions.payerId, existing.payerId)
+			: isNull(transactions.payerId);
+
 		if (data.scope === "future") {
 			const futureLancamentos = await db.query.transactions.findMany({
 				columns: {
@@ -319,6 +375,7 @@ export async function updateTransactionBulkAction(
 					eq(transactions.seriesId, existing.seriesId),
 					eq(transactions.userId, user.id),
 					sql`${transactions.period} >= ${existing.period}`,
+					payerIdFilter,
 				),
 				orderBy: asc(transactions.purchaseDate),
 			});
@@ -346,6 +403,7 @@ export async function updateTransactionBulkAction(
 				where: and(
 					eq(transactions.seriesId, existing.seriesId),
 					eq(transactions.userId, user.id),
+					payerIdFilter,
 				),
 				orderBy: asc(transactions.purchaseDate),
 			});

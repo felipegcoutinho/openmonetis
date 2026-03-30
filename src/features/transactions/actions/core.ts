@@ -664,7 +664,7 @@ export const buildLancamentoRecords = ({
 
 export const deleteBulkSchema = z.object({
 	id: uuidSchema("Lançamento"),
-	scope: z.enum(["current", "future", "all"], {
+	scope: z.enum(["current", "period", "future", "all"], {
 		message: "Escopo de ação inválido.",
 	}),
 });
@@ -673,7 +673,7 @@ export type DeleteBulkInput = z.infer<typeof deleteBulkSchema>;
 
 export const updateBulkSchema = z.object({
 	id: uuidSchema("Lançamento"),
-	scope: z.enum(["current", "future", "all"], {
+	scope: z.enum(["current", "period", "future", "all"], {
 		message: "Escopo de ação inválido.",
 	}),
 	name: z

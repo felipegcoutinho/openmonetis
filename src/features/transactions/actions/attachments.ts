@@ -33,7 +33,7 @@ const presignSchema = z.object({
 
 const confirmSchema = z.object({
 	uploadToken: z.string().min(1),
-	applyToSeries: z.boolean().default(false),
+	scope: z.enum(["current", "period", "future", "all"]).default("current"),
 });
 
 const detachSchema = z.object({
@@ -183,7 +183,7 @@ export async function getPresignedUploadUrlAction(input: {
 
 export async function confirmAttachmentUploadAction(input: {
 	uploadToken: string;
-	applyToSeries?: boolean;
+	scope?: "current" | "period" | "future" | "all";
 }): Promise<ActionResult> {
 	try {
 		const user = await getUser();
@@ -195,7 +195,11 @@ export async function confirmAttachmentUploadAction(input: {
 		}
 
 		const [transaction] = await db
-			.select({ id: transactions.id, seriesId: transactions.seriesId })
+			.select({
+				id: transactions.id,
+				seriesId: transactions.seriesId,
+				period: transactions.period,
+			})
 			.from(transactions)
 			.where(
 				and(
@@ -253,9 +257,9 @@ export async function confirmAttachmentUploadAction(input: {
 
 		let transactionIds: string[] = [uploadPayload.transactionId];
 
-		if (data.applyToSeries && transaction.seriesId) {
+		if (data.scope !== "current" && transaction.seriesId) {
 			const seriesRows = await db
-				.select({ id: transactions.id })
+				.select({ id: transactions.id, period: transactions.period })
 				.from(transactions)
 				.where(
 					and(
@@ -263,7 +267,18 @@ export async function confirmAttachmentUploadAction(input: {
 						eq(transactions.userId, user.id),
 					),
 				);
-			transactionIds = seriesRows.map((t) => t.id);
+
+			if (data.scope === "period") {
+				transactionIds = seriesRows
+					.filter((r) => r.period === transaction.period)
+					.map((r) => r.id);
+			} else if (data.scope === "future") {
+				transactionIds = seriesRows
+					.filter((r) => (r.period ?? "") >= (transaction.period ?? ""))
+					.map((r) => r.id);
+			} else {
+				transactionIds = seriesRows.map((r) => r.id);
+			}
 		}
 
 		await db.insert(transactionAttachments).values(
@@ -405,6 +420,110 @@ export async function fetchTransactionAttachmentsAction(
 			url: await createPresignedGetUrl(row.fileKey),
 		})),
 	);
+}
+
+const detachBulkSchema = z.object({
+	attachmentId: z.string().uuid(),
+	transactionId: z.string().uuid(),
+	scope: z.enum(["current", "period", "future", "all"]),
+});
+
+export async function detachAttachmentBulkAction(input: {
+	attachmentId: string;
+	transactionId: string;
+	scope: "current" | "period" | "future" | "all";
+}): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = detachBulkSchema.parse(input);
+
+		const [baseTransaction] = await db
+			.select({
+				id: transactions.id,
+				seriesId: transactions.seriesId,
+				period: transactions.period,
+			})
+			.from(transactions)
+			.where(
+				and(
+					eq(transactions.id, data.transactionId),
+					eq(transactions.userId, user.id),
+				),
+			);
+
+		if (!baseTransaction) {
+			return { success: false, error: "Lançamento não encontrado." };
+		}
+
+		const [attachment] = await db
+			.select({ id: attachments.id, fileKey: attachments.fileKey })
+			.from(attachments)
+			.where(
+				and(
+					eq(attachments.id, data.attachmentId),
+					eq(attachments.userId, user.id),
+				),
+			);
+
+		if (!attachment) {
+			return { success: false, error: "Anexo não encontrado." };
+		}
+
+		let targetTransactionIds: string[];
+
+		if (data.scope === "current" || !baseTransaction.seriesId) {
+			targetTransactionIds = [data.transactionId];
+		} else {
+			const seriesRows = await db
+				.select({ id: transactions.id, period: transactions.period })
+				.from(transactions)
+				.where(
+					and(
+						eq(transactions.seriesId, baseTransaction.seriesId),
+						eq(transactions.userId, user.id),
+					),
+				);
+
+			if (data.scope === "period") {
+				targetTransactionIds = seriesRows
+					.filter((r) => r.period === baseTransaction.period)
+					.map((r) => r.id);
+			} else if (data.scope === "future") {
+				targetTransactionIds = seriesRows
+					.filter((r) => (r.period ?? "") >= (baseTransaction.period ?? ""))
+					.map((r) => r.id);
+			} else {
+				targetTransactionIds = seriesRows.map((r) => r.id);
+			}
+		}
+
+		if (targetTransactionIds.length > 0) {
+			await db
+				.delete(transactionAttachments)
+				.where(
+					and(
+						inArray(transactionAttachments.transactionId, targetTransactionIds),
+						eq(transactionAttachments.attachmentId, data.attachmentId),
+					),
+				);
+		}
+
+		const [remaining] = await db
+			.select({ total: count() })
+			.from(transactionAttachments)
+			.where(eq(transactionAttachments.attachmentId, data.attachmentId));
+
+		if (!remaining || remaining.total === 0) {
+			await deleteS3Object(attachment.fileKey);
+			await db.delete(attachments).where(eq(attachments.id, data.attachmentId));
+		}
+
+		revalidateForEntity("transactions", user.id);
+
+		return { success: true, message: "Anexo removido com sucesso." };
+	} catch (error) {
+		return handleActionError(error);
+	}
 }
 
 /** Limpa anexos órfãos do S3 após deletar transações. Chame APÓS o delete. */
