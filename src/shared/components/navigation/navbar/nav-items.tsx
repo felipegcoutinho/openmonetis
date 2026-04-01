@@ -1,6 +1,7 @@
 import {
 	RiArrowLeftRightLine,
 	RiAtLine,
+	RiAttachmentLine,
 	RiBankCard2Line,
 	RiBankLine,
 	RiBarChart2Line,
@@ -109,6 +110,14 @@ export const NAV_SECTIONS: NavSection[] = [
 				description: "Guarde lembretes e observações",
 				icon: <RiTodoLine className="size-4" />,
 				iconClass: "text-primary",
+			},
+			{
+				href: "/attachments",
+				label: "anexos",
+				description: "Comprovantes e documentos",
+				icon: <RiAttachmentLine className="size-4" />,
+				iconClass: "text-primary",
+				preservePeriod: true,
 			},
 		],
 	},

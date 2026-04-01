@@ -41,6 +41,7 @@ export function TransactionDetailsDialog({
 }: TransactionDetailsDialogProps) {
 	const [attachmentCount, setAttachmentCount] = useState<number | null>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: transaction?.id é trigger intencional para reset do contador
 	useEffect(() => {
 		setAttachmentCount(null);
 	}, [transaction?.id]);
@@ -87,7 +88,7 @@ export function TransactionDetailsDialog({
 									<p className="text-xs uppercase tracking-wide text-muted-foreground">
 										Resumo
 									</p>
-									<p className="mt-1 text-2xl font-semibold">
+									<p className="mt-1 text-2xl font-medium">
 										{currencyFormatter.format(valorTotal)}
 									</p>
 								</div>
@@ -235,14 +236,14 @@ export function TransactionDetailsDialog({
 				<Separator />
 
 				<DialogFooter>
-					{onEdit && !transaction.readonly && (
-						<Button variant="outline" onClick={handleEdit}>
-							Editar
-						</Button>
-					)}
 					<DialogClose asChild>
-						<Button type="button">Fechar</Button>
+						<Button type="button" variant="outline">
+							Fechar
+						</Button>
 					</DialogClose>
+					{onEdit && !transaction.readonly && (
+						<Button onClick={handleEdit}>Editar</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

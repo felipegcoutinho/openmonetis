@@ -85,7 +85,7 @@ export function AttachmentFilePicker({
 						<RiAttachment2 className="size-4" />
 						Adicionar anexo
 					</span>
-					<span className="text-[11px]">
+					<span className="text-xs">
 						PDF, JPEG, PNG ou WebP · máx. {maxSizeMb} MB
 					</span>
 				</button>

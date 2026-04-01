@@ -5,8 +5,7 @@ import {
 	RiDownloadLine,
 	RiExternalLinkLine,
 	RiFileImageLine,
-	RiFileLine,
-	RiFilePdfLine,
+	RiFilePdf2Line,
 } from "@remixicon/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -30,10 +29,9 @@ function formatBytes(bytes: number): string {
 
 function AttachmentIcon({ mimeType }: { mimeType: string }) {
 	if (mimeType === "application/pdf")
-		return <RiFilePdfLine className="size-4 text-red-500 shrink-0" />;
+		return <RiFilePdf2Line className="size-4 text-red-500 shrink-0" />;
 	if (mimeType.startsWith("image/"))
 		return <RiFileImageLine className="size-4 text-blue-500 shrink-0" />;
-	return <RiFileLine className="size-4 text-muted-foreground shrink-0" />;
 }
 
 function AttachmentPreview({

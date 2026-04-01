@@ -156,6 +156,7 @@ export function TransactionDialog({
 		defaultTransactionType,
 		isImporting,
 		cardOptions,
+		mode,
 	]);
 
 	const primaryPayerId = formState.payerId;
@@ -555,38 +556,23 @@ export function TransactionDialog({
 									<AttachmentSection
 										transactionId={transaction?.id ?? ""}
 										maxSizeMb={maxSizeMb}
-										pendingDetachIds={
-											transaction?.seriesId ? pendingDetachIds : undefined
+										pendingDetachIds={pendingDetachIds}
+										onPendingDetach={(id) =>
+											setPendingDetachIds((prev) => [...prev, id])
 										}
-										onPendingDetach={
-											transaction?.seriesId
-												? (id) => setPendingDetachIds((prev) => [...prev, id])
-												: undefined
+										onUndoPendingDetach={(id) =>
+											setPendingDetachIds((prev) =>
+												prev.filter((x) => x !== id),
+											)
 										}
-										onUndoPendingDetach={
-											transaction?.seriesId
-												? (id) =>
-														setPendingDetachIds((prev) =>
-															prev.filter((x) => x !== id),
-														)
-												: undefined
+										pendingUploadFiles={pendingUploadFiles}
+										onPendingUpload={(file) =>
+											setPendingUploadFiles((prev) => [...prev, file])
 										}
-										pendingUploadFiles={
-											transaction?.seriesId ? pendingUploadFiles : undefined
-										}
-										onPendingUpload={
-											transaction?.seriesId
-												? (file) =>
-														setPendingUploadFiles((prev) => [...prev, file])
-												: undefined
-										}
-										onCancelPendingUpload={
-											transaction?.seriesId
-												? (file) =>
-														setPendingUploadFiles((prev) =>
-															prev.filter((f) => f !== file),
-														)
-												: undefined
+										onCancelPendingUpload={(file) =>
+											setPendingUploadFiles((prev) =>
+												prev.filter((f) => f !== file),
+											)
 										}
 									/>
 								</div>
