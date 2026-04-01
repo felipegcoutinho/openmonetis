@@ -7,6 +7,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-04-01
+
+### Corrigido
+
+- Docker: imagem de produção deixa de executar `chown -R /app` no stage final; as permissões passam a ser definidas nos `COPY --chown`, reduzindo o risco de travamento e lentidão excessiva no build/push da GitHub Action
+
 ## [2.2.0] - 2026-04-01
 
 ### Adicionado
