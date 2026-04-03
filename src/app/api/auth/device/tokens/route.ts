@@ -1,19 +1,22 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { apiTokens } from "@/db/schema";
 import { auth } from "@/shared/lib/auth/config";
 import { db } from "@/shared/lib/db";
 
 export async function GET() {
+	await connection();
+
+	// Verificar autenticação via sessão web
+	const requestHeaders = new Headers(await headers());
+	const session = await auth.api.getSession({ headers: requestHeaders });
+
+	if (!session?.user) {
+		return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+	}
+
 	try {
-		// Verificar autenticação via sessão web
-		const session = await auth.api.getSession({ headers: await headers() });
-
-		if (!session?.user) {
-			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-		}
-
 		// Buscar tokens ativos do usuário
 		const activeTokens = await db
 			.select({

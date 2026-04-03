@@ -33,6 +33,9 @@ export default async function proxy(request: NextRequest) {
 	const hostname = request.headers.get("host")?.replace(/:\d+$/, "");
 
 	if (publicDomain && hostname === publicDomain) {
+		if (pathname.startsWith("/api/")) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
+		}
 		if (pathname !== "/") {
 			return NextResponse.redirect(new URL("/", request.url));
 		}
@@ -67,6 +70,7 @@ export const config = {
 	// Apply middleware to protected and auth routes
 	matcher: [
 		"/",
+		"/api/:path*",
 		"/settings/:path*",
 		"/notes/:path*",
 		"/calendar/:path*",

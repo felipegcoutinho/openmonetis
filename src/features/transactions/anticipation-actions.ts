@@ -131,6 +131,46 @@ export async function createInstallmentAnticipationAction(
 		const user = await getUser();
 		const data = createAnticipationSchema.parse(input);
 
+		if (data.payerId || data.categoryId) {
+			const [payer, category] = await Promise.all([
+				data.payerId
+					? db
+							.select({ id: payers.id })
+							.from(payers)
+							.where(
+								and(eq(payers.id, data.payerId), eq(payers.userId, user.id)),
+							)
+							.limit(1)
+					: Promise.resolve([]),
+				data.categoryId
+					? db
+							.select({ id: categories.id })
+							.from(categories)
+							.where(
+								and(
+									eq(categories.id, data.categoryId),
+									eq(categories.userId, user.id),
+								),
+							)
+							.limit(1)
+					: Promise.resolve([]),
+			]);
+
+			if (data.payerId && payer.length === 0) {
+				return {
+					success: false,
+					error: "Pagador inválido para esta conta.",
+				};
+			}
+
+			if (data.categoryId && category.length === 0) {
+				return {
+					success: false,
+					error: "Categoria inválida para esta conta.",
+				};
+			}
+		}
+
 		// 1. Validar parcelas selecionadas
 		const installments = await db.query.transactions.findMany({
 			where: and(

@@ -57,6 +57,16 @@ export const auth = betterAuth({
 		autoSignIn: true,
 	},
 
+	// Rate limiting
+	rateLimit: {
+		window: 60,
+		max: 100,
+		customRules: {
+			"/sign-in/email": { window: 60, max: 5 },
+			"/sign-up/email": { window: 60, max: 3 },
+		},
+	},
+
 	// Database adapter (Drizzle + PostgreSQL)
 	database: drizzleAdapter(db, {
 		provider: "pg",

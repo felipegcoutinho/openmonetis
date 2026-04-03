@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { z } from "zod";
 import { apiTokens } from "@/db/schema";
 import {
@@ -16,14 +16,17 @@ const createTokenSchema = z.object({
 });
 
 export async function POST(request: Request) {
+	await connection();
+
+	// Verificar autenticação via sessão web
+	const requestHeaders = new Headers(await headers());
+	const session = await auth.api.getSession({ headers: requestHeaders });
+
+	if (!session?.user) {
+		return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+	}
+
 	try {
-		// Verificar autenticação via sessão web
-		const session = await auth.api.getSession({ headers: await headers() });
-
-		if (!session?.user) {
-			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-		}
-
 		// Validar body
 		const body = await request.json();
 		const { name, deviceId } = createTokenSchema.parse(body);

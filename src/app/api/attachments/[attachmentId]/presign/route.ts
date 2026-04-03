@@ -5,6 +5,10 @@ import { getUserId } from "@/shared/lib/auth/server";
 import { db } from "@/shared/lib/db";
 import { createPresignedGetUrl } from "@/shared/lib/storage/presign";
 
+const PRIVATE_RESPONSE_HEADERS = {
+	"Cache-Control": "private, no-store",
+};
+
 export async function GET(
 	_request: Request,
 	{ params }: { params: Promise<{ attachmentId: string }> },
@@ -19,9 +23,20 @@ export async function GET(
 		);
 
 	if (!row) {
-		return NextResponse.json({ error: "Not found" }, { status: 404 });
+		return NextResponse.json(
+			{ error: "Not found" },
+			{
+				status: 404,
+				headers: PRIVATE_RESPONSE_HEADERS,
+			},
+		);
 	}
 
 	const url = await createPresignedGetUrl(row.fileKey);
-	return NextResponse.json({ url });
+	return NextResponse.json(
+		{ url },
+		{
+			headers: PRIVATE_RESPONSE_HEADERS,
+		},
+	);
 }
