@@ -3,6 +3,7 @@ import type { PaymentDialogState } from "@/features/dashboard/use-payment-dialog
 import { getBusinessDateString, isDateOnlyPast } from "@/shared/utils/date";
 import {
 	buildFinancialStatusLabel,
+	buildRelativeFinancialStatusLabel,
 	formatFinancialDateLabel,
 } from "@/shared/utils/financial-dates";
 
@@ -18,6 +19,14 @@ export const formatBillDateLabel = (value: string | null, prefix?: string) => {
 
 export const buildBillStatusLabel = (bill: BillStatusDateItem) => {
 	return buildFinancialStatusLabel({
+		isSettled: bill.isSettled,
+		dueDate: bill.dueDate,
+		paidAt: bill.boletoPaymentDate,
+	});
+};
+
+export const buildBillWidgetStatusLabel = (bill: BillStatusDateItem) => {
+	return buildRelativeFinancialStatusLabel({
 		isSettled: bill.isSettled,
 		dueDate: bill.dueDate,
 		paidAt: bill.boletoPaymentDate,

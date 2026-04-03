@@ -19,6 +19,7 @@ import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/shared/lib/accounts/constants";
+import { excludeTransactionsFromExcludedAccounts } from "@/shared/lib/accounts/query-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber } from "@/shared/utils/number";
@@ -118,6 +119,7 @@ export async function fetchTopEstablishmentsData(
 			isNull(financialAccounts.excludeInitialBalanceFromIncome),
 			eq(financialAccounts.excludeInitialBalanceFromIncome, false),
 		),
+		excludeTransactionsFromExcludedAccounts(),
 	] as const;
 
 	// Fetch establishments with transaction count and total amount

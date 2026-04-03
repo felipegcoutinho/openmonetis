@@ -1,6 +1,7 @@
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { categories, transactions } from "@/db/schema";
+import { categories, financialAccounts, transactions } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
+import { excludeTransactionsFromExcludedAccounts } from "@/shared/lib/accounts/query-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
@@ -49,6 +50,7 @@ export async function fetchCategoryChartData(
 			isNull(transactions.note),
 			sql`${transactions.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,
 		),
+		excludeTransactionsFromExcludedAccounts(),
 	];
 
 	if (categoryIds && categoryIds.length > 0) {
@@ -67,6 +69,10 @@ export async function fetchCategoryChartData(
 			})
 			.from(transactions)
 			.innerJoin(categories, eq(transactions.categoryId, categories.id))
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(and(...whereConditions))
 			.groupBy(
 				categories.id,

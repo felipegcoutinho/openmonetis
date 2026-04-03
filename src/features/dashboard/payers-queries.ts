@@ -1,5 +1,6 @@
 import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { payers, transactions } from "@/db/schema";
+import { financialAccounts, payers, transactions } from "@/db/schema";
+import { excludeTransactionsFromExcludedAccounts } from "@/features/dashboard/transaction-filters";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
 import { PAYER_ROLE_ADMIN } from "@/shared/lib/payers/constants";
@@ -41,11 +42,16 @@ export async function fetchDashboardPayers(
 		})
 		.from(transactions)
 		.innerJoin(payers, eq(transactions.payerId, payers.id))
+		.leftJoin(
+			financialAccounts,
+			eq(transactions.accountId, financialAccounts.id),
+		)
 		.where(
 			and(
 				eq(transactions.userId, userId),
 				inArray(transactions.period, [period, previousPeriod]),
 				eq(transactions.transactionType, "Despesa"),
+				excludeTransactionsFromExcludedAccounts(),
 				or(
 					isNull(transactions.note),
 					sql`${transactions.note} NOT LIKE ${`${ACCOUNT_AUTO_INVOICE_NOTE_PREFIX}%`}`,

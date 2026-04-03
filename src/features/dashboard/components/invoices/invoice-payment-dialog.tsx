@@ -63,7 +63,7 @@ export function InvoicePaymentDialog({
 			}}
 		>
 			<DialogContent
-				className="max-w-[calc(100%-2rem)] sm:max-w-md"
+				className="max-w-[calc(100%-2rem)] sm:max-w-md sm:p-8"
 				onEscapeKeyDown={(event) => {
 					if (isProcessing) {
 						event.preventDefault();
@@ -100,7 +100,7 @@ export function InvoicePaymentDialog({
 						{invoice ? (
 							<div className="space-y-3">
 								{/* Card principal */}
-								<div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-4">
+								<div className="flex items-center gap-3 rounded-xl border p-4">
 									<InvoiceLogo
 										cardName={invoice.cardName}
 										logo={invoice.logo}

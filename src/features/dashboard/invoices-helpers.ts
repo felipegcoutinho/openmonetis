@@ -7,7 +7,9 @@ import {
 import { getBusinessDateString } from "@/shared/utils/date";
 import {
 	buildDueDateInfoFromPeriodDay,
+	buildRelativeDueDateInfoFromPeriodDay,
 	formatFinancialDateLabel,
+	formatRelativeFinancialDateLabel,
 } from "@/shared/utils/financial-dates";
 import { formatPercentage } from "@/shared/utils/percentage";
 import { formatPeriodForUrl } from "@/shared/utils/period";
@@ -45,10 +47,30 @@ export const parseInvoiceDueDate = (
 	return buildDueDateInfoFromPeriodDay(period, dueDay);
 };
 
+export const parseInvoiceWidgetDueDate = (
+	period: string,
+	dueDay: string,
+): InvoiceDueDateInfo => {
+	return buildRelativeDueDateInfoFromPeriodDay(period, dueDay);
+};
+
 export const formatInvoicePaymentDate = (
 	value: string | null,
 ): InvoicePaymentDateInfo | null => {
 	const label = formatFinancialDateLabel(value, "Pago em");
+	if (!label) {
+		return null;
+	}
+
+	return {
+		label,
+	};
+};
+
+export const formatInvoiceWidgetPaymentDate = (
+	value: string | null,
+): InvoicePaymentDateInfo | null => {
+	const label = formatRelativeFinancialDateLabel(value, "paid");
 	if (!label) {
 		return null;
 	}

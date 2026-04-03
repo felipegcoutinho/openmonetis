@@ -7,7 +7,13 @@ import {
 	INVOICE_STATUS_VALUES,
 	type InvoicePaymentStatus,
 } from "@/shared/lib/invoices";
-import { toDateOnlyString } from "@/shared/utils/date";
+import {
+	buildDateOnlyStringFromPeriodDay,
+	compareDateOnly,
+	getBusinessDateString,
+	isDateOnlyPast,
+	toDateOnlyString,
+} from "@/shared/utils/date";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
 
 type RawDashboardInvoice = {
@@ -68,10 +74,31 @@ const isInvoiceStatus = (value: unknown): value is InvoicePaymentStatus =>
 const buildFallbackId = (cardId: string, period: string) =>
 	`${cardId}:${period}`;
 
+const compareDateOnlyAscWithNullsLast = (
+	left: string | null,
+	right: string | null,
+) => {
+	if (!left && !right) return 0;
+	if (!left) return 1;
+	if (!right) return -1;
+	return compareDateOnly(left, right);
+};
+
+const compareDateOnlyDescWithNullsLast = (
+	left: string | null,
+	right: string | null,
+) => {
+	if (!left && !right) return 0;
+	if (!left) return 1;
+	if (!right) return -1;
+	return compareDateOnly(right, left);
+};
+
 export async function fetchDashboardInvoices(
 	userId: string,
 	period: string,
 ): Promise<DashboardInvoicesSnapshot> {
+	const today = getBusinessDateString();
 	const paymentRows = await db
 		.select({
 			note: transactions.note,
@@ -258,8 +285,53 @@ export async function fetchDashboardInvoices(
 	}
 
 	invoiceList.sort((a, b) => {
-		// Ordena do maior valor para o menor
-		return Math.abs(b.totalAmount) - Math.abs(a.totalAmount);
+		const aIsPending = a.paymentStatus === INVOICE_PAYMENT_STATUS.PENDING;
+		const bIsPending = b.paymentStatus === INVOICE_PAYMENT_STATUS.PENDING;
+		if (aIsPending !== bIsPending) {
+			return aIsPending ? -1 : 1;
+		}
+
+		if (aIsPending && bIsPending) {
+			const aDueDate = buildDateOnlyStringFromPeriodDay(a.period, a.dueDay);
+			const bDueDate = buildDateOnlyStringFromPeriodDay(b.period, b.dueDay);
+			const aIsOverdue = aDueDate ? isDateOnlyPast(aDueDate, today) : false;
+			const bIsOverdue = bDueDate ? isDateOnlyPast(bDueDate, today) : false;
+
+			if (aIsOverdue !== bIsOverdue) {
+				return aIsOverdue ? -1 : 1;
+			}
+
+			const dueDateDiff = compareDateOnlyAscWithNullsLast(aDueDate, bDueDate);
+			if (dueDateDiff !== 0) {
+				return dueDateDiff;
+			}
+
+			const amountDiff = Math.abs(b.totalAmount) - Math.abs(a.totalAmount);
+			if (amountDiff !== 0) {
+				return amountDiff;
+			}
+		}
+
+		if (!aIsPending && !bIsPending) {
+			const paidAtDiff = compareDateOnlyDescWithNullsLast(a.paidAt, b.paidAt);
+			if (paidAtDiff !== 0) {
+				return paidAtDiff;
+			}
+
+			const amountDiff = Math.abs(b.totalAmount) - Math.abs(a.totalAmount);
+			if (amountDiff !== 0) {
+				return amountDiff;
+			}
+		}
+
+		const nameDiff = a.cardName.localeCompare(b.cardName, "pt-BR", {
+			sensitivity: "base",
+		});
+		if (nameDiff !== 0) {
+			return nameDiff;
+		}
+
+		return a.id.localeCompare(b.id);
 	});
 
 	const totalPending = invoiceList.reduce((total, invoice) => {

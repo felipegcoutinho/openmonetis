@@ -9,6 +9,7 @@ import {
 	transactions,
 } from "@/db/schema";
 import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
+import { excludeTransactionsFromExcludedAccounts } from "@/shared/lib/accounts/query-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber } from "@/shared/utils/number";
@@ -36,12 +37,14 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 		transactionType,
 		excludeTransfers = true,
 		excludeAutoInvoice = true,
+		excludeExcludedAccounts = true,
 	}: {
 		period?: string;
 		periods?: string[];
 		transactionType?: string;
 		excludeTransfers?: boolean;
 		excludeAutoInvoice?: boolean;
+		excludeExcludedAccounts?: boolean;
 	}) => {
 		const conditions = [eq(transactions.userId, userId), adminPayerCondition];
 
@@ -59,6 +62,9 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 		}
 		if (excludeAutoInvoice) {
 			conditions.push(autoInvoiceExclusion);
+		}
+		if (excludeExcludedAccounts) {
+			conditions.push(excludeTransactionsFromExcludedAccounts());
 		}
 
 		return conditions;
@@ -84,6 +90,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				totalAmount: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(and(...buildAdminTransactionConditions({ period })))
 			.groupBy(transactions.transactionType),
 		db
@@ -92,6 +102,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				totalAmount: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(...buildAdminTransactionConditions({ period: previousPeriod })),
 			)
@@ -102,6 +116,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				totalAmount: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(and(...buildAdminTransactionConditions({ period: twoMonthsAgo })))
 			.groupBy(transactions.transactionType),
 		db
@@ -110,6 +128,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				totalAmount: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(...buildAdminTransactionConditions({ period: threeMonthsAgo })),
 			)
@@ -121,6 +143,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 			})
 			.from(transactions)
 			.innerJoin(categories, eq(transactions.categoryId, categories.id))
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(
 					...buildAdminTransactionConditions({
@@ -137,7 +163,7 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 			.select({
 				categoryName: categories.name,
 				budgetAmount: budgets.amount,
-				spent: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
+				spent: sql<number>`coalesce(sum(case when ${excludeTransactionsFromExcludedAccounts()} then ${transactions.amount} else 0 end), 0)`,
 			})
 			.from(budgets)
 			.innerJoin(categories, eq(budgets.categoryId, categories.id))
@@ -151,6 +177,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 					adminPayerCondition,
 					autoInvoiceExclusion,
 				),
+			)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
 			)
 			.where(and(eq(budgets.userId, userId), eq(budgets.period, period)))
 			.groupBy(categories.name, budgets.amount),
@@ -180,6 +210,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				transactionCount: sql<number>`count(*)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(and(...buildAdminTransactionConditions({ period }))),
 		db
 			.select({
@@ -187,6 +221,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				amount: transactions.amount,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(
 					...buildAdminTransactionConditions({
@@ -201,6 +239,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 				total: sql<number>`coalesce(sum(abs(${transactions.amount})), 0)`,
 			})
 			.from(transactions)
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(
 					...buildAdminTransactionConditions({
@@ -222,6 +264,10 @@ async function aggregateMonthDataInternal(userId: string, period: string) {
 			})
 			.from(transactions)
 			.leftJoin(categories, eq(transactions.categoryId, categories.id))
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(
 					...buildAdminTransactionConditions({

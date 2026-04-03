@@ -1,12 +1,18 @@
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import {
 	buildBillStatusLabel,
+	buildBillWidgetStatusLabel,
 	isBillOverdue,
 } from "@/features/dashboard/bills-helpers";
 import type { DashboardBill } from "@/features/dashboard/bills-queries";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { cn } from "@/shared/utils/ui";
 
 type BillListItemProps = {
@@ -15,8 +21,13 @@ type BillListItemProps = {
 };
 
 export function BillListItem({ bill, onPay }: BillListItemProps) {
-	const statusLabel = buildBillStatusLabel(bill);
+	const statusLabel = buildBillWidgetStatusLabel(bill);
+	const absoluteStatusLabel = buildBillStatusLabel(bill);
 	const overdue = isBillOverdue(bill);
+	const statusTooltipLabel =
+		statusLabel && statusLabel !== absoluteStatusLabel
+			? absoluteStatusLabel
+			: null;
 
 	return (
 		<li className="flex items-center justify-between transition-all duration-300 py-1.5">
@@ -29,14 +40,32 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 					</span>
 					<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
 						{statusLabel ? (
-							<span
-								className={cn(
-									"rounded-full py-0.5",
-									bill.isSettled && "text-success",
-								)}
-							>
-								{statusLabel}
-							</span>
+							statusTooltipLabel ? (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span
+											className={cn(
+												"cursor-help rounded-full py-0.5",
+												bill.isSettled && "text-success",
+											)}
+										>
+											{statusLabel}
+										</span>
+									</TooltipTrigger>
+									<TooltipContent side="top">
+										{statusTooltipLabel}
+									</TooltipContent>
+								</Tooltip>
+							) : (
+								<span
+									className={cn(
+										"rounded-full py-0.5",
+										bill.isSettled && "text-success",
+									)}
+								>
+									{statusLabel}
+								</span>
+							)
 						) : null}
 					</div>
 				</div>

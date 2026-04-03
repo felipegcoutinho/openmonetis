@@ -56,7 +56,7 @@ export function BillPaymentDialog({
 			}}
 		>
 			<DialogContent
-				className="max-w-[calc(100%-2rem)] sm:max-w-md"
+				className="max-w-[calc(100%-2rem)] sm:max-w-md sm:p-8"
 				onEscapeKeyDown={(event) => {
 					if (isProcessing) {
 						event.preventDefault();
@@ -93,7 +93,7 @@ export function BillPaymentDialog({
 						{bill ? (
 							<div className="space-y-3">
 								{/* Card principal */}
-								<div className="rounded-xl border bg-muted/30 p-4">
+								<div className="rounded-xl border p-3">
 									<p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
 										Boleto
 									</p>

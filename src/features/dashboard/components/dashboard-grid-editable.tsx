@@ -76,6 +76,9 @@ export function DashboardGridEditable({
 	const [hiddenWidgets, setHiddenWidgets] = useState<string[]>(
 		initialPreferences?.hidden ?? [],
 	);
+	const [myAccountsShowExcluded, setMyAccountsShowExcluded] = useState(
+		initialPreferences?.myAccountsShowExcluded ?? true,
+	);
 
 	// Keep track of original state for cancel
 	const [originalOrder, setOriginalOrder] = useState(widgetOrder);
@@ -186,6 +189,7 @@ export function DashboardGridEditable({
 			if (result.success) {
 				setWidgetOrder(DEFAULT_WIDGET_ORDER);
 				setHiddenWidgets([]);
+				setMyAccountsShowExcluded(true);
 				toast.success("Preferências restauradas!");
 			} else {
 				toast.error(result.error ?? "Erro ao restaurar");
@@ -361,7 +365,16 @@ export function DashboardGridEditable({
 										icon={widget.icon}
 										action={widget.action}
 									>
-										{widget.component({ data, period })}
+										{widget.component({
+											data,
+											period,
+											widgetPreferences: {
+												order: widgetOrder,
+												hidden: hiddenWidgets,
+												myAccountsShowExcluded,
+											},
+											onMyAccountsShowExcludedChange: setMyAccountsShowExcluded,
+										})}
 									</ExpandableWidgetCard>
 								</div>
 							</SortableWidget>

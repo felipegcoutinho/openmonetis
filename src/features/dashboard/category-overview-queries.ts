@@ -20,6 +20,7 @@ import {
 	buildDashboardAdminFilters,
 	excludeAutoInvoiceEntries,
 	excludeInitialBalanceWhenConfigured,
+	excludeTransactionsFromExcludedAccounts,
 } from "@/features/dashboard/transaction-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
@@ -156,6 +157,7 @@ export async function fetchDashboardCategoryOverview(
 				and(
 					...buildDashboardAdminFilters({ userId, adminPayerId }),
 					inArray(transactions.period, [period, previousPeriod]),
+					excludeTransactionsFromExcludedAccounts(),
 					or(
 						and(
 							eq(transactions.transactionType, "Despesa"),

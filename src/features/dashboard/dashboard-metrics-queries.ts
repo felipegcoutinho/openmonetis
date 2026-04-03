@@ -1,9 +1,10 @@
-import { and, asc, eq, gte, lte, ne, sum } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lte, sum } from "drizzle-orm";
 import { financialAccounts, transactions } from "@/db/schema";
 import {
 	buildDashboardAdminFilters,
 	excludeAutoInvoiceEntries,
 	excludeInitialBalanceWhenConfigured,
+	excludeTransactionsFromExcludedAccounts,
 } from "@/features/dashboard/transaction-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
@@ -36,12 +37,14 @@ export type DashboardCardMetrics = {
 type PeriodTotals = {
 	receitas: number;
 	despesas: number;
+	transferAdjustment: number;
 	balanco: number;
 };
 
 const createEmptyTotals = (): PeriodTotals => ({
 	receitas: 0,
 	despesas: 0,
+	transferAdjustment: 0,
 	balanco: 0,
 });
 
@@ -90,6 +93,7 @@ export async function fetchDashboardCardMetrics(
 			period: transactions.period,
 			transactionType: transactions.transactionType,
 			totalAmount: sum(transactions.amount).as("total"),
+			accountExcludeFromBalance: financialAccounts.excludeFromBalance,
 		})
 		.from(transactions)
 		.leftJoin(
@@ -101,12 +105,21 @@ export async function fetchDashboardCardMetrics(
 				...buildDashboardAdminFilters({ userId, adminPayerId }),
 				gte(transactions.period, startPeriod),
 				lte(transactions.period, period),
-				ne(transactions.transactionType, TRANSFERENCIA),
+				inArray(transactions.transactionType, [
+					RECEITA,
+					DESPESA,
+					TRANSFERENCIA,
+				]),
 				excludeAutoInvoiceEntries(),
 				excludeInitialBalanceWhenConfigured(),
+				excludeTransactionsFromExcludedAccounts(),
 			),
 		)
-		.groupBy(transactions.period, transactions.transactionType)
+		.groupBy(
+			transactions.period,
+			transactions.transactionType,
+			financialAccounts.excludeFromBalance,
+		)
 		.orderBy(asc(transactions.period), asc(transactions.transactionType));
 
 	const periodTotals = new Map<string, PeriodTotals>();
@@ -119,6 +132,11 @@ export async function fetchDashboardCardMetrics(
 			totals.receitas += total;
 		} else if (row.transactionType === DESPESA) {
 			totals.despesas += Math.abs(total);
+		} else if (
+			row.transactionType === TRANSFERENCIA &&
+			row.accountExcludeFromBalance === false
+		) {
+			totals.transferAdjustment += total;
 		}
 	}
 
@@ -139,7 +157,8 @@ export async function fetchDashboardCardMetrics(
 
 	for (const key of periodRange) {
 		const totals = ensurePeriodTotals(periodTotals, key);
-		totals.balanco = totals.receitas - totals.despesas;
+		totals.balanco =
+			totals.receitas - totals.despesas + totals.transferAdjustment;
 		runningForecast += totals.balanco;
 		forecastByPeriod.set(key, runningForecast);
 	}

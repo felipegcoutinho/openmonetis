@@ -31,6 +31,7 @@ import { PaymentStatusWidget } from "@/features/dashboard/components/payment-sta
 import { PurchasesByCategoryWidget } from "@/features/dashboard/components/purchases-by-category-widget";
 import { RecurringExpensesWidget } from "@/features/dashboard/components/recurring-expenses-widget";
 import { SpendingOverviewWidget } from "@/features/dashboard/components/spending-overview-widget";
+import type { WidgetPreferences } from "@/features/dashboard/widgets/actions";
 import type { DashboardData } from "../fetch-dashboard-data";
 
 export type WidgetConfig = {
@@ -38,7 +39,12 @@ export type WidgetConfig = {
 	title: string;
 	subtitle: string;
 	icon: ReactNode;
-	component: (props: { data: DashboardData; period: string }) => ReactNode;
+	component: (props: {
+		data: DashboardData;
+		period: string;
+		widgetPreferences: WidgetPreferences;
+		onMyAccountsShowExcludedChange?: (value: boolean) => void;
+	}) => ReactNode;
 	action?: ReactNode;
 };
 
@@ -48,9 +54,16 @@ export const widgetsConfig: WidgetConfig[] = [
 		title: "Minhas Contas",
 		subtitle: "Saldo consolidado disponível",
 		icon: <RiBarChartBoxLine className="size-4" />,
-		component: ({ data, period }) => (
+		component: ({
+			data,
+			period,
+			widgetPreferences,
+			onMyAccountsShowExcludedChange,
+		}) => (
 			<MyAccountsWidget
 				accounts={data.accountsSnapshot.accounts}
+				showExcludedAccounts={widgetPreferences.myAccountsShowExcluded ?? true}
+				onShowExcludedAccountsChange={onMyAccountsShowExcludedChange}
 				totalBalance={data.accountsSnapshot.totalBalance}
 				period={period}
 			/>

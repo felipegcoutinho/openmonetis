@@ -5,6 +5,8 @@ import {
 	INITIAL_BALANCE_NOTE,
 } from "@/shared/lib/accounts/constants";
 
+export { excludeTransactionsFromExcludedAccounts } from "@/shared/lib/accounts/query-filters";
+
 type DashboardAdminFiltersParams = {
 	userId: string;
 	adminPayerId: string;

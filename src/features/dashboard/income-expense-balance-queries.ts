@@ -4,6 +4,7 @@ import {
 	buildDashboardAdminFilters,
 	excludeAutoInvoiceEntries,
 	excludeInitialBalanceWhenConfigured,
+	excludeTransactionsFromExcludedAccounts,
 } from "@/features/dashboard/transaction-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
@@ -51,6 +52,7 @@ export async function fetchIncomeExpenseBalance(
 			period: transactions.period,
 			transactionType: transactions.transactionType,
 			total: sql<number>`coalesce(sum(${transactions.amount}), 0)`,
+			accountExcludeFromBalance: financialAccounts.excludeFromBalance,
 		})
 		.from(transactions)
 		.leftJoin(
@@ -61,37 +63,62 @@ export async function fetchIncomeExpenseBalance(
 			and(
 				...buildDashboardAdminFilters({ userId, adminPayerId }),
 				inArray(transactions.period, periods),
-				inArray(transactions.transactionType, ["Receita", "Despesa"]),
+				inArray(transactions.transactionType, [
+					"Receita",
+					"Despesa",
+					"Transferência",
+				]),
 				excludeAutoInvoiceEntries(),
 				excludeInitialBalanceWhenConfigured(),
+				excludeTransactionsFromExcludedAccounts(),
 			),
 		)
-		.groupBy(transactions.period, transactions.transactionType);
+		.groupBy(
+			transactions.period,
+			transactions.transactionType,
+			financialAccounts.excludeFromBalance,
+		);
 
 	// Build lookup from query results
-	const dataMap = new Map<string, { income: number; expense: number }>();
+	const dataMap = new Map<
+		string,
+		{ income: number; expense: number; transferAdjustment: number }
+	>();
 	for (const row of rows) {
 		if (!row.period) continue;
-		const entry = dataMap.get(row.period) ?? { income: 0, expense: 0 };
-		const total = Math.abs(toNumber(row.total));
+		const entry = dataMap.get(row.period) ?? {
+			income: 0,
+			expense: 0,
+			transferAdjustment: 0,
+		};
+		const total = toNumber(row.total);
 		if (row.transactionType === "Receita") {
-			entry.income = total;
+			entry.income += Math.abs(total);
 		} else if (row.transactionType === "Despesa") {
-			entry.expense = total;
+			entry.expense += Math.abs(total);
+		} else if (
+			row.transactionType === "Transferência" &&
+			row.accountExcludeFromBalance === false
+		) {
+			entry.transferAdjustment += total;
 		}
 		dataMap.set(row.period, entry);
 	}
 
 	// Build result array preserving period order
 	const months = periods.map((period) => {
-		const entry = dataMap.get(period) ?? { income: 0, expense: 0 };
+		const entry = dataMap.get(period) ?? {
+			income: 0,
+			expense: 0,
+			transferAdjustment: 0,
+		};
 
 		return {
 			month: period,
 			monthLabel: formatPeriodMonthShort(period).toLowerCase(),
 			income: entry.income,
 			expense: entry.expense,
-			balance: entry.income - entry.expense,
+			balance: entry.income - entry.expense + entry.transferAdjustment,
 		};
 	});
 

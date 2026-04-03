@@ -1,8 +1,10 @@
-import { and, inArray, sql } from "drizzle-orm";
-import { transactions } from "@/db/schema";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { financialAccounts, transactions } from "@/db/schema";
 import {
 	buildDashboardAdminPeriodFilters,
 	excludeAutoInvoiceEntries,
+	excludeInitialBalanceWhenConfigured,
+	excludeTransactionsFromExcludedAccounts,
 } from "@/features/dashboard/transaction-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
@@ -52,6 +54,10 @@ export async function fetchPaymentStatus(
 			`,
 		})
 		.from(transactions)
+		.leftJoin(
+			financialAccounts,
+			eq(transactions.accountId, financialAccounts.id),
+		)
 		.where(
 			and(
 				...buildDashboardAdminPeriodFilters({
@@ -61,6 +67,8 @@ export async function fetchPaymentStatus(
 				}),
 				inArray(transactions.transactionType, ["Receita", "Despesa"]),
 				excludeAutoInvoiceEntries(),
+				excludeInitialBalanceWhenConfigured(),
+				excludeTransactionsFromExcludedAccounts(),
 			),
 		)
 		.groupBy(transactions.transactionType);

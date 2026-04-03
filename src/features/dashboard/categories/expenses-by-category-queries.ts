@@ -1,5 +1,10 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { budgets, categories, transactions } from "@/db/schema";
+import {
+	budgets,
+	categories,
+	financialAccounts,
+	transactions,
+} from "@/db/schema";
 import {
 	buildCategoryBreakdownData,
 	type DashboardCategoryBreakdownData,
@@ -8,6 +13,7 @@ import {
 import {
 	buildDashboardAdminFilters,
 	excludeAutoInvoiceEntries,
+	excludeTransactionsFromExcludedAccounts,
 } from "@/features/dashboard/transaction-filters";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
@@ -39,6 +45,10 @@ export async function fetchExpensesByCategory(
 			})
 			.from(transactions)
 			.innerJoin(categories, eq(transactions.categoryId, categories.id))
+			.leftJoin(
+				financialAccounts,
+				eq(transactions.accountId, financialAccounts.id),
+			)
 			.where(
 				and(
 					...buildDashboardAdminFilters({ userId, adminPayerId }),
@@ -46,6 +56,7 @@ export async function fetchExpensesByCategory(
 					eq(transactions.transactionType, "Despesa"),
 					eq(categories.type, "despesa"),
 					excludeAutoInvoiceEntries(),
+					excludeTransactionsFromExcludedAccounts(),
 				),
 			)
 			.groupBy(

@@ -139,6 +139,7 @@ export const userPreferences = pgTable("preferencias_usuario", {
 	dashboardWidgets: jsonb("dashboard_widgets").$type<{
 		order: string[];
 		hidden: string[];
+		myAccountsShowExcluded?: boolean;
 	}>(),
 	createdAt: timestamp("created_at", {
 		mode: "date",

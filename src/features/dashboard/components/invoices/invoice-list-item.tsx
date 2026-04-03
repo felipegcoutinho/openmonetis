@@ -4,8 +4,10 @@ import {
 	buildInvoiceDetailsHref,
 	buildInvoiceInitials,
 	formatInvoicePaymentDate,
+	formatInvoiceWidgetPaymentDate,
 	getInvoiceShareLabel,
 	parseInvoiceDueDate,
+	parseInvoiceWidgetDueDate,
 } from "@/features/dashboard/invoices-helpers";
 import type { DashboardInvoice } from "@/features/dashboard/invoices-queries";
 import MoneyValues from "@/shared/components/money-values";
@@ -20,6 +22,11 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/shared/components/ui/hover-card";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { INVOICE_PAYMENT_STATUS } from "@/shared/lib/invoices";
 import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import { isDateOnlyPast } from "@/shared/utils/date";
@@ -31,14 +38,22 @@ type InvoiceListItemProps = {
 };
 
 export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
-	const dueInfo = parseInvoiceDueDate(invoice.period, invoice.dueDay);
+	const dueInfo = parseInvoiceWidgetDueDate(invoice.period, invoice.dueDay);
+	const absoluteDueInfo = parseInvoiceDueDate(invoice.period, invoice.dueDay);
 	const isPaid = invoice.paymentStatus === INVOICE_PAYMENT_STATUS.PAID;
 	const isOverdue =
 		!isPaid && dueInfo.date !== null && isDateOnlyPast(dueInfo.date);
-	const paymentInfo = formatInvoicePaymentDate(invoice.paidAt);
+	const paymentInfo = formatInvoiceWidgetPaymentDate(invoice.paidAt);
+	const absolutePaymentInfo = formatInvoicePaymentDate(invoice.paidAt);
 	const breakdown = invoice.pagadorBreakdown ?? [];
 	const hasBreakdown = breakdown.length > 0;
 	const detailHref = buildInvoiceDetailsHref(invoice.cardId, invoice.period);
+	const dueTooltipLabel =
+		dueInfo.label !== absoluteDueInfo.label ? absoluteDueInfo.label : null;
+	const paymentTooltipLabel =
+		paymentInfo?.label && paymentInfo.label !== absolutePaymentInfo?.label
+			? absolutePaymentInfo?.label
+			: null;
 
 	const linkNode = (
 		<Link
@@ -113,9 +128,33 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 					)}
 
 					<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-						{!isPaid ? <span>{dueInfo.label}</span> : null}
+						{!isPaid ? (
+							dueTooltipLabel ? (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="cursor-help">{dueInfo.label}</span>
+									</TooltipTrigger>
+									<TooltipContent side="top">{dueTooltipLabel}</TooltipContent>
+								</Tooltip>
+							) : (
+								<span>{dueInfo.label}</span>
+							)
+						) : null}
 						{isPaid && paymentInfo ? (
-							<span className="text-success">{paymentInfo.label}</span>
+							paymentTooltipLabel ? (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="cursor-help text-success">
+											{paymentInfo.label}
+										</span>
+									</TooltipTrigger>
+									<TooltipContent side="top">
+										{paymentTooltipLabel}
+									</TooltipContent>
+								</Tooltip>
+							) : (
+								<span className="text-success">{paymentInfo.label}</span>
+							)
 						) : null}
 					</div>
 				</div>
