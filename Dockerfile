@@ -56,10 +56,27 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
+# Instalar deps do drizzle-kit em diretório separado ANTES de copiar o standalone
+# Isso evita que o pnpm install sobrescreva o node_modules do Next.js standalone
+COPY --from=builder /app/package.json /tmp/pkg.json
+RUN mkdir -p /app/migrate && \
+  node -e "\
+  const p=JSON.parse(require('fs').readFileSync('/tmp/pkg.json','utf8'));\
+  require('fs').writeFileSync('/app/migrate/package.json',JSON.stringify({\
+    name:'openmonetis-migrate',version:p.version,\
+    dependencies:{\
+      'drizzle-orm':p.dependencies['drizzle-orm'],\
+      'pg':p.dependencies['pg']\
+    },\
+    devDependencies:{'drizzle-kit':p.devDependencies['drizzle-kit']}\
+  }));" && \
+  cd /app/migrate && pnpm install --no-frozen-lockfile --ignore-scripts && \
+  chown -R nextjs:nodejs /app/migrate
+
 # Copiar apenas arquivos necessários para produção
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Copiar arquivos de build do Next.js
+# Copiar arquivos de build do Next.js (inclui node_modules standalone com next)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -67,22 +84,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/src/db ./src/db
-
-# Instalar apenas as deps necessárias para drizzle-kit migrate
-# Gera package.json mínimo a partir do original para evitar version drift
-COPY --from=builder /app/package.json /tmp/pkg.json
-RUN node -e "\
-  const p=JSON.parse(require('fs').readFileSync('/tmp/pkg.json','utf8'));\
-  require('fs').writeFileSync('package.json',JSON.stringify({\
-    name:'openmonetis',version:p.version,\
-    dependencies:{\
-      'drizzle-orm':p.dependencies['drizzle-orm'],\
-      'pg':p.dependencies['pg']\
-    },\
-    devDependencies:{'drizzle-kit':p.devDependencies['drizzle-kit']}\
-  }));" && \
-  pnpm install --no-frozen-lockfile --ignore-scripts && \
-  chown nextjs:nodejs package.json
 
 # Copiar entrypoint de migrations
 COPY docker-entrypoint.sh ./
