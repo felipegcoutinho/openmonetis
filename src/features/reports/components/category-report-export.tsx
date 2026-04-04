@@ -33,7 +33,7 @@ interface CategoryReportExportProps {
 	filters: FilterState;
 }
 
-const loadXlsx = () => import("xlsx");
+const loadExcelJS = () => import("exceljs");
 
 const loadPdfDeps = async () => {
 	const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
@@ -134,7 +134,7 @@ export function CategoryReportExport({
 	const exportToExcel = async () => {
 		try {
 			setIsExporting(true);
-			const XLSX = await loadXlsx();
+			const ExcelJS = await loadExcelJS();
 
 			// Build data array
 			const headers = [
@@ -179,20 +179,32 @@ export function CategoryReportExport({
 			totalsRow.push(formatCurrency(data.grandTotal));
 			rows.push(totalsRow);
 
-			// Create worksheet
-			const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+			// Create workbook and worksheet
+			const workbook = new ExcelJS.Workbook();
+			const ws = workbook.addWorksheet("Relatório de Categorias");
+
+			ws.addRows([headers, ...rows]);
 
 			// Set column widths
-			ws["!cols"] = [
-				{ wch: 20 }, // Category
-				...data.periods.map(() => ({ wch: 15 })), // Periods
-				{ wch: 15 }, // Total
-			];
+			ws.getColumn(1).width = 20;
+			for (let i = 0; i < data.periods.length; i++) {
+				ws.getColumn(i + 2).width = 15;
+			}
+			ws.getColumn(data.periods.length + 2).width = 15;
 
-			// Create workbook and download
-			const wb = XLSX.utils.book_new();
-			XLSX.utils.book_append_sheet(wb, ws, "Relatório de Categorias");
-			XLSX.writeFile(wb, getFileName("xlsx"));
+			// Download
+			const buffer = await workbook.xlsx.writeBuffer();
+			const blob = new Blob([buffer], {
+				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			});
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = getFileName("xlsx");
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
 
 			toast.success("Relatório exportado em Excel com sucesso!");
 		} catch (error) {

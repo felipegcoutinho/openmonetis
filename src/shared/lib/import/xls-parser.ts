@@ -1,19 +1,46 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import type {
 	ImportedTransaction,
 	ImportStatement,
 } from "@/shared/lib/import/types";
+
+/**
+ * Converte serial number do Excel (1900 date system) para ano/mês/dia.
+ * Excel trata 1900 como bissexto (serial 60 = 29/02/1900 inexistente).
+ */
+function excelSerialToDate(
+	serial: number,
+): { y: number; m: number; d: number } | null {
+	if (serial < 1) return null;
+	let adjusted = serial;
+	if (serial > 60) adjusted--;
+	const baseDate = new Date(1899, 11, 31);
+	const date = new Date(baseDate.getTime() + adjusted * 86400000);
+	return {
+		y: date.getFullYear(),
+		m: date.getMonth() + 1,
+		d: date.getDate(),
+	};
+}
 
 function parseDateValue(value: unknown): string | null {
 	if (value == null || value === "") return null;
 
 	// Excel date serial number
 	if (typeof value === "number") {
-		const date = XLSX.SSF.parse_date_code(value);
+		const date = excelSerialToDate(value);
 		if (!date) return null;
 		const y = date.y;
 		const m = String(date.m).padStart(2, "0");
 		const d = String(date.d).padStart(2, "0");
+		return `${y}-${m}-${d}`;
+	}
+
+	// ExcelJS pode retornar Date objects
+	if (value instanceof Date) {
+		const y = value.getFullYear();
+		const m = String(value.getMonth() + 1).padStart(2, "0");
+		const d = String(value.getDate()).padStart(2, "0");
 		return `${y}-${m}-${d}`;
 	}
 
@@ -43,54 +70,37 @@ function parseAmountValue(value: unknown): number | null {
 	return Number.isNaN(num) ? null : Math.abs(num);
 }
 
-export function parseXls(buffer: ArrayBuffer): ImportStatement {
-	const workbook = XLSX.read(new Uint8Array(buffer), {
-		type: "array",
-		cellDates: false,
-		cellFormula: false,
-		cellNF: false,
-	});
+export async function parseXls(buffer: ArrayBuffer): Promise<ImportStatement> {
+	const workbook = new ExcelJS.Workbook();
+	await workbook.xlsx.load(buffer);
 
-	if (!workbook.SheetNames.length) {
+	if (workbook.worksheets.length === 0) {
 		throw new Error("Arquivo sem abas.");
 	}
 
-	const sheetName = workbook.SheetNames[0];
-	const sheet = workbook.Sheets[sheetName];
+	const sheet = workbook.worksheets[0];
 
-	if (!sheet) {
-		throw new Error(`Aba "${sheetName}" não encontrada.`);
-	}
-
-	const range = sheet["!ref"];
-	if (!range) {
-		throw new Error("Planilha vazia (sem intervalo de células).");
-	}
-
-	const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
-		header: 1,
-		defval: "",
-	});
-
-	if (rows.length < 2) {
+	if (!sheet || sheet.rowCount < 2) {
 		throw new Error(
-			`Planilha vazia ou sem dados (${rows.length} linha(s) encontrada(s)).`,
+			`Planilha vazia ou sem dados (${sheet?.rowCount ?? 0} linha(s) encontrada(s)).`,
 		);
 	}
 
 	const transactions: ImportedTransaction[] = [];
 
-	for (let i = 1; i < rows.length; i++) {
-		const row = rows[i] as unknown[];
-		if (!row || row.every((cell) => cell == null || cell === "")) continue;
+	sheet.eachRow((row, rowNumber) => {
+		if (rowNumber === 1) return; // skip header
 
-		const date = parseDateValue(row[0]);
-		const description = row[1] != null ? String(row[1]).trim() : "";
-		const amount = parseAmountValue(row[2]);
-		const typeRaw = row[3] != null ? String(row[3]).toLowerCase().trim() : "";
+		// ExcelJS row.values é 1-indexed (values[0] é undefined)
+		const values = row.values as unknown[];
+		const date = parseDateValue(values[1]);
+		const description = values[2] != null ? String(values[2]).trim() : "";
+		const amount = parseAmountValue(values[3]);
+		const typeRaw =
+			values[4] != null ? String(values[4]).toLowerCase().trim() : "";
 		const transactionType = typeRaw === "receita" ? "income" : "expense";
 
-		if (!date || !description || amount === null || amount <= 0) continue;
+		if (!date || !description || amount === null || amount <= 0) return;
 
 		transactions.push({
 			externalId: null,
@@ -99,7 +109,7 @@ export function parseXls(buffer: ArrayBuffer): ImportStatement {
 			description,
 			transactionType,
 		});
-	}
+	});
 
 	if (transactions.length === 0) {
 		throw new Error("Nenhuma transação válida encontrada na planilha.");
@@ -117,31 +127,31 @@ export function parseXls(buffer: ArrayBuffer): ImportStatement {
 	};
 }
 
-export function generateXlsTemplate(): ArrayBuffer {
-	const wb = XLSX.utils.book_new();
+export async function generateXlsTemplate(): Promise<ArrayBuffer> {
+	const workbook = new ExcelJS.Workbook();
+	const ws = workbook.addWorksheet("Lançamentos");
 
-	const data = [
+	ws.addRows([
 		["Data", "Descrição", "Valor", "Tipo"],
 		["01/03/2026", "Ingressos São Januário", 160, "despesa"],
 		["01/03/2026", "Salário", 3000.0, "receita"],
 		["01/03/2026", "Posto do Vasco da Gama", 89.9, "despesa"],
-	];
+	]);
 
-	const ws = XLSX.utils.aoa_to_sheet(data);
+	ws.getColumn(1).width = 14;
+	ws.getColumn(2).width = 32;
+	ws.getColumn(3).width = 12;
+	ws.getColumn(4).width = 10;
 
-	ws["!cols"] = [{ wch: 14 }, { wch: 32 }, { wch: 12 }, { wch: 10 }];
+	// Dropdown para coluna Tipo (D2:D100)
+	for (let i = 2; i <= 100; i++) {
+		ws.getCell(`D${i}`).dataValidation = {
+			type: "list",
+			allowBlank: true,
+			formulae: ['"despesa,receita"'],
+		};
+	}
 
-	// Dropdown para coluna Tipo (D2:D1000)
-	if (!ws["!dataValidations"]) ws["!dataValidations"] = [];
-	(ws["!dataValidations"] as object[]).push({
-		type: "list",
-		sqref: "D2:D1000",
-		formula1: '"despesa,receita"',
-		showDropDown: false,
-	});
-
-	XLSX.utils.book_append_sheet(wb, ws, "Lançamentos");
-
-	const raw = XLSX.write(wb, { type: "array", bookType: "xlsx" }) as number[];
-	return new Uint8Array(raw).buffer as ArrayBuffer;
+	const buffer = await workbook.xlsx.writeBuffer();
+	return buffer as ArrayBuffer;
 }

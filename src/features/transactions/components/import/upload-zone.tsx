@@ -45,10 +45,10 @@ export function UploadZone({ onParsed }: UploadZoneProps) {
 			reader.readAsText(file, "windows-1252");
 		} else {
 			const reader = new FileReader();
-			reader.onload = (e) => {
+			reader.onload = async (e) => {
 				try {
 					const buffer = e.target?.result as ArrayBuffer;
-					const statement = parseXls(buffer);
+					const statement = await parseXls(buffer);
 					onParsed(statement);
 				} catch (err) {
 					setError(
@@ -62,8 +62,8 @@ export function UploadZone({ onParsed }: UploadZoneProps) {
 		}
 	};
 
-	const handleDownloadTemplate = () => {
-		const bytes = generateXlsTemplate();
+	const handleDownloadTemplate = async () => {
+		const bytes = await generateXlsTemplate();
 		const blob = new Blob([bytes], {
 			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		});

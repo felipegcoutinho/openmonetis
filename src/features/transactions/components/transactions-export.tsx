@@ -32,7 +32,7 @@ interface LancamentosExportProps {
 	exportContext?: TransactionsExportContext;
 }
 
-const loadXlsx = () => import("xlsx");
+const loadExcelJS = () => import("exceljs");
 
 const loadPdfDeps = async () => {
 	const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
@@ -158,7 +158,7 @@ export function TransactionsExport({
 		try {
 			setIsExporting(true);
 			const transactions = await loadTransactions();
-			const XLSX = await loadXlsx();
+			const ExcelJS = await loadExcelJS();
 
 			const headers = [
 				"Data",
@@ -188,23 +188,28 @@ export function TransactionsExport({
 				rows.push(row);
 			});
 
-			const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+			const workbook = new ExcelJS.Workbook();
+			const ws = workbook.addWorksheet("Lançamentos");
 
-			ws["!cols"] = [
-				{ wch: 12 }, // Data
-				{ wch: 42 }, // Nome
-				{ wch: 15 }, // Tipo
-				{ wch: 15 }, // Condição
-				{ wch: 20 }, // Pagamento
-				{ wch: 15 }, // Valor
-				{ wch: 20 }, // Category
-				{ wch: 20 }, // Conta/Cartão
-				{ wch: 20 }, // Payer
-			];
+			ws.addRows([headers, ...rows]);
 
-			const wb = XLSX.utils.book_new();
-			XLSX.utils.book_append_sheet(wb, ws, "Lançamentos");
-			XLSX.writeFile(wb, getFileName("xlsx"));
+			const colWidths = [12, 42, 15, 15, 20, 15, 20, 20, 20];
+			colWidths.forEach((w, i) => {
+				ws.getColumn(i + 1).width = w;
+			});
+
+			const buffer = await workbook.xlsx.writeBuffer();
+			const blob = new Blob([buffer], {
+				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			});
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = getFileName("xlsx");
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
 
 			toast.success("Lançamentos exportados em Excel com sucesso!");
 		} catch (error) {
