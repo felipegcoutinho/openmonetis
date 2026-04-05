@@ -1,7 +1,7 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { apiTokens } from "@/db/schema";
-import { extractBearerToken, verifyJwt } from "@/shared/lib/auth/api-token";
+import { extractBearerToken, hashToken } from "@/shared/lib/auth/api-token";
 import { db } from "@/shared/lib/db";
 
 export async function POST(request: Request) {
@@ -17,21 +17,20 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Verificar JWT (assinatura + expiração)
-		const payload = verifyJwt(token);
-
-		if (!payload || payload.type !== "api_access") {
+		// Validar token opm_xxx via hash
+		if (!token.startsWith("opm_")) {
 			return NextResponse.json(
-				{ valid: false, error: "Token inválido ou expirado" },
+				{ valid: false, error: "Formato de token inválido" },
 				{ status: 401 },
 			);
 		}
 
-		// Buscar token no banco por tokenId para checar revogação
+		const tokenHash = hashToken(token);
+
+		// Buscar token no banco
 		const tokenRecord = await db.query.apiTokens.findFirst({
 			where: and(
-				eq(apiTokens.id, payload.tokenId),
-				eq(apiTokens.userId, payload.sub),
+				eq(apiTokens.tokenHash, tokenHash),
 				isNull(apiTokens.revokedAt),
 				gt(apiTokens.expiresAt, new Date()),
 			),
@@ -39,7 +38,7 @@ export async function POST(request: Request) {
 
 		if (!tokenRecord) {
 			return NextResponse.json(
-				{ valid: false, error: "Token revogado ou não encontrado" },
+				{ valid: false, error: "Token inválido ou revogado" },
 				{ status: 401 },
 			);
 		}

@@ -610,7 +610,7 @@ const revokeApiTokenSchema = z.object({
 });
 
 function generateSecureToken(): string {
-	const prefix = "os";
+	const prefix = "opm";
 	const randomPart = randomBytes(32).toString("base64url");
 	return `${prefix}_${randomPart}`;
 }

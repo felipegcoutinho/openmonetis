@@ -48,8 +48,8 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Validar token os_xxx via hash
-		if (!token.startsWith("os_")) {
+		// Validar token opm_xxx via hash
+		if (!token.startsWith("opm_")) {
 			return NextResponse.json(
 				{ error: "Formato de token inválido" },
 				{ status: 401 },

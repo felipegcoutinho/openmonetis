@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.3.3] - 2026-04-05
+
+### Corrigido
+
+- Tokens: corrigido `/api/auth/device/verify` que rejeitava tokens criados via Settings (revertido de JWT para hash lookup)
+
+### Alterado
+
+- Tokens: prefixo renomeado de `os_` para `opm_` (OpenMonetis); tokens existentes precisam ser recriados
+- Tokens: removidas rotas JWT não utilizadas (`/api/auth/device/token` e `/api/auth/device/refresh`)
+- Tokens: `api-token.ts` simplificado para conter apenas `hashToken` e `extractBearerToken`
+
 ## [2.3.2] - 2026-04-04
 
 ### Segurança
