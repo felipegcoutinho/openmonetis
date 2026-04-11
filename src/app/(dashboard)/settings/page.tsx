@@ -5,8 +5,6 @@ import { connection } from "next/server";
 
 import { CompanionTab } from "@/features/settings/components/companion-tab";
 import { DeleteAccountForm } from "@/features/settings/components/delete-account-form";
-import { DiagnosticsTab } from "@/features/settings/components/diagnostics-tab";
-import { fetchDiagnosticsData } from "@/features/settings/diagnostics-queries";
 import { PasskeysForm } from "@/features/settings/components/passkeys-form";
 import { PreferencesForm } from "@/features/settings/components/preferences-form";
 import { UpdateEmailForm } from "@/features/settings/components/update-email-form";
@@ -39,19 +37,6 @@ export default async function Page() {
 	const { authProvider, userPreferences, userApiTokens } =
 		await fetchSettingsPageData(session.user.id);
 
-	const diagnosticsData = await fetchDiagnosticsData(
-		session.user.id,
-		{
-			id: session.user.id,
-			name: session.user.name ?? "",
-			email: session.user.email ?? "",
-		},
-		{
-			createdAt: session.session.createdAt,
-			expiresAt: session.session.expiresAt,
-		},
-	);
-
 	return (
 		<div className="w-full">
 			<Tabs defaultValue="preferencias" className="w-full">
@@ -65,8 +50,7 @@ export default async function Page() {
 							<TabsTrigger value="senha">Alterar senha</TabsTrigger>
 							<TabsTrigger value="passkeys">Passkeys</TabsTrigger>
 							<TabsTrigger value="email">Alterar e-mail</TabsTrigger>
-							<TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
-							<TabsTrigger value="deletar" className="text-destructive">
+<TabsTrigger value="deletar" className="text-destructive">
 								Deletar conta
 							</TabsTrigger>
 						</TabsList>
@@ -196,23 +180,7 @@ export default async function Page() {
 					</Card>
 				</TabsContent>
 
-				<TabsContent value="diagnostico" className="mt-4">
-					<Card className="p-6">
-						<div className="space-y-4">
-							<div>
-								<h2 className="text-xl font-semibold mb-1">Diagnóstico</h2>
-								<p className="text-sm text-muted-foreground">
-									Informações técnicas sobre sua conta, sessão e estado do
-									servidor. Nenhuma credencial ou dado sensível é exibido.
-								</p>
-							</div>
-							<Separator />
-							<DiagnosticsTab data={diagnosticsData} />
-						</div>
-					</Card>
-				</TabsContent>
-
-				<TabsContent value="deletar" className="mt-4">
+<TabsContent value="deletar" className="mt-4">
 					<Card className="p-6">
 						<div className="space-y-4">
 							<div>

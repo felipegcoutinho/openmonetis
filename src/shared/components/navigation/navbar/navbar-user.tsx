@@ -119,11 +119,8 @@ export function NavbarUser({
 							/>
 						</div>
 						<div className="flex flex-col min-w-0">
-							<span className="text-sm font-medium truncate">{user.name}</span>
 							<div className="flex items-center gap-1 min-w-0">
-								<span className="text-xs text-muted-foreground truncate">
-									{user.email}
-								</span>
+								<span className="text-sm font-medium truncate">{user.name}</span>
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<button
@@ -144,6 +141,9 @@ export function NavbarUser({
 									</TooltipContent>
 								</Tooltip>
 							</div>
+							<span className="text-xs text-muted-foreground truncate">
+								{user.email}
+							</span>
 						</div>
 					</DropdownMenuLabel>
 
