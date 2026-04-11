@@ -117,7 +117,7 @@ export function DeleteAccountForm() {
 					</div>
 				</div>
 
-				<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+				<div className="rounded-lg border border-destructive/30 p-4">
 					<div className="space-y-4">
 						<div>
 							<h3 className="font-semibold text-destructive">Deletar conta</h3>
@@ -132,7 +132,7 @@ export function DeleteAccountForm() {
 							<li>Contas, cartões e categorias</li>
 							<li>Pagadores, credenciais e configurações</li>
 							<li className="font-medium">
-								Resumindo tudo, sua conta será permanentemente removida
+								Resumindo, sua conta irá de arrasta pra cima!
 							</li>
 						</ul>
 

@@ -50,7 +50,7 @@ export default async function Page() {
 							<TabsTrigger value="senha">Alterar senha</TabsTrigger>
 							<TabsTrigger value="passkeys">Passkeys</TabsTrigger>
 							<TabsTrigger value="email">Alterar e-mail</TabsTrigger>
-<TabsTrigger value="deletar" className="text-destructive">
+							<TabsTrigger value="deletar" className="text-destructive">
 								Deletar conta
 							</TabsTrigger>
 						</TabsList>
@@ -180,7 +180,7 @@ export default async function Page() {
 					</Card>
 				</TabsContent>
 
-<TabsContent value="deletar" className="mt-4">
+				<TabsContent value="deletar" className="mt-4">
 					<Card className="p-6">
 						<div className="space-y-4">
 							<div>
