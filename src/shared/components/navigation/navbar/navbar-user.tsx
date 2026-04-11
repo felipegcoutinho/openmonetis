@@ -18,11 +18,6 @@ import { FeedbackDialogBody } from "@/shared/components/navigation/navbar/feedba
 import { Badge } from "@/shared/components/ui/badge";
 import { Dialog, DialogTrigger } from "@/shared/components/ui/dialog";
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuLabel,
@@ -30,6 +25,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Spinner } from "@/shared/components/ui/spinner";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { authClient } from "@/shared/lib/auth/client";
 import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import type { UpdateCheckResult } from "@/shared/lib/version/check-update";
@@ -68,6 +68,7 @@ export function NavbarUser({
 	const avatarSrc = pagadorAvatarUrl
 		? getAvatarSrc(pagadorAvatarUrl)
 		: user.image || getAvatarSrc(null);
+	const isDataUrl = avatarSrc.startsWith("data:");
 
 	async function handleLogout() {
 		await authClient.signOut({
@@ -91,6 +92,7 @@ export function NavbarUser({
 							<div className="relative size-10 overflow-hidden rounded-full">
 								<Image
 									src={avatarSrc}
+									unoptimized={isDataUrl}
 									alt={`Avatar de ${user.name}`}
 									fill
 									sizes="40px"
@@ -112,6 +114,7 @@ export function NavbarUser({
 						<div className="relative size-9 shrink-0 overflow-hidden rounded-full">
 							<Image
 								src={avatarSrc}
+								unoptimized={isDataUrl}
 								alt={user.name}
 								fill
 								sizes="36px"
@@ -120,7 +123,9 @@ export function NavbarUser({
 						</div>
 						<div className="flex flex-col min-w-0">
 							<div className="flex items-center gap-1 min-w-0">
-								<span className="text-sm font-medium truncate">{user.name}</span>
+								<span className="text-sm font-medium truncate">
+									{user.name}
+								</span>
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<button

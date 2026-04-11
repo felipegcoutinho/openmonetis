@@ -52,6 +52,7 @@ export function PayerHeaderCard({
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	const avatarSrc = getAvatarSrc(payer.avatarUrl);
+	const isDataUrl = avatarSrc.startsWith("data:");
 	const createdAtLabel = formatDate(payer.createdAt);
 	const isAdmin = payer.role === PAYER_ROLE_ADMIN;
 
@@ -109,6 +110,7 @@ export function PayerHeaderCard({
 					<div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden">
 						<Image
 							src={avatarSrc}
+							unoptimized={isDataUrl}
 							alt={`Avatar de ${payer.name}`}
 							width={64}
 							height={64}

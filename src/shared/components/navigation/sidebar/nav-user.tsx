@@ -22,6 +22,7 @@ export function NavUser({ user, pagadorAvatarUrl }: NavUserProps) {
 	const avatarSrc = pagadorAvatarUrl
 		? getAvatarSrc(pagadorAvatarUrl)
 		: user.image || getAvatarSrc(null);
+	const isDataUrl = avatarSrc.startsWith("data:");
 
 	return (
 		<SidebarMenu>
@@ -33,6 +34,7 @@ export function NavUser({ user, pagadorAvatarUrl }: NavUserProps) {
 					<div className="relative size-8 shrink-0 overflow-hidden rounded-full">
 						<Image
 							src={avatarSrc}
+							unoptimized={isDataUrl}
 							alt={user.name}
 							fill
 							sizes="32px"

@@ -24,6 +24,7 @@ interface PayerCardProps {
 export function PayerCard({ payer, onEdit, onRemove }: PayerCardProps) {
 	const avatarSrc = getAvatarSrc(payer.avatarUrl);
 	const isAdmin = payer.role === PAYER_ROLE_ADMIN;
+	const isDataUrl = avatarSrc.startsWith("data:");
 	const isReadOnly = !payer.canEdit;
 
 	return (
@@ -33,6 +34,7 @@ export function PayerCard({ payer, onEdit, onRemove }: PayerCardProps) {
 				<div className="relative mb-3 flex size-16 items-center justify-center overflow-hidden rounded-full  border-background bg-background shadow-lg">
 					<Image
 						src={avatarSrc}
+						unoptimized={isDataUrl}
 						alt={`Avatar de ${payer.name}`}
 						width={80}
 						height={80}
