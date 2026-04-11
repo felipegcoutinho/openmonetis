@@ -6,6 +6,8 @@ export type TransactionExportFilters = {
 	categoryFilter: string | null;
 	accountCardFilter: string | null;
 	searchFilter: string | null;
+	settledFilter: string | null;
+	attachmentFilter: string | null;
 };
 
 export type TransactionsExportContext = {

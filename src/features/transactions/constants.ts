@@ -19,3 +19,8 @@ export const PAYMENT_METHODS = [
 	"Pré-Pago | VR/VA",
 	"Transferência bancária",
 ] as const;
+
+export const SETTLED_FILTER_VALUES = {
+	PAID: "pago",
+	UNPAID: "nao-pago",
+} as const;

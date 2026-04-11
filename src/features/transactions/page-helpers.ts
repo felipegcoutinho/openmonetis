@@ -1,15 +1,17 @@
 import type { SQL } from "drizzle-orm";
-import { and, eq, ilike, isNotNull, or } from "drizzle-orm";
+import { and, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import {
 	cards,
 	type categories,
 	financialAccounts,
 	type payers,
+	transactionAttachments,
 	transactions,
 } from "@/db/schema";
 import type { SelectOption } from "@/features/transactions/components/types";
 import {
 	PAYMENT_METHODS,
+	SETTLED_FILTER_VALUES,
 	TRANSACTION_CONDITIONS,
 	TRANSACTION_TYPES,
 } from "@/features/transactions/constants";
@@ -19,6 +21,7 @@ import {
 	PAYER_ROLE_THIRD_PARTY,
 } from "@/shared/lib/payers/constants";
 import { toDateOnlyString } from "@/shared/utils/date";
+import { slugify } from "@/shared/utils/string";
 
 type PayerRow = typeof payers.$inferSelect;
 type AccountRow = typeof financialAccounts.$inferSelect;
@@ -40,6 +43,8 @@ export type TransactionSearchFilters = {
 	categoryFilter: string | null;
 	accountCardFilter: string | null;
 	searchFilter: string | null;
+	settledFilter: string | null;
+	attachmentFilter: string | null;
 };
 
 type BaseSluggedOption = {
@@ -127,6 +132,8 @@ export const extractTransactionSearchFilters = (
 	categoryFilter: getSingleParam(params, "category"),
 	accountCardFilter: getSingleParam(params, "accountCard"),
 	searchFilter: getSingleParam(params, "q"),
+	settledFilter: getSingleParam(params, "settled"),
+	attachmentFilter: getSingleParam(params, "hasAttachment"),
 });
 
 export const resolveTransactionPagination = (
@@ -152,15 +159,17 @@ export const resolveTransactionPagination = (
 const normalizeLabel = (value: string | null | undefined) =>
 	value?.trim().length ? value.trim() : "Sem descrição";
 
-const slugify = (value: string) => {
-	const base = value
-		.normalize("NFD")
-		.replace(/[\u0300-\u036f]/g, "")
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
-	return base || "item";
-};
+const typeSlugToValue = Object.fromEntries(
+	TRANSACTION_TYPES.map((t) => [slugify(t), t]),
+) as Record<string, (typeof TRANSACTION_TYPES)[number]>;
+
+const conditionSlugToValue = Object.fromEntries(
+	TRANSACTION_CONDITIONS.map((c) => [slugify(c), c]),
+) as Record<string, (typeof TRANSACTION_CONDITIONS)[number]>;
+
+const paymentSlugToValue = Object.fromEntries(
+	PAYMENT_METHODS.map((m) => [slugify(m), m]),
+) as Record<string, (typeof PAYMENT_METHODS)[number]>;
 
 const createSlugGenerator = () => {
 	const seen = new Map<string, number>();
@@ -338,16 +347,20 @@ export const buildTransactionWhere = ({
 		where.push(eq(transactions.accountId, accountId));
 	}
 
-	if (isValidTransaction(filters.transactionFilter)) {
-		where.push(eq(transactions.transactionType, filters.transactionFilter));
+	const typeValue = typeSlugToValue[filters.transactionFilter ?? ""] ?? null;
+	if (isValidTransaction(typeValue)) {
+		where.push(eq(transactions.transactionType, typeValue));
 	}
 
-	if (isValidCondition(filters.conditionFilter)) {
-		where.push(eq(transactions.condition, filters.conditionFilter));
+	const conditionValue =
+		conditionSlugToValue[filters.conditionFilter ?? ""] ?? null;
+	if (isValidCondition(conditionValue)) {
+		where.push(eq(transactions.condition, conditionValue));
 	}
 
-	if (isValidPaymentMethod(filters.paymentFilter)) {
-		where.push(eq(transactions.paymentMethod, filters.paymentFilter));
+	const paymentValue = paymentSlugToValue[filters.paymentFilter ?? ""] ?? null;
+	if (isValidPaymentMethod(paymentValue)) {
+		where.push(eq(transactions.paymentMethod, paymentValue));
 	}
 
 	if (!payerId && filters.payerFilter) {
@@ -375,6 +388,18 @@ export const buildTransactionWhere = ({
 		if (!accountId && relatedCardId) {
 			where.push(eq(transactions.cardId, relatedCardId));
 		}
+	}
+
+	if (filters.settledFilter === SETTLED_FILTER_VALUES.PAID) {
+		where.push(eq(transactions.isSettled, true));
+	} else if (filters.settledFilter === SETTLED_FILTER_VALUES.UNPAID) {
+		where.push(eq(transactions.isSettled, false));
+	}
+
+	if (filters.attachmentFilter === "true") {
+		where.push(
+			sql`EXISTS (SELECT 1 FROM ${transactionAttachments} WHERE ${transactionAttachments.transactionId} = ${transactions.id})`,
+		);
 	}
 
 	const searchPattern = buildSearchPattern(filters.searchFilter);

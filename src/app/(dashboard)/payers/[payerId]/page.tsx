@@ -80,6 +80,8 @@ const EMPTY_FILTERS: TransactionSearchFilters = {
 	categoryFilter: null,
 	accountCardFilter: null,
 	searchFilter: null,
+	settledFilter: null,
+	attachmentFilter: null,
 };
 
 const createEmptySlugMaps = (): SlugMaps => ({

@@ -210,7 +210,7 @@ function buildColumns({
 							<span className="flex items-center gap-1">
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<span className="line-clamp-2 max-w-[180px] font-medium truncate">
+										<span className="line-clamp-2 max-w-[180px] font-semibold truncate">
 											{name}
 										</span>
 									</TooltipTrigger>
@@ -570,12 +570,44 @@ function buildColumns({
 							paymentMethod === "Transferência bancária" ||
 							paymentMethod === "Pré-Pago | VR/VA";
 
-						if (!canToggleSettlement)
+						if (!canToggleSettlement) {
+							const invoicePaid = Boolean(row.original.isSettled);
 							return (
-								<span className="flex size-7 shrink-0 items-center justify-center">
-									<RiBankCard2Line className="size-4 text-muted-foreground/30" />
-								</span>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="inline-flex">
+											<Button
+												variant="ghost"
+												size="icon-sm"
+												disabled
+												className={cn(
+													"transition-colors",
+													invoicePaid
+														? "bg-success/10 text-success"
+														: "text-muted-foreground/30",
+												)}
+											>
+												{invoicePaid ? (
+													<RiCheckboxCircleFill className="size-4" />
+												) : (
+													<RiBankCard2Line className="size-4" />
+												)}
+												<span className="sr-only">
+													{invoicePaid
+														? "Fatura paga"
+														: "Lançamento de cartão de crédito"}
+												</span>
+											</Button>
+										</span>
+									</TooltipTrigger>
+									<TooltipContent side="top" className="max-w-48 text-center">
+										{invoicePaid
+											? "Fatura paga"
+											: "Lançamentos de cartão de crédito são liquidados ao pagar a fatura"}
+									</TooltipContent>
+								</Tooltip>
 							);
+						}
 
 						const readOnly = row.original.readonly;
 						const loading = isSettlementLoading(row.original.id);
