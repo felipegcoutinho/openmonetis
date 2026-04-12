@@ -32,9 +32,12 @@
 ## 📖 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
-- [Instalação via Script](#-instalação-via-script)
-  - [Preparar o servidor (Ubuntu 24.04)](#-preparar-o-servidor-ubuntu-2404)
-- [Início Rápido (manual)](#-início-rápido)
+- [Como rodar o OpenMonetis](#-como-rodar-o-openmonetis)
+  - [Antes de tudo: preparar o servidor](#-antes-de-tudo-preparar-o-servidor-ubuntu-2404)
+  - [Modo 1 — Só quero usar](#modo-1--só-quero-usar-sem-mexer-no-código)
+  - [Modo 2 — Quero configurar opcionais](#modo-2--quero-configurar-opcionais-oauth-e-mail-ia)
+  - [Modo 3 — Quero contribuir com o código](#modo-3--quero-contribuir-com-o-código)
+  - [Modo 4 — Banco remoto](#modo-4--banco-remoto-supabase-neon-railway)
 - [Scripts Disponíveis](#-scripts-disponíveis)
 - [Docker](#-docker)
 - [Backup](#-backup)
@@ -103,22 +106,24 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 
 ---
 
-## ⚡ Instalação via Script
+## 🚀 Como rodar o OpenMonetis
 
-A forma mais rápida de instalar. O script verifica dependências, configura o `.env` interativamente e sobe o banco automaticamente.
+O OpenMonetis precisa de dois serviços funcionando ao mesmo tempo para operar: **o app** (a interface e a lógica do sistema) e **o banco de dados** (onde ficam guardados seus lançamentos, contas, categorias etc.). Existem algumas formas de subir os dois, dependendo do que você quer fazer.
 
-### 🖥️ Preparar o servidor (Ubuntu 24.04)
+---
 
-Se você está num **servidor Ubuntu limpo** (VPS, Oracle Cloud, DigitalOcean...) sem Node.js, Docker ou pnpm instalados, use o script de preparação antes de continuar.
+### 🖥️ Antes de tudo: preparar o servidor (Ubuntu 24.04)
 
-> ⚠️ **Testado apenas em Ubuntu Server 24.04 LTS.** Em outras distribuições ou versões é necessário testar ou ajustar o script.
+Se você está em um **servidor Ubuntu limpo** (VPS, Oracle Cloud, DigitalOcean...) sem Docker, Node.js ou pnpm instalados, rode esse script primeiro. Ele instala tudo que é necessário automaticamente e pula o que já estiver presente.
+
+> ⚠️ **Testado apenas em Ubuntu Server 24.04 LTS.** Em outras distribuições ou versões, instale as dependências manualmente.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/scripts/install-deps.sh -o install-deps.sh
 sudo sh install-deps.sh
 ```
 
-O script instala (e pula o que já estiver presente):
+O script instala:
 
 | Ferramenta | Como instala |
 |---|---|
@@ -128,9 +133,33 @@ O script instala (e pula o que já estiver presente):
 | Node.js 22 | Via Homebrew |
 | pnpm | Via corepack |
 
-Após a conclusão, adiciona o usuário atual ao grupo `docker` — faça logout/login para ativar. Em seguida, prossiga com o `setup.mjs` abaixo.
+Ao final, o usuário atual é adicionado ao grupo `docker` — faça **logout e login** para a mudança ter efeito antes de continuar.
+
+Se já tiver Docker e Node.js 22+ instalados, pule essa etapa.
 
 ---
+
+### Modo 1 — Só quero usar (sem mexer no código)
+
+Esse é o caminho mais simples. Você baixa apenas um arquivo de configuração e o Docker faz o resto: baixa a imagem do app pronta do Docker Hub e sobe o banco automaticamente. **Não precisa clonar o repositório nem instalar dependências.**
+
+```bash
+# 1. Baixa o arquivo de configuração
+curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/docker-compose.yml -o docker-compose.yml
+
+# 2. Sobe o app e o banco juntos
+docker compose --profile local up
+```
+
+Acesse em: `http://localhost:3000`
+
+> O banco sobe com as credenciais padrão. Se quiser usar uma senha personalizada, crie um arquivo `.env` na mesma pasta antes de subir — veja a seção [Variáveis de Ambiente](#-variáveis-de-ambiente).
+
+---
+
+### Modo 2 — Quero configurar opcionais (OAuth, e-mail, IA)
+
+Se quiser ativar login com Google, envio de e-mails, integrações com IA ou outras configurações, use o assistente interativo. Ele faz perguntas passo a passo e gera o arquivo `.env` com tudo preenchido corretamente.
 
 **Pré-requisito:** Node.js 22+
 
@@ -142,68 +171,64 @@ curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/se
 curl -o setup.mjs https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/setup.mjs ; node setup.mjs
 ```
 
-O script irá:
-- Verificar Node, pnpm, Git e Docker
-- Perguntar se quer banco local (Docker) ou remoto (Supabase, Neon, etc.)
-- Gerar o `BETTER_AUTH_SECRET` automaticamente
-- Configurar opcionais: Google OAuth, e-mail, IA, domínio público
-- Clonar o repositório, instalar dependências e aplicar o schema
+O assistente vai perguntar:
+- Banco local (Docker) ou remoto (Supabase, Neon, Railway...)?
+- URL da aplicação
+- Google OAuth (opcional)
+- E-mail via Resend (opcional)
+- Chaves de IA — Claude, GPT, Gemini, OpenRouter (opcional)
+- Domínio público separado para landing page (opcional)
+
+Ao final, ele clona o repositório, instala as dependências e aplica o schema no banco. Depois é só subir:
+
+```bash
+cd openmonetis
+docker compose --profile local up
+```
 
 ---
 
-## 🚀 Início Rápido (manual)
+### Modo 3 — Quero contribuir com o código
 
-### Pré-requisitos
+Nesse modo o Next.js roda **direto no seu servidor com hot-reload** — toda vez que você salva um arquivo, o sistema atualiza automaticamente sem precisar reiniciar nada. O banco continua rodando dentro do Docker (mais simples), só o app fica fora.
 
-- Node.js 22+ e pnpm
-- Docker e Docker Compose
+```bash
+# 1. Clona o repositório e roda o assistente de configuração
+git clone https://github.com/felipegcoutinho/openmonetis.git
+cd openmonetis
+node setup.mjs
 
-### Passo a Passo
+# 2. Sobe apenas o banco em background (o app vai rodar fora do Docker)
+pnpm docker:up:db
 
-1. **Clone e instale**
+# 3. Inicia o app com hot-reload
+pnpm dev
+```
 
-   ```bash
-   git clone https://github.com/felipegcoutinho/openmonetis.git
-   cd openmonetis
-   pnpm install
-   ```
+Acesse em: `http://localhost:3000`
 
-2. **Configure o `.env`**
+---
 
-   ```bash
-   cp .env.example .env
-   ```
+### Modo 4 — Banco remoto (Supabase, Neon, Railway...)
 
-   Edite o `.env` com suas credenciais. O principal é o `DATABASE_URL` e o `BETTER_AUTH_SECRET`:
+Se você já tem um banco PostgreSQL hospedado em algum serviço externo, não precisa rodar o banco localmente. Informe a URL do banco durante o `setup.mjs` (escolha a opção "URL remota") e suba só o app:
 
-   ```env
-   # Banco local (Docker): use host "localhost"
-   DATABASE_URL=postgresql://openmonetis:openmonetis_dev_password@localhost:5432/openmonetis_db
+```bash
+node setup.mjs   # escolha "URL remota" e cole a URL do seu banco
 
-   # Banco remoto (Supabase, Neon, etc): use a URL completa do provider
-   # DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
+docker compose up
+```
 
-   BETTER_AUTH_SECRET=seu-secret-aqui  # gere com: openssl rand -base64 32
-   BETTER_AUTH_URL=http://localhost:3000
-   ```
+---
 
-3. **Suba o banco de dados** (pule se estiver usando banco remoto)
+### Comparativo
 
-   ```bash
-   docker compose up db -d
-   pnpm db:extensions
-   ```
-
-4. **Execute as migrations e inicie**
-
-   ```bash
-   pnpm db:push
-   pnpm dev
-   ```
-
-5. Acesse `http://localhost:3000`
-
-> **Docker completo** (app + banco em containers): use `pnpm docker:up:local` ao invés dos passos 3-4.
+| O que quero fazer | Comandos principais |
+|---|---|
+| Só usar, da forma mais simples | `docker-compose.yml` → `docker compose --profile local up` |
+| Usar com Google OAuth, e-mail ou IA | `node setup.mjs` → `docker compose --profile local up` |
+| Desenvolver e contribuir com o código | `node setup.mjs` → `pnpm docker:up:db` → `pnpm dev` |
+| Usar com banco remoto (Supabase etc.) | `node setup.mjs` → `docker compose up` |
 
 ---
 
@@ -263,27 +288,24 @@ Health checks configurados para ambos os serviços (PostgreSQL via `pg_isready`,
 
 **Modo 1 — App + banco local (recomendado para self-hosting)**
 
-Puxa a imagem pronta do Docker Hub e sobe app + banco juntos. Não precisa de Node.js instalado.
+Puxa a imagem pronta do Docker Hub e sobe app + banco juntos. Não precisa de Node.js instalado nem de arquivo `.env` para começar — as credenciais padrão já estão configuradas.
 
 ```bash
 # 1. Baixar o docker-compose.yml
 curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/docker-compose.yml -o docker-compose.yml
 
-# 2. Criar o .env (copie o .env.example como referência)
-# DATABASE_URL=postgresql://openmonetis:SUA_SENHA@db:5432/openmonetis_db
-# POSTGRES_PASSWORD=SUA_SENHA
-# BETTER_AUTH_SECRET=string-longa-aleatoria
-# BETTER_AUTH_URL=http://localhost:3000
-
-# 3. Subir
+# 2. Subir (sem precisar de .env)
 docker compose --profile local up
+
 # ou, se tiver o projeto clonado:
 pnpm docker:up:local
 ```
 
+> Se quiser personalizar senhas ou ativar opcionais, crie um arquivo `.env` na mesma pasta antes de subir. Veja a seção [Variáveis de Ambiente](#-variáveis-de-ambiente).
+
 **Modo 2 — App com banco remoto**
 
-Use quando o banco está em um provider externo (Supabase, Neon, Railway...).
+Use quando o banco está em um provider externo (Supabase, Neon, Railway...). Configure o `DATABASE_URL` no `.env` com a URL do seu banco e suba só o app.
 
 ```bash
 # DATABASE_URL deve apontar para o banco remoto no .env
@@ -292,11 +314,11 @@ docker compose up
 
 **Modo 3 — Build local (desenvolvimento)**
 
-Builda a imagem localmente a partir do código-fonte.
+Builda a imagem localmente a partir do código-fonte em vez de usar a imagem do Docker Hub. Útil para testar mudanças antes de publicar.
 
 ```bash
-pnpm docker:up        # app apenas (banco separado)
 pnpm docker:up:db     # sobe o banco em background
+pnpm docker:up        # builda e sobe o app localmente
 ```
 
 ### Comandos úteis

@@ -40,6 +40,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ### Removido
 
 - Scripts: removidos arquivos órfãos `scripts/dev.ts` e `scripts/setup-env.sh` (substituídos pelo `setup.mjs`)
+- Docker: `docker-compose.yml` agora funciona sem arquivo `.env` — `DATABASE_URL` tem valor padrão com credenciais de desenvolvimento
+- Docker: `docker-entrypoint.sh` converte automaticamente `@localhost:` para `@db:` na `DATABASE_URL` ao iniciar o container, eliminando a necessidade de usar hosts diferentes no `.env` para desenvolvimento local e Docker
 
 ## [2.3.6] - 2026-04-09
 

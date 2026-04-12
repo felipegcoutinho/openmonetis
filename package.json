@@ -11,7 +11,7 @@
 		"lint": "biome check .",
 		"lint:deadcode": "knip --reporter compact",
 		"lint:fix": "biome check --write .",
-		"env:setup": "bash scripts/setup-env.sh",
+		"env:setup": "node setup.mjs",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
