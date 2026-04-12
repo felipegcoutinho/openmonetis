@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.3.8] - 2026-04-12
+
+### Alterado
+
+- Docker: `docker-compose.yml` refatorado — removidos profiles, build e dependência de arquivo externo; compose agora é standalone (basta `curl` + `docker compose up -d`)
+- Docker: `docker-entrypoint.sh` simplificado — extensão `pgcrypto` criada via Node.js antes das migrations; loop de retry reescrito; removido hack `@localhost → @db`
+- Docker: scripts reduzidos de 10 para 5 — `docker:up`, `docker:db`, `docker:down`, `docker:logs`, `docker:update`
+- Docs: README reestruturado em dois perfis claros — **Usar** (só Docker) e **Desenvolver** (hot-reload)
+
 ## [2.3.7] - 2026-04-11
 
 ### Adicionado
