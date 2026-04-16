@@ -136,7 +136,7 @@ export function CardItem({
 
 						<div className="min-w-0">
 							<div className="flex items-center gap-1.5">
-								<h3 className="truncate text-sm font-medium text-foreground sm:text-base">
+								<h3 className="truncate text-sm font-semibold text-foreground sm:text-base">
 									{name}
 								</h3>
 								{note ? (
@@ -206,29 +206,29 @@ export function CardItem({
 					<>
 						<div className="grid grid-cols-3 gap-4">
 							<div className="flex flex-col items-start gap-1">
-								<p className="text-sm font-medium text-foreground">
+								<p className="text-sm font-semibold text-foreground">
 									<MoneyValues amount={metrics[0].value} />
 								</p>
-								<span className="text-xs font-medium text-muted-foreground">
+								<span className="text-xs text-muted-foreground">
 									{metrics[0].label}
 								</span>
 							</div>
 
 							<div className="flex flex-col items-center gap-1">
-								<p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+								<p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
 									<span className="size-2 rounded-full bg-primary" />
 									<MoneyValues amount={metrics[1].value} />
 								</p>
-								<span className="text-xs font-medium text-muted-foreground">
+								<span className="text-xs text-muted-foreground">
 									{metrics[1].label}
 								</span>
 							</div>
 
 							<div className="flex flex-col items-end gap-1">
-								<p className="text-sm font-medium text-foreground">
+								<p className="text-sm font-semibold text-foreground">
 									<MoneyValues amount={metrics[2].value} />
 								</p>
-								<span className="text-xs font-medium text-muted-foreground">
+								<span className="text-xs text-muted-foreground">
 									{metrics[2].label}
 								</span>
 							</div>

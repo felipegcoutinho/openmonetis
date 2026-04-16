@@ -69,9 +69,7 @@ function PdfCanvas({ url }: PdfCanvasProps) {
 		return (
 			<div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-muted/50">
 				<RiFilePdf2Line className="size-12 text-muted-foreground/40" />
-				<span className="text-xs font-medium text-muted-foreground/60">
-					PDF Protegido
-				</span>
+				<span className="text-xs text-muted-foreground/60">PDF Protegido</span>
 			</div>
 		);
 	}
@@ -153,7 +151,7 @@ export function AttachmentGridItem({
 
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<p className="truncate text-sm font-medium leading-tight text-foreground">
+							<p className="truncate text-sm font-semibold leading-tight text-foreground">
 								{attachment.fileName}
 							</p>
 						</TooltipTrigger>
@@ -180,25 +178,21 @@ export function AttachmentGridItem({
 							{attachment.transactionName}
 						</TooltipContent>
 					</Tooltip>
-					<span
-						className={cn(
-							"shrink-0 text-sm font-medium tracking-tighter tabular-nums",
-						)}
-					>
+					<span className={cn("shrink-0 text-sm font-medium tracking-tighter")}>
 						{formatCurrency(amount)}
 					</span>
 				</div>
 
 				{/* Footer: Tamanho + Botão Detalhes */}
 				<div className="mt-auto flex items-center justify-between border-t pt-3">
-					<span className="text-xs font-medium text-muted-foreground/70">
+					<span className="text-xs text-muted-foreground/70">
 						{formatBytes(attachment.fileSize)}
 					</span>
 					<button
 						type="button"
 						onClick={onDetails}
 						disabled={isLoadingDetails}
-						className="text-xs font-medium text-muted-foreground/70 underline-offset-2 hover:underline focus-visible:outline-none disabled:opacity-50"
+						className="text-xs text-muted-foreground/70 underline-offset-2 hover:underline focus-visible:outline-none disabled:opacity-50"
 					>
 						{isLoadingDetails ? "Carregando..." : "Detalhes"}
 					</button>

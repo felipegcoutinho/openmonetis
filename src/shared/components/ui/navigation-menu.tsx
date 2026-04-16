@@ -1,6 +1,6 @@
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { RiArrowDropDownLine } from "@remixicon/react";
 import { cva } from "class-variance-authority";
-import { NavigationMenu as NavigationMenuPrimitive } from "radix-ui";
 import type * as React from "react";
 import { cn } from "@/shared/utils";
 

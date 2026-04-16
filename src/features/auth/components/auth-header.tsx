@@ -8,7 +8,7 @@ interface AuthHeaderProps {
 export function AuthHeader({ title, description }: AuthHeaderProps) {
 	return (
 		<div className={cn("flex flex-col gap-2.5")}>
-			<h1 className="text-2xl font-medium tracking-tight text-card-foreground">
+			<h1 className="text-2xl font-semibold tracking-tight text-card-foreground">
 				{title}
 			</h1>
 			{description ? (

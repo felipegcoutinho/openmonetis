@@ -78,12 +78,12 @@ export function CategoryTable({
 						{periods.map((period) => (
 							<TableHead
 								key={period}
-								className="text-right min-w-[120px] font-medium"
+								className="text-right min-w-[120px] font-semibold"
 							>
 								{formatPeriodLabel(period)}
 							</TableHead>
 						))}
-						<TableHead className="text-right min-w-[140px] font-medium">
+						<TableHead className="text-right min-w-[140px] font-semibold">
 							<div className="flex items-center justify-end gap-1">
 								Média
 								<Tooltip>
@@ -100,7 +100,7 @@ export function CategoryTable({
 								</Tooltip>
 							</div>
 						</TableHead>
-						<TableHead className="text-right min-w-[120px] font-medium">
+						<TableHead className="text-right min-w-[120px] font-semibold">
 							Total
 						</TableHead>
 					</TableRow>
@@ -128,7 +128,7 @@ export function CategoryTable({
 										/>
 										<Link
 											href={`/categories/${category.categoryId}?periodo=${periodParam}`}
-											className="flex items-center gap-1.5 truncate hover:underline underline-offset-2"
+											className="flex items-center gap-1.5 truncate hover:underline underline-offset-2 font-semibold"
 										>
 											{category.name}
 										</Link>
@@ -149,7 +149,7 @@ export function CategoryTable({
 										</TableCell>
 									);
 								})}
-								<TableCell className="text-right font-medium text-info">
+								<TableCell className="text-right font-semibold text-info">
 									{(() => {
 										const nonZeroCount = periods.filter(
 											(p) => (category.monthlyData.get(p)?.amount ?? 0) > 0,
@@ -178,10 +178,10 @@ export function CategoryTable({
 								</TableCell>
 							);
 						})}
-						<TableCell className="text-right font-medium text-info">
+						<TableCell className="text-right font-semibold text-info">
 							{formatCurrency(sectionTotals.averageMonthlyTotal)}
 						</TableCell>
-						<TableCell className="text-right font-medium">
+						<TableCell className="text-right font-semibold">
 							{formatCurrency(sectionTotals.grandTotal)}
 						</TableCell>
 					</TableRow>

@@ -99,7 +99,7 @@ export async function createAccountAction(
 
 		if (hasInitialBalance && !adminPayerId) {
 			throw new Error(
-				"Payer com papel administrador não encontrado. Crie um pagador admin antes de definir um saldo inicial.",
+				"Pagador com papel administrador não encontrado. Crie um pagador admin antes de definir um saldo inicial.",
 			);
 		}
 
@@ -299,7 +299,7 @@ export async function transferBetweenAccountsAction(
 
 		if (!adminPayerId) {
 			throw new Error(
-				"Payer administrador não encontrado. Por favor, crie um pagador admin.",
+				"Pagador administrador não encontrado. Por favor, crie um pagador admin.",
 			);
 		}
 

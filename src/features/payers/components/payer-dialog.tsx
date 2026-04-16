@@ -1,6 +1,7 @@
 "use client";
+import { RiImageAddLine } from "@remixicon/react";
 import Image from "next/image";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
 	createPayerAction,
@@ -36,6 +37,45 @@ import {
 import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import { StatusSelectContent } from "./payer-select-items";
 import type { Payer, PayerFormValues } from "./types";
+
+const AVATAR_MAX_SIZE = 200;
+
+function resizeImageToBase64(file: File): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const img = new window.Image();
+			img.onload = () => {
+				let { width, height } = img;
+				if (width > height) {
+					if (width > AVATAR_MAX_SIZE) {
+						height = Math.round((height * AVATAR_MAX_SIZE) / width);
+						width = AVATAR_MAX_SIZE;
+					}
+				} else {
+					if (height > AVATAR_MAX_SIZE) {
+						width = Math.round((width * AVATAR_MAX_SIZE) / height);
+						height = AVATAR_MAX_SIZE;
+					}
+				}
+				const canvas = document.createElement("canvas");
+				canvas.width = width;
+				canvas.height = height;
+				const ctx = canvas.getContext("2d");
+				if (!ctx) {
+					reject(new Error("Canvas não disponível"));
+					return;
+				}
+				ctx.drawImage(img, 0, 0, width, height);
+				resolve(canvas.toDataURL("image/jpeg", 0.85));
+			};
+			img.onerror = () => reject(new Error("Falha ao carregar imagem"));
+			img.src = e.target?.result as string;
+		};
+		reader.onerror = () => reject(new Error("Falha ao ler arquivo"));
+		reader.readAsDataURL(file);
+	});
+}
 
 type PayerCreatePayload = Parameters<typeof createPayerAction>[0];
 
@@ -77,8 +117,10 @@ export function PayerDialog({
 }: PayerDialogProps) {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
+	const [uploadedAvatar, setUploadedAvatar] = useState<string | null>(null);
+	const [isProcessingImage, setIsProcessingImage] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	// Use controlled state hook for dialog open state
 	const [dialogOpen, setDialogOpen] = useControlledState(
 		open,
 		false,
@@ -90,26 +132,47 @@ export function PayerDialog({
 		[payer, avatarOptions],
 	);
 
-	// Use form state hook for form management
 	const { formState, resetForm, updateField } =
 		useFormState<PayerFormValues>(initialState);
 
+	// Avatares da biblioteca excluem data URLs (que ficam no círculo de upload)
 	const availableAvatars = useMemo(() => {
-		const set = new Set([
-			...avatarOptions,
-			initialState.avatarUrl,
-			DEFAULT_PAYER_AVATAR,
-		]);
+		const set = new Set([...avatarOptions, DEFAULT_PAYER_AVATAR]);
+		if (initialState.avatarUrl && !initialState.avatarUrl.startsWith("data:")) {
+			set.add(initialState.avatarUrl);
+		}
 		return Array.from(set).sort((a, b) =>
 			a.localeCompare(b, "pt-BR", { sensitivity: "base" }),
 		);
 	}, [avatarOptions, initialState.avatarUrl]);
 
-	// Reset form when dialog opens
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		setIsProcessingImage(true);
+		try {
+			const base64 = await resizeImageToBase64(file);
+			setUploadedAvatar(base64);
+			updateField("avatarUrl", base64);
+		} catch {
+			toast.error("Não foi possível processar a imagem.");
+		} finally {
+			setIsProcessingImage(false);
+			if (fileInputRef.current) fileInputRef.current.value = "";
+		}
+	};
+
 	useEffect(() => {
 		if (dialogOpen) {
 			resetForm(initialState);
 			setErrorMessage(null);
+			setIsProcessingImage(false);
+			// Se o avatar atual for um upload anterior, restaura no círculo
+			setUploadedAvatar(
+				initialState.avatarUrl.startsWith("data:")
+					? initialState.avatarUrl
+					: null,
+			);
 		}
 	}, [dialogOpen, initialState, resetForm]);
 
@@ -119,7 +182,7 @@ export function PayerDialog({
 		const payerId = payer?.id;
 
 		if (mode === "update" && !payerId) {
-			const message = "Payer inválido.";
+			const message = "Pagador inválido.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;
@@ -160,6 +223,9 @@ export function PayerDialog({
 			: "Atualize os detalhes do pagador selecionado.";
 	const submitLabel =
 		mode === "create" ? "Salvar pagador" : "Atualizar pagador";
+
+	const isUploadSelected =
+		uploadedAvatar !== null && formState.avatarUrl === uploadedAvatar;
 
 	return (
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -255,6 +321,7 @@ export function PayerDialog({
 								<div className="flex flex-wrap gap-3">
 									{availableAvatars.map((avatar) => {
 										const isSelected = avatar === formState.avatarUrl;
+										const src = getAvatarSrc(avatar);
 										return (
 											<button
 												type="button"
@@ -265,7 +332,8 @@ export function PayerDialog({
 												aria-pressed={isSelected}
 											>
 												<Image
-													src={getAvatarSrc(avatar)}
+													src={src}
+													unoptimized={src.startsWith("data:")}
 													alt={`Avatar ${avatar}`}
 													width={40}
 													height={40}
@@ -274,6 +342,43 @@ export function PayerDialog({
 											</button>
 										);
 									})}
+
+									{/* Círculo de upload — sempre o último */}
+									<input
+										ref={fileInputRef}
+										type="file"
+										accept="image/*"
+										className="hidden"
+										onChange={handleFileChange}
+									/>
+									<button
+										type="button"
+										onClick={() => fileInputRef.current?.click()}
+										disabled={isProcessingImage}
+										className="group relative flex items-center justify-center rounded-full p-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 data-[selected=true]:ring-2 data-[selected=true]:ring-primary"
+										data-selected={isUploadSelected}
+										aria-pressed={isUploadSelected}
+										aria-label="Fazer upload de foto"
+									>
+										{uploadedAvatar ? (
+											// eslint-disable-next-line @next/next/no-img-element
+											<img
+												src={uploadedAvatar}
+												alt="Avatar personalizado"
+												className="size-12 rounded-full object-cover hover:scale-110 transition-transform duration-200"
+											/>
+										) : (
+											<div className="size-12 rounded-full bg-muted border-2 border-dashed border-muted-foreground/20 flex items-center justify-center hover:scale-110 transition-transform duration-200">
+												{isProcessingImage ? (
+													<span className="text-[10px] text-muted-foreground animate-pulse">
+														...
+													</span>
+												) : (
+													<RiImageAddLine className="size-4 text-muted-foreground/50" />
+												)}
+											</div>
+										)}
+									</button>
 								</div>
 							</div>
 

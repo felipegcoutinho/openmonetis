@@ -301,7 +301,7 @@ function ErrorState({
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 py-12 px-4 text-center">
 			<div className="flex flex-col gap-2">
-				<h3 className="text-lg font-medium text-destructive">{title}</h3>
+				<h3 className="text-lg font-semibold text-destructive">{title}</h3>
 				<p className="text-sm text-muted-foreground max-w-md">{error}</p>
 			</div>
 			<Button onClick={onRetry} variant="outline">

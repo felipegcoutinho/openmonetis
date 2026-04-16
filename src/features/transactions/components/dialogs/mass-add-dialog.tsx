@@ -279,7 +279,7 @@ export function MassAddDialog({
 				<div className="space-y-4">
 					{/* Fixed Fields Section */}
 					<div className="space-y-4">
-						<h3 className="text-sm font-medium">Valores Padrão</h3>
+						<h3 className="text-sm font-semibold">Valores Padrão</h3>
 						<div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
 							{/* Transaction Type */}
 							<div className="space-y-2">
@@ -452,7 +452,7 @@ export function MassAddDialog({
 
 					{/* Transactions Section */}
 					<div className="space-y-4">
-						<h3 className="text-sm font-medium">Lançamentos</h3>
+						<h3 className="text-sm font-semibold">Lançamentos</h3>
 
 						<div className="space-y-3">
 							{transactions.map((transaction, index) => (

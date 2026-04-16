@@ -82,7 +82,7 @@ export function InsightsGrid({ insights }: InsightsGridProps) {
 							<CardHeader>
 								<div className="flex items-center gap-2">
 									<Icon className={cn("size-5", colors.chatAiIcon)} />
-									<CardTitle className={cn("font-medium", colors.titleText)}>
+									<CardTitle className={cn("font-semibold", colors.titleText)}>
 										{categoryConfig.title}
 									</CardTitle>
 								</div>

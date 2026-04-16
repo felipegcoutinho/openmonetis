@@ -51,7 +51,7 @@ export function PayerMonthlySummaryCard({
 	return (
 		<Card>
 			<CardHeader className="flex flex-col gap-1.5">
-				<CardTitle className="text-lg font-medium">Totais do mês</CardTitle>
+				<CardTitle className="text-lg font-semibold">Totais do mês</CardTitle>
 				<p className="text-xs text-muted-foreground">
 					{periodLabel} - Despesas por forma de pagamento
 				</p>
@@ -65,7 +65,7 @@ export function PayerMonthlySummaryCard({
 						</span>
 						<MoneyValues
 							amount={breakdown.totalExpenses}
-							className="block text-2xl font-medium text-foreground"
+							className="block text-2xl font-semibold text-foreground"
 						/>
 					</div>
 
@@ -100,7 +100,7 @@ export function PayerMonthlySummaryCard({
 							totalBase > 0 ? Math.round((entry.value / totalBase) * 100) : 0;
 						return (
 							<div key={entry.key} className="space-y-1 rounded-lg border p-3">
-								<span className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground/70">
+								<span className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground/70">
 									<span
 										className={cn("size-2 rounded-full", entry.color)}
 										aria-hidden
@@ -109,7 +109,7 @@ export function PayerMonthlySummaryCard({
 								</span>
 								<MoneyValues
 									amount={entry.value}
-									className="block text-lg font-medium text-foreground"
+									className="block text-lg font-semibold text-foreground"
 								/>
 								<span className="text-xs text-muted-foreground">
 									{percent}% das despesas

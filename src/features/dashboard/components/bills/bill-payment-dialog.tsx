@@ -97,7 +97,7 @@ export function BillPaymentDialog({
 									<p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
 										Boleto
 									</p>
-									<p className="text-base font-medium text-foreground">
+									<p className="text-base font-semibold text-foreground">
 										{bill.name}
 									</p>
 								</div>
@@ -113,7 +113,7 @@ export function BillPaymentDialog({
 										</div>
 										<MoneyValues
 											amount={bill.amount}
-											className="text-lg font-medium"
+											className="text-lg font-semibold"
 										/>
 									</div>
 

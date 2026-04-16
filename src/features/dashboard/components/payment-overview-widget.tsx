@@ -8,11 +8,15 @@ import { PaymentOverviewWidgetView } from "./payment-overview/payment-overview-w
 type PaymentOverviewWidgetProps = {
 	paymentConditionsData: PaymentConditionsData;
 	paymentMethodsData: PaymentMethodsData;
+	period: string;
+	adminPayerSlug: string | null;
 };
 
 export function PaymentOverviewWidget({
 	paymentConditionsData,
 	paymentMethodsData,
+	period,
+	adminPayerSlug,
 }: PaymentOverviewWidgetProps) {
 	const { activeTab, handleTabChange } = usePaymentOverviewWidgetController();
 
@@ -22,6 +26,8 @@ export function PaymentOverviewWidget({
 			paymentConditionsData={paymentConditionsData}
 			paymentMethodsData={paymentMethodsData}
 			onTabChange={handleTabChange}
+			period={period}
+			adminPayerSlug={adminPayerSlug}
 		/>
 	);
 }

@@ -1,0 +1,4 @@
+# Força LF para arquivos que precisam de line endings Unix no container
+*.sh text eol=lf
+docker-entrypoint.sh text eol=lf
+Dockerfile text eol=lf

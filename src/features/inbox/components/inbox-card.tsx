@@ -104,11 +104,11 @@ export const InboxCard = memo(function InboxCard({
 
 	return (
 		<Card
-			className={`flex h-54 flex-col gap-0 py-0 transition-colors ${selected ? "ring-2 ring-primary" : ""}`}
+			className={`flex h-54 flex-col gap-0 py-0 transition-colors ${selected ? "ring-2 ring-primary/30" : ""}`}
 		>
 			<CardHeader className="pt-4">
-				<div className="flex items-center justify-between gap-2">
-					<CardTitle className="flex min-w-0 items-center gap-1.5 text-sm">
+				<div className="flex items-center justify-between">
+					<CardTitle className="flex min-w-0 items-center gap-3 text-sm">
 						{onSelectToggle && (
 							<Checkbox
 								checked={!!selected}
@@ -117,29 +117,34 @@ export const InboxCard = memo(function InboxCard({
 								className="shrink-0"
 							/>
 						)}
-						<div className="relative size-8 shrink-0 overflow-hidden rounded-full">
+						<div className="relative shrink-0 overflow-hidden ">
 							<Image
 								src={displayLogo}
-								alt=""
-								fill
-								sizes="32px"
-								className="object-cover"
+								alt={item.sourceAppName || item.sourceApp}
+								width={40}
+								height={40}
+								className="size-10 rounded-full object-cover"
 							/>
 						</div>
-						<span className="truncate">
-							{item.sourceAppName || item.sourceApp}
-						</span>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<span className="shrink-0 cursor-default text-xs font-normal text-muted-foreground underline decoration-dotted underline-offset-2">
-									{timeAgo}
-								</span>
-							</TooltipTrigger>
-							<TooltipContent>{fullDate}</TooltipContent>
-						</Tooltip>
+						<div className="flex min-w-0 flex-col">
+							<span className="truncate font-semibold text-base">
+								{item.sourceAppName || item.sourceApp}
+							</span>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span className="cursor-default text-xs text-muted-foreground underline decoration-dotted underline-offset-2">
+										{timeAgo}
+									</span>
+								</TooltipTrigger>
+								<TooltipContent>{fullDate}</TooltipContent>
+							</Tooltip>
+						</div>
 					</CardTitle>
 					{amount !== null && (
-						<MoneyValues amount={amount} className="shrink-0 text-sm" />
+						<MoneyValues
+							amount={amount}
+							className="shrink-0 text-base font-semibold"
+						/>
 					)}
 				</div>
 			</CardHeader>

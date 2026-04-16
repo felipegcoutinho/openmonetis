@@ -19,9 +19,9 @@ export function CalendarGrid({
 }: CalendarGridProps) {
 	return (
 		<div className="overflow-hidden rounded-lg bg-card drop-shadow-xs border-none">
-			<div className="grid grid-cols-7 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+			<div className="grid grid-cols-7 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
 				{WEEK_DAYS_SHORT.map((dayName) => (
-					<span key={dayName} className="px-3 py-2 text-center text-primary">
+					<span key={dayName} className="px-3 py-2 text-center">
 						{dayName}
 					</span>
 				))}

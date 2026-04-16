@@ -15,6 +15,7 @@ import {
 } from "react";
 import {
 	PAYMENT_METHODS,
+	SETTLED_FILTER_VALUES,
 	TRANSACTION_CONDITIONS,
 	TRANSACTION_TYPES,
 } from "@/features/transactions/constants";
@@ -50,6 +51,8 @@ import {
 	SelectLabel,
 	SelectTrigger,
 } from "@/shared/components/ui/select";
+import { Switch } from "@/shared/components/ui/switch";
+import { slugify } from "@/shared/utils/string";
 import { cn } from "@/shared/utils/ui";
 import {
 	AccountCardSelectContent,
@@ -65,9 +68,6 @@ import type {
 } from "../types";
 
 const FILTER_EMPTY_VALUE = "__all";
-
-const buildStaticOptions = (values: readonly string[]) =>
-	values.map((value) => ({ value, label: value }));
 
 interface FilterSelectProps {
 	param: string;
@@ -263,7 +263,9 @@ export function TransactionsFilters({
 		searchParams.get("payment") ||
 		searchParams.get("payer") ||
 		searchParams.get("category") ||
-		searchParams.get("accountCard");
+		searchParams.get("accountCard") ||
+		searchParams.get("settled") ||
+		searchParams.get("hasAttachment");
 
 	const handleResetFilters = () => {
 		handleReset();
@@ -327,7 +329,10 @@ export function TransactionsFilters({
 									<FilterSelect
 										param="type"
 										placeholder="Todos"
-										options={buildStaticOptions(TRANSACTION_TYPES)}
+										options={TRANSACTION_TYPES.map((v) => ({
+											value: slugify(v),
+											label: v,
+										}))}
 										widthClass="w-full border-dashed"
 										disabled={isPending}
 										getParamValue={getParamValue}
@@ -345,7 +350,10 @@ export function TransactionsFilters({
 									<FilterSelect
 										param="condition"
 										placeholder="Todas"
-										options={buildStaticOptions(TRANSACTION_CONDITIONS)}
+										options={TRANSACTION_CONDITIONS.map((v) => ({
+											value: slugify(v),
+											label: v,
+										}))}
 										widthClass="w-full border-dashed"
 										disabled={isPending}
 										getParamValue={getParamValue}
@@ -363,7 +371,10 @@ export function TransactionsFilters({
 									<FilterSelect
 										param="payment"
 										placeholder="Todos"
-										options={buildStaticOptions(PAYMENT_METHODS)}
+										options={PAYMENT_METHODS.map((v) => ({
+											value: slugify(v),
+											label: v,
+										}))}
 										widthClass="w-full border-dashed"
 										disabled={isPending}
 										getParamValue={getParamValue}
@@ -546,6 +557,76 @@ export function TransactionsFilters({
 											) : null}
 										</SelectContent>
 									</Select>
+								</div>
+
+								<div className="space-y-3">
+									<p className="text-sm font-medium">Status</p>
+									<div className="space-y-3">
+										<div className="flex items-center justify-between">
+											<label
+												htmlFor="filter-pago"
+												className="text-sm text-muted-foreground cursor-pointer"
+											>
+												Somente pagos
+											</label>
+											<Switch
+												id="filter-pago"
+												checked={
+													searchParams.get("settled") ===
+													SETTLED_FILTER_VALUES.PAID
+												}
+												disabled={isPending}
+												onCheckedChange={(checked) => {
+													handleFilterChange(
+														"settled",
+														checked ? SETTLED_FILTER_VALUES.PAID : null,
+													);
+												}}
+											/>
+										</div>
+										<div className="flex items-center justify-between">
+											<label
+												htmlFor="filter-nao-pago"
+												className="text-sm text-muted-foreground cursor-pointer"
+											>
+												Somente não pagos
+											</label>
+											<Switch
+												id="filter-nao-pago"
+												checked={
+													searchParams.get("settled") ===
+													SETTLED_FILTER_VALUES.UNPAID
+												}
+												disabled={isPending}
+												onCheckedChange={(checked) => {
+													handleFilterChange(
+														"settled",
+														checked ? SETTLED_FILTER_VALUES.UNPAID : null,
+													);
+												}}
+											/>
+										</div>
+									</div>
+								</div>
+
+								<div className="flex items-center justify-between">
+									<label
+										htmlFor="filter-has-attachment"
+										className="text-sm font-medium cursor-pointer"
+									>
+										Com anexo
+									</label>
+									<Switch
+										id="filter-has-attachment"
+										checked={searchParams.get("hasAttachment") === "true"}
+										disabled={isPending}
+										onCheckedChange={(checked) => {
+											handleFilterChange(
+												"hasAttachment",
+												checked ? "true" : null,
+											);
+										}}
+									/>
 								</div>
 							</div>
 

@@ -1,138 +1,51 @@
-# Docker Compose para Next.js + PostgreSQL
 name: openmonetis
 
-# MODOS DE USO:
-# 1. Banco LOCAL (PostgreSQL em container):
-#    - Configure DATABASE_URL com host "db" no .env
-#    - Execute: docker compose --profile local up
-#
-# 2. Banco REMOTO (ex: Supabase, Neon, etc):
-#    - Configure DATABASE_URL com a URL do banco remoto no .env
-#    - Execute: docker compose up
-#
-# 3. Build local (desenvolvimento):
-#    - Execute: docker compose --profile local up --build
-#
-# 4. Para parar todos os serviços:
-#    - Execute: docker compose down
-#
-# 5. Para remover volumes (CUIDADO: apaga dados do banco local):
-#    - Execute: docker compose down -v
-
 services:
-  # ============================================
-  # Serviço: PostgreSQL (Banco de dados local)
-  # Ativado apenas com: --profile local
-  # ============================================
   db:
-    profiles: ["local"]
     image: postgres:18-alpine
     container_name: openmonetis_postgres
     restart: unless-stopped
-
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-openmonetis}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openmonetis_dev_password}
       POSTGRES_DB: ${POSTGRES_DB:-openmonetis_db}
-      PGDATA: /var/lib/postgresql/data
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
-
     ports:
       - "${DB_PORT:-5432}:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-    # Cria extensão pgcrypto inline (necessária para gen_random_bytes no schema)
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        echo 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' > /docker-entrypoint-initdb.d/init.sql
-        exec docker-entrypoint.sh postgres
-
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-openmonetis} -d ${POSTGRES_DB:-openmonetis_db}",
-        ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openmonetis} -d ${POSTGRES_DB:-openmonetis_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
-    # Para ativar logs de queries (debug), adicione ao command acima:
-    # exec docker-entrypoint.sh postgres -c log_statement=all
-
-  # ============================================
-  # Serviço: Aplicação Next.js
-  # ============================================
   app:
-    build: .
     image: felipegcoutinho/openmonetis:latest
-
     container_name: openmonetis_app
     restart: unless-stopped
-
     ports:
       - "${APP_PORT:-3000}:3000"
-
+    env_file:
+      - path: .env
+        required: false
     environment:
       NODE_ENV: production
-
-      # Banco local: use host "db" | Banco remoto: URL completa do provider
-      DATABASE_URL: ${DATABASE_URL}
-
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://openmonetis:openmonetis_dev_password@db:5432/openmonetis_db}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
-
-      # S3 (opcional)
-      S3_ENDPOINT: ${S3_ENDPOINT:-}
-      S3_REGION: ${S3_REGION:-}
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
-      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
-      S3_BUCKET: ${S3_BUCKET:-}
-
-      # Email (opcional)
-      RESEND_API_KEY: ${RESEND_API_KEY:-}
-      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
-
-      # OAuth (opcional)
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
-
-      # AI providers (opcional)
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY:-}
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-
-    # required: false permite subir sem banco local (banco remoto via DATABASE_URL)
     depends_on:
       db:
         condition: service_healthy
         required: false
-
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--quiet",
-          "--tries=1",
-          "--spider",
-          "http://localhost:3000/api/health",
-        ]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-# ============================================
-# Volumes
-# ============================================
 volumes:
   postgres_data:
     driver: local

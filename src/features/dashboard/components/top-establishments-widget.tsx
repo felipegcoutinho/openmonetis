@@ -48,7 +48,10 @@ export function TopEstablishmentsWidget({
 								</div>
 
 								<div className="shrink-0 text-foreground">
-									<MoneyValues amount={establishment.amount} />
+									<MoneyValues
+										className="font-medium"
+										amount={establishment.amount}
+									/>
 								</div>
 							</div>
 						);

@@ -53,7 +53,9 @@ export function CategoryCell({
 						>
 							{isIncrease && <RiArrowUpSFill className="h-3 w-3" />}
 							{isDecrease && <RiArrowDownSFill className="h-3 w-3" />}
-							<span>{formatPercentageChange(percentageChange)}</span>
+							<span className="font-medium">
+								{formatPercentageChange(percentageChange)}
+							</span>
 						</div>
 					)}
 				</div>

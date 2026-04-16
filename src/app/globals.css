@@ -177,7 +177,7 @@
 }
 
 @theme inline {
-  --default-font-family: var(--font-america);
+  --default-font-family: var(--font-inter);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

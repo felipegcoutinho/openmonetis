@@ -103,7 +103,7 @@ function StepCard({
 						{step}
 					</div>
 					<div className="min-w-0">
-						<h3 className="font-medium mb-1.5 md:mb-2">{title}</h3>
+						<h3 className="font-semibold mb-1.5 md:mb-2">{title}</h3>
 						{children}
 					</div>
 				</div>

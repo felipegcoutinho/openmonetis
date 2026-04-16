@@ -7,6 +7,76 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-04-13
+
+### Adicionado
+
+- Estabelecimentos: integração com Logo.dev — logos automáticos de marcas exibidos na coluna de estabelecimentos nos lançamentos
+- Estabelecimentos: picker de logo por estabelecimento — clique no avatar para buscar e fixar um domínio Logo.dev específico (salvo por usuário no banco)
+- API: rotas `/api/logo/search` e `/api/logo/mapping` — proxy seguro para Logo.dev Brand Search API (secret key server-side) e consulta de mapeamentos salvos
+- Schema: tabela `establishment_logos` com PK composta `(user_id, name_key)` para persistir preferências de logo por usuário
+
+### Corrigido
+
+- Dev: `.env.example` usava host `db` no `DATABASE_URL`, causando erro `EAI_AGAIN` ao rodar `pnpm dev` localmente — corrigido para `localhost`
+
+### Documentação
+
+- README: tabela comparativa entre Perfil 1 (Usar) e Perfil 2 (Desenvolver) com diferenças de setup, `DATABASE_URL` e instruções de atualização
+- README: seção "Variáveis de Ambiente" esclarecida — distingue contexto Docker (Perfil 1) de desenvolvimento local (Perfil 2)
+- Logo.dev: crie uma conta em logo.dev para obter as chaves `NEXT_PUBLIC_LOGO_DEV_TOKEN` e `LOGO_DEV_SECRET_KEY` — plano gratuito inclui 500.000 requisições/mês
+
+## [2.3.8] - 2026-04-12
+
+### Alterado
+
+- Docker: `docker-compose.yml` refatorado — removidos profiles, build e dependência de arquivo externo; compose agora é standalone (basta `curl` + `docker compose up -d`)
+- Docker: `docker-entrypoint.sh` simplificado — extensão `pgcrypto` criada via Node.js antes das migrations; loop de retry reescrito; removido hack `@localhost → @db`
+- Docker: scripts reduzidos de 10 para 5 — `docker:up`, `docker:db`, `docker:down`, `docker:logs`, `docker:update`
+- Docs: README reestruturado em dois perfis claros — **Usar** (só Docker) e **Desenvolver** (hot-reload)
+
+## [2.3.7] - 2026-04-11
+
+### Adicionado
+
+- Dashboard: novos widgets configuráveis — Anexos (resumo de arquivos do período), Inbox (snapshot de pré-lançamentos pendentes) e Tendências de Categoria
+- Lançamentos: filtro por status de pagamento (somente pagos / somente não pagos) e filtro por presença de anexo
+- Lançamentos: indicador visual no status de liquidação para lançamentos de cartão de crédito com fatura paga — exibe ícone verde com tooltip explicativo
+- Scripts: `scripts/install-deps.sh` — script de preparação para servidores Ubuntu 24.04 limpos (instala Docker, Node.js 22, pnpm via Homebrew)
+- Docker: variáveis `PUBLIC_DOMAIN`, `UMAMI_URL`, `UMAMI_WEBSITE_ID` e `UMAMI_DOMAINS` passadas ao container da aplicação no `docker-compose.yml`
+
+### Alterado
+
+- Fonte: substituída fonte local `America` por `Inter` (Google Fonts, self-hosted pelo Next.js) — elimina arquivos `.woff2` do repositório
+- Tipografia: peso tipográfico padronizado de `font-medium` para `font-semibold` em títulos, rótulos e valores monetários em toda a interface
+- Parcelas: redesenho do card de grupo de parcelas — expandindo para dialog de detalhes com parcelas pagas/pendentes separadas
+- Inbox: redesenho do card de pré-lançamento — logo maior, hierarquia tipográfica melhorada
+- Lançamentos: filtros de tipo, condição e forma de pagamento agora usam slugs em URL (ex: `receita` em vez do valor literal com acentos)
+- Estabelecimento: popover de autocomplete agora respeita a largura do input ao abrir
+- CSP: adicionado `frame-src` para permitir preview de anexos PDF via S3
+
+### Corrigido
+
+- Docker: corrigido crash loop no container com mensagem `exec /app/docker-entrypoint.sh: no such file or directory` causado por CRLF no `docker-entrypoint.sh` em ambientes Windows/WSL2 — adicionado `sed -i 's/\r$//'` no Dockerfile e `.gitattributes` com `eol=lf` para scripts shell
+- S3: corrigido `Error: Region is missing` ao usar o app sem S3 configurado — `S3_REGION` vazio (string vazia) não era tratado pelo operador `??`; substituído por `||` em todo o `s3-client.ts`
+- i18n: corrigidas mensagens de erro que exibiam "Payer" em inglês em vez de "Pagador"
+- Logos: corrigido modal seletor de logos de cartões e contas para renderizar miniaturas sem avisos de proporção
+- Scripts: `install-deps.sh` — spinner travava o script por `wait` retornar código não-zero com `set -e` ativo; corrigido com `|| true`
+- Scripts: `install-deps.sh` — prompt interativo do corepack suprimido com `COREPACK_ENABLE_DOWNLOAD_PROMPT=0`
+- Scripts: `install-deps.sh` — PATH do Homebrew não estava configurado na seção de resumo
+
+### Removido
+
+- Scripts: removidos arquivos órfãos `scripts/dev.ts` e `scripts/setup-env.sh` (substituídos pelo `setup.mjs`)
+- Docker: `docker-compose.yml` agora funciona sem arquivo `.env` — `DATABASE_URL` tem valor padrão com credenciais de desenvolvimento
+- Docker: `docker-entrypoint.sh` converte automaticamente `@localhost:` para `@db:` na `DATABASE_URL` ao iniciar o container, eliminando a necessidade de usar hosts diferentes no `.env` para desenvolvimento local e Docker
+
+## [2.3.6] - 2026-04-09
+
+### Corrigido
+
+- Docker: adicionado `NODE_PATH=/app/migrate/node_modules` no entrypoint para que o `drizzle-kit` consiga resolver `drizzle-orm` ao executar as migrations no container
+
 ## [2.3.5] - 2026-04-07
 
 ### Corrigido

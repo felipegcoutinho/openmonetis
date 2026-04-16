@@ -34,12 +34,12 @@ import {
 	type WidgetPreferences,
 } from "@/features/dashboard/widgets/actions";
 import {
+	type DashboardWidgetQuickActionOptions,
 	type WidgetConfig,
 	widgetsConfig,
 } from "@/features/dashboard/widgets/widgets-config";
 import { NoteDialog } from "@/features/notes/components/note-dialog";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/transaction-dialog/transaction-dialog";
-import type { SelectOption } from "@/features/transactions/components/types";
 import { ExpandableWidgetCard } from "@/shared/components/expandable-widget-card";
 import { Button } from "@/shared/components/ui/button";
 
@@ -47,15 +47,7 @@ type DashboardGridEditableProps = {
 	data: DashboardData;
 	period: string;
 	initialPreferences: WidgetPreferences | null;
-	quickActionOptions: {
-		payerOptions: SelectOption[];
-		splitPayerOptions: SelectOption[];
-		defaultPayerId: string | null;
-		accountOptions: SelectOption[];
-		cardOptions: SelectOption[];
-		categoryOptions: SelectOption[];
-		estabelecimentos: string[];
-	};
+	quickActionOptions: DashboardWidgetQuickActionOptions;
 };
 
 const DEFAULT_WIDGET_ORDER = widgetsConfig.map((widget) => widget.id);
@@ -368,11 +360,16 @@ export function DashboardGridEditable({
 										{widget.component({
 											data,
 											period,
+											adminPayerSlug:
+												quickActionOptions.payerOptions.find(
+													(p) => p.value === quickActionOptions.defaultPayerId,
+												)?.slug ?? null,
 											widgetPreferences: {
 												order: widgetOrder,
 												hidden: hiddenWidgets,
 												myAccountsShowExcluded,
 											},
+											quickActionOptions,
 											onMyAccountsShowExcludedChange: setMyAccountsShowExcluded,
 										})}
 									</ExpandableWidgetCard>

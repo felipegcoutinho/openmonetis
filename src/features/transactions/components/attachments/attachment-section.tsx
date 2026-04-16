@@ -44,8 +44,10 @@ export function AttachmentSection({
 	} = useTransactionAttachments(transactionId);
 
 	useEffect(() => {
-		onLoaded?.(items.length);
-	}, [items.length, onLoaded]);
+		if (!isLoading) {
+			onLoaded?.(items.length);
+		}
+	}, [items.length, isLoading, onLoaded]);
 
 	const invalidateAttachments = () => {
 		void queryClient.invalidateQueries({

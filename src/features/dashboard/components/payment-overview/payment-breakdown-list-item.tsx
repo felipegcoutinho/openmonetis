@@ -1,3 +1,5 @@
+import { RiExternalLinkLine } from "@remixicon/react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import {
 	formatPaymentBreakdownPercentage,
@@ -17,6 +19,7 @@ export type PaymentBreakdownListItemData = {
 	amount: number;
 	transactions: number;
 	percentage: number;
+	href?: string;
 };
 
 type PaymentBreakdownListItemProps = {
@@ -40,8 +43,21 @@ export function PaymentBreakdownListItem({
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between">
-					<p className="text-sm font-medium text-foreground">{item.title}</p>
-					<MoneyValues amount={item.amount} />
+					{item.href ? (
+						<Link
+							href={item.href}
+							className="inline-flex items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+						>
+							<span className="truncate">{item.title}</span>
+							<RiExternalLinkLine
+								className="size-3 shrink-0 text-muted-foreground"
+								aria-hidden
+							/>
+						</Link>
+					) : (
+						<p className="text-sm font-medium text-foreground">{item.title}</p>
+					)}
+					<MoneyValues className="font-medium" amount={item.amount} />
 				</div>
 
 				<div className="flex items-center justify-between text-xs text-muted-foreground">

@@ -116,7 +116,7 @@ export function InstallmentSelectionTable({
 								<TableCell className="text-muted-foreground">
 									{formatDate(inst.dueDate)}
 								</TableCell>
-								<TableCell className="text-right font-medium tabular-nums">
+								<TableCell className="text-right font-medium">
 									<MoneyValues amount={Number(inst.amount)} />
 								</TableCell>
 							</TableRow>

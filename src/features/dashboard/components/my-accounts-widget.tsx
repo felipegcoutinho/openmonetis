@@ -78,7 +78,7 @@ export function MyAccountsWidget({
 			<div className="flex items-start justify-between gap-3 py-1">
 				<div className="space-y-1">
 					<p className="text-sm text-muted-foreground">Saldo Total</p>
-					<MoneyValues className="text-2xl" amount={totalBalance} />
+					<MoneyValues className="text-2xl font-medium" amount={totalBalance} />
 				</div>
 
 				{excludedAccountsCount > 0 ? (
@@ -137,7 +137,7 @@ export function MyAccountsWidget({
 					</div>
 				) : (
 					<ul className="flex flex-col">
-						{displayedAccounts.map((account) => {
+						{displayedAccounts.map((account, index) => {
 							const logoSrc = resolveLogoSrc(account.logo);
 
 							return (
@@ -154,6 +154,7 @@ export function MyAccountsWidget({
 													fill
 													sizes="38px"
 													className="object-contain rounded-full"
+													priority={index === 0}
 												/>
 											) : null}
 										</div>
@@ -199,7 +200,10 @@ export function MyAccountsWidget({
 									</div>
 
 									<div className="flex flex-col items-end gap-0.5 text-right">
-										<MoneyValues amount={account.balance} />
+										<MoneyValues
+											className="font-medium"
+											amount={account.balance}
+										/>
 									</div>
 								</div>
 							);

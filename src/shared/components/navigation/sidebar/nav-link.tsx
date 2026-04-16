@@ -68,7 +68,7 @@ export function createSidebarNavData(
 		.map((pagador) => ({
 			title: pagador.name?.trim().length
 				? pagador.name.trim()
-				: "Payer sem nome",
+				: "Pagador sem nome",
 			url: `/payers/${pagador.id}`,
 			key: pagador.canEdit ? pagador.id : `${pagador.id}-shared`,
 			isShared: !pagador.canEdit,

@@ -46,7 +46,7 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 										<span
 											className={cn(
 												"cursor-help rounded-full py-0.5",
-												bill.isSettled && "text-success",
+												bill.isSettled && "text-success font-semibold",
 											)}
 										>
 											{statusLabel}
@@ -60,7 +60,7 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 								<span
 									className={cn(
 										"rounded-full py-0.5",
-										bill.isSettled && "text-success",
+										bill.isSettled && "text-success font-semibold",
 									)}
 								>
 									{statusLabel}
@@ -72,7 +72,7 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 			</div>
 
 			<div className="flex shrink-0 flex-col items-end">
-				<MoneyValues amount={bill.amount} />
+				<MoneyValues className="font-medium" amount={bill.amount} />
 				<Button
 					type="button"
 					size="sm"

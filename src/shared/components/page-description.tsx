@@ -9,7 +9,7 @@ export default function PageDescription({
 }) {
 	return (
 		<div>
-			<h1 className="text-xl font-medium flex items-center gap-1 tracking-tight">
+			<h1 className="text-2xl font-semibold flex items-center gap-1 ">
 				<span className="text-primary">{icon}</span>
 				{title}
 			</h1>

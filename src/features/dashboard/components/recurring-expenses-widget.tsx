@@ -45,7 +45,7 @@ export function RecurringExpensesWidget({
 									{expense.name}
 								</p>
 
-								<MoneyValues amount={expense.amount} />
+								<MoneyValues className="font-medium" amount={expense.amount} />
 							</div>
 
 							<div className="flex items-center justify-between text-xs text-muted-foreground">

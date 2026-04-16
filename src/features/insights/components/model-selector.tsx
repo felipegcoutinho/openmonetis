@@ -133,7 +133,7 @@ export function ModelSelector({
 		<Card className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-6 items-start p-6">
 			{/* Descrição */}
 			<div className="space-y-2">
-				<h3 className="text-lg font-medium">Definir modelo de análise</h3>
+				<h3 className="text-lg font-semibold">Definir modelo de análise</h3>
 				<p className="text-sm text-muted-foreground leading-relaxed">
 					Escolha o provedor de IA e o modelo específico que será utilizado para
 					gerar insights sobre seus dados financeiros. <br />

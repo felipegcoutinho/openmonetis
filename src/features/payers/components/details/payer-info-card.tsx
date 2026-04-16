@@ -31,7 +31,7 @@ export function PagadorInfoCard({ payer }: PayerInfoCardProps) {
 	return (
 		<Card className="border gap-4">
 			<CardHeader className="gap-1.5">
-				<CardTitle className="text-lg font-medium">
+				<CardTitle className="text-lg font-semibold">
 					Detalhes do pagador
 				</CardTitle>
 				<CardDescription>
@@ -106,7 +106,7 @@ export function PagadorInfoCard({ payer }: PayerInfoCardProps) {
 
 const resolveRoleLabel = (role: string | null) => {
 	if (role === PAYER_ROLE_ADMIN) return "Administrador";
-	return "Payer";
+	return "Pagador";
 };
 
 type InfoItemProps = {

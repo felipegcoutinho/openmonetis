@@ -197,7 +197,7 @@ export function PasskeysForm() {
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<div>
-					<h3 className="font-medium">Suas passkeys</h3>
+					<h3 className="font-semibold">Suas passkeys</h3>
 					<p className="text-sm text-muted-foreground">
 						Gerencie suas passkeys para login sem senha.
 					</p>

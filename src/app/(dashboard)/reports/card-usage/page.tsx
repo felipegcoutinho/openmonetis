@@ -71,7 +71,7 @@ export default async function RelatorioCartoesPage({
 					<div className="flex size-14 items-center justify-center rounded-full bg-muted mb-4">
 						<RiBankCard2Line className="size-7 text-muted-foreground" />
 					</div>
-					<p className="text-base font-medium">Nenhum cartão selecionado</p>
+					<p className="text-base font-semibold">Nenhum cartão selecionado</p>
 					<p className="text-sm text-muted-foreground mt-1">
 						Selecione um cartão para ver os detalhes de uso.
 					</p>

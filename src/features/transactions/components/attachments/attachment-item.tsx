@@ -54,6 +54,7 @@ function AttachmentPreview({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
 				showCloseButton={false}
+				aria-describedby={undefined}
 				className="flex h-[92vh] w-[min(96vw,1400px)] max-w-none flex-col gap-0 overflow-hidden p-0 sm:p-0"
 			>
 				<DialogHeader className="flex-row items-center justify-between gap-3 border-b px-4 py-3 sm:px-5">

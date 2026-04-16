@@ -83,10 +83,13 @@ export function PayersWidget({ payers }: PayersWidgetProps) {
 								</div>
 
 								<div className="flex shrink-0 flex-col items-end">
-									<MoneyValues amount={payer.totalExpenses} />
+									<MoneyValues
+										className="font-medium"
+										amount={payer.totalExpenses}
+									/>
 									{percentageChange !== null && (
 										<span
-											className={`flex items-center gap-0.5 text-xs ${
+											className={`flex items-center gap-0.5 text-xs font-medium ${
 												percentageChange > 0
 													? "text-destructive"
 													: percentageChange < 0

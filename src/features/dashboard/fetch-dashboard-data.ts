@@ -1,7 +1,9 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { fetchAttachmentsForPeriod } from "@/features/attachments/queries";
 import { fetchDashboardAccounts } from "./accounts-queries";
 import { fetchDashboardCategoryOverview } from "./category-overview-queries";
 import { fetchDashboardCurrentPeriodOverview } from "./current-period-overview-queries";
+import { fetchDashboardInboxSnapshot } from "./inbox-snapshot-queries";
 import { fetchDashboardInvoices } from "./invoices-queries";
 import { fetchDashboardNotes } from "./notes-queries";
 import { fetchDashboardPayers } from "./payers-queries";
@@ -16,6 +18,8 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		categoryOverview,
 		pagadoresSnapshot,
 		notesData,
+		allAttachments,
+		inboxSnapshot,
 	] = await Promise.all([
 		fetchDashboardPeriodOverview(userId, period),
 		fetchDashboardAccounts(userId),
@@ -24,7 +28,26 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		fetchDashboardCategoryOverview(userId, period),
 		fetchDashboardPayers(userId, period),
 		fetchDashboardNotes(userId),
+		fetchAttachmentsForPeriod(userId, period),
+		fetchDashboardInboxSnapshot(userId),
 	]);
+
+	const attachmentsSnapshot = allAttachments.reduce(
+		(acc, attachment, index) => {
+			acc.totalBytes += attachment.fileSize;
+			if (attachment.mimeType.startsWith("image/")) acc.imageCount++;
+			if (attachment.mimeType === "application/pdf") acc.pdfCount++;
+			if (index < 5) acc.recentAttachments.push(attachment);
+			return acc;
+		},
+		{
+			totalCount: allAttachments.length,
+			totalBytes: 0,
+			imageCount: 0,
+			pdfCount: 0,
+			recentAttachments: [] as typeof allAttachments,
+		},
+	);
 
 	return {
 		metrics: periodOverview.metrics,
@@ -46,6 +69,8 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		purchasesByCategoryData: currentPeriodOverview.purchasesByCategoryData,
 		incomeByCategoryData: categoryOverview.incomeByCategoryData,
 		expensesByCategoryData: categoryOverview.expensesByCategoryData,
+		attachmentsSnapshot,
+		inboxSnapshot,
 	};
 }
 

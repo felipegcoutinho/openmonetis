@@ -176,7 +176,7 @@ export function InvoiceSummaryCard({
 								</span>
 							) : null}
 							<div className="min-w-0">
-								<h2 className="truncate text-sm font-medium text-foreground">
+								<h2 className="truncate text-sm font-semibold text-foreground">
 									{cardName}
 								</h2>
 								<p className="text-xs text-muted-foreground">
@@ -189,13 +189,11 @@ export function InvoiceSummaryCard({
 
 					{/* Linha 2 — valor da fatura (hero) */}
 					<div className="space-y-4">
-						<p className="text-sm font-medium text-muted-foreground">
-							Valor da fatura
-						</p>
+						<p className="text-sm text-muted-foreground">Valor da fatura</p>
 						<MoneyValues
 							amount={totalAmount}
 							className={cn(
-								"text-3xl leading-none font-medium tracking-tight sm:text-[2rem]",
+								"text-3xl leading-none tracking-tighter sm:text-[2rem]",
 								isPaid ? "text-success" : "text-foreground",
 							)}
 						/>

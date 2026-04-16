@@ -183,7 +183,7 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 															<TableCell className="font-medium">
 																<Link
 																	href={`/categories/${category.id}`}
-																	className="inline-flex items-center gap-1 underline-offset-2 hover:text-primary hover:underline"
+																	className="inline-flex items-center gap-1 underline-offset-2 hover:text-primary hover:underline font-semibold"
 																>
 																	{category.name}
 																	<RiExternalLinkLine

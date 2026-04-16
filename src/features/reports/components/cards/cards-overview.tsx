@@ -67,11 +67,11 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 							<p className="text-xs text-muted-foreground">{card.title}</p>
 							{card.isMoney ? (
 								<MoneyValues
-									className="text-2xl font-medium"
+									className="text-2xl font-semibold"
 									amount={card.value}
 								/>
 							) : (
-								<p className="text-2xl font-medium">
+								<p className="text-2xl font-semibold">
 									{formatPercentage(card.value, {
 										maximumFractionDigits: 0,
 										minimumFractionDigits: 0,
@@ -83,7 +83,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 				))}
 			</div>
 
-			<p className="text-base font-medium ml-2 py-2">Meus cartões</p>
+			<p className="text-base font-semibold ml-2 py-2">Meus cartões</p>
 
 			{/* Cards list */}
 			<div className="grid gap-2 grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
@@ -116,7 +116,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 								</div>
 								<div className="min-w-0 flex-1 space-y-1">
 									<div className="flex items-center gap-2">
-										<span className="text-base font-medium truncate">
+										<span className="text-base font-semibold truncate">
 											{card.name}
 										</span>
 										{brandAsset && (
@@ -129,7 +129,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 											/>
 										)}
 									</div>
-									<p className="text-xs text-muted-foreground tabular-nums">
+									<p className="text-xs text-muted-foreground">
 										{formatCurrency(card.currentUsage)} /{" "}
 										{formatCurrency(card.limit)}
 									</p>
@@ -141,7 +141,7 @@ export function CardsOverview({ data }: CardsOverviewProps) {
 												`[&>div]:${getUsageColor(card.usagePercent)}`,
 											)}
 										/>
-										<span className="text-xs font-medium tabular-nums">
+										<span className="text-xs font-medium">
 											{formatPercentage(card.usagePercent, {
 												maximumFractionDigits: 0,
 												minimumFractionDigits: 0,

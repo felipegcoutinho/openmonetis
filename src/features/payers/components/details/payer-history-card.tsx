@@ -63,7 +63,7 @@ export function PayerHistoryCard({ data }: PagadorHistoryCardProps) {
 	return (
 		<Card className="border">
 			<CardHeader className="gap-1.5 pb-3">
-				<CardTitle className="text-lg font-medium">
+				<CardTitle className="text-lg font-semibold">
 					Evolução (últimos 6 meses)
 				</CardTitle>
 				<p className="text-xs text-muted-foreground">

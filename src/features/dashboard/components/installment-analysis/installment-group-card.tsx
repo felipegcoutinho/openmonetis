@@ -1,19 +1,35 @@
 "use client";
 
 import {
-	RiArrowDownSLine,
-	RiArrowRightSLine,
+	RiBankCard2Line,
 	RiCheckboxCircleFill,
+	RiEyeLine,
+	RiTimeLine,
 } from "@remixicon/react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Image from "next/image";
 import { useState } from "react";
 import MoneyValues from "@/shared/components/money-values";
 import { Badge } from "@/shared/components/ui/badge";
-import { Card, CardContent } from "@/shared/components/ui/card";
+import { Button } from "@/shared/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/shared/components/ui/card";
 import { Checkbox } from "@/shared/components/ui/checkbox";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { Progress } from "@/shared/components/ui/progress";
-import { cn } from "@/shared/utils/ui";
+import { cn } from "@/shared/utils";
 import type { InstallmentGroup } from "./types";
 
 type InstallmentGroupCardProps = {
@@ -29,17 +45,21 @@ export function InstallmentGroupCard({
 	onToggleGroup,
 	onToggleInstallment,
 }: InstallmentGroupCardProps) {
-	const [isExpanded, setIsExpanded] = useState(false);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
 	const unpaidInstallments = group.pendingInstallments.filter(
 		(i) => !i.isSettled,
 	);
-
+	const paidInstallments = group.pendingInstallments.filter((i) => i.isSettled);
 	const unpaidCount = unpaidInstallments.length;
 
 	const isFullySelected =
 		selectedInstallments.size === unpaidInstallments.length &&
 		unpaidInstallments.length > 0;
+
+	const isPartiallySelected = selectedInstallments.size > 0 && !isFullySelected;
+
+	const hasSelection = selectedInstallments.size > 0;
 
 	const progress =
 		group.totalInstallments > 0
@@ -50,186 +70,304 @@ export function InstallmentGroupCard({
 		.filter((i) => selectedInstallments.has(i.id) && !i.isSettled)
 		.reduce((sum, i) => sum + Number(i.amount), 0);
 
-	// Calcular valor total de todas as parcelas (pagas + pendentes)
 	const totalAmount = group.pendingInstallments.reduce(
 		(sum, i) => sum + i.amount,
 		0,
 	);
 
-	// Calcular valor pendente (apenas não pagas)
 	const pendingAmount = unpaidInstallments.reduce(
 		(sum, i) => sum + i.amount,
 		0,
 	);
 
 	return (
-		<Card className={cn(isFullySelected && "border-primary/50")}>
-			<CardContent className="flex flex-col gap-2">
-				{/* Header do card */}
-				<div className="flex items-start gap-3">
-					<Checkbox
-						checked={isFullySelected}
-						onCheckedChange={onToggleGroup}
-						className="mt-1"
-						aria-label={`Selecionar todas as parcelas de ${group.name}`}
-					/>
+		<>
+			<Card
+				className={cn(
+					"overflow-hidden transition-all duration-300",
+					isFullySelected && "ring-2 ring-primary/30 border-primary/50",
+					isPartiallySelected && "border-primary/30",
+				)}
+			>
+				{/* Header Section */}
+				<CardHeader className="pb-0">
+					<div className="flex items-start gap-2">
+						{/* Checkbox de seleção do grupo */}
+						<div className="pt-1">
+							<Checkbox
+								checked={
+									isFullySelected
+										? true
+										: isPartiallySelected
+											? "indeterminate"
+											: false
+								}
+								onCheckedChange={onToggleGroup}
+								className="size-4"
+								aria-label={`Selecionar todas as parcelas de ${group.name}`}
+							/>
+						</div>
 
-					<div className="min-w-0 flex-1">
-						<div className="flex flex-col gap-1">
-							<div className="flex gap-1 items-center flex-wrap">
-								{group.cartaoLogo && (
-									<img
+						{/* Info principal */}
+						<div className="flex-1 min-w-0">
+							<div className="flex items-center gap-3 flex-wrap">
+								{group.cartaoLogo ? (
+									<Image
 										src={`/logos/${group.cartaoLogo}`}
 										alt={group.cartaoName ?? "Cartão"}
-										className="h-6 w-auto object-contain rounded"
+										width={40}
+										height={40}
+										className="size-10 rounded-full object-cover"
 									/>
+								) : (
+									<div className="size-10 flex items-center justify-center">
+										<RiBankCard2Line className="size-5 text-muted-foreground" />
+									</div>
 								)}
-								<span className="font-medium truncate">{group.name}</span>
-								<span className="text-xs text-muted-foreground">
-									| {group.cartaoName}
-								</span>
-							</div>
-
-							<div className="flex items-center gap-3 flex-wrap">
-								<div className="flex items-center gap-1">
-									<span className="text-xs text-muted-foreground">Total:</span>
-									<MoneyValues
-										amount={totalAmount}
-										className="text-base font-medium"
-									/>
-								</div>
-								<div className="flex items-center gap-1">
-									<span className="text-xs text-muted-foreground">
-										Pendente:
-									</span>
-									<MoneyValues
-										amount={pendingAmount}
-										className="text-sm font-medium text-primary"
-									/>
+								<div className="flex-1 min-w-0">
+									<CardTitle className="text-base truncate">
+										{group.name}
+									</CardTitle>
+									<CardDescription className="text-xs">
+										{group.cartaoName ?? "Compra parcelada"}
+									</CardDescription>
 								</div>
 							</div>
 						</div>
 
-						{/* Progress bar */}
-						<div className="mt-3">
-							<div className="mb-2 flex flex-wrap items-center px-1 justify-between gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+						{/* Badge de status */}
+						<Badge
+							variant={progress === 100 ? "default" : "outline"}
+							className={cn("shrink-0", progress === 100 && "bg-success")}
+						>
+							{progress === 100 ? "Quitado" : `${Math.round(progress)}% pago`}
+						</Badge>
+					</div>
+				</CardHeader>
+
+				<CardContent>
+					{/* Grid de valores */}
+					<div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-muted/50 mb-4">
+						<div className="space-y-1">
+							<p className="text-xs text-muted-foreground font-medium">
+								Valor total
+							</p>
+							<MoneyValues
+								amount={totalAmount}
+								className="text-lg font-semibold text-foreground"
+							/>
+						</div>
+						<div className="space-y-1 text-right">
+							<p className="text-xs text-muted-foreground font-medium">
+								Pendente
+							</p>
+							<MoneyValues
+								amount={pendingAmount}
+								className={cn(
+									"text-lg font-semibold",
+									pendingAmount > 0 ? "text-amber-600" : "text-success-600",
+								)}
+							/>
+						</div>
+					</div>
+
+					{/* Barra de progresso */}
+					<div className="space-y-2 mb-4">
+						<div className="flex items-center justify-between text-xs">
+							<div className="flex items-center gap-1 text-muted-foreground">
+								<RiCheckboxCircleFill className="size-3.5 text-success" />
 								<span>
-									{group.paidInstallments} de {group.totalInstallments} pagas
+									{group.paidInstallments} de {group.totalInstallments} parcelas
+									pagas
 								</span>
-								<div className="flex items-center gap-2 flex-wrap">
+							</div>
+							{unpaidCount > 0 && (
+								<div className="flex items-center gap-1 text-muted-foreground">
+									<RiTimeLine className="size-3.5 text-amber-600" />
 									<span>
 										{unpaidCount} {unpaidCount === 1 ? "pendente" : "pendentes"}
 									</span>
-									{selectedInstallments.size > 0 && (
-										<span className="text-primary font-medium">
-											• Selecionado:{" "}
-											<MoneyValues
-												amount={selectedAmount}
-												className="text-xs font-medium text-primary inline"
-											/>
-										</span>
-									)}
 								</div>
-							</div>
-							<Progress value={progress} className="h-2" />
-						</div>
-
-						{/* Botão de expandir */}
-						<button
-							type="button"
-							onClick={() => setIsExpanded(!isExpanded)}
-							className="mt-2 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-						>
-							{isExpanded ? (
-								<>
-									<RiArrowDownSLine className="size-4" />
-									Ocultar parcelas ({group.pendingInstallments.length})
-								</>
-							) : (
-								<>
-									<RiArrowRightSLine className="size-4" />
-									Ver parcelas ({group.pendingInstallments.length})
-								</>
 							)}
-						</button>
+						</div>
+						<Progress value={progress} className="h-2.5" />
 					</div>
-				</div>
 
-				{/* Lista de parcelas expandida */}
-				{isExpanded && (
-					<div className="px-2 sm:px-8 mt-2 flex flex-col gap-2">
-						{group.pendingInstallments.map((installment) => {
-							const isSelected = selectedInstallments.has(installment.id);
-							const isPaid = installment.isSettled;
-							const dueDate = installment.dueDate
-								? format(installment.dueDate, "dd/MM/yyyy", { locale: ptBR })
-								: format(installment.purchaseDate, "dd/MM/yyyy", {
-										locale: ptBR,
-									});
+					{/* Valor selecionado */}
+					{hasSelection && (
+						<div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/20 mb-4">
+							<span className="text-sm font-medium text-foreground">
+								{selectedInstallments.size}{" "}
+								{selectedInstallments.size === 1
+									? "parcela selecionada"
+									: "parcelas selecionadas"}
+							</span>
+							<MoneyValues
+								amount={selectedAmount}
+								className="text-base font-semibold text-primary"
+							/>
+						</div>
+					)}
 
-							return (
-								<div
-									key={installment.id}
-									className={cn(
-										"flex items-center gap-3 rounded-md border p-2 transition-colors",
-										isSelected && !isPaid && "border-primary/50 bg-primary/5",
-										isPaid &&
-											"border-success/40 bg-success/5 dark:border-success/20 dark:bg-success/5",
-									)}
-								>
-									<Checkbox
-										checked={isPaid ? false : isSelected}
-										disabled={isPaid}
-										onCheckedChange={() =>
-											!isPaid && onToggleInstallment(installment.id)
-										}
-										aria-label={`Selecionar parcela ${installment.currentInstallment} de ${group.totalInstallments}`}
-									/>
+					{/* Botão para abrir detalhes */}
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						className="w-full gap-1.5"
+						onClick={() => setIsDetailsOpen(true)}
+					>
+						<RiEyeLine className="size-4" />
+						Ver detalhes ({group.pendingInstallments.length} parcelas)
+					</Button>
+				</CardContent>
+			</Card>
 
-									<div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-										<div className="min-w-0">
-											<p
-												className={cn(
-													"text-xs font-medium",
-													isPaid &&
-														"text-success line-through decoration-success/50",
-												)}
-											>
-												Parcela {installment.currentInstallment}/
-												{group.totalInstallments}
-												{isPaid && (
-													<Badge
-														variant="outline"
-														className="ml-1 text-xs border-none text-success"
-													>
-														<RiCheckboxCircleFill /> Pago
-													</Badge>
-												)}
-											</p>
-											<p
-												className={cn(
-													"text-xs mt-1",
-													isPaid ? "text-success" : "text-muted-foreground",
-												)}
-											>
-												Vencimento: {dueDate}
-											</p>
-										</div>
-
-										<MoneyValues
-											amount={installment.amount}
-											className={cn(
-												"shrink-0 text-sm",
-												isPaid && "text-success",
-											)}
-										/>
-									</div>
+			{/* Modal de detalhes */}
+			<Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+				<DialogContent className="max-w-md max-h-[80vh] flex flex-col">
+					<DialogHeader>
+						<div className="flex items-center gap-3">
+							{group.cartaoLogo ? (
+								<img
+									src={`/logos/${group.cartaoLogo}`}
+									alt={group.cartaoName ?? "Cartão"}
+									className="size-8 rounded-full object-cover"
+								/>
+							) : (
+								<div className="size-8 rounded-full bg-muted flex items-center justify-center">
+									<RiBankCard2Line className="size-4 text-muted-foreground" />
 								</div>
-							);
-						})}
+							)}
+							<DialogTitle className="text-base">{group.name}</DialogTitle>
+						</div>
+						<DialogDescription className="sr-only">
+							Detalhes das parcelas do grupo {group.name}
+						</DialogDescription>
+					</DialogHeader>
+
+					<div className="overflow-y-auto flex-1 space-y-4 pr-1">
+						{/* Parcelas pagas */}
+						{paidInstallments.length > 0 && (
+							<div className="space-y-2">
+								<p className="text-xs font-medium text-muted-foreground">
+									Parcelas pagas
+								</p>
+								{paidInstallments.map((installment) => {
+									const dueDate = installment.dueDate
+										? format(installment.dueDate, "dd MMM yyyy", {
+												locale: ptBR,
+											})
+										: format(installment.purchaseDate, "dd MMM yyyy", {
+												locale: ptBR,
+											});
+
+									return (
+										<div
+											key={installment.id}
+											className="flex items-center gap-3 p-3 rounded-lg bg-success/5 dark:bg-success/10 border border-success/20 dark:border-success/10"
+										>
+											<div className="size-8 rounded-full flex items-center justify-center shrink-0">
+												<RiCheckboxCircleFill className="size-6 text-success" />
+											</div>
+
+											<div className="flex-1 min-w-0">
+												<p className="text-sm text-success">
+													Parcela {installment.currentInstallment}/
+													{group.totalInstallments}
+												</p>
+												<p className="text-xs text-success/80">
+													Vencimento: {dueDate}
+												</p>
+											</div>
+
+											<MoneyValues
+												amount={installment.amount}
+												className="text-sm font-semibold text-success shrink-0"
+											/>
+										</div>
+									);
+								})}
+							</div>
+						)}
+
+						{/* Parcelas pendentes */}
+						{unpaidInstallments.length > 0 && (
+							<div className="space-y-2">
+								<p className="text-xs font-medium text-muted-foreground">
+									Parcelas pendentes
+								</p>
+								{unpaidInstallments.map((installment) => {
+									const isSelected = selectedInstallments.has(installment.id);
+									const dueDate = installment.dueDate
+										? format(installment.dueDate, "dd MMM yyyy", {
+												locale: ptBR,
+											})
+										: format(installment.purchaseDate, "dd MMM yyyy", {
+												locale: ptBR,
+											});
+
+									return (
+										<label
+											key={installment.id}
+											className={cn(
+												"flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
+												isSelected
+													? "bg-primary/5 border-primary/30 shadow-sm"
+													: "bg-card hover:bg-muted/50 hover:border-border",
+											)}
+										>
+											<Checkbox
+												checked={isSelected}
+												onCheckedChange={() =>
+													onToggleInstallment(installment.id)
+												}
+												className="size-5"
+												aria-label={`Selecionar parcela ${installment.currentInstallment} de ${group.totalInstallments}`}
+											/>
+
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-medium">
+													Parcela {installment.currentInstallment}/
+													{group.totalInstallments}
+												</p>
+												<p className="text-xs text-muted-foreground flex items-center gap-1">
+													<RiTimeLine className="size-3 text-amber-600" />
+													Vencimento: {dueDate}
+												</p>
+											</div>
+
+											<MoneyValues
+												amount={installment.amount}
+												className={cn(
+													"text-sm font-semibold shrink-0",
+													isSelected ? "text-primary" : "text-foreground",
+												)}
+											/>
+										</label>
+									);
+								})}
+							</div>
+						)}
 					</div>
-				)}
-			</CardContent>
-		</Card>
+
+					{/* Footer com resumo da seleção */}
+					{hasSelection && (
+						<div className="border-t pt-3 mt-1 flex items-center justify-between">
+							<span className="text-sm text-muted-foreground">
+								{selectedInstallments.size}{" "}
+								{selectedInstallments.size === 1
+									? "parcela selecionada"
+									: "parcelas selecionadas"}
+							</span>
+							<MoneyValues
+								amount={selectedAmount}
+								className="text-base font-bold text-primary"
+							/>
+						</div>
+					)}
+				</DialogContent>
+			</Dialog>
+		</>
 	);
 }

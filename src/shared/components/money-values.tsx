@@ -20,9 +20,9 @@ function MoneyValues({ amount, className, showPositiveSign = false }: Props) {
 	return (
 		<span
 			className={cn(
-				"inline-flex items-baseline transition-all duration-200 tracking-tighter",
+				"inline-flex items-baseline tabular-nums transition-all duration-200 tracking-tighter",
 				privacyMode &&
-					"blur-[6px] select-none hover:blur-none focus-within:blur-none",
+					"blur-sm select-none hover:blur-none focus-within:blur-none",
 				className,
 			)}
 			aria-label={privacyMode ? "Valor oculto" : displayValue}

@@ -15,6 +15,7 @@ export function useTransactionAttachments(transactionId: string) {
 				`/api/transactions/${transactionId}/attachments`,
 			),
 		enabled: Boolean(transactionId),
-		staleTime: 30_000,
+		staleTime: 50 * 60 * 1000, // 50 min — presigned URLs duram 1h
+		gcTime: 60 * 60 * 1000, // 1h — mantém cache enquanto URL é válida
 	});
 }

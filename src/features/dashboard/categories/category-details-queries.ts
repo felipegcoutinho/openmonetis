@@ -5,7 +5,10 @@ import {
 	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
 	INITIAL_BALANCE_NOTE,
 } from "@/shared/lib/accounts/constants";
-import type { CategoryType } from "@/shared/lib/categories/constants";
+import {
+	type CategoryType,
+	INVOICE_PAYMENT_CATEGORY_NAME,
+} from "@/shared/lib/categories/constants";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { calculatePercentageChange } from "@/shared/utils/math";
@@ -45,6 +48,7 @@ export async function fetchCategoryDetails(
 	const previousPeriod = getPreviousPeriod(period);
 	const transactionType = category.type === "receita" ? "Receita" : "Despesa";
 	const adminPayerId = await getAdminPayerId(userId);
+	const isInvoiceCategory = category.name === INVOICE_PAYMENT_CATEGORY_NAME;
 
 	const sanitizedNote = or(
 		isNull(transactions.note),
@@ -59,7 +63,7 @@ export async function fetchCategoryDetails(
 					eq(transactions.transactionType, transactionType),
 					eq(transactions.period, period),
 					eq(transactions.payerId, adminPayerId),
-					sanitizedNote,
+					...(isInvoiceCategory ? [] : [sanitizedNote]),
 				),
 				with: {
 					payer: true,
@@ -108,7 +112,7 @@ export async function fetchCategoryDetails(
 						eq(transactions.categoryId, categoryId),
 						eq(transactions.transactionType, transactionType),
 						eq(transactions.payerId, adminPayerId),
-						sanitizedNote,
+						...(isInvoiceCategory ? [] : [sanitizedNote]),
 						eq(transactions.period, previousPeriod),
 						or(
 							isNull(transactions.note),

@@ -34,21 +34,26 @@ function buildCsp(): string {
 		}
 	})();
 
-	const connectExtras = ["https://umami.felipecoutinho.com", s3Origin]
-		.filter(Boolean)
-		.join(" ");
+	const umamiOrigin = process.env.UMAMI_URL ?? "";
 
-	const imgExtras = ["https://lh3.googleusercontent.com", s3Origin]
+	const connectExtras = [umamiOrigin, s3Origin].filter(Boolean).join(" ");
+
+	const imgExtras = [
+		"https://lh3.googleusercontent.com",
+		"https://img.logo.dev",
+		s3Origin,
+	]
 		.filter(Boolean)
 		.join(" ");
 
 	return [
 		"default-src 'self'",
-		`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://umami.felipecoutinho.com`,
+		`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${umamiOrigin ? ` ${umamiOrigin}` : ""}`,
 		"style-src 'self' 'unsafe-inline'",
 		`img-src 'self' ${imgExtras} data: blob:`,
 		"font-src 'self'",
 		`connect-src 'self' ${connectExtras}`,
+		`frame-src 'self'${s3Origin ? ` ${s3Origin}` : ""}`,
 		"frame-ancestors 'none'",
 	].join("; ");
 }

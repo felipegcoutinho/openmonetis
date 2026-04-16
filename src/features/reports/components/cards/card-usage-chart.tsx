@@ -142,7 +142,7 @@ export function CardUsageChart({ data, limit, card }: CardUsageChartProps) {
 												<span className="text-xs text-muted-foreground">
 													Uso
 												</span>
-												<span className="text-xs font-medium tabular-nums">
+												<span className="text-xs font-medium">
 													{formatCurrency(value, {
 														maximumFractionDigits: 0,
 														minimumFractionDigits: 0,
@@ -154,7 +154,7 @@ export function CardUsageChart({ data, limit, card }: CardUsageChartProps) {
 													<span className="text-xs text-muted-foreground">
 														% do Limite
 													</span>
-													<span className="text-xs font-medium tabular-nums">
+													<span className="text-xs font-medium">
 														{formatPercentage(usagePercent, {
 															maximumFractionDigits: 0,
 															minimumFractionDigits: 0,

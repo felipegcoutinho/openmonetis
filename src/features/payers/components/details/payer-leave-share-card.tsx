@@ -53,7 +53,7 @@ export function PayerLeaveShareCard({
 	return (
 		<Card className="border">
 			<CardHeader>
-				<CardTitle className="text-base font-medium">
+				<CardTitle className="text-base font-semibold">
 					Acesso Compartilhado
 				</CardTitle>
 				<p className="text-sm text-muted-foreground">

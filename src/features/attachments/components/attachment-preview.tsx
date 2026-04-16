@@ -105,7 +105,7 @@ export function AttachmentPreview({
 								>
 									<RiArrowLeftSLine className="size-4" />
 								</Button>
-								<span className="select-none text-xs text-muted-foreground tabular-nums">
+								<span className="select-none text-xs text-muted-foreground">
 									{currentIndex + 1} / {attachments.length}
 								</span>
 								<Button

@@ -34,7 +34,7 @@ export function CalculatorDisplay({
 			<div className="mt-auto flex items-end justify-end gap-2">
 				<div
 					className={cn(
-						"truncate text-right font-medium tracking-tight tabular-nums leading-none transition-all",
+						"truncate text-right font-medium tracking-tight leading-none transition-all",
 						isResultView ? "text-2xl" : "text-3xl",
 					)}
 				>

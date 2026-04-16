@@ -113,7 +113,7 @@ export function InvoicePaymentDialog({
 										<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 											Cartão
 										</p>
-										<p className="truncate text-base font-medium text-foreground">
+										<p className="truncate text-base font-semibold text-foreground">
 											{invoice.cardName}
 										</p>
 									</div>
@@ -130,7 +130,7 @@ export function InvoicePaymentDialog({
 										</div>
 										<MoneyValues
 											amount={Math.abs(invoice.totalAmount)}
-											className="text-lg font-medium"
+											className="text-lg font-semibold"
 										/>
 									</div>
 

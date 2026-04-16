@@ -130,7 +130,7 @@ const renderCard = (event: Extract<CalendarEvent, { type: "card" }>) => (
 			<div className="flex flex-col gap-1">
 				<div className="flex gap-1 items-center">
 					<span className="text-sm font-medium leading-tight">
-						Vencimento Invoice - {event.card.name}
+						Vencimento Fatura - {event.card.name}
 					</span>
 				</div>
 

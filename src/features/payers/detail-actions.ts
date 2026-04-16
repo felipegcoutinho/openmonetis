@@ -404,7 +404,7 @@ export async function sendPayerSummaryAction(
 		});
 
 		if (!pagadorRow) {
-			return { success: false, error: "Payer não encontrado." };
+			return { success: false, error: "Pagador não encontrado." };
 		}
 
 		if (!pagadorRow.email) {

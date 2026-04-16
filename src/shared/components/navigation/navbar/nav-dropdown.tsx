@@ -42,7 +42,7 @@ export function NavDropdown({ items }: NavDropdownProps) {
 								{item.icon}
 							</span>
 							<span className="flex flex-col min-w-0">
-								<span className="font-medium">{item.label}</span>
+								<span className="font-semibold">{item.label}</span>
 								{item.description && (
 									<span className="text-xs text-muted-foreground truncate lowercase">
 										{item.description}

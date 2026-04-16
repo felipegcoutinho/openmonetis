@@ -145,7 +145,7 @@ export function PreferencesForm({
 			{/* Seção: Lançamentos */}
 			<section className="space-y-4">
 				<div>
-					<h3 className="text-base font-medium">Lançamentos</h3>
+					<h3 className="text-base font-semibold">Lançamentos</h3>
 					<p className="text-sm text-muted-foreground">
 						Configurações de exibição da tabela de movimentações.
 					</p>

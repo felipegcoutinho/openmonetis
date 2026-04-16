@@ -84,7 +84,7 @@ export function AnticipationCard({
 				<dl className="grid grid-cols-2 gap-3 text-sm">
 					<div>
 						<dt className="text-muted-foreground">Valor Original</dt>
-						<dd className="mt-1 font-medium tabular-nums">
+						<dd className="mt-1 font-medium">
 							<MoneyValues amount={Number(anticipation.totalAmount)} />
 						</dd>
 					</div>
@@ -92,7 +92,7 @@ export function AnticipationCard({
 					{Number(anticipation.discount) > 0 && (
 						<div>
 							<dt className="text-muted-foreground">Desconto</dt>
-							<dd className="mt-1 font-medium tabular-nums text-success">
+							<dd className="mt-1 font-medium text-success">
 								- <MoneyValues amount={Number(anticipation.discount)} />
 							</dd>
 						</div>
@@ -110,7 +110,7 @@ export function AnticipationCard({
 								? "Valor Final"
 								: "Valor Total"}
 						</dt>
-						<dd className="mt-1 text-lg font-medium tabular-nums text-primary">
+						<dd className="mt-1 text-lg font-semibold text-primary">
 							<MoneyValues
 								amount={
 									Number(anticipation.totalAmount) < 0

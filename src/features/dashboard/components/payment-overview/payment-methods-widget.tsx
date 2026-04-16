@@ -1,6 +1,8 @@
 import { RiBankCard2Line, RiMoneyDollarCircleLine } from "@remixicon/react";
 import type { PaymentMethodsData } from "@/features/dashboard/payments/payment-methods-queries";
 import { getPaymentMethodIcon } from "@/shared/utils/icons";
+import { formatPeriodForUrl } from "@/shared/utils/period";
+import { slugify } from "@/shared/utils/string";
 import {
 	PaymentBreakdownList,
 	type PaymentBreakdownListItemData,
@@ -8,6 +10,8 @@ import {
 
 type PaymentMethodsWidgetProps = {
 	data: PaymentMethodsData;
+	period: string;
+	adminPayerSlug: string | null;
 };
 
 const resolvePaymentMethodIcon = (paymentMethod: string) =>
@@ -15,15 +19,28 @@ const resolvePaymentMethodIcon = (paymentMethod: string) =>
 		<RiBankCard2Line className="size-5" aria-hidden />
 	);
 
-export function PaymentMethodsWidget({ data }: PaymentMethodsWidgetProps) {
-	const items: PaymentBreakdownListItemData[] = data.methods.map((method) => ({
-		id: method.paymentMethod,
-		title: method.paymentMethod,
-		icon: resolvePaymentMethodIcon(method.paymentMethod),
-		amount: method.amount,
-		transactions: method.transactions,
-		percentage: method.percentage,
-	}));
+export function PaymentMethodsWidget({
+	data,
+	period,
+	adminPayerSlug,
+}: PaymentMethodsWidgetProps) {
+	const items: PaymentBreakdownListItemData[] = data.methods.map((method) => {
+		const params = new URLSearchParams({
+			type: slugify("Despesa"),
+			payment: slugify(method.paymentMethod),
+			periodo: formatPeriodForUrl(period),
+		});
+		if (adminPayerSlug) params.set("payer", adminPayerSlug);
+		return {
+			id: method.paymentMethod,
+			title: method.paymentMethod,
+			icon: resolvePaymentMethodIcon(method.paymentMethod),
+			amount: method.amount,
+			transactions: method.transactions,
+			percentage: method.percentage,
+			href: `/transactions?${params.toString()}`,
+		};
+	});
 
 	return (
 		<PaymentBreakdownList

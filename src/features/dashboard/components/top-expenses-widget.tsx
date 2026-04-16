@@ -113,7 +113,10 @@ export function TopExpensesWidget({
 								</div>
 
 								<div className="shrink-0 text-foreground">
-									<MoneyValues amount={expense.amount} />
+									<MoneyValues
+										className="font-medium"
+										amount={expense.amount}
+									/>
 								</div>
 							</div>
 						);

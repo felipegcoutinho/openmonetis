@@ -77,7 +77,7 @@ export function NoteCard({
 			<CardContent className="flex min-h-0 flex-1 flex-col gap-4">
 				<div className="flex shrink-0 items-start justify-between gap-3">
 					<div className="flex min-w-0 flex-col gap-1">
-						<h3 className="text-lg font-medium leading-tight text-foreground wrap-break-word">
+						<h3 className="text-lg font-semibold text-foreground wrap-break-word">
 							{displayTitle}
 						</h3>
 						{createdAtLabel && (

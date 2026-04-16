@@ -130,7 +130,7 @@ export async function updatePayerAction(
 		if (!existing) {
 			return {
 				success: false,
-				error: "Payer não encontrado.",
+				error: "Pagador não encontrado.",
 			};
 		}
 
@@ -180,7 +180,7 @@ export async function deletePayerAction(
 		if (!existing) {
 			return {
 				success: false,
-				error: "Payer não encontrado.",
+				error: "Pagador não encontrado.",
 			};
 		}
 

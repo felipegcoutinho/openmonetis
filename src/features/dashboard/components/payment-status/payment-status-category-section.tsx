@@ -24,10 +24,7 @@ export function PaymentStatusCategorySection({
 		<div className="mt-4 space-y-3">
 			<div className="flex items-center justify-between">
 				<span className="text-sm font-medium text-foreground">{title}</span>
-				<MoneyValues
-					amount={total}
-					className="text-sm font-medium tabular-nums"
-				/>
+				<MoneyValues amount={total} className="font-medium" />
 			</div>
 
 			<Progress value={confirmedPercentage} className="h-2" />
@@ -35,13 +32,13 @@ export function PaymentStatusCategorySection({
 			<div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4">
 				<div className="flex items-center gap-1.5">
 					<StatusDot color="bg-primary" />
-					<MoneyValues amount={confirmed} className="tabular-nums" />
+					<MoneyValues amount={confirmed} className="font-medium" />
 					<span className="text-xs text-muted-foreground">confirmados</span>
 				</div>
 
 				<div className="flex items-center gap-1.5">
 					<StatusDot color="bg-warning/40" />
-					<MoneyValues amount={pending} className="tabular-nums" />
+					<MoneyValues amount={pending} className="font-medium" />
 					<span className="text-xs text-muted-foreground">pendentes</span>
 				</div>
 			</div>

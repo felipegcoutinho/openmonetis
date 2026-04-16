@@ -19,8 +19,6 @@ import { TransactionDetailsDialog } from "@/features/transactions/components/dia
 import { TransactionDialog } from "@/features/transactions/components/dialogs/transaction-dialog/transaction-dialog";
 import type { TransactionItem } from "@/features/transactions/components/types";
 import { EmptyState } from "@/shared/components/empty-state";
-import MonthNavigation from "@/shared/components/month-picker/month-navigation";
-import PageDescription from "@/shared/components/page-description";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { cn } from "@/shared/utils/ui";
 
@@ -143,14 +141,6 @@ export function AttachmentsPage({ attachments }: AttachmentsPageProps) {
 
 	return (
 		<div className="w-full space-y-6">
-			<PageDescription
-				icon={<RiAttachmentLine className="size-5" />}
-				title="Anexos"
-				subtitle="Comprovantes e documentos dos seus lançamentos no mês."
-			/>
-
-			<MonthNavigation />
-
 			<Card>
 				<CardContent>
 					{attachments.length === 0 ? (

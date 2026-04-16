@@ -721,6 +721,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	installmentAnticipations: many(installmentAnticipations),
 	apiTokens: many(apiTokens),
 	inboxItems: many(inboxItems),
+	establishmentLogos: many(establishmentLogos),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -955,6 +956,25 @@ export const importCategoryMappings = pgTable(
 	}),
 );
 
+export const establishmentLogos = pgTable(
+	"establishment_logos",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		nameKey: text("name_key").notNull(),
+		domain: text("domain").notNull(),
+		updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.nameKey] }),
+	}),
+);
+
+export type EstablishmentLogo = typeof establishmentLogos.$inferSelect;
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Account = typeof account.$inferSelect;
@@ -1004,3 +1024,13 @@ export const transactionAttachmentsRelations = relations(
 
 export type Attachment = typeof attachments.$inferSelect;
 export type TransactionAttachment = typeof transactionAttachments.$inferSelect;
+
+export const establishmentLogosRelations = relations(
+	establishmentLogos,
+	({ one }) => ({
+		user: one(user, {
+			fields: [establishmentLogos.userId],
+			references: [user.id],
+		}),
+	}),
+);

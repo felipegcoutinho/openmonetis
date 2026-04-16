@@ -1,6 +1,8 @@
 "use client";
 
 import {
+	RiCheckLine,
+	RiFileCopyLine,
 	RiHistoryLine,
 	RiLogoutCircleLine,
 	RiMegaphoneLine,
@@ -23,6 +25,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Spinner } from "@/shared/components/ui/spinner";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { authClient } from "@/shared/lib/auth/client";
 import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import type { UpdateCheckResult } from "@/shared/lib/version/check-update";
@@ -50,10 +57,18 @@ export function NavbarUser({
 	const router = useRouter();
 	const [logoutLoading, setLogoutLoading] = useState(false);
 	const [feedbackOpen, setFeedbackOpen] = useState(false);
+	const [copied, setCopied] = useState(false);
+
+	function handleCopyId() {
+		navigator.clipboard.writeText(user.id);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
+	}
 
 	const avatarSrc = pagadorAvatarUrl
 		? getAvatarSrc(pagadorAvatarUrl)
 		: user.image || getAvatarSrc(null);
+	const isDataUrl = avatarSrc.startsWith("data:");
 
 	async function handleLogout() {
 		await authClient.signOut({
@@ -77,6 +92,7 @@ export function NavbarUser({
 							<div className="relative size-10 overflow-hidden rounded-full">
 								<Image
 									src={avatarSrc}
+									unoptimized={isDataUrl}
 									alt={`Avatar de ${user.name}`}
 									fill
 									sizes="40px"
@@ -98,6 +114,7 @@ export function NavbarUser({
 						<div className="relative size-9 shrink-0 overflow-hidden rounded-full">
 							<Image
 								src={avatarSrc}
+								unoptimized={isDataUrl}
 								alt={user.name}
 								fill
 								sizes="36px"
@@ -105,7 +122,30 @@ export function NavbarUser({
 							/>
 						</div>
 						<div className="flex flex-col min-w-0">
-							<span className="text-sm font-medium truncate">{user.name}</span>
+							<div className="flex items-center gap-1 min-w-0">
+								<span className="text-sm font-medium truncate">
+									{user.name}
+								</span>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<button
+											type="button"
+											onClick={handleCopyId}
+											className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+											aria-label="Copiar ID do usuário"
+										>
+											{copied ? (
+												<RiCheckLine className="size-3 text-success" />
+											) : (
+												<RiFileCopyLine className="size-3" />
+											)}
+										</button>
+									</TooltipTrigger>
+									<TooltipContent side="bottom">
+										{copied ? "Copiado!" : "Copiar ID do usuário"}
+									</TooltipContent>
+								</Tooltip>
+							</div>
 							<span className="text-xs text-muted-foreground truncate">
 								{user.email}
 							</span>
@@ -126,7 +166,9 @@ export function NavbarUser({
 						>
 							<RiHistoryLine className="size-4 text-muted-foreground shrink-0" />
 							<span className="flex-1">Changelog</span>
-							<Badge variant="outline">v{version}</Badge>
+							<Badge variant="outline" className="text-xs font-semibold">
+								v{version}
+							</Badge>
 						</Link>
 
 						<DialogTrigger asChild>
@@ -147,7 +189,7 @@ export function NavbarUser({
 								className={cn(itemClass, "text-success")}
 							>
 								<RiMegaphoneLine className="size-4 text-success shrink-0" />
-								<span className="flex-1 tracking-wide text-xs font-medium">
+								<span className="flex-1 tracking-wide text-xs font-bold">
 									Atualização {updateCheck.latestVersion} disponível
 								</span>
 							</Link>

@@ -88,7 +88,7 @@ export function TransactionDetailsDialog({
 									<p className="text-xs uppercase tracking-wide text-muted-foreground">
 										Resumo
 									</p>
-									<p className="mt-1 text-2xl font-medium">
+									<p className="mt-1 text-2xl font-semibold">
 										{currencyFormatter.format(valorTotal)}
 									</p>
 								</div>
@@ -116,7 +116,7 @@ export function TransactionDetailsDialog({
 						</section>
 
 						<section className="space-y-2">
-							<h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+							<h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 								Detalhes
 							</h3>
 							<ul className="min-w-0 grid gap-2 rounded-lg border p-3">
@@ -167,7 +167,7 @@ export function TransactionDetailsDialog({
 						</section>
 
 						<section className="space-y-2">
-							<h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+							<h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 								Valores
 							</h3>
 							<ul className="min-w-0 grid gap-2 rounded-lg border p-3">
@@ -207,7 +207,7 @@ export function TransactionDetailsDialog({
 
 						{transaction.note ? (
 							<section className="space-y-2">
-								<h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+								<h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 									Notas
 								</h3>
 								<div className="rounded-lg border p-3 text-foreground">
@@ -218,7 +218,7 @@ export function TransactionDetailsDialog({
 
 						{attachmentCount !== 0 && (
 							<section className="space-y-2">
-								<h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+								<h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 									Anexos
 								</h3>
 								<div className="min-w-0">

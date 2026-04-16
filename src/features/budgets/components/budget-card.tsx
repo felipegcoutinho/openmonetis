@@ -52,7 +52,7 @@ export function BudgetCard({
 						size="lg"
 					/>
 					<div className="space-y-1">
-						<h3 className="text-base font-medium leading-tight">
+						<h3 className="text-base font-semibold leading-tight">
 							{formatCategoryName(budget)}
 						</h3>
 						<p className="text-xs text-muted-foreground">

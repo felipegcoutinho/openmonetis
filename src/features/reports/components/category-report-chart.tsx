@@ -73,7 +73,7 @@ function AreaTooltip({
 								{entry.name}
 							</span>
 						</div>
-						<span className="shrink-0 text-xs font-medium tabular-nums text-foreground">
+						<span className="shrink-0 text-xs font-medium text-foreground">
 							{currencyFormatter.format(Number(entry.value))}
 						</span>
 					</div>

@@ -116,13 +116,14 @@ const getPercentChange = (current: number, previous: number): string => {
 	}
 
 	const change = ((current - previous) / Math.abs(previous)) * 100;
-	return Number.isFinite(change) && Math.abs(change) < 1000000
-		? formatPercentage(change, {
-				maximumFractionDigits: 1,
-				minimumFractionDigits: 1,
-				signDisplay: "always",
-			})
-		: "—";
+	if (!Number.isFinite(change)) return "—";
+	if (change > 999) return "+999%";
+	if (change < -999) return "-999%";
+	return formatPercentage(change, {
+		maximumFractionDigits: 2,
+		minimumFractionDigits: 2,
+		signDisplay: "always",
+	});
 };
 
 const getTrendBadgeClass = (trend: Trend, invertTrend: boolean): string => {
@@ -159,7 +160,7 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 							<CardHeader>
 								<div className="flex items-start justify-between">
 									<div>
-										<CardTitle className="flex items-center gap-1.5 tracking-tight">
+										<CardTitle className="flex items-center gap-1.5 ">
 											<Icon className={cn("size-4", iconClass)} aria-hidden />
 											{label}
 											<MetricsCardInfoButton
@@ -179,12 +180,12 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 							<CardContent className="flex flex-col gap-3">
 								<div className="flex flex-wrap items-center justify-between gap-2 mt-1">
 									<MoneyValues
-										className="text-2xl leading-none"
+										className="text-2xl leading-none font-medium"
 										amount={metric.current}
 									/>
 									<div
 										className={cn(
-											"inline-flex items-center gap-1 text-xs ",
+											"inline-flex items-center gap-1 text-xs font-medium",
 											trendBadgeClass,
 										)}
 									>
@@ -195,7 +196,7 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 
 								<div className="text-xs text-muted-foreground">
 									<MoneyValues
-										className="inline text-xs  text-muted-foreground"
+										className="inline text-xs font-medium text-muted-foreground"
 										amount={metric.previous}
 									/>
 									<span className="ml-1">no mês anterior</span>

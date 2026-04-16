@@ -197,7 +197,9 @@ export function CategoryHistoryWidget({ data }: CategoryHistoryWidgetProps) {
 												style={{ backgroundColor: color }}
 											/>
 										)}
-										<span className="text-foreground">{category.name}</span>
+										<span className="text-sm font-medium text-foreground">
+											{category.name}
+										</span>
 										<Button
 											variant="ghost"
 											size="sm"
@@ -398,7 +400,7 @@ export function CategoryHistoryWidget({ data }: CategoryHistoryWidgetProps) {
 																	{config?.label}
 																</span>
 															</div>
-															<span className="text-xs font-medium tabular-nums">
+															<span className="text-xs font-medium">
 																{formatCurrency(value)}
 															</span>
 														</div>

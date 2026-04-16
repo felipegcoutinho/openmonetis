@@ -131,7 +131,7 @@ export function ReviewTable({
 											aria-label={`Selecionar ${row.description}`}
 										/>
 									</TableCell>
-									<TableCell className="text-muted-foreground text-sm tabular-nums">
+									<TableCell className="text-muted-foreground text-sm">
 										{formatDate(row.date)}
 									</TableCell>
 									<TableCell className="max-w-[200px] text-sm">
@@ -204,7 +204,7 @@ export function ReviewTable({
 											}
 										/>
 									</TableCell>
-									<TableCell className="text-right tabular-nums text-sm">
+									<TableCell className="text-right text-sm">
 										<MoneyValues
 											amount={
 												row.transactionType === "expense"

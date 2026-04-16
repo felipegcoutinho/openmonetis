@@ -84,7 +84,7 @@ export function DeleteAccountForm() {
 				<div className="rounded-lg border p-4">
 					<div className="space-y-4">
 						<div>
-							<h3 className="font-medium">Zerar conta</h3>
+							<h3 className="font-semibold">Zerar conta</h3>
 							<p className="text-sm text-muted-foreground">
 								Apaga todos os dados do OpenMonetis e deixa sua conta no estado
 								inicial, mantendo seu login e credenciais de acesso.
@@ -117,10 +117,10 @@ export function DeleteAccountForm() {
 					</div>
 				</div>
 
-				<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+				<div className="rounded-lg border border-destructive/30 p-4">
 					<div className="space-y-4">
 						<div>
-							<h3 className="font-medium text-destructive">Deletar conta</h3>
+							<h3 className="font-semibold text-destructive">Deletar conta</h3>
 							<p className="text-sm text-muted-foreground">
 								Remove seu usuário e todos os dados associados de forma
 								permanente.
@@ -132,7 +132,7 @@ export function DeleteAccountForm() {
 							<li>Contas, cartões e categorias</li>
 							<li>Pagadores, credenciais e configurações</li>
 							<li className="font-medium">
-								Resumindo tudo, sua conta será permanentemente removida
+								Resumindo, sua conta irá de arrasta pra cima!
 							</li>
 						</ul>
 

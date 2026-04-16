@@ -178,7 +178,10 @@ export function PurchasesByCategoryWidget({
 								</div>
 
 								<div className="shrink-0 text-foreground">
-									<MoneyValues amount={transaction.amount} />
+									<MoneyValues
+										className="font-medium"
+										amount={transaction.amount}
+									/>
 								</div>
 							</div>
 						);

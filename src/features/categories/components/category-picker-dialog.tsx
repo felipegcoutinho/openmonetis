@@ -80,7 +80,7 @@ export function CategoryPickerDialog({
 					<div className="flex max-h-96 flex-col gap-4 overflow-y-auto pr-1">
 						{filteredGroups.map((group) => (
 							<div key={group.label}>
-								<p className="mb-2 text-xs font-medium text-muted-foreground">
+								<p className="mb-2 text-xs text-muted-foreground">
 									{group.label}
 								</p>
 								<div className="grid grid-cols-8 gap-1.5">

@@ -131,7 +131,7 @@ export function UpdatePasswordForm({ authProvider }: UpdatePasswordFormProps) {
 				<div className="flex gap-3">
 					<RiAlertLine className="h-5 w-5 text-warning shrink-0 mt-0.5" />
 					<div>
-						<h3 className="font-medium text-warning">
+						<h3 className="font-semibold text-warning">
 							Alteração de senha não disponível
 						</h3>
 						<p className="mt-1 text-sm text-warning">

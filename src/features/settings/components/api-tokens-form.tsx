@@ -139,7 +139,7 @@ export function ApiTokensForm({ tokens }: ApiTokensFormProps) {
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<div>
-					<h3 className="font-medium">Dispositivos conectados</h3>
+					<h3 className="font-semibold">Dispositivos conectados</h3>
 					<p className="text-sm text-muted-foreground">
 						Gerencie os dispositivos que podem enviar notificações para o
 						OpenMonetis.

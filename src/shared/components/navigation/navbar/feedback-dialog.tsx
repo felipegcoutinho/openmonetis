@@ -96,7 +96,7 @@ export function FeedbackDialogBody({ onClose }: { onClose?: () => void }) {
 								<Icon className={cn("h-5 w-5", item.color)} />
 							</div>
 							<div className="flex-1 text-left space-y-1">
-								<h3 className="font-medium text-sm flex items-center gap-2">
+								<h3 className="font-semibold text-sm flex items-center gap-2">
 									{item.title}
 									<RiExternalLinkLine className="h-3.5 w-3.5 text-muted-foreground" />
 								</h3>

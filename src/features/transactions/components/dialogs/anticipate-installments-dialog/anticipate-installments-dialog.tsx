@@ -342,21 +342,21 @@ export function AnticipateInstallmentsDialog({
 					{/* Seção 3: Resumo */}
 					{selectedIds.length > 0 && (
 						<div className="rounded-lg border bg-muted/20 p-3">
-							<h4 className="text-sm font-medium mb-2">Resumo</h4>
+							<h4 className="text-sm font-semibold mb-2">Resumo</h4>
 							<dl className="space-y-1.5 text-sm">
 								<div className="flex items-center justify-between">
 									<dt className="text-muted-foreground">
 										{selectedIds.length} parcela
 										{selectedIds.length > 1 ? "s" : ""}
 									</dt>
-									<dd className="font-medium tabular-nums">
+									<dd className="font-medium">
 										<MoneyValues amount={totalAmount} className="text-sm" />
 									</dd>
 								</div>
 								{Number(formState.discount) > 0 && (
 									<div className="flex items-center justify-between">
 										<dt className="text-muted-foreground">Desconto</dt>
-										<dd className="font-medium tabular-nums text-success">
+										<dd className="font-medium text-success">
 											-{" "}
 											<MoneyValues
 												amount={Number(formState.discount)}
@@ -367,7 +367,7 @@ export function AnticipateInstallmentsDialog({
 								)}
 								<div className="flex items-center justify-between border-t pt-1.5">
 									<dt className="font-medium">Total</dt>
-									<dd className="text-base font-medium tabular-nums text-primary">
+									<dd className="text-base font-semibold text-primary">
 										<MoneyValues amount={finalAmount} className="text-sm" />
 									</dd>
 								</div>

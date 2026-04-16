@@ -53,16 +53,14 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 					<CardContent className="px-4 py-2">
 						<div className="flex items-start justify-between gap-3">
 							<div className="space-y-1">
-								<p className="text-xs font-medium text-muted-foreground">
-									{card.title}
-								</p>
+								<p className="text-xs text-muted-foreground">{card.title}</p>
 								{card.isMoney ? (
 									<MoneyValues
-										className="text-2xl font-medium"
+										className="text-2xl font-semibold"
 										amount={card.value}
 									/>
 								) : (
-									<p className="text-2xl font-medium">{card.value}</p>
+									<p className="text-2xl font-semibold">{card.value}</p>
 								)}
 								<p className="text-xs text-muted-foreground">
 									{card.description}

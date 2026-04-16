@@ -16,7 +16,7 @@
 3. **Periods** usam formato `YYYY-MM` (ex: `"2025-11"`). Utils em `src/shared/utils/period/`.
 4. **Moeda**: R$ com 2 decimais. DB: `numeric(12, 2)`. Utils em `src/shared/utils/currency.ts`.
 5. **Revalidation**: usar `revalidateForEntity("entity")` de `src/shared/lib/actions/helpers.ts` apos mutations.
-6. **Versionamento**: registrar mudancas no `CHANGELOG.md` seguindo Keep a Changelog, também altere o `package.json` e `readme.md`.
+6. **Versionamento**: registrar mudancas no `CHANGELOG.md` seguindo Keep a Changelog, também altere o `package.json` e `readme.md` (Badges do README.md).
 7. **Comunicacao**: responder em portugues clara e direta com o time.
 8. **Commit messages**: agrupar por natureza. em pt-br. seguindo o padrao do sistema.
 9. **README.md**: sempre que fizer alteracoes significativas, atualize o README.md.
@@ -85,6 +85,7 @@ src/
 │   │   ├── insights/
 │   │   ├── calendar/
 │   │   ├── inbox/
+│   │   ├── attachments/
 │   │   ├── changelog/
 │   │   ├── reports/
 │   │   │   ├── category-trends/
@@ -111,6 +112,7 @@ src/
 │   ├── insights/
 │   ├── calendar/
 │   ├── inbox/
+│   ├── attachments/
 │   ├── reports/
 │   └── settings/
 ├── shared/
@@ -307,18 +309,29 @@ export async function fetchData(userId: string, period: string) {
 
 ---
 
-## Response Style
+## Security Rules
 
-Quando o time pedir avaliacao de plano ou feature:
+Regras aplicadas automaticamente ao gerar codigo.
 
-1. Responder em portugues simples.
-2. Listar 3-5 problemas principais.
-3. Fechar com decisao pratica:
-   - aprova agora
-   - nao aprova agora
-   - o que ajustar antes de comecar codigo
+### Secrets
+Nunca colocar API keys, credenciais de banco ou tokens em codigo frontend. Evitar variaveis prefixadas com `NEXT_PUBLIC_` para dados sensiveis — estas sao bundladas no cliente. Usar variaveis server-side apenas. `.env` deve estar no `.gitignore` antes do primeiro commit. `.env.example` deve ter apenas placeholders.
 
-Exemplo:
+### Autenticacao & Autorizacao
+Toda rota protegida em `src/app/api/` requer `getUser()` ou `getOptionalUserSession()` antes de qualquer logica, retornando 401 para nao autenticados. Rotas com IDs de recursos devem verificar ownership: `eq(table.userId, userId)`. Rotas admin devem checar role e retornar 403 para nao-admins. Session cookies em Better Auth ja tem `httpOnly`, `secure` e `sameSite` configurados — nao alterar.
 
-- "Nao aprovaria para comecar codigo imediatamente."
-- "Primeiro ajustaria o doc com estes 5 pontos."
+### Input & Output
+Usar Drizzle ORM (parametrizado por padrao) — nunca concatenar input de usuario em SQL. Validar todo input com Zod antes de usar. Upload de arquivos: usar whitelist de MIME types (`ALLOWED_MIME_TYPES`), presigned URLs para S3, token de upload assinado com verificacao pos-upload. Nunca usar `dangerouslySetInnerHTML` com conteudo de usuario.
+
+### Headers & CSP
+CSP definida em `src/proxy.ts` via middleware — alterar la, nao em `next.config.ts`. Headers de seguranca (HSTS, X-Frame-Options, etc.) definidos em `next.config.ts`. Nao remover nem enfraquecer essas configuracoes.
+
+### Rate Limiting
+Login: 5 tentativas/min. Signup: 3 tentativas/min. API tokens: 100 req/min (inbox), 20 req/min (batch). Configurado em `src/shared/lib/auth/config.ts` e nas rotas de inbox. Nao remover.
+
+### Tratamento de Erros
+Erros nao devem expor stack traces, paths ou nomes de bibliotecas ao cliente. Usar mensagens genericas: `"Algo deu errado"`. Logar detalhes apenas no servidor com `console.error()`.
+
+### Dependencias
+Verificar pacotes novos sugeridos pela IA em npmjs.com antes de instalar. Red flags: menos de 1.000 downloads/semana, publicado nos ultimos 30 dias, nome muito parecido com pacote popular. Rodar `pnpm audit` periodicamente.
+
+---

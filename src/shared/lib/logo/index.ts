@@ -39,6 +39,27 @@ export const deriveNameFromLogo = (logo?: string | null) => {
 		.join(" ");
 };
 
+/**
+ * Normaliza o nome do estabelecimento para usar como chave de lookup no banco.
+ */
+export const toNameKey = (name: string): string => name.trim().toLowerCase();
+
+// === Logo.dev ===
+
+export const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
+
+export function buildLogoDevUrl(domain?: string | null): string | null {
+	if (!LOGO_DEV_TOKEN || !domain) return null;
+	return `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=64&format=png`;
+}
+
+export const logoQueryKeys = {
+	mapping: (nameKey: string) => ["logo-mapping", nameKey] as const,
+	search: (query: string) => ["logo-search", query] as const,
+};
+
+// === Local logo resolution ===
+
 const LOGO_SRC_PATTERN = /^(https?:\/\/|data:)/;
 
 type ResolveLogoSrcOptions = {

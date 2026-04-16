@@ -59,7 +59,10 @@ export function InstallmentExpenseListItem({
 							</span>
 						) : null}
 					</div>
-					<MoneyValues amount={expense.amount} className="shrink-0" />
+					<MoneyValues
+						amount={expense.amount}
+						className="shrink-0 font-medium"
+					/>
 				</div>
 
 				<p className="text-xs text-muted-foreground">
@@ -67,7 +70,7 @@ export function InstallmentExpenseListItem({
 					{" · Restante "}
 					<MoneyValues
 						amount={remainingAmount}
-						className="inline-block font-medium"
+						className="inline-block font-semibold"
 					/>{" "}
 					({remainingInstallments})
 				</p>

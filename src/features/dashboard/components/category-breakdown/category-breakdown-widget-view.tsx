@@ -281,12 +281,12 @@ export function CategoryBreakdownWidgetView({
 
 									<div className="flex shrink-0 flex-col items-end gap-0.5">
 										<MoneyValues
-											className="text-foreground"
+											className="text-foreground font-medium"
 											amount={category.currentAmount}
 										/>
 										{category.percentageChange !== null ? (
 											<span
-												className={`flex items-center gap-0.5 text-xs ${changeClassName}`}
+												className={`flex items-center gap-0.5 text-xs font-medium ${changeClassName}`}
 											>
 												{hasIncrease ? (
 													<RiArrowUpSFill className="size-3" />

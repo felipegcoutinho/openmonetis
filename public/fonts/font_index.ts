@@ -1,18 +1,9 @@
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 
-export const america = localFont({
-	src: [
-		{
-			path: "./america-regular.woff2",
-			weight: "400",
-			style: "normal",
-		},
-		{
-			path: "./america-medium.woff2",
-			weight: "500",
-			style: "normal",
-		},
-	],
-	display: "fallback",
-	variable: "--font-america",
+export const inter = Inter({
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-inter",
+	fallback: ["ui-sans-serif", "system-ui"],
+	preload: true,
 });

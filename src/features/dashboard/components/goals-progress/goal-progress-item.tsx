@@ -44,8 +44,9 @@ export function GoalProgressItem({
 							{item.categoryName}
 						</p>
 						<p className="mt-0.5 text-xs text-muted-foreground">
-							<MoneyValues amount={item.spentAmount} /> de{" "}
-							<MoneyValues amount={item.budgetAmount} />
+							<MoneyValues className="font-medium" amount={item.spentAmount} />{" "}
+							de{" "}
+							<MoneyValues className="font-medium" amount={item.budgetAmount} />
 							<span className={`ml-1.5 font-medium ${deltaColor}`}>
 								{formatGoalProgressPercentage(percentageDelta, true)}
 							</span>

@@ -32,7 +32,7 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 			{versions.map((version) => (
 				<Card key={version.version} className="p-6">
 					<div className="flex items-baseline gap-3">
-						<h3 className="text-lg font-medium">v{version.version}</h3>
+						<h3 className="text-lg font-semibold">v{version.version}</h3>
 						<span className="text-sm text-muted-foreground">
 							{version.date}
 						</span>

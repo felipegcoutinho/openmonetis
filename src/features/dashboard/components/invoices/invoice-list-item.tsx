@@ -116,7 +116,10 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 												</p>
 											</div>
 											<div className="text-sm font-medium text-foreground">
-												<MoneyValues amount={share.amount} />
+												<MoneyValues
+													className="font-medium"
+													amount={share.amount}
+												/>
 											</div>
 										</li>
 									))}
@@ -144,7 +147,7 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 							paymentTooltipLabel ? (
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<span className="cursor-help text-success">
+										<span className="cursor-help text-success font-semibold">
 											{paymentInfo.label}
 										</span>
 									</TooltipTrigger>
@@ -153,7 +156,9 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 									</TooltipContent>
 								</Tooltip>
 							) : (
-								<span className="text-success">{paymentInfo.label}</span>
+								<span className="text-success font-semibold">
+									{paymentInfo.label}
+								</span>
 							)
 						) : null}
 					</div>
@@ -161,7 +166,10 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 			</div>
 
 			<div className="flex shrink-0 flex-col items-end">
-				<MoneyValues amount={Math.abs(invoice.totalAmount)} />
+				<MoneyValues
+					className="font-medium"
+					amount={Math.abs(invoice.totalAmount)}
+				/>
 				<Button
 					type="button"
 					size="sm"

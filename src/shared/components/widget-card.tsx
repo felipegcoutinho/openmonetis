@@ -37,7 +37,7 @@ export default function WidgetCard({
 			<CardHeader>
 				<div className="flex w-full items-start justify-between">
 					<div>
-						<CardTitle className="flex items-center gap-1 tracking-tight">
+						<CardTitle className="flex items-center gap-1 ">
 							{icon && <span className="size-4">{icon}</span>}
 							{title}
 						</CardTitle>

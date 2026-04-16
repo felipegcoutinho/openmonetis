@@ -68,7 +68,7 @@ export function AccountStatementCard({
 								</div>
 							) : null}
 							<div className="min-w-0">
-								<h2 className="truncate text-sm font-medium text-foreground">
+								<h2 className="truncate text-sm font-semibold text-foreground">
 									{accountName}
 								</h2>
 								<p className="text-xs text-muted-foreground">
@@ -81,12 +81,12 @@ export function AccountStatementCard({
 
 					{/* Linha 2 — saldo final (hero) */}
 					<div className="space-y-4">
-						<p className="text-sm font-medium text-muted-foreground ">
+						<p className="text-sm text-muted-foreground ">
 							Saldo ao final do período
 						</p>
 						<MoneyValues
 							amount={currentBalance}
-							className="text-3xl leading-none font-medium tracking-tight sm:text-[2rem]"
+							className="text-3xl leading-none tracking-tighter sm:text-[2rem]"
 						/>
 						<div className="flex items-center gap-2">
 							<Badge
