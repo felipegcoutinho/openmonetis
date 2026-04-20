@@ -7,6 +7,38 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-04-20
+
+Esta versão é quase toda sobre organização e polimento. O código interno do Dashboard foi reestruturado — módulos espalhados pela raiz da feature foram agrupados em subdiretórios coesos e a arquitetura de widgets foi renovada com um novo `widget-registry`. A sidebar lateral foi aposentada em favor de uma navegação concentrada na navbar. A interface passou por um refinamento visual amplo: cards redesenhados, dark mode mais consistente e efeitos decorativos removidos para uma composição mais limpa. As imagens de preview da landing page foram atualizadas. Por fim, a integração com Logo.dev ganhou uma arquitetura mais segura — o token agora é lido apenas no servidor e nunca chega ao cliente.
+
+### Adicionado
+
+- Dashboard: nova arquitetura de widgets com `widget-registry` — módulos reorganizados em subdiretórios (`bills/`, `invoices/`, `notes/`, `notifications/`, `overview/`, `payments/`, `goals-progress/`, `categories/`)
+- Dashboard: novos componentes `category-breakdown-chart`, `category-breakdown-list`, `goals-progress-item` e `percentage-change-indicator`
+- Logo.dev: `server.ts` com `isLogoDevEnabled()` e `buildLogoDevUrl()` server-side; `LogoDevProvider` propaga flag `enabled` para Client Components
+- Scripts: `mockup` adicionado ao `package.json` (`tsx scripts/mock-data.ts`)
+
+### Alterado
+
+- Nav: sidebar lateral removida — navegação unificada na navbar
+- UI/Tema: raio de borda global 0.625rem → 0.7rem; ajustes finos em `--card` e `--border` (light e dark)
+- UI: `DotPattern` removido do layout dashboard, tela de autenticação e landing page
+- UI: account-card redesenhado com cores de saldo (success/destructive) e tooltip para flags de exclusão
+- UI: budget-card, card-item e componentes do calendário (day-cell, event-modal) com layout revisado
+- UI: auth-card-shell simplificado (removido glassmorphism e blob animado)
+- Landing: imagens de preview atualizadas; `mainFeatures` + `extraFeatures` unificados em grid único; dark mode nos botões de CTA
+- Navbar: dark mode corrigido no navbar-shell (`dark:bg-card`, `dark:border-b-border/60`)
+- Logo.dev: `NEXT_PUBLIC_LOGO_DEV_TOKEN` renomeado para `LOGO_DEV_TOKEN` (agora lido em runtime server-side apenas)
+- Deps: next 16.2.3 → 16.2.4, better-auth 1.6.2 → 1.6.5, ai 6.0.159 → 6.0.168 e outros patches menores
+
+### Removido
+
+- Nav: componentes sidebar (`app-sidebar`, `nav-main`, `nav-secondary`, `nav-user`, `nav-link`), `sidebar.tsx` e `use-mobile.ts`
+- Dashboard: ~25 widgets monolíticos obsoletos (`inbox-widget`, `bills-widget`, `notes-widget`, `payers-widget`, `my-accounts-widget` etc.)
+- Dashboard: arquivos dispersos na raiz da feature movidos para subdiretórios (arquivos antigos removidos)
+- CSS: variáveis `--data-7` a `--data-10` removidas do tema
+- CI: build arg `NEXT_PUBLIC_LOGO_DEV_TOKEN` removido do `Dockerfile` e do workflow `docker-publish.yml` — basta configurar `LOGO_DEV_TOKEN` e `LOGO_DEV_SECRET_KEY` como variáveis de runtime no host (Coolify, Railway, etc.)
+
 ## [2.4.1] - 2026-04-16
 
 ### Adicionado

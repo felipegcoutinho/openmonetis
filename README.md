@@ -8,7 +8,7 @@
 
 > **⚠️ Não há versão online hospedada.** Você precisa clonar o repositório e rodar localmente ou no seu próprio servidor.
 
-[![Version](https://img.shields.io/badge/version-2.4.1-blue?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.4.2-blue?style=flat-square)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -397,28 +397,32 @@ O app exibe logos automáticos de marcas na coluna de estabelecimentos nos lanç
 ### Variáveis
 
 ```env
-NEXT_PUBLIC_LOGO_DEV_TOKEN=pk_...   # token público (obrigatório para exibir logos)
-LOGO_DEV_SECRET_KEY=sk_...          # chave secreta (obrigatório para o picker de busca)
+LOGO_DEV_TOKEN=pk_...          # token público (obrigatório para exibir logos)
+LOGO_DEV_SECRET_KEY=sk_...     # chave secreta (obrigatório para o picker de busca)
 ```
+
+> **Atualizando da v2.4.1 ou anterior:** a variável foi renomeada de `NEXT_PUBLIC_LOGO_DEV_TOKEN` para `LOGO_DEV_TOKEN`. Renomeie no seu `.env` (ou nas variáveis do Coolify/host) e remova o secret homônimo do GitHub Actions — ele não é mais usado. Não há outra etapa de migração.
 
 ### Como configurar
 
+Ambas as variáveis são lidas em **runtime** pelo servidor Next.js. Não há mais nenhuma etapa no CI nem `--build-arg` no Docker.
+
 **Self-hosted via Docker Hub (Coolify, Railway, etc.):**
 
-O `NEXT_PUBLIC_LOGO_DEV_TOKEN` é inlinado pelo Next.js **em build time** — ele não pode ser injetado como variável de ambiente em runtime. Por isso o processo é diferente do usual:
-
-1. Cadastre o secret `NEXT_PUBLIC_LOGO_DEV_TOKEN` no repositório GitHub Fork (Settings → Secrets → Actions)
-2. O workflow de CI já está configurado para passar o valor como `--build-arg` no `docker build`
-3. Faça um novo build (push ou Run workflow manual) — a imagem gerada já terá o token embutido
-4. No Coolify (ou outro host), adicione apenas `LOGO_DEV_SECRET_KEY` como variável de ambiente runtime
+1. Adicione `LOGO_DEV_TOKEN` e `LOGO_DEV_SECRET_KEY` nas variáveis de ambiente do host
+2. Reinicie o container — pronto
 
 **Desenvolvimento local:**
 
-Adicione as duas variáveis no `.env` normalmente — o Next.js as lê em `pnpm dev` sem nenhuma etapa extra.
+Adicione as duas no `.env` e rode `pnpm dev`.
 
 ### Como usar
 
 Após configurado, passe o mouse sobre o avatar de qualquer estabelecimento nos lançamentos — um ícone de lápis aparece. Clique para abrir o picker, busque pelo nome da marca e selecione o logo desejado. O mapeamento fica salvo por usuário no banco.
+
+### Arquitetura
+
+O token **nunca chega ao cliente**. O servidor constrói a URL `https://img.logo.dev/{domain}?token=...` nos endpoints `/api/logo/mapping` e `/api/logo/search`, e o cliente apenas consome a URL pronta. Um Context Provider (`LogoDevProvider`) propaga a flag `enabled` para os componentes que decidem se renderizam o picker.
 
 ---
 
@@ -471,8 +475,8 @@ GOOGLE_GENERATIVE_AI_API_KEY=
 OPENROUTER_API_KEY=
 
 # Logo.dev (opcional, necessário para logos automáticos de estabelecimentos)
-# NEXT_PUBLIC_LOGO_DEV_TOKEN deve ser passado como build arg no CI — veja seção Logo.dev
-NEXT_PUBLIC_LOGO_DEV_TOKEN=
+# Ambas as variáveis são runtime — basta definir no host; nenhum build arg necessário.
+LOGO_DEV_TOKEN=
 LOGO_DEV_SECRET_KEY=
 ```
 
