@@ -602,7 +602,7 @@ export async function createMassTransactionsAction(
 			if (transaction.payerId && invalidPayers.has(transaction.payerId)) {
 				return {
 					success: false,
-					error: `Payer não encontrado na transação ${i + 1}.`,
+					error: `Pessoa não encontrado na transação ${i + 1}.`,
 				};
 			}
 			if (
@@ -611,7 +611,7 @@ export async function createMassTransactionsAction(
 			) {
 				return {
 					success: false,
-					error: `Category não encontrada na transação ${i + 1}.`,
+					error: `Categoria não encontrada na transação ${i + 1}.`,
 				};
 			}
 		}

@@ -71,7 +71,7 @@ export async function fetchInstallmentAnalysis(
 		return { installmentGroups: [], totalPendingInstallments: 0 };
 	}
 
-	// 1. Buscar todos os lançamentos parcelados não antecipados do pagador admin
+	// 1. Buscar todos os lançamentos parcelados não antecipados da pessoa admin
 	const installmentRows = await db
 		.select({
 			id: transactions.id,

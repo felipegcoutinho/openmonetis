@@ -36,7 +36,7 @@ export async function ensureDefaultPagadorForUser(user: SeedUserLike) {
 	const name =
 		(user.name && user.name.trim().length > 0
 			? user.name.trim()
-			: normalizeNameFromEmail(user.email)) || "Payer principal";
+			: normalizeNameFromEmail(user.email)) || "Pessoa principal";
 
 	// Usa a imagem do Google se disponível, senão usa o avatar padrão
 	const avatarUrl = user.image ?? DEFAULT_PAYER_AVATAR;

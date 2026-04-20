@@ -50,7 +50,7 @@ export function PayerSection({
 					<div>
 						<p className="text-sm text-foreground">Dividir lançamento</p>
 						<p className="text-xs text-muted-foreground">
-							Atribuir parte do valor a outro pagador.
+							Atribuir parte do valor a outra pessoa.
 						</p>
 					</div>
 				</div>
@@ -75,7 +75,7 @@ export function PayerSection({
 
 			<div className="flex w-full flex-col gap-2 md:flex-row">
 				<div className="w-full space-y-1">
-					<Label htmlFor="payer">Pagador</Label>
+					<Label htmlFor="payer">Pessoa</Label>
 					<div className="flex gap-2">
 						<Select
 							value={formState.payerId ?? ""}

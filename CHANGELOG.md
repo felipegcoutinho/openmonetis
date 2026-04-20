@@ -9,7 +9,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [2.4.2] - 2026-04-20
 
-Esta versão é quase toda sobre organização e polimento. O código interno do Dashboard foi reestruturado — módulos espalhados pela raiz da feature foram agrupados em subdiretórios coesos e a arquitetura de widgets foi renovada com um novo `widget-registry`. A sidebar lateral foi aposentada em favor de uma navegação concentrada na navbar. A interface passou por um refinamento visual amplo: cards redesenhados, dark mode mais consistente e efeitos decorativos removidos para uma composição mais limpa. As imagens de preview da landing page foram atualizadas. Por fim, a integração com Logo.dev ganhou uma arquitetura mais segura — o token agora é lido apenas no servidor e nunca chega ao cliente.
+Esta versão é quase toda sobre organização e polimento. O código interno do Dashboard foi reestruturado — módulos espalhados pela raiz da feature foram agrupados em subdiretórios coesos e a arquitetura de widgets foi renovada com um novo `widget-registry`. A sidebar lateral foi aposentada em favor de uma navegação concentrada na navbar. A interface passou por um refinamento visual amplo: cards redesenhados, dark mode mais consistente e efeitos decorativos removidos para uma composição mais limpa. As imagens de preview da landing page foram atualizadas. Por fim, a integração com Logo.dev ganhou uma arquitetura mais segura — o token agora é lido apenas no servidor e nunca chega ao cliente. O conceito de "Pagador" foi renomeado para "Pessoa" em toda a interface.
 
 ### Adicionado
 
@@ -29,6 +29,7 @@ Esta versão é quase toda sobre organização e polimento. O código interno do
 - Landing: imagens de preview atualizadas; `mainFeatures` + `extraFeatures` unificados em grid único; dark mode nos botões de CTA
 - Navbar: dark mode corrigido no navbar-shell (`dark:bg-card`, `dark:border-b-border/60`)
 - Logo.dev: `NEXT_PUBLIC_LOGO_DEV_TOKEN` renomeado para `LOGO_DEV_TOKEN` (agora lido em runtime server-side apenas)
+- UI: conceito "Pagador/Pagadores" renomeado para **"Pessoa/Pessoas"** em toda a interface — labels, títulos, toasts, mensagens de erro, cabeçalhos de tabela e exportações. Código, rotas (`/payers`) e schema do banco (`pagadores`) permanecem inalterados; a divergência entre UI e código é intencional
 - Deps: next 16.2.3 → 16.2.4, better-auth 1.6.2 → 1.6.5, ai 6.0.159 → 6.0.168 e outros patches menores
 
 ### Removido

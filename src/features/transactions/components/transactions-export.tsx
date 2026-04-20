@@ -109,7 +109,7 @@ export function TransactionsExport({
 				"Valor",
 				"Category",
 				"Conta/Cartão",
-				"Payer",
+				"Pessoa",
 			];
 			const rows: string[][] = [];
 
@@ -169,7 +169,7 @@ export function TransactionsExport({
 				"Valor",
 				"Category",
 				"Conta/Cartão",
-				"Payer",
+				"Pessoa",
 			];
 			const rows: (string | number)[][] = [];
 
@@ -277,7 +277,7 @@ export function TransactionsExport({
 					"Valor",
 					"Categoria",
 					"Conta/Cartão",
-					"Payer",
+					"Pessoa",
 				],
 			];
 
@@ -317,7 +317,7 @@ export function TransactionsExport({
 					5: { cellWidth: 24 }, // Valor
 					6: { cellWidth: 30 }, // Categoria
 					7: { cellWidth: 30 }, // Conta/Cartão
-					8: { cellWidth: 31 }, // Payer
+					8: { cellWidth: 31 }, // Pessoa
 				},
 				didParseCell: (cellData) => {
 					if (cellData.section === "body" && cellData.column.index === 5) {

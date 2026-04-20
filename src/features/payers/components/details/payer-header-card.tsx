@@ -66,7 +66,7 @@ export function PayerHeaderCard({
 
 	const openConfirmDialog = () => {
 		if (!payer.email) {
-			toast.error("Cadastre um e-mail para este pagador antes de enviar.");
+			toast.error("Cadastre um e-mail para esta pessoa antes de enviar.");
 			return;
 		}
 		setConfirmOpen(true);
@@ -74,7 +74,7 @@ export function PayerHeaderCard({
 
 	const handleSendSummary = () => {
 		if (!payer.email) {
-			toast.error("Cadastre um e-mail para este pagador antes de enviar.");
+			toast.error("Cadastre um e-mail para esta pessoa antes de enviar.");
 			return;
 		}
 

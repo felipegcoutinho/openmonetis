@@ -21,7 +21,7 @@ export const LANCAMENTOS_COLUMN_LABELS: Record<string, string> = {
 	condition: "Condição",
 	paymentMethod: "Forma de Pagamento",
 	categoriaName: "Categoria",
-	pagadorName: "Pagador",
+	pagadorName: "Pessoa",
 	note: "Anotação",
 	contaCartao: "Conta/Cartão",
 };

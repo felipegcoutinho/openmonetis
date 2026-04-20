@@ -189,8 +189,8 @@ export async function validateAllOwnership(
 	];
 
 	const errors = [
-		"Pagador não encontrado ou sem permissão.",
-		"Pagador secundário não encontrado ou sem permissão.",
+		"Pessoa não encontrada ou sem permissão.",
+		"Pessoa secundário não encontrado ou sem permissão.",
 		"Categoria não encontrada.",
 		"Conta não encontrada.",
 		"Cartão não encontrado.",
@@ -359,7 +359,7 @@ const refineLancamento = (
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ["payerId"],
-				message: "Selecione o pagador principal para dividir o lançamento.",
+				message: "Selecione a pessoa principal para dividir o lançamento.",
 			});
 		}
 
@@ -367,13 +367,13 @@ const refineLancamento = (
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ["secondaryPayerId"],
-				message: "Selecione o pagador secundário para dividir o lançamento.",
+				message: "Selecione a pessoa secundário para dividir o lançamento.",
 			});
 		} else if (data.payerId && data.secondaryPayerId === data.payerId) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ["secondaryPayerId"],
-				message: "Escolha um pagador diferente para dividir o lançamento.",
+				message: "Escolha uma pessoa diferente para dividir o lançamento.",
 			});
 		}
 

@@ -90,7 +90,7 @@ export function BulkImportDialog({
 		event.preventDefault();
 
 		if (!payerId) {
-			toast.error("Selecione o pagador.");
+			toast.error("Selecione a pessoa.");
 			return;
 		}
 
@@ -197,16 +197,16 @@ export function BulkImportDialog({
 					<DialogDescription>
 						Importando {itemCount}{" "}
 						{itemCount === 1 ? "lançamento" : "lançamentos"}. Selecione o
-						pagador, categoria e forma de pagamento para aplicar a todos.
+						pessoa, categoria e forma de pagamento para aplicar a todos.
 					</DialogDescription>
 				</DialogHeader>
 
 				<form className="space-y-4" onSubmit={handleSubmit}>
 					<div className="space-y-2">
-						<Label htmlFor="pagador">Pagador *</Label>
+						<Label htmlFor="pagador">Pessoa *</Label>
 						<Select value={payerId} onValueChange={setPagadorId}>
 							<SelectTrigger id="pagador" className="w-full">
-								<SelectValue placeholder="Selecione o pagador">
+								<SelectValue placeholder="Selecione a pessoa">
 									{payerId &&
 										(() => {
 											const selectedOption = payerOptions.find(

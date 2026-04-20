@@ -230,7 +230,7 @@ export function TransactionDialog({
 
 		if (formState.isSplit && !formState.payerId) {
 			const message =
-				"Selecione o pagador principal para dividir o lançamento.";
+				"Selecione a pessoa principal para dividir o lançamento.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;
@@ -238,7 +238,7 @@ export function TransactionDialog({
 
 		if (formState.isSplit && !formState.secondaryPayerId) {
 			const message =
-				"Selecione o pagador secundário para dividir o lançamento.";
+				"Selecione a pessoa secundário para dividir o lançamento.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;
@@ -464,7 +464,7 @@ export function TransactionDialog({
 	const description =
 		mode === "create"
 			? isImportMode
-				? "Importando lançamento de outro usuário. Ajuste a categoria, pagador e cartão/conta antes de salvar."
+				? "Importando lançamento de outro usuário. Ajuste a categoria, pessoa e cartão/conta antes de salvar."
 				: isCopyMode
 					? "Os dados do lançamento foram copiados. Revise e ajuste conforme necessário antes de salvar."
 					: isNewWithType
@@ -519,7 +519,7 @@ export function TransactionDialog({
 
 						<div className="border-t border-border/40 my-3" />
 
-						{/* Pagador */}
+						{/* Pessoa */}
 						<PayerSection
 							formState={formState}
 							onFieldChange={handleFieldChange}

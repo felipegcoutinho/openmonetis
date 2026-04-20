@@ -60,7 +60,7 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 
 	const handleRemoveRequest = (payer: Payer) => {
 		if (payer.role === PAYER_ROLE_ADMIN) {
-			toast.error("Pagadores administradores não podem ser removidos.");
+			toast.error("Pessoas administradoras não podem ser removidas.");
 			return;
 		}
 		setPayerToRemove(payer);
@@ -91,8 +91,8 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 	};
 
 	const removeTitle = payerToRemove
-		? `Remover pagador "${payerToRemove.name}"?`
-		: "Remover pagador?";
+		? `Remover pessoa "${payerToRemove.name}"?`
+		: "Remover pessoa?";
 
 	const handleJoinByCode = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -127,7 +127,7 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 						trigger={
 							<Button className="w-full sm:w-auto">
 								<RiAddFill className="size-4" />
-								Novo pagador
+								Nova pessoa
 							</Button>
 						}
 					/>
@@ -151,7 +151,7 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 				{orderedPayers.length === 0 ? (
 					<div className="flex min-h-[320px] items-center justify-center rounded-lg border border-dashed bg-muted/30">
 						<div className="max-w-sm text-center text-sm text-muted-foreground">
-							Cadastre seu primeiro pagador para organizar cobranças e
+							Cadastre seu primeira pessoa para organizar cobranças e
 							pagamentos recorrentes.
 						</div>
 					</div>
@@ -185,8 +185,8 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 				open={removeOpen && !!payerToRemove}
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
-				description="Ao remover este pagador, os registros relacionados a ele deixarão de ser associados automaticamente."
-				confirmLabel="Remover pagador"
+				description="Ao remover esta pessoa, os registros relacionados a ele deixarão de ser associados automaticamente."
+				confirmLabel="Remover pessoa"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}

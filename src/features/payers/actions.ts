@@ -34,9 +34,9 @@ const statusEnum = z
 
 const baseSchema = z.object({
 	name: z
-		.string({ message: "Informe o nome do pagador." })
+		.string({ message: "Informe o nome da pessoa." })
 		.trim()
-		.min(1, "Informe o nome do pagador."),
+		.min(1, "Informe o nome da pessoa."),
 	email: z
 		.string()
 		.trim()
@@ -110,7 +110,7 @@ export async function createPayerAction(
 
 		revalidate(user.id);
 
-		return { success: true, message: "Payer criado com sucesso." };
+		return { success: true, message: "Pessoa criada com sucesso." };
 	} catch (error) {
 		return handleActionError(error);
 	}
@@ -130,7 +130,7 @@ export async function updatePayerAction(
 		if (!existing) {
 			return {
 				success: false,
-				error: "Pagador não encontrado.",
+				error: "Pessoa não encontrada.",
 			};
 		}
 
@@ -160,7 +160,7 @@ export async function updatePayerAction(
 
 		revalidate(currentUser.id);
 
-		return { success: true, message: "Payer atualizado com sucesso." };
+		return { success: true, message: "Pessoa atualizada com sucesso." };
 	} catch (error) {
 		return handleActionError(error);
 	}
@@ -180,14 +180,14 @@ export async function deletePayerAction(
 		if (!existing) {
 			return {
 				success: false,
-				error: "Pagador não encontrado.",
+				error: "Pessoa não encontrada.",
 			};
 		}
 
 		if (existing.role === PAYER_ROLE_ADMIN) {
 			return {
 				success: false,
-				error: "Pagadores administradores não podem ser removidos.",
+				error: "Pessoas administradoras não podem ser removidas.",
 			};
 		}
 
@@ -197,7 +197,7 @@ export async function deletePayerAction(
 
 		revalidate(user.id);
 
-		return { success: true, message: "Payer removido com sucesso." };
+		return { success: true, message: "Pessoa removida com sucesso." };
 	} catch (error) {
 		return handleActionError(error);
 	}
@@ -221,7 +221,7 @@ export async function joinPayerByShareCodeAction(
 		if (pagadorRow.userId === user.id) {
 			return {
 				success: false,
-				error: "Você já é o proprietário deste pagador.",
+				error: "Você já é o proprietário desta entidade pagadora.",
 			};
 		}
 
@@ -235,7 +235,7 @@ export async function joinPayerByShareCodeAction(
 		if (existingShare) {
 			return {
 				success: false,
-				error: "Você já possui acesso a este pagador.",
+				error: "Você já possui acesso a esta pessoa.",
 			};
 		}
 
@@ -248,7 +248,7 @@ export async function joinPayerByShareCodeAction(
 
 		revalidate(user.id);
 
-		return { success: true, message: "Payer adicionado à sua lista." };
+		return { success: true, message: "Pessoa adicionada à sua lista." };
 	} catch (error) {
 		return handleActionError(error);
 	}
@@ -313,7 +313,7 @@ export async function regeneratePayerShareCodeAction(
 		});
 
 		if (!existing) {
-			return { success: false, error: "Payer não encontrado." };
+			return { success: false, error: "Pessoa não encontrada." };
 		}
 
 		let attempts = 0;

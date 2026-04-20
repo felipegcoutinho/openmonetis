@@ -67,7 +67,7 @@ export function PayerHistoryCard({ data }: PagadorHistoryCardProps) {
 					Evolução (últimos 6 meses)
 				</CardTitle>
 				<p className="text-xs text-muted-foreground">
-					Despesas registradas para este pagador ao longo do tempo.
+					Despesas registradas para esta pessoa ao longo do tempo.
 				</p>
 			</CardHeader>
 

@@ -89,7 +89,7 @@ export function PayerSharingCard({
 				</CardTitle>
 				<p className="text-sm text-muted-foreground">
 					Compartilhe o código abaixo com outra pessoa. Ela poderá adicioná-lo
-					na página de pagadores usando a opção Adicionar por código para ter
+					na página de pessoas usando a opção Adicionar por código para ter
 					acesso somente leitura.
 				</p>
 			</CardHeader>

@@ -251,8 +251,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "pagadores",
-		title: "Pagadores",
-		subtitle: "Despesas por pagador no período",
+		title: "Pessoas",
+		subtitle: "Despesas por pessoa no período",
 		icon: <RiGroupLine className="size-4" />,
 		component: ({ data }) => (
 			<PayersWidget payers={data.pagadoresSnapshot.payers} />

@@ -386,7 +386,7 @@ export function TransactionsFilters({
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-sm font-medium">Pagador</label>
+									<label className="text-sm font-medium">Pessoa</label>
 									<Select
 										value={getParamValue("payer")}
 										onValueChange={(value) =>

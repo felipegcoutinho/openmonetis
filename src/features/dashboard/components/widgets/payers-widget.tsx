@@ -28,8 +28,8 @@ export function PayersWidget({ payers }: PayersWidgetProps) {
 			{payers.length === 0 ? (
 				<WidgetEmptyState
 					icon={<RiGroupLine className="size-6 text-muted-foreground" />}
-					title="Nenhum pagador para o período"
-					description="Quando houver despesas associadas a pagadores, eles aparecerão aqui."
+					title="Nenhuma pessoa para o período"
+					description="Quando houver despesas associadas a pessoas, elas aparecerão aqui."
 				/>
 			) : (
 				<div className="flex flex-col">

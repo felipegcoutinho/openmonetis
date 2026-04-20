@@ -269,7 +269,7 @@ export function AnticipateInstallmentsDialog({
 							</Field>
 
 							<Field className="gap-1">
-								<FieldLabel htmlFor="anticipation-pagador">Pagador</FieldLabel>
+								<FieldLabel htmlFor="anticipation-pagador">Pessoa</FieldLabel>
 								<FieldContent>
 									<Select
 										value={formState.payerId}

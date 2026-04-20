@@ -1,7 +1,7 @@
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 /**
- * Loading state para a página de pagadores
+ * Loading state para a página de pessoas
  * Layout: Header + Input de compartilhamento + Grid de cards
  */
 export default function PagadoresLoading() {
@@ -17,7 +17,7 @@ export default function PagadoresLoading() {
 					</div>
 				</div>
 
-				{/* Grid de cards de pagadores */}
+				{/* Grid de cards de pessoas */}
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{Array.from({ length: 6 }).map((_, i) => (
 						<div key={i} className="rounded-md border p-6 space-y-4">

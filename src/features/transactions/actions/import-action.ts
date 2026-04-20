@@ -84,7 +84,7 @@ export async function importTransactionsAction(
 		validateCartaoOwnership(userId, cardId),
 	]);
 
-	if (!payerOk) return { success: false, error: "Pagador não encontrado." };
+	if (!payerOk) return { success: false, error: "Pessoa não encontrada." };
 	if (!accountOk) return { success: false, error: "Conta não encontrada." };
 	if (!cardOk) return { success: false, error: "Cartão não encontrado." };
 

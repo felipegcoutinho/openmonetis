@@ -53,11 +53,11 @@ export const normalizeNameFromEmail = (
 	email: string | null | undefined,
 ): string => {
 	if (!email) {
-		return "Novo pagador";
+		return "Nova pessoa";
 	}
 	const [local] = email.split("@");
 	if (!local) {
-		return "Novo pagador";
+		return "Nova pessoa";
 	}
 	return local
 		.split(".")

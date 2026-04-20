@@ -182,7 +182,7 @@ export function PayerDialog({
 		const payerId = payer?.id;
 
 		if (mode === "update" && !payerId) {
-			const message = "Pagador inválido.";
+			const message = "Pessoa inválida.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;
@@ -216,13 +216,12 @@ export function PayerDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Novo pagador" : "Editar pagador";
+	const title = mode === "create" ? "Nova pessoa" : "Editar pessoa";
 	const description =
 		mode === "create"
-			? "Selecione um avatar e informe os detalhes para criar um novo pagador."
-			: "Atualize os detalhes do pagador selecionado.";
-	const submitLabel =
-		mode === "create" ? "Salvar pagador" : "Atualizar pagador";
+			? "Selecione um avatar e informe os detalhes para criar uma nova pessoa."
+			: "Atualize os detalhes da pessoa selecionada.";
+	const submitLabel = mode === "create" ? "Salvar pessoa" : "Atualizar pessoa";
 
 	const isUploadSelected =
 		uploadedAvatar !== null && formState.avatarUrl === uploadedAvatar;
@@ -388,7 +387,7 @@ export function PayerDialog({
 									id="payer-note"
 									value={formState.note}
 									onChange={(event) => updateField("note", event.target.value)}
-									placeholder="Observações sobre este pagador"
+									placeholder="Observações sobre esta pessoa"
 								/>
 							</div>
 						</div>

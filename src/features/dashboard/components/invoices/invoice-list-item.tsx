@@ -86,7 +86,7 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 							<HoverCardTrigger asChild>{linkNode}</HoverCardTrigger>
 							<HoverCardContent align="start" className="w-80 space-y-3">
 								<p className="text-xs text-muted-foreground">
-									Distribuição por pagador
+									Distribuição por pessoa
 								</p>
 								<ul className="space-y-2">
 									{breakdown.map((share, index) => (

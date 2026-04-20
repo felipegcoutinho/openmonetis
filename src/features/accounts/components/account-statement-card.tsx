@@ -123,7 +123,7 @@ export function AccountStatementCard({
 
 						<MetaItem
 							label="Saídas"
-							tooltip="Total de despesas pagas neste mês (considerando divisão entre pagadores)."
+							tooltip="Total de despesas pagas neste mês (considerando divisão entre pessoas)."
 						>
 							<span className="text-sm font-medium text-destructive">
 								{formatCurrency(totalExpenses)}

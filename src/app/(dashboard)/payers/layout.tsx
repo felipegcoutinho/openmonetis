@@ -2,7 +2,7 @@ import { RiGroupLine } from "@remixicon/react";
 import PageDescription from "@/shared/components/page-description";
 
 export const metadata = {
-	title: "Pagadores",
+	title: "Pessoas",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
 		<section className="space-y-6">
 			<PageDescription
 				icon={<RiGroupLine />}
-				title="Pagadores"
+				title="Pessoas"
 				subtitle="Gerencie as pessoas ou entidades responsáveis pelos pagamentos."
 			/>
 			{children}

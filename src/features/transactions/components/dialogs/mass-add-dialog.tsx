@@ -525,7 +525,7 @@ export function MassAddDialog({
 												htmlFor={`pagador-${transaction.id}`}
 												className="sr-only"
 											>
-												Pagador {index + 1}
+												Pessoa {index + 1}
 											</Label>
 											<Select
 												value={transaction.payerId}
@@ -537,7 +537,7 @@ export function MassAddDialog({
 													id={`pagador-${transaction.id}`}
 													className="w-32 truncate"
 												>
-													<SelectValue placeholder="Pagador">
+													<SelectValue placeholder="Pessoa">
 														{transaction.payerId &&
 															(() => {
 																const selectedOption = payerOptions.find(

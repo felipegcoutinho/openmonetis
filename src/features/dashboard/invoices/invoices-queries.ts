@@ -244,7 +244,7 @@ export async function fetchDashboardInvoices(
 		}
 
 		const payerId = row.payerId ?? null;
-		const pagadorName = row.pagadorName?.trim() || "Sem pagador";
+		const pagadorName = row.pagadorName?.trim() || "Sem pessoa";
 		const pagadorAvatar = row.pagadorAvatar ?? null;
 		const payerKey = payerId ?? "__without-payer__";
 		const key = `${row.cardId}:${payerKey}`;

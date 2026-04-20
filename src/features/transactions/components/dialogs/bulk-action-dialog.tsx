@@ -116,7 +116,7 @@ export function BulkActionDialog({
 									htmlFor="period"
 									className="text-sm cursor-pointer font-medium"
 								>
-									Todos os pagadores deste período
+									Todas as pessoas deste período
 								</Label>
 								<p className="text-xs text-muted-foreground">
 									Aplica a todos os lançamentos deste mesmo mês na série
@@ -125,7 +125,7 @@ export function BulkActionDialog({
 									<div className="mt-1.5 flex items-start gap-1.5 rounded-md bg-amber-50 px-2 py-1.5 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
 										<RiErrorWarningLine className="mt-0.5 size-3.5 shrink-0" />
 										<p className="text-xs">
-											Atenção: os valores individuais de cada pagador serão
+											Atenção: os valores individuais de cada pessoa serão
 											substituídos pelos valores deste lançamento.
 										</p>
 									</div>

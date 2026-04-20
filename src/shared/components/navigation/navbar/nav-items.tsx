@@ -92,7 +92,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		items: [
 			{
 				href: "/payers",
-				label: "Pagadores",
+				label: "Pessoas",
 				description: "Gerencie quem divide as despesas",
 				icon: <RiGroupLine className="size-4" />,
 				iconClass: "text-primary",

@@ -81,7 +81,7 @@ async function resetUserAppData(
 	const payerName =
 		(user.name && user.name.trim().length > 0
 			? user.name.trim()
-			: normalizeNameFromEmail(user.email)) || "Payer principal";
+			: normalizeNameFromEmail(user.email)) || "Pessoa principal";
 	const avatarUrl = user.image ?? DEFAULT_PAYER_AVATAR;
 	const defaultPayerStatus = PAYER_STATUS_OPTIONS[0];
 
@@ -176,7 +176,7 @@ export async function updateNameAction(
 			.set({ name: fullName })
 			.where(eq(schema.user.id, session.user.id));
 
-		// Sincronizar nome com o pagador admin
+		// Sincronizar nome com o pessoa admin
 		if (adminPayerId) {
 			await db
 				.update(payers)

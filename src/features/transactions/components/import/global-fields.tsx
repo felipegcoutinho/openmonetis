@@ -123,13 +123,13 @@ export function GlobalFields({
 				</div>
 
 				<div className="flex min-w-44 flex-col gap-1.5">
-					<Label>Pagador</Label>
+					<Label>Pessoa</Label>
 					<Select
 						value={payerId ?? ""}
 						onValueChange={(v) => onPayerChange(v || null)}
 					>
 						<SelectTrigger>
-							<SelectValue placeholder="Selecionar pagador…" />
+							<SelectValue placeholder="Selecionar pessoa…" />
 						</SelectTrigger>
 						<SelectContent>
 							{payerOptions.map((opt) => (

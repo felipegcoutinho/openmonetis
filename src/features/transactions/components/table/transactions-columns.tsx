@@ -229,12 +229,12 @@ function buildColumns({
 													aria-hidden
 												/>
 												<span className="sr-only">
-													Dividido entre pagadores
+													Dividido entre pessoas
 												</span>
 											</span>
 										</TooltipTrigger>
 										<TooltipContent side="top">
-											Dividido entre pagadores
+											Dividido entre pessoas
 										</TooltipContent>
 									</Tooltip>
 								)}
@@ -408,10 +408,10 @@ function buildColumns({
 		},
 		{
 			accessorKey: "pagadorName",
-			header: "Pagador",
+			header: "Pessoa",
 			cell: ({ row }) => {
 				const { payerId, pagadorName, pagadorAvatar } = row.original;
-				const label = pagadorName?.trim() || "Sem pagador";
+				const label = pagadorName?.trim() || "Sem pessoa";
 				const displayName = label.split(/\s+/)[0] ?? label;
 				const avatarSrc = getAvatarSrc(pagadorAvatar);
 				const initial = displayName.charAt(0).toUpperCase() || "?";

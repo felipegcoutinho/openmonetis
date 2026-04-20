@@ -159,7 +159,7 @@ export async function createInstallmentAnticipationAction(
 			if (data.payerId && payer.length === 0) {
 				return {
 					success: false,
-					error: "Pagador inválido para esta conta.",
+					error: "Pessoa inválida para esta conta.",
 				};
 			}
 

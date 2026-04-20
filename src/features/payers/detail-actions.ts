@@ -19,7 +19,7 @@ import { formatDateTime } from "@/shared/utils/date";
 import { displayPeriod } from "@/shared/utils/period";
 
 const inputSchema = z.object({
-	payerId: z.string().uuid("Payer inválido."),
+	payerId: z.string().uuid("Pessoa inválida."),
 	period: z
 		.string()
 		.regex(/^\d{4}-\d{2}$/, "Período inválido. Informe no formato AAAA-MM."),
@@ -404,7 +404,7 @@ export async function sendPayerSummaryAction(
 		});
 
 		if (!pagadorRow) {
-			return { success: false, error: "Pagador não encontrado." };
+			return { success: false, error: "Pessoa não encontrada." };
 		}
 
 		if (!pagadorRow.email) {

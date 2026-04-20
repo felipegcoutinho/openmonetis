@@ -38,7 +38,7 @@ const CARDS = [
 		helpTitle: "Como calculamos receitas",
 		helpLines: [
 			"Somamos os lançamentos do tipo Receita no período selecionado.",
-			"Consideramos lançamentos efetivados e não efetivados do pagador principal (admin).",
+			"Consideramos lançamentos efetivados e não efetivados da pessoa principal (admin).",
 			"Movimentações de contas marcadas como não consideradas no saldo total ficam fora deste card.",
 			"Não entram transferências internas nem lançamentos automáticos de fatura.",
 			"Saldo inicial também fica fora quando a conta está marcada para desconsiderá-lo das receitas.",
@@ -54,7 +54,7 @@ const CARDS = [
 		helpTitle: "Como calculamos despesas",
 		helpLines: [
 			"Somamos os lançamentos do tipo Despesa no período selecionado.",
-			"Consideramos lançamentos efetivados e não efetivados do pagador principal (admin).",
+			"Consideramos lançamentos efetivados e não efetivados da pessoa principal (admin).",
 			"Movimentações de contas marcadas como não consideradas no saldo total ficam fora deste card.",
 			"Não entram transferências internas nem lançamentos automáticos de fatura.",
 			"O valor mostrado é a saída efetiva do período, sempre em número positivo no card.",
