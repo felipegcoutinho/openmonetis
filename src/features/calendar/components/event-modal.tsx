@@ -150,8 +150,39 @@ const renderCard = (event: Extract<CalendarEvent, { type: "card" }>) => {
 	);
 };
 
+const renderInstallment = (
+	event: Extract<CalendarEvent, { type: "installment" }>,
+) => {
+	const isReceita = event.transaction.transactionType === "Receita";
+
+	return (
+		<EventCard type="installment">
+			<div className="flex items-start justify-between gap-3">
+				<div className="flex flex-col gap-1">
+					<span className="text-sm font-medium leading-tight">
+						{event.transaction.name}
+					</span>
+					<Badge variant="outline">{event.installmentCount}x parcelas</Badge>
+				</div>
+				<div className="flex flex-col items-end gap-0.5">
+					<MoneyValues
+						showPositiveSign
+						className={cn(
+							"text-base whitespace-nowrap font-medium",
+							isReceita ? "text-success" : "text-foreground",
+						)}
+						amount={event.installmentValue}
+					/>
+					<span className="text-xs text-muted-foreground">por parcela</span>
+				</div>
+			</div>
+		</EventCard>
+	);
+};
+
 const SECTION_LABELS: Record<CalendarEvent["type"], string> = {
 	transaction: "Lançamentos",
+	installment: "Parcelas",
 	boleto: "Boletos",
 	card: "Faturas",
 };
@@ -160,6 +191,8 @@ const renderEvent = (event: CalendarEvent) => {
 	switch (event.type) {
 		case "transaction":
 			return renderLancamento(event);
+		case "installment":
+			return renderInstallment(event);
 		case "boleto":
 			return renderBoleto(event);
 		case "card":
@@ -185,6 +218,7 @@ export function EventModal({ open, day, onClose, onCreate }: EventModalProps) {
 	const grouped = day
 		? {
 				transaction: day.events.filter((e) => e.type === "transaction"),
+				installment: day.events.filter((e) => e.type === "installment"),
 				boleto: day.events.filter((e) => e.type === "boleto"),
 				card: day.events.filter((e) => e.type === "card"),
 			}
@@ -204,7 +238,7 @@ export function EventModal({ open, day, onClose, onCreate }: EventModalProps) {
 
 				<div className="max-h-[380px] space-y-3 overflow-y-auto pr-2">
 					{hasEvents && grouped ? (
-						(["transaction", "boleto", "card"] as const)
+						(["transaction", "installment", "boleto", "card"] as const)
 							.filter((type) => grouped[type].length > 0)
 							.map((type) => (
 								<div key={type} className="space-y-1.5">

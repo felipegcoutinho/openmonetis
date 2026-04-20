@@ -12,6 +12,14 @@ export type CalendarEvent =
 	  }
 	| {
 			id: string;
+			type: "installment";
+			date: string;
+			transaction: TransactionItem;
+			installmentCount: number;
+			installmentValue: number;
+	  }
+	| {
+			id: string;
 			type: "boleto";
 			date: string;
 			transaction: TransactionItem;

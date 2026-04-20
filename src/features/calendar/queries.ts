@@ -136,6 +136,44 @@ export const fetchCalendarData = async ({
 		}
 	}
 
+	// Agrupar parcelas da mesma série em um único evento
+	const installmentGroups = new Map<
+		string,
+		Array<Extract<CalendarEvent, { type: "transaction" }>>
+	>();
+	for (const event of events) {
+		if (event.type !== "transaction") continue;
+		const { seriesId, installmentCount } = event.transaction;
+		if (!seriesId || !installmentCount || installmentCount <= 1) continue;
+		const group = installmentGroups.get(seriesId) ?? [];
+		group.push(event as Extract<CalendarEvent, { type: "transaction" }>);
+		installmentGroups.set(seriesId, group);
+	}
+
+	const groupedSeriesIds = new Set<string>();
+	const installmentEvents: CalendarEvent[] = [];
+	for (const [seriesId, group] of installmentGroups) {
+		if (group.length < 2) continue;
+		groupedSeriesIds.add(seriesId);
+		const rep = group[0];
+		installmentEvents.push({
+			id: `${seriesId}:installment`,
+			type: "installment",
+			date: rep.date,
+			transaction: rep.transaction,
+			installmentCount: rep.transaction.installmentCount ?? group.length,
+			installmentValue: rep.transaction.amount ?? 0,
+		});
+	}
+
+	const baseEvents = events.filter((e) => {
+		if (e.type !== "transaction") return true;
+		const { seriesId } = e.transaction;
+		return !seriesId || !groupedSeriesIds.has(seriesId);
+	});
+
+	const allEvents = [...baseEvents, ...installmentEvents];
+
 	// Vencimentos de cartões com lançamentos no período
 	for (const card of cardRows) {
 		if (!cardTotals.has(card.id)) continue;
@@ -151,7 +189,7 @@ export const fetchCalendarData = async ({
 		const isPaid = paymentByCardName.has(card.name);
 		const paymentDate = paymentByCardName.get(card.name) ?? null;
 
-		events.push({
+		allEvents.push({
 			id: `${card.id}:cartao`,
 			type: "card",
 			date: dueDateKey,
@@ -172,11 +210,12 @@ export const fetchCalendarData = async ({
 
 	const typePriority: Record<CalendarEvent["type"], number> = {
 		transaction: 0,
+		installment: 0,
 		boleto: 1,
 		card: 2,
 	};
 
-	events.sort((a, b) => {
+	allEvents.sort((a, b) => {
 		if (a.date === b.date) {
 			return typePriority[a.type] - typePriority[b.type];
 		}
@@ -192,7 +231,7 @@ export const fetchCalendarData = async ({
 	const estabelecimentos = await fetchRecentEstablishments(userId);
 
 	return {
-		events,
+		events: allEvents,
 		formOptions: {
 			payerOptions: optionSets.payerOptions,
 			splitPayerOptions: optionSets.splitPayerOptions,

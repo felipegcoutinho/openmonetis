@@ -20,6 +20,11 @@ export const EVENT_TYPE_STYLES: Record<
 		wrapper: "bg-primary/10 text-primary dark:bg-primary/5 dark:text-primary",
 		dot: "bg-primary",
 	},
+	installment: {
+		wrapper:
+			"bg-amber-100 text-amber-600 dark:bg-amber-900/10 dark:text-amber-500",
+		dot: "bg-amber-500",
+	},
 	boleto: {
 		wrapper: "bg-info/10 text-info dark:bg-info/5 dark:text-info",
 		dot: "bg-info",
@@ -39,6 +44,8 @@ const buildEventLabel = (event: CalendarEvent) => {
 		case "transaction":
 		case "boleto":
 			return event.transaction.name;
+		case "installment":
+			return event.transaction.name;
 		case "card":
 			return event.card.name;
 		default:
@@ -51,6 +58,8 @@ const buildEventComplement = (event: CalendarEvent) => {
 		case "transaction":
 		case "boleto":
 			return formatCurrencyValue(event.transaction.amount);
+		case "installment":
+			return `${event.installmentCount}x de ${formatCurrencyValue(event.installmentValue)}`;
 		case "card":
 			return event.card.totalDue !== null
 				? formatCurrencyValue(event.card.totalDue)

@@ -5,6 +5,7 @@ import { cn } from "@/shared/utils/ui";
 
 const LEGEND_ITEMS = [
 	{ label: "Lançamentos", ...EVENT_TYPE_STYLES.transaction },
+	{ label: "Parcelas", ...EVENT_TYPE_STYLES.installment },
 	{ label: "Boletos", ...EVENT_TYPE_STYLES.boleto },
 	{ label: "Fatura de Cartão", ...EVENT_TYPE_STYLES.card },
 ];
