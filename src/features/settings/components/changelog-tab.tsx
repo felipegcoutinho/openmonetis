@@ -39,7 +39,7 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 					</div>
 					<div className="space-y-4 w-full mx-auto sm:w-3/4">
 						{version.summary && (
-							<p className="text-sm text-muted-foreground leading-relaxed">
+							<p className="border-l-2 border-muted-foreground/25 pl-3 text-sm text-muted-foreground/80 leading-relaxed italic">
 								{version.summary}
 							</p>
 						)}
