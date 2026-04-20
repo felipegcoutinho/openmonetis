@@ -16,7 +16,7 @@
 3. **Periods** usam formato `YYYY-MM` (ex: `"2025-11"`). Utils em `src/shared/utils/period/`.
 4. **Moeda**: R$ com 2 decimais. DB: `numeric(12, 2)`. Utils em `src/shared/utils/currency.ts`.
 5. **Revalidation**: usar `revalidateForEntity("entity")` de `src/shared/lib/actions/helpers.ts` apos mutations.
-6. **Versionamento**: registrar mudancas no `CHANGELOG.md` seguindo Keep a Changelog, também altere o `package.json` e `readme.md` (Badges do README.md).
+6. **Versionamento**: registrar mudancas no `CHANGELOG.md` seguindo Keep a Changelog, também altere o `package.json` e `readme.md` (Badges do README.md). Cada versão deve ter um parágrafo introdutório em linguagem humana logo abaixo do cabeçalho `## [x.y.z]`, antes das seções `### Adicionado/Alterado/Removido` — descrevendo em prosa o que a versão representa (ex: "Esta versão foca em polimento visual e reorganização interna...").
 7. **Comunicacao**: responder em portugues clara e direta com o time.
 8. **Commit messages**: agrupar por natureza. em pt-br. seguindo o padrao do sistema.
 9. **README.md**: sempre que fizer alteracoes significativas, atualize o README.md.
