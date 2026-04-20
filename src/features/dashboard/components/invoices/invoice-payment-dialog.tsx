@@ -9,8 +9,8 @@ import {
 	getInvoiceStatusBadgeVariant,
 	type InvoiceDialogState,
 	parseInvoiceDueDate,
-} from "@/features/dashboard/invoices-helpers";
-import type { DashboardInvoice } from "@/features/dashboard/invoices-queries";
+} from "@/features/dashboard/invoices/invoices-helpers";
+import type { DashboardInvoice } from "@/features/dashboard/invoices/invoices-queries";
 import MoneyValues from "@/shared/components/money-values";
 import { PaymentSuccess } from "@/shared/components/payment-success";
 import { Badge } from "@/shared/components/ui/badge";

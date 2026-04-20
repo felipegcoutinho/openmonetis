@@ -19,7 +19,7 @@ export type DashboardPagador = {
 	isAdmin: boolean;
 };
 
-export type DashboardPayersSnapshot = {
+type DashboardPayersSnapshot = {
 	payers: DashboardPagador[];
 	totalExpenses: number;
 };

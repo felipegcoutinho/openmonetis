@@ -25,19 +25,19 @@ import {
 } from "@remixicon/react";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { SortableWidget } from "@/features/dashboard/components/sortable-widget";
-import { WidgetSettingsDialog } from "@/features/dashboard/components/widget-settings-dialog";
+import { SortableWidget } from "@/features/dashboard/components/widgets/sortable-widget";
+import { WidgetSettingsDialog } from "@/features/dashboard/components/widgets/widget-settings-dialog";
 import type { DashboardData } from "@/features/dashboard/fetch-dashboard-data";
 import {
 	resetWidgetPreferences,
 	updateWidgetPreferences,
 	type WidgetPreferences,
-} from "@/features/dashboard/widgets/actions";
+} from "@/features/dashboard/widget-registry/widget-actions";
 import {
 	type DashboardWidgetQuickActionOptions,
 	type WidgetConfig,
 	widgetsConfig,
-} from "@/features/dashboard/widgets/widgets-config";
+} from "@/features/dashboard/widget-registry/widget-config";
 import { NoteDialog } from "@/features/notes/components/note-dialog";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/transaction-dialog/transaction-dialog";
 import { ExpandableWidgetCard } from "@/shared/components/expandable-widget-card";

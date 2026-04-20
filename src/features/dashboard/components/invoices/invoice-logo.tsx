@@ -2,7 +2,7 @@ import Image from "next/image";
 import {
 	buildInvoiceInitials,
 	type InvoiceLogoTone,
-} from "@/features/dashboard/invoices-helpers";
+} from "@/features/dashboard/invoices/invoices-helpers";
 import { resolveLogoSrc } from "@/shared/lib/logo";
 import { cn } from "@/shared/utils/ui";
 

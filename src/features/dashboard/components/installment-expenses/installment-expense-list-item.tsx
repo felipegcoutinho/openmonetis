@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { InstallmentExpense } from "@/features/dashboard/expenses/installment-expenses-queries";
-import { buildInstallmentExpenseDisplay } from "@/features/dashboard/installment-expenses-helpers";
+import { buildInstallmentExpenseDisplay } from "@/features/dashboard/expenses/installment-expenses-helpers";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Progress } from "@/shared/components/ui/progress";

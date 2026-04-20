@@ -29,14 +29,12 @@ export function NoteListItem({
 					{displayTitle}
 				</p>
 				<div className="mt-1 flex items-center gap-2">
-					<Badge variant="outline" className="h-5 px-1.5 text-[10px]">
+					<Badge variant="outline" className="h-5 px-1.5 text-xs">
 						{getNoteTasksSummary(note)}
 					</Badge>
-					{createdAtLabel ? (
-						<p className="truncate text-xs text-muted-foreground">
-							{createdAtLabel}
-						</p>
-					) : null}
+					<p className="truncate text-xs text-muted-foreground">
+						{createdAtLabel}
+					</p>
 				</div>
 			</div>
 

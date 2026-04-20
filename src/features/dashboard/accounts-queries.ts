@@ -26,7 +26,7 @@ export type DashboardAccount = {
 	excludeFromBalance: boolean;
 };
 
-export type DashboardAccountsSnapshot = {
+type DashboardAccountsSnapshot = {
 	totalBalance: number;
 	accounts: DashboardAccount[];
 };

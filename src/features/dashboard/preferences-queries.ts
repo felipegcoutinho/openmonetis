@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
-import type { WidgetPreferences } from "@/features/dashboard/widgets/actions";
+import type { WidgetPreferences } from "@/features/dashboard/widget-registry/widget-actions";
 import { db, schema } from "@/shared/lib/db";
 
-export interface UserDashboardPreferences {
+interface UserDashboardPreferences {
 	dashboardWidgets: WidgetPreferences | null;
 }
 

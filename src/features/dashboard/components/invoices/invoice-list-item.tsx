@@ -1,5 +1,6 @@
 import { RiCheckboxCircleFill, RiExternalLinkLine } from "@remixicon/react";
 import Link from "next/link";
+import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
 import {
 	buildInvoiceDetailsHref,
 	buildInvoiceInitials,
@@ -8,8 +9,8 @@ import {
 	getInvoiceShareLabel,
 	parseInvoiceDueDate,
 	parseInvoiceWidgetDueDate,
-} from "@/features/dashboard/invoices-helpers";
-import type { DashboardInvoice } from "@/features/dashboard/invoices-queries";
+} from "@/features/dashboard/invoices/invoices-helpers";
+import type { DashboardInvoice } from "@/features/dashboard/invoices/invoices-queries";
 import MoneyValues from "@/shared/components/money-values";
 import {
 	Avatar,
@@ -83,7 +84,7 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 					{hasBreakdown ? (
 						<HoverCard openDelay={150}>
 							<HoverCardTrigger asChild>{linkNode}</HoverCardTrigger>
-							<HoverCardContent align="start" className="w-72 space-y-3">
+							<HoverCardContent align="start" className="w-80 space-y-3">
 								<p className="text-xs text-muted-foreground">
 									Distribuição por pagador
 								</p>
@@ -115,10 +116,13 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 													)}
 												</p>
 											</div>
-											<div className="text-sm font-medium text-foreground">
+											<div className="flex shrink-0 flex-col items-end gap-0.5 text-sm font-medium text-foreground">
 												<MoneyValues
 													className="font-medium"
 													amount={share.amount}
+												/>
+												<PercentageChangeIndicator
+													value={share.percentageChange}
 												/>
 											</div>
 										</li>
@@ -179,8 +183,8 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 					onClick={() => onPay(invoice.id)}
 				>
 					{isPaid ? (
-						<span className="flex items-center gap-1 text-success">
-							<RiCheckboxCircleFill className="size-4" /> Pago
+						<span className="flex items-center gap-0.5 text-success">
+							<RiCheckboxCircleFill className="size-3.5" /> Pago
 						</span>
 					) : isOverdue ? (
 						<span className="overdue-blink">

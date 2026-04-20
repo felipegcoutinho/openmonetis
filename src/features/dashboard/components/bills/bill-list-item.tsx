@@ -3,8 +3,8 @@ import {
 	buildBillStatusLabel,
 	buildBillWidgetStatusLabel,
 	isBillOverdue,
-} from "@/features/dashboard/bills-helpers";
-import type { DashboardBill } from "@/features/dashboard/bills-queries";
+} from "@/features/dashboard/bills/bills-helpers";
+import type { DashboardBill } from "@/features/dashboard/bills/bills-queries";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { Button } from "@/shared/components/ui/button";
@@ -82,8 +82,8 @@ export function BillListItem({ bill, onPay }: BillListItemProps) {
 					onClick={() => onPay(bill.id)}
 				>
 					{bill.isSettled ? (
-						<span className="flex items-center gap-1 text-success">
-							<RiCheckboxCircleFill className="size-4" /> Pago
+						<span className="flex items-center gap-0.5 text-success">
+							<RiCheckboxCircleFill className="size-3.5" /> Pago
 						</span>
 					) : overdue ? (
 						<span className="overdue-blink">

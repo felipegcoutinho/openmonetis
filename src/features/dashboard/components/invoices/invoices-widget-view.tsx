@@ -1,5 +1,5 @@
-import type { InvoiceDialogState } from "@/features/dashboard/invoices-helpers";
-import type { DashboardInvoice } from "@/features/dashboard/invoices-queries";
+import type { InvoiceDialogState } from "@/features/dashboard/invoices/invoices-helpers";
+import type { DashboardInvoice } from "@/features/dashboard/invoices/invoices-queries";
 import { InvoicePaymentDialog } from "./invoice-payment-dialog";
 import { InvoicesList } from "./invoices-list";
 

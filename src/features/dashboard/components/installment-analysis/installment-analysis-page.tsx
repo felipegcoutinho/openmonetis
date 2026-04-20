@@ -130,7 +130,7 @@ export function InstallmentAnalysisPage({
 	return (
 		<div className="flex flex-col gap-4">
 			{/* Card de resumo principal */}
-			<Card className="border-none bg-primary/15">
+			<Card className="border-none bg-primary/10 dark:bg-primary/10">
 				<CardContent className="flex flex-col items-start justify-center gap-2 py-2">
 					<p className="text-sm text-muted-foreground">
 						Se você pagar tudo que está selecionado:

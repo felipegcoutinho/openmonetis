@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import {
 	formatPaymentBreakdownPercentage,
 	formatPaymentBreakdownTransactionsLabel,
-} from "@/features/dashboard/payment-breakdown-formatters";
+} from "@/features/dashboard/payments/payment-breakdown-formatters";
 import MoneyValues from "@/shared/components/money-values";
 import { Progress } from "@/shared/components/ui/progress";
 import {

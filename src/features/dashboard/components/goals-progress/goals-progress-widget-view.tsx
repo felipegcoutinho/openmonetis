@@ -5,7 +5,7 @@ import type {
 import type {
 	GoalProgressItem,
 	GoalsProgressData,
-} from "@/features/dashboard/goals-progress-queries";
+} from "@/features/dashboard/goals-progress/goals-progress-queries";
 import { GoalsProgressList } from "./goals-progress-list";
 import { GoalsProgressWidgetDialogs } from "./goals-progress-widget-dialogs";
 

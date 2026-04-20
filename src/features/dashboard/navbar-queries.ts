@@ -8,9 +8,9 @@ import { getBusinessDateString } from "@/shared/utils/date";
 import {
 	type DashboardNotificationsSnapshot,
 	fetchDashboardNotifications,
-} from "./notifications-queries";
+} from "./notifications/notifications-queries";
 
-export type DashboardNavbarData = {
+type DashboardNavbarData = {
 	pagadorAvatarUrl: string | null;
 	preLancamentosCount: number;
 	notificationsSnapshot: DashboardNotificationsSnapshot;

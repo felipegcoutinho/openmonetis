@@ -8,8 +8,8 @@ import {
 	type BillDialogState,
 	formatBillDateLabel,
 	getBillStatusBadgeVariant,
-} from "@/features/dashboard/bills-helpers";
-import type { DashboardBill } from "@/features/dashboard/bills-queries";
+} from "@/features/dashboard/bills/bills-helpers";
+import type { DashboardBill } from "@/features/dashboard/bills/bills-queries";
 import MoneyValues from "@/shared/components/money-values";
 import { PaymentSuccess } from "@/shared/components/payment-success";
 import { Badge } from "@/shared/components/ui/badge";

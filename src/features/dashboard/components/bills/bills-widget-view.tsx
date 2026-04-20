@@ -1,5 +1,5 @@
-import type { BillDialogState } from "@/features/dashboard/bills-helpers";
-import type { DashboardBill } from "@/features/dashboard/bills-queries";
+import type { BillDialogState } from "@/features/dashboard/bills/bills-helpers";
+import type { DashboardBill } from "@/features/dashboard/bills/bills-queries";
 import { BillPaymentDialog } from "./bill-payment-dialog";
 import { BillsList } from "./bills-list";
 

@@ -10,7 +10,7 @@ import {
 	fetchTransactionFilterSources,
 } from "@/features/transactions/queries";
 
-export type DashboardQuickActionOptions = {
+type DashboardQuickActionOptions = {
 	payerOptions: ReturnType<typeof buildOptionSets>["payerOptions"];
 	splitPayerOptions: ReturnType<typeof buildOptionSets>["splitPayerOptions"];
 	defaultPayerId: string | null;

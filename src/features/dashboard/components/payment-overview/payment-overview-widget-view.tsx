@@ -1,5 +1,5 @@
 import { RiMoneyDollarCircleLine, RiSlideshowLine } from "@remixicon/react";
-import type { PaymentOverviewTab } from "@/features/dashboard/payment-overview-tabs";
+import type { PaymentOverviewTab } from "@/features/dashboard/payments/payment-overview-tabs";
 import type { PaymentConditionsData } from "@/features/dashboard/payments/payment-conditions-queries";
 import type { PaymentMethodsData } from "@/features/dashboard/payments/payment-methods-queries";
 import {
@@ -31,11 +31,17 @@ export function PaymentOverviewWidgetView({
 	return (
 		<Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
 			<TabsList className="grid grid-cols-2">
-				<TabsTrigger value="conditions" className="text-xs">
+				<TabsTrigger
+					value="conditions"
+					className="text-xs data-[state=active]:bg-transparent"
+				>
 					<RiSlideshowLine className="mr-1 size-3.5" />
 					Condições
 				</TabsTrigger>
-				<TabsTrigger value="methods" className="text-xs">
+				<TabsTrigger
+					value="methods"
+					className="text-xs data-[state=active]:bg-transparent"
+				>
 					<RiMoneyDollarCircleLine className="mr-1 size-3.5" />
 					Formas
 				</TabsTrigger>

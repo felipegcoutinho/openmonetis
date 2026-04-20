@@ -1,14 +1,12 @@
 import {
-	RiArrowDownLine,
-	RiArrowDownSFill,
-	RiArrowUpLine,
-	RiArrowUpSFill,
-	RiCalendarCheckLine,
-	RiScalesLine,
-	RiSubtractLine,
+	RiArrowLeftRightLine,
+	RiArrowRightDownLine,
+	RiArrowRightUpLine,
+	RiCalendar2Line,
 } from "@remixicon/react";
 import { MetricsCardInfoButton } from "@/features/dashboard/components/metrics-card-info-button";
-import type { DashboardCardMetrics } from "@/features/dashboard/dashboard-metrics-queries";
+import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
+import type { DashboardCardMetrics } from "@/features/dashboard/overview/dashboard-metrics-queries";
 import MoneyValues from "@/shared/components/money-values";
 import {
 	Card,
@@ -34,7 +32,7 @@ const CARDS = [
 		label: "Receitas",
 		subtitle: "Entradas do período",
 		key: "receitas",
-		icon: RiArrowDownLine,
+		icon: RiArrowRightDownLine,
 		invertTrend: false,
 		iconClass: "text-success",
 		helpTitle: "Como calculamos receitas",
@@ -50,7 +48,7 @@ const CARDS = [
 		label: "Despesas",
 		subtitle: "Saídas do período",
 		key: "despesas",
-		icon: RiArrowUpLine,
+		icon: RiArrowRightUpLine,
 		invertTrend: true,
 		iconClass: "text-destructive",
 		helpTitle: "Como calculamos despesas",
@@ -66,7 +64,7 @@ const CARDS = [
 		label: "Balanço",
 		subtitle: "Receitas, despesas e ajustes entre contas",
 		key: "balanco",
-		icon: RiScalesLine,
+		icon: RiArrowLeftRightLine,
 		invertTrend: false,
 		iconClass: "text-warning",
 		helpTitle: "Como calculamos o balanço",
@@ -81,7 +79,7 @@ const CARDS = [
 		label: "Previsto",
 		subtitle: "Saldo acumulado projetado",
 		key: "previsto",
-		icon: RiCalendarCheckLine,
+		icon: RiCalendar2Line,
 		invertTrend: false,
 		iconClass: "text-cyan-600",
 		helpTitle: "Como calculamos o previsto",
@@ -93,12 +91,6 @@ const CARDS = [
 		],
 	},
 ] as const;
-
-const TREND_ICONS = {
-	up: RiArrowUpSFill,
-	down: RiArrowDownSFill,
-	flat: RiSubtractLine,
-} as const;
 
 const getTrend = (current: number, previous: number): Trend => {
 	const diff = current - previous;
@@ -126,12 +118,6 @@ const getPercentChange = (current: number, previous: number): string => {
 	});
 };
 
-const getTrendBadgeClass = (trend: Trend, invertTrend: boolean): string => {
-	if (trend === "flat") return "text-muted-foreground";
-	const isPositive = invertTrend ? trend === "down" : trend === "up";
-	return isPositive ? "text-success" : "text-destructive";
-};
-
 export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
@@ -148,8 +134,6 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 				}) => {
 					const metric = metrics[key];
 					const trend = getTrend(metric.current, metric.previous);
-					const TrendIcon = TREND_ICONS[trend];
-					const trendBadgeClass = getTrendBadgeClass(trend, invertTrend);
 					const percentChange = getPercentChange(
 						metric.current,
 						metric.previous,
@@ -157,23 +141,19 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 
 					return (
 						<Card key={label} className="gap-2 overflow-hidden">
-							<CardHeader>
-								<div className="flex items-start justify-between">
-									<div>
-										<CardTitle className="flex items-center gap-1.5 ">
-											<Icon className={cn("size-4", iconClass)} aria-hidden />
-											{label}
-											<MetricsCardInfoButton
-												label={label}
-												helpTitle={helpTitle}
-												helpLines={helpLines}
-											/>
-										</CardTitle>
-										<CardDescription className="mt-1.5 tracking-tight">
-											{subtitle}
-										</CardDescription>
-									</div>
-								</div>
+							<CardHeader className="gap-1">
+								<CardTitle className="flex items-center gap-1">
+									<Icon className={cn("size-4", iconClass)} aria-hidden />
+									{label}
+									<MetricsCardInfoButton
+										label={label}
+										helpTitle={helpTitle}
+										helpLines={helpLines}
+									/>
+								</CardTitle>
+								<CardDescription className="mt-1 tracking-tight">
+									{subtitle}
+								</CardDescription>
 								<Separator className="mt-1" />
 							</CardHeader>
 
@@ -183,15 +163,14 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 										className="text-2xl leading-none font-medium"
 										amount={metric.current}
 									/>
-									<div
-										className={cn(
-											"inline-flex items-center gap-1 text-xs font-medium",
-											trendBadgeClass,
-										)}
-									>
-										<TrendIcon className="size-3.5" aria-hidden />
-										<span>{percentChange}</span>
-									</div>
+									<PercentageChangeIndicator
+										trend={trend}
+										label={percentChange}
+										positiveTrend={invertTrend ? "down" : "up"}
+										showFlatIcon
+										className="gap-1"
+										iconClassName="size-3.5"
+									/>
 								</div>
 
 								<div className="text-xs text-muted-foreground">

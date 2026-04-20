@@ -1,13 +1,13 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchAttachmentsForPeriod } from "@/features/attachments/queries";
 import { fetchDashboardAccounts } from "./accounts-queries";
-import { fetchDashboardCategoryOverview } from "./category-overview-queries";
-import { fetchDashboardCurrentPeriodOverview } from "./current-period-overview-queries";
+import { fetchDashboardCategoryOverview } from "./categories/category-overview-queries";
 import { fetchDashboardInboxSnapshot } from "./inbox-snapshot-queries";
-import { fetchDashboardInvoices } from "./invoices-queries";
-import { fetchDashboardNotes } from "./notes-queries";
+import { fetchDashboardInvoices } from "./invoices/invoices-queries";
+import { fetchDashboardNotes } from "./notes/notes-queries";
+import { fetchDashboardCurrentPeriodOverview } from "./overview/current-period-overview-queries";
+import { fetchDashboardPeriodOverview } from "./overview/period-overview-queries";
 import { fetchDashboardPayers } from "./payers-queries";
-import { fetchDashboardPeriodOverview } from "./period-overview-queries";
 
 async function fetchDashboardDataInternal(userId: string, period: string) {
 	const [
