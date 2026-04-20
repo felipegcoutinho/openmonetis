@@ -341,7 +341,7 @@ export function AnticipateInstallmentsDialog({
 
 					{/* Seção 3: Resumo */}
 					{selectedIds.length > 0 && (
-						<div className="rounded-lg border bg-muted/20 p-3">
+						<div className="rounded-lg border p-3">
 							<h4 className="text-sm font-semibold mb-2">Resumo</h4>
 							<dl className="space-y-1.5 text-sm">
 								<div className="flex items-center justify-between">

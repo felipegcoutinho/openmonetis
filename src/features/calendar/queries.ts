@@ -17,6 +17,7 @@ import { parsePeriod } from "@/shared/utils/period";
 
 const PAYMENT_METHOD_BOLETO = "Boleto";
 const TRANSACTION_TYPE_TRANSFERENCIA = "Transferência";
+const PAYMENT_PREFIX = "Pagamento fatura - ";
 
 const clampDayInMonth = (year: number, monthIndex: number, day: number) => {
 	const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
@@ -88,19 +89,28 @@ export const fetchCalendarData = async ({
 	const transactionData = mapTransactionsData(transactionRows);
 	const events: CalendarEvent[] = [];
 
+	// Totais por cartão para exibir no vencimento
 	const cardTotals = new Map<string, number>();
 	for (const item of transactionData) {
-		if (!item.cardId || item.period !== period) {
-			continue;
-		}
+		if (!item.cardId || item.period !== period) continue;
 		const amount = Math.abs(item.amount ?? 0);
 		cardTotals.set(item.cardId, (cardTotals.get(item.cardId) ?? 0) + amount);
 	}
 
+	// Pagamentos de fatura por nome do cartão → data de pagamento
+	const paymentByCardName = new Map<string, string | null>();
 	for (const item of transactionData) {
+		if (!item.name.startsWith(PAYMENT_PREFIX)) continue;
+		const cardName = item.name.slice(PAYMENT_PREFIX.length);
+		paymentByCardName.set(cardName, item.purchaseDate?.slice(0, 10) ?? null);
+	}
+
+	for (const item of transactionData) {
+		// Pagamentos de fatura são consumidos pelos eventos de cartão
+		if (item.name.startsWith(PAYMENT_PREFIX)) continue;
+
 		const isBoleto = item.paymentMethod === PAYMENT_METHOD_BOLETO;
 
-		// Para boletos, exibir apenas na data de vencimento
 		if (isBoleto) {
 			if (
 				item.dueDate &&
@@ -114,7 +124,6 @@ export const fetchCalendarData = async ({
 				});
 			}
 		} else {
-			// Para outros tipos de lançamento, exibir na data de compra
 			const purchaseDateKey = item.purchaseDate.slice(0, 10);
 			if (isWithinRange(purchaseDateKey, rangeStartKey, rangeEndKey)) {
 				events.push({
@@ -127,21 +136,20 @@ export const fetchCalendarData = async ({
 		}
 	}
 
-	// Exibir vencimentos apenas de cartões com lançamentos do período
+	// Vencimentos de cartões com lançamentos no período
 	for (const card of cardRows) {
-		if (!cardTotals.has(card.id)) {
-			continue;
-		}
+		if (!cardTotals.has(card.id)) continue;
 
 		const dueDayNumber = Number.parseInt(card.dueDay ?? "", 10);
-		if (Number.isNaN(dueDayNumber)) {
-			continue;
-		}
+		if (Number.isNaN(dueDayNumber)) continue;
 
 		const normalizedDay = clampDayInMonth(year, monthIndex, dueDayNumber);
 		const dueDateKey = formatDateKey(
 			new Date(Date.UTC(year, monthIndex, normalizedDay)),
 		);
+
+		const isPaid = paymentByCardName.has(card.name);
+		const paymentDate = paymentByCardName.get(card.name) ?? null;
 
 		events.push({
 			id: `${card.id}:cartao`,
@@ -156,6 +164,8 @@ export const fetchCalendarData = async ({
 				status: card.status,
 				logo: card.logo ?? null,
 				totalDue: cardTotals.get(card.id) ?? null,
+				isPaid,
+				paymentDate,
 			},
 		});
 	}

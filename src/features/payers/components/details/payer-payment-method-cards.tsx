@@ -4,7 +4,7 @@ import {
 	RiHourglass2Line,
 	RiWallet3Line,
 } from "@remixicon/react";
-import { buildBillStatusLabel } from "@/features/dashboard/bills-helpers";
+import { buildBillStatusLabel } from "@/features/dashboard/bills/bills-helpers";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
 import { CardContent } from "@/shared/components/ui/card";

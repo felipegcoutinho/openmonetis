@@ -20,22 +20,13 @@ const getSingleParam = (
 	return Array.isArray(value) ? (value[0] ?? null) : value;
 };
 
-const capitalize = (value: string) =>
-	value.length === 0 ? value : value[0]?.toUpperCase() + value.slice(1);
-
 export default async function Page({ searchParams }: PageProps) {
 	await connection();
 	const userId = await getUserId();
 	const resolvedSearchParams = searchParams ? await searchParams : undefined;
 	const periodoParam = getSingleParam(resolvedSearchParams, "periodo");
 
-	const {
-		period: selectedPeriod,
-		monthName: rawMonthName,
-		year,
-	} = parsePeriodParam(periodoParam);
-
-	const periodLabel = `${capitalize(rawMonthName)} ${year}`;
+	const { period: selectedPeriod } = parsePeriodParam(periodoParam);
 
 	const { budgets, categoriesOptions } = await fetchBudgetsForUser(
 		userId,
@@ -49,7 +40,6 @@ export default async function Page({ searchParams }: PageProps) {
 				budgets={budgets}
 				categories={categoriesOptions}
 				selectedPeriod={selectedPeriod}
-				periodLabel={periodLabel}
 			/>
 		</main>
 	);

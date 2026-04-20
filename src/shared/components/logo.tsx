@@ -8,6 +8,10 @@ interface LogoProps {
 	invertTextOnDark?: boolean;
 	/** Exibe o ícone na cor original, sem filtro preto. Apenas nos variants "full" e "compact" */
 	colorIcon?: boolean;
+	/** Classes extras aplicadas na imagem do ícone */
+	iconClassName?: string;
+	/** Classes extras aplicadas na imagem do texto */
+	textClassName?: string;
 }
 
 const iconFilterClass = "brightness-0 saturate-0";
@@ -17,6 +21,8 @@ export function Logo({
 	className,
 	invertTextOnDark = true,
 	colorIcon = false,
+	iconClassName,
+	textClassName,
 }: LogoProps) {
 	if (variant === "compact") {
 		return (
@@ -27,7 +33,11 @@ export function Logo({
 						alt="OpenMonetis"
 						fill
 						sizes="32px"
-						className={cn("object-contain", !colorIcon && iconFilterClass)}
+						className={cn(
+							"object-contain",
+							!colorIcon && iconFilterClass,
+							iconClassName,
+						)}
 						priority
 					/>
 				</div>
@@ -37,7 +47,11 @@ export function Logo({
 						alt="OpenMonetis"
 						fill
 						sizes="110px"
-						className={cn("object-contain", invertTextOnDark && "dark:invert")}
+						className={cn(
+							"object-contain",
+							invertTextOnDark && "dark:invert",
+							textClassName,
+						)}
 						priority
 					/>
 				</div>

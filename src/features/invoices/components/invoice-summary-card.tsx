@@ -191,9 +191,9 @@ export function InvoiceSummaryCard({
 					<div className="space-y-4">
 						<p className="text-sm text-muted-foreground">Valor da fatura</p>
 						<MoneyValues
-							amount={totalAmount}
+							amount={Math.abs(totalAmount)}
 							className={cn(
-								"text-3xl leading-none tracking-tighter sm:text-[2rem]",
+								"text-3xl tracking-tighter font-semibold",
 								isPaid ? "text-success" : "text-foreground",
 							)}
 						/>

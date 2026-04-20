@@ -39,7 +39,7 @@ const MONTH_NAMES = [
 	"dezembro",
 ] as const;
 
-export const OPENMONETIS_TIME_ZONE = "America/Sao_Paulo";
+const OPENMONETIS_TIME_ZONE = "America/Sao_Paulo";
 
 type DateOnlyParts = {
 	year: number;
@@ -200,7 +200,7 @@ export function getTodayDateString(date: Date = new Date()): string {
 /**
  * Gets a date string in YYYY-MM-DD format for a specific timezone
  */
-export function getDateStringInTimeZone(
+function getDateStringInTimeZone(
 	timeZone: string,
 	date: Date = new Date(),
 ): string {
@@ -213,14 +213,6 @@ export function getDateStringInTimeZone(
  */
 export function getBusinessDateString(date: Date = new Date()): string {
 	return getDateStringInTimeZone(OPENMONETIS_TIME_ZONE, date);
-}
-
-/**
- * Gets today's date as Date object
- * @returns Date object for today
- */
-export function getTodayDate(date: Date = new Date()): Date {
-	return parseLocalDateString(getTodayDateString(date));
 }
 
 /**
@@ -397,19 +389,6 @@ export function formatDateOnlyLabel(
 	return prefix ? `${prefix} ${formatted}` : formatted;
 }
 
-export function formatDateTimeLabel(
-	value: string | Date | null | undefined,
-	prefix?: string,
-	options?: Intl.DateTimeFormatOptions,
-): string | null {
-	const formatted = formatDateTime(value, options);
-	if (!formatted) {
-		return null;
-	}
-
-	return prefix ? `${prefix} ${formatted}` : formatted;
-}
-
 export function compareDateOnly(
 	left: string | Date | null | undefined,
 	right: string | Date | null | undefined,
@@ -505,19 +484,7 @@ export function friendlyDate(date: Date): string {
 // TIME-BASED UTILITIES
 // ============================================================================
 
-/**
- * Gets appropriate greeting based on time of day
- * @param date - Date to get greeting for (defaults to now)
- * @returns "Bom dia", "Boa tarde", or "Boa noite"
- */
-export function getGreeting(date: Date = new Date()): string {
-	const hour = date.getHours();
-	if (hour >= 5 && hour < 12) return "Bom dia";
-	if (hour >= 12 && hour < 18) return "Boa tarde";
-	return "Boa noite";
-}
-
-export function getGreetingInTimeZone(
+function getGreetingInTimeZone(
 	timeZone: string,
 	date: Date = new Date(),
 ): string {
@@ -531,7 +498,7 @@ export function getBusinessGreeting(date: Date = new Date()): string {
 	return getGreetingInTimeZone(OPENMONETIS_TIME_ZONE, date);
 }
 
-export function formatCurrentDateInTimeZone(
+function formatCurrentDateInTimeZone(
 	timeZone: string,
 	date: Date = new Date(),
 ): string {
@@ -550,6 +517,3 @@ export function formatCurrentDateInTimeZone(
 export function formatBusinessCurrentDate(date: Date = new Date()): string {
 	return formatCurrentDateInTimeZone(OPENMONETIS_TIME_ZONE, date);
 }
-
-// Re-export MONTH_NAMES for convenience
-export { MONTH_NAMES };

@@ -1,6 +1,6 @@
 "use client";
 
-import { RiArrowDownSFill, RiArrowUpSFill } from "@remixicon/react";
+import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
 import { formatPercentageChange } from "@/features/reports/utils";
 import {
 	Tooltip,
@@ -30,13 +30,9 @@ export function CategoryCell({
 
 	const absoluteChange = !isFirstMonth ? value - previousValue : null;
 
-	const isIncrease = percentageChange !== null && percentageChange > 0;
-	const isDecrease = percentageChange !== null && percentageChange < 0;
-
 	// Despesa: aumento é ruim (vermelho), diminuição é bom (verde)
 	// Receita: aumento é bom (verde), diminuição é ruim (vermelho)
-	const isPositive = categoryType === "receita" ? isIncrease : isDecrease;
-	const isNegative = categoryType === "receita" ? isDecrease : isIncrease;
+	const positiveTrend = categoryType === "receita" ? "up" : "down";
 
 	return (
 		<Tooltip>
@@ -44,19 +40,12 @@ export function CategoryCell({
 				<div className="flex flex-col items-end gap-0.5 min-h-9 justify-center cursor-default px-4 py-2">
 					<span className="font-medium">{formatCurrency(value)}</span>
 					{!isFirstMonth && percentageChange !== null && (
-						<div
-							className={cn(
-								"flex items-center gap-0.5 text-xs",
-								isNegative && "text-destructive",
-								isPositive && "text-success",
-							)}
-						>
-							{isIncrease && <RiArrowUpSFill className="h-3 w-3" />}
-							{isDecrease && <RiArrowDownSFill className="h-3 w-3" />}
-							<span className="font-medium">
-								{formatPercentageChange(percentageChange)}
-							</span>
-						</div>
+						<PercentageChangeIndicator
+							value={percentageChange}
+							label={formatPercentageChange(percentageChange)}
+							positiveTrend={positiveTrend}
+							iconClassName="h-3 w-3"
+						/>
 					)}
 				</div>
 			</TooltipTrigger>
@@ -71,8 +60,14 @@ export function CategoryCell({
 							<div
 								className={cn(
 									"font-medium",
-									isNegative && "text-destructive",
-									isPositive && "text-success",
+									(positiveTrend === "up"
+										? absoluteChange !== null && absoluteChange < 0
+										: absoluteChange !== null && absoluteChange > 0) &&
+										"text-destructive",
+									(positiveTrend === "up"
+										? absoluteChange !== null && absoluteChange > 0
+										: absoluteChange !== null && absoluteChange < 0) &&
+										"text-success",
 								)}
 							>
 								Diferença:{" "}

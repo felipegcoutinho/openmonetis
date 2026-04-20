@@ -72,7 +72,7 @@ export function TransactionTypeBadge({
 			variant="outline"
 			data-kind={normalizedKind ?? "custom"}
 			className={cn(
-				"h-6 gap-1.5 rounded-full border-transparent px-2 py-0 text-xs font-medium shadow-none",
+				"h-6 gap-1 border-none rounded-md px-2 py-0 text-xs shadow-none",
 				config?.className ??
 					"bg-muted/30 text-muted-foreground dark:bg-muted/20",
 				className,

@@ -102,32 +102,29 @@ export function InboxItemsList({
 	const groups = groupItemsByDay(items);
 
 	return (
-		<div className="space-y-6">
-			{groups.map((group) => (
-				<div key={group.label}>
-					<div className="mb-3 flex items-center gap-1 text-muted-foreground">
-						<RiCalendarEventLine className="size-3.5 shrink-0" />
-						<p className="text-sm font-medium">{group.label}</p>
+		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{groups.flatMap((group) =>
+				group.items.map((item) => (
+					<div key={item.id} className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5 text-muted-foreground">
+							<RiCalendarEventLine className="size-3 shrink-0" />
+							<span className="text-xs font-medium">{group.label}</span>
+						</div>
+						<InboxCard
+							item={item}
+							readonly={readonly}
+							appLogoMap={appLogoMap}
+							onProcess={readonly ? undefined : onProcess}
+							onDiscard={readonly ? undefined : onDiscard}
+							onViewDetails={readonly ? undefined : onViewDetails}
+							onDelete={readonly ? onDelete : undefined}
+							onRestoreToPending={readonly ? onRestoreToPending : undefined}
+							selected={selectedIds.includes(item.id)}
+							onSelectToggle={onSelectToggle}
+						/>
 					</div>
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{group.items.map((item) => (
-							<InboxCard
-								key={item.id}
-								item={item}
-								readonly={readonly}
-								appLogoMap={appLogoMap}
-								onProcess={readonly ? undefined : onProcess}
-								onDiscard={readonly ? undefined : onDiscard}
-								onViewDetails={readonly ? undefined : onViewDetails}
-								onDelete={readonly ? onDelete : undefined}
-								onRestoreToPending={readonly ? onRestoreToPending : undefined}
-								selected={selectedIds.includes(item.id)}
-								onSelectToggle={onSelectToggle}
-							/>
-						))}
-					</div>
-				</div>
-			))}
+				)),
+			)}
 		</div>
 	);
 }

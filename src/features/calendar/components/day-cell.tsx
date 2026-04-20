@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAddLine } from "@remixicon/react";
+import { RiAddLine, RiCheckboxCircleFill } from "@remixicon/react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import type { CalendarDay, CalendarEvent } from "@/shared/lib/types/calendar";
 import { currencyFormatter } from "@/shared/utils/currency";
@@ -14,44 +14,33 @@ type DayCellProps = {
 
 export const EVENT_TYPE_STYLES: Record<
 	CalendarEvent["type"],
-	{ wrapper: string; dot: string; accent?: string }
+	{ wrapper: string; dot: string }
 > = {
 	transaction: {
-		wrapper:
-			"bg-warning/10 text-warning dark:bg-warning/5 dark:text-warning border-l-4 border-warning",
-		dot: "bg-warning",
+		wrapper: "bg-primary/10 text-primary dark:bg-primary/5 dark:text-primary",
+		dot: "bg-primary",
 	},
 	boleto: {
-		wrapper:
-			"bg-info/10 text-info dark:bg-info/5 dark:text-info border-l-4 border-info",
+		wrapper: "bg-info/10 text-info dark:bg-info/5 dark:text-info",
 		dot: "bg-info",
 	},
 	card: {
 		wrapper:
-			"bg-violet-100 text-violet-600 dark:bg-violet-900/10 dark:text-violet-50 border-l-4 border-violet-500",
-		dot: "bg-violet-600",
+			"bg-violet-100 text-violet-600 dark:bg-violet-900/10 dark:text-violet-500",
+		dot: "bg-violet-600 dark:bg-violet-500",
 	},
 };
-
-const eventStyles = EVENT_TYPE_STYLES;
 
 const formatCurrencyValue = (value: number | null | undefined) =>
 	currencyFormatter.format(Math.abs(value ?? 0));
 
-const formatAmount = (event: Extract<CalendarEvent, { type: "transaction" }>) =>
-	formatCurrencyValue(event.transaction.amount);
-
 const buildEventLabel = (event: CalendarEvent) => {
 	switch (event.type) {
-		case "transaction": {
+		case "transaction":
+		case "boleto":
 			return event.transaction.name;
-		}
-		case "boleto": {
-			return event.transaction.name;
-		}
-		case "card": {
+		case "card":
 			return event.card.name;
-		}
 		default:
 			return "";
 	}
@@ -59,60 +48,48 @@ const buildEventLabel = (event: CalendarEvent) => {
 
 const buildEventComplement = (event: CalendarEvent) => {
 	switch (event.type) {
-		case "transaction": {
-			return formatAmount(event);
-		}
-		case "boleto": {
+		case "transaction":
+		case "boleto":
 			return formatCurrencyValue(event.transaction.amount);
-		}
-		case "card": {
-			if (event.card.totalDue !== null) {
-				return formatCurrencyValue(event.card.totalDue);
-			}
-			return null;
-		}
+		case "card":
+			return event.card.totalDue !== null
+				? formatCurrencyValue(event.card.totalDue)
+				: null;
 		default:
 			return null;
 	}
 };
 
-const isPagamentoFatura = (event: CalendarEvent) => {
-	return (
-		event.type === "transaction" &&
-		event.transaction.name.startsWith("Pagamento fatura -")
-	);
-};
-
-const getEventStyle = (event: CalendarEvent) => {
-	if (isPagamentoFatura(event)) {
-		return {
-			wrapper:
-				"bg-success/10 text-success dark:bg-success/5 dark:text-success border-l-4 border-success",
-			dot: "bg-success",
-		};
-	}
-	return eventStyles[event.type];
+const isPaid = (event: CalendarEvent) => {
+	if (event.type === "boleto") return Boolean(event.transaction.isSettled);
+	if (event.type === "card") return event.card.isPaid;
+	return false;
 };
 
 const DayEventPreview = ({ event }: { event: CalendarEvent }) => {
 	const complement = buildEventComplement(event);
 	const label = buildEventLabel(event);
-	const style = getEventStyle(event);
+	const style = EVENT_TYPE_STYLES[event.type];
 
 	return (
 		<div
 			className={cn(
-				"flex w-full items-center justify-between gap-2 rounded p-1 text-xs",
+				"flex w-full items-center justify-between gap-2 rounded-md px-2 py-1 text-xs",
 				style.wrapper,
 			)}
 		>
 			<div className="flex min-w-0 items-center gap-1">
+				<span
+					className={cn("size-1.5 shrink-0 rounded-full", style.dot)}
+					aria-hidden
+				/>
 				<span className="truncate">{label}</span>
+				{isPaid(event) && (
+					<RiCheckboxCircleFill className="size-3.5 shrink-0 text-success" />
+				)}
 			</div>
 			{complement ? (
-				<span className={cn("shrink-0 font-medium", style.accent ?? "text-xs")}>
-					{complement}
-				</span>
+				<span className="shrink-0 font-medium">{complement}</span>
 			) : null}
 		</div>
 	);
@@ -143,8 +120,8 @@ export function DayCell({ day, onSelect, onCreate }: DayCellProps) {
 			onClick={() => onSelect(day)}
 			onKeyDown={handleKeyDown}
 			className={cn(
-				"group flex h-full cursor-pointer flex-col gap-1.5 rounded-lg border border-transparent bg-card/80 p-2 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-accent",
-				!day.isCurrentMonth && "opacity-60",
+				"group flex h-full cursor-pointer flex-col gap-1.5 rounded-lg border bg-card/80 p-2 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-accent",
+				!day.isCurrentMonth && "bg-muted/20 opacity-60",
 				day.isToday && "border-primary/70 bg-primary/5 hover:border-primary",
 			)}
 		>
@@ -159,14 +136,16 @@ export function DayCell({ day, onSelect, onCreate }: DayCellProps) {
 				>
 					{day.label}
 				</span>
-				<button
-					type="button"
-					onClick={handleCreateClick}
-					className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-0 transition-all group-hover:opacity-100 hover:bg-primary/20 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-					aria-label={`Criar lançamento em ${day.date}`}
-				>
-					<RiAddLine className="size-3.5" />
-				</button>
+				{day.isCurrentMonth && (
+					<button
+						type="button"
+						onClick={handleCreateClick}
+						className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-0 transition-all group-hover:opacity-100 hover:bg-primary/20 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+						aria-label={`Criar lançamento em ${day.date}`}
+					>
+						<RiAddLine className="size-3.5" />
+					</button>
+				)}
 			</div>
 
 			<div className="flex flex-1 flex-col gap-1.5">

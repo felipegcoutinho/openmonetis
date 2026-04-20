@@ -370,7 +370,7 @@ export function PayerDialog({
 										) : (
 											<div className="size-12 rounded-full bg-muted border-2 border-dashed border-muted-foreground/20 flex items-center justify-center hover:scale-110 transition-transform duration-200">
 												{isProcessingImage ? (
-													<span className="text-[10px] text-muted-foreground animate-pulse">
+													<span className="text-xs text-muted-foreground animate-pulse">
 														...
 													</span>
 												) : (

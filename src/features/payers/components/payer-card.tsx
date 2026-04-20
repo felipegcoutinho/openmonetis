@@ -72,7 +72,7 @@ export function PayerCard({ payer, onEdit, onRemove }: PayerCardProps) {
 					</Badge>
 
 					{isReadOnly ? (
-						<Badge variant="outline" className="text-xs text-warning">
+						<Badge variant="outline" className="text-xs text-primary">
 							Somente leitura
 						</Badge>
 					) : null}

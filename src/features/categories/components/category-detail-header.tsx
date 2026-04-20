@@ -1,11 +1,10 @@
-import { RiArrowDownSFill, RiArrowUpSFill } from "@remixicon/react";
+import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import { TransactionTypeBadge } from "@/shared/components/transaction-type-badge";
 import { Card } from "@/shared/components/ui/card";
 import type { CategoryType } from "@/shared/lib/categories/constants";
 import { currencyFormatter } from "@/shared/utils/currency";
 import { formatPercentage } from "@/shared/utils/percentage";
-import { cn } from "@/shared/utils/ui";
-import { CategoryIconBadge } from "./category-icon-badge";
 
 type CategorySummary = {
 	id: string;
@@ -33,33 +32,6 @@ export function CategoryDetailHeader({
 	percentageChange,
 	transactionCount,
 }: CategoryDetailHeaderProps) {
-	const isIncrease =
-		typeof percentageChange === "number" && percentageChange > 0;
-	const isDecrease =
-		typeof percentageChange === "number" && percentageChange < 0;
-
-	const variationColor =
-		category.type === "receita"
-			? isIncrease
-				? "text-success"
-				: isDecrease
-					? "text-destructive"
-					: "text-muted-foreground"
-			: isIncrease
-				? "text-destructive"
-				: isDecrease
-					? "text-success"
-					: "text-muted-foreground";
-
-	const variationIcon =
-		isIncrease || isDecrease ? (
-			isIncrease ? (
-				<RiArrowUpSFill className="size-4" aria-hidden />
-			) : (
-				<RiArrowDownSFill className="size-4" aria-hidden />
-			)
-		) : null;
-
 	const variationLabel =
 		typeof percentageChange === "number"
 			? formatPercentage(percentageChange, {
@@ -115,15 +87,13 @@ export function CategoryDetailHeader({
 						<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
 							Variação vs mês anterior
 						</p>
-						<div
-							className={cn(
-								"mt-1 flex items-center gap-1 text-lg font-semibold",
-								variationColor,
-							)}
-						>
-							{variationIcon}
-							<span>{variationLabel}</span>
-						</div>
+						<PercentageChangeIndicator
+							value={percentageChange}
+							label={variationLabel}
+							positiveTrend={category.type === "receita" ? "up" : "down"}
+							className="mt-1 gap-1 text-lg font-semibold"
+							iconClassName="size-4"
+						/>
 					</div>
 				</div>
 			</div>

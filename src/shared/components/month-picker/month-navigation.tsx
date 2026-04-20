@@ -37,7 +37,7 @@ export default function MonthNavigation() {
 	};
 
 	return (
-		<Card className="sticky top-16 z-10 flex w-full flex-row p-4 backdrop-blur-xs supports-backdrop-filter:bg-card/80 ">
+		<Card className="sticky top-18 z-10 flex w-full flex-row p-4 backdrop-blur-md supports-backdrop-filter:bg-card/60">
 			<div className="flex items-center gap-1">
 				<NavigationButton
 					direction="left"

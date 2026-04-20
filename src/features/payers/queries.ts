@@ -9,7 +9,7 @@ import {
 	PAYER_STATUS_OPTIONS,
 } from "@/shared/lib/payers/constants";
 
-export type PayerData = {
+type PayerData = {
 	id: string;
 	name: string;
 	email: string | null;

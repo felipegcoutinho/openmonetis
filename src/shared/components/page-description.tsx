@@ -8,12 +8,12 @@ export default function PageDescription({
 	icon?: React.ReactNode;
 }) {
 	return (
-		<div>
-			<h1 className="text-2xl font-semibold flex items-center gap-1 ">
+		<div className="space-y-2">
+			<h1 className="text-2xl font-semibold flex items-center gap-1">
 				<span className="text-primary">{icon}</span>
 				{title}
 			</h1>
-			<h2 className="text-sm max-w-2xl text-muted-foreground leading-relaxed mt-1.5">
+			<h2 className="text-sm max-w-2xl text-muted-foreground leading-relaxed">
 				{subtitle}
 			</h2>
 		</div>

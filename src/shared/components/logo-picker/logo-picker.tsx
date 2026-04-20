@@ -59,7 +59,7 @@ export function LogoPickerTrigger({
 						className="object-contain p-0.5"
 					/>
 				) : (
-					<span className="text-[10px] text-muted-foreground">Logo</span>
+					<span className="text-xs text-muted-foreground">Logo</span>
 				)}
 			</span>
 
@@ -172,7 +172,7 @@ export function LogoPickerDialog({
 											/>
 										</span>
 									</span>
-									<span className="line-clamp-1 text-[10px] leading-tight text-muted-foreground">
+									<span className="line-clamp-1 text-xs leading-tight text-muted-foreground">
 										{logoLabel}
 									</span>
 								</button>

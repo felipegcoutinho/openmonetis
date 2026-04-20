@@ -30,7 +30,6 @@ import { NavbarShell } from "@/shared/components/navigation/navbar/navbar-shell"
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { DotPattern } from "@/shared/components/ui/dot-pattern";
 import { getOptionalUserSession } from "@/shared/lib/auth/server";
 
 export default async function Page() {
@@ -57,7 +56,7 @@ export default async function Page() {
 						<a
 							key={href}
 							href={href}
-							className="rounded-md px-2 py-1.5 text-sm font-medium text-black/75 hover:text-black hover:bg-black/10 transition-colors"
+							className="rounded-md px-2 py-1.5 text-sm font-medium text-black/75 hover:text-black hover:bg-black/10 transition-colors dark:text-white/75 dark:hover:text-white dark:hover:bg-white/10"
 						>
 							{label}
 						</a>
@@ -70,9 +69,9 @@ export default async function Page() {
 						(session?.user ? (
 							<Link prefetch href="/dashboard" className="hidden md:block">
 								<Button
-									variant="outline"
+									variant="navbar"
 									size="sm"
-									className="border-black/20 text-black/80 bg-transparent hover:bg-black/10 hover:text-black shadow-none"
+									className="border border-black/20 dark:border-white/20"
 								>
 									Dashboard
 								</Button>
@@ -83,7 +82,7 @@ export default async function Page() {
 									<Button
 										variant="ghost"
 										size="sm"
-										className="text-black/75 hover:bg-black/10 hover:text-black shadow-none"
+										className="text-black/75 hover:bg-black/10 hover:text-black shadow-none dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white"
 									>
 										Entrar
 									</Button>
@@ -91,7 +90,7 @@ export default async function Page() {
 								<Link href="/signup">
 									<Button
 										size="sm"
-										className="bg-black/10 border border-black/20 text-black shadow-none hover:bg-black/20 gap-2"
+										className="bg-black/10 border border-black/20 text-black shadow-none hover:bg-black/20 gap-2 dark:bg-white/10 dark:border-white/20 dark:text-white dark:hover:bg-white/20"
 									>
 										Começar
 									</Button>
@@ -107,18 +106,6 @@ export default async function Page() {
 
 			{/* Hero Section */}
 			<section className="relative overflow-hidden pt-14 md:pt-20 lg:pt-24 pb-0">
-				<div className="pointer-events-none absolute inset-x-0 top-0 h-80 overflow-hidden">
-					<DotPattern
-						width={20}
-						height={20}
-						cx={1.25}
-						cy={1.25}
-						cr={1.25}
-						className="text-primary/10 mask-[linear-gradient(to_bottom,black_0%,transparent_100%)]"
-					/>
-					<div className="absolute inset-0 bg-linear-to-b from-primary/6 to-transparent" />
-				</div>
-
 				<div className="max-w-8xl mx-auto px-4 relative">
 					<div className="mx-auto flex max-w-4xl flex-col items-center text-center gap-5 md:gap-6 pb-10 md:pb-14">
 						<Badge variant="outline">
@@ -265,70 +252,32 @@ export default async function Page() {
 						</AnimateOnScroll>
 
 						<AnimateOnScroll>
-							<div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-								{mainFeatures.map((feature) => (
+							<div className="grid gap-4 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+								{[...mainFeatures, ...extraFeatures].map((feature) => (
 									<Card key={feature.title}>
-										<CardContent className="pt-5 pb-5 md:pt-6">
-											<div className="flex flex-col gap-3 md:gap-4">
+										<CardContent>
+											<div className="flex items-center gap-3 mb-3">
 												<div
-													className="flex h-11 w-11 md:h-12 md:w-12 items-center justify-center rounded-lg"
+													className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
 													style={{
-														backgroundColor: `color-mix(in oklch, ${feature.colorVar} 14%, transparent)`,
+														backgroundColor: `color-mix(in oklch, ${feature.colorVar} 20%, transparent)`,
 													}}
 												>
 													<feature.icon
-														className="size-[22px] md:size-6"
-														style={{ color: feature.colorVar }}
+														className="size-5"
+														style={{ color: "var(--foreground)" }}
 													/>
 												</div>
-												<div>
-													<h3 className="font-semibold text-base md:text-lg mb-1.5 md:mb-2">
-														{feature.title}
-													</h3>
-													<p className="text-sm text-muted-foreground leading-relaxed">
-														{feature.description}
-													</p>
-												</div>
+												<h3 className="font-semibold text-base leading-tight">
+													{feature.title}
+												</h3>
 											</div>
+											<p className="text-sm text-muted-foreground leading-relaxed">
+												{feature.description}
+											</p>
 										</CardContent>
 									</Card>
 								))}
-							</div>
-						</AnimateOnScroll>
-
-						<AnimateOnScroll>
-							<div className="mt-8 md:mt-12">
-								<h3 className="text-sm font-semibold text-center mb-4 md:mb-6 text-muted-foreground">
-									Também inclui
-								</h3>
-								<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-									{extraFeatures.map((feature) => (
-										<div
-											key={feature.title}
-											className="flex items-start gap-3 rounded-lg border bg-card p-3 md:p-4"
-										>
-											<div
-												className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
-												style={{
-													backgroundColor: `color-mix(in oklch, ${feature.colorVar} 14%, transparent)`,
-												}}
-											>
-												<feature.icon
-													className="size-[18px]"
-													style={{ color: feature.colorVar }}
-												/>
-											</div>
-											<div className="min-w-0">
-												<h4 className="font-semibold text-sm mb-0.5">
-													{feature.title}
-												</h4>
-												<p className="text-xs text-muted-foreground leading-relaxed">
-													{feature.description}
-												</p>
-											</div>
-										</div>
-									))}
-								</div>
 							</div>
 						</AnimateOnScroll>
 					</div>
@@ -396,14 +345,14 @@ export default async function Page() {
 										{pwaHighlights.map((item) => (
 											<li key={item.title} className="flex items-start gap-3">
 												<div
-													className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+													className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
 													style={{
-														backgroundColor: `color-mix(in oklch, ${item.colorVar} 14%, transparent)`,
+														backgroundColor: `color-mix(in oklch, ${item.colorVar} 20%, transparent)`,
 													}}
 												>
 													<item.icon
 														className="size-[15px]"
-														style={{ color: item.colorVar }}
+														style={{ color: "var(--foreground)" }}
 													/>
 												</div>
 												<p className="text-sm">
@@ -438,17 +387,19 @@ export default async function Page() {
 										pré-lançamentos automaticamente para você revisar na inbox.
 									</p>
 									<ol className="space-y-3 mb-6">
-										{companionSteps.map((step, index) => (
+										{companionSteps.map((step) => (
 											<li key={step.title} className="flex items-start gap-3">
-												<span
-													className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-medium"
+												<div
+													className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
 													style={{
-														backgroundColor: `color-mix(in oklch, ${step.colorVar} 14%, transparent)`,
-														color: step.colorVar,
+														backgroundColor: `color-mix(in oklch, ${step.colorVar} 20%, transparent)`,
 													}}
 												>
-													{index + 1}
-												</span>
+													<step.icon
+														className="size-3.5"
+														style={{ color: "var(--foreground)" }}
+													/>
+												</div>
 												<p className="text-sm">
 													<span className="font-medium">{step.title}</span>
 													<span className="text-muted-foreground">
@@ -545,14 +496,14 @@ export default async function Page() {
 										<CardContent>
 											<div className="flex items-start gap-4">
 												<div
-													className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
+													className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
 													style={{
-														backgroundColor: `color-mix(in oklch, ${item.colorVar} 14%, transparent)`,
+														backgroundColor: `color-mix(in oklch, ${item.colorVar} 20%, transparent)`,
 													}}
 												>
 													<item.icon
 														className="size-6"
-														style={{ color: item.colorVar }}
+														style={{ color: "var(--foreground)" }}
 													/>
 												</div>
 												<div>
@@ -633,14 +584,14 @@ export default async function Page() {
 										<CardContent>
 											<div className="flex gap-3 md:gap-4">
 												<div
-													className="flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg"
+													className="flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full"
 													style={{
-														backgroundColor: `color-mix(in oklch, ${item.colorVar} 14%, transparent)`,
+														backgroundColor: `color-mix(in oklch, ${item.colorVar} 20%, transparent)`,
 													}}
 												>
 													<item.icon
 														className="size-[18px] md:size-5"
-														style={{ color: item.colorVar }}
+														style={{ color: "var(--foreground)" }}
 													/>
 												</div>
 												<div>

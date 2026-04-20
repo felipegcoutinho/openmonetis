@@ -148,7 +148,7 @@ export function AnticipationCard({
 				</dl>
 
 				{anticipation.note && (
-					<div className="rounded-lg border bg-muted/20 p-3">
+					<div className="rounded-lg border p-3">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Observação
 						</dt>

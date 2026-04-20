@@ -19,14 +19,12 @@ interface BudgetsPageProps {
 	budgets: Budget[];
 	categories: BudgetCategory[];
 	selectedPeriod: string;
-	periodLabel: string;
 }
 
 export function BudgetsPage({
 	budgets,
 	categories,
 	selectedPeriod,
-	periodLabel,
 }: BudgetsPageProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
@@ -137,7 +135,6 @@ export function BudgetsPage({
 							<BudgetCard
 								key={budget.id}
 								budget={budget}
-								periodLabel={periodLabel}
 								onEdit={handleEdit}
 								onRemove={handleRemoveRequest}
 							/>

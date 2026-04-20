@@ -86,7 +86,7 @@ export function AccountStatementCard({
 						</p>
 						<MoneyValues
 							amount={currentBalance}
-							className="text-3xl leading-none tracking-tighter sm:text-[2rem]"
+							className="text-3xl leading-none tracking-tighter sm:text-2xl"
 						/>
 						<div className="flex items-center gap-2">
 							<Badge

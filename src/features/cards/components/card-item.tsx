@@ -84,39 +84,11 @@ export function CardItem({
 	const logoPath = resolveLogoSrc(logo);
 	const brandAsset = resolveCardBrandAsset(brand);
 	const isInactive = status?.toLowerCase() === "inativo";
-	const metrics =
-		limitTotal === null || used === null || available === null
-			? null
-			: [
-					{ label: "Limite Total", value: limitTotal },
-					{ label: "Em uso", value: used },
-					{ label: "Disponível", value: available },
-				];
-
-	const actions = [
-		{
-			label: "editar",
-			icon: <RiPencilLine className="size-4" aria-hidden />,
-			onClick: onEdit,
-			className: "text-primary",
-		},
-		{
-			label: "ver fatura",
-			icon: <RiFileList2Line className="size-4" aria-hidden />,
-			onClick: onInvoice,
-			className: "text-primary",
-		},
-		{
-			label: "remover",
-			icon: <RiDeleteBin5Line className="size-4" aria-hidden />,
-			onClick: onRemove,
-			className: "text-destructive",
-		},
-	];
+	const hasMetrics = limitTotal !== null && used !== null && available !== null;
 
 	return (
 		<Card className="flex flex-col p-6 w-full">
-			<CardHeader className="space-y-2 px-0 pb-0">
+			<CardHeader className="space-y-2 p-0">
 				<div className="flex items-start justify-between gap-2">
 					<div className="flex flex-1 items-center gap-2">
 						{logoPath ? (
@@ -135,8 +107,8 @@ export function CardItem({
 						) : null}
 
 						<div className="min-w-0">
-							<div className="flex items-center gap-1.5">
-								<h3 className="truncate text-sm font-semibold text-foreground sm:text-base">
+							<div className="flex items-center gap-2">
+								<h3 className="truncate font-semibold text-foreground">
 									{name}
 								</h3>
 								{note ? (
@@ -166,14 +138,14 @@ export function CardItem({
 					</div>
 
 					{brandAsset ? (
-						<div className="flex items-center justify-center py-1">
+						<div className="flex items-center justify-center py-2">
 							<Image
 								src={brandAsset}
 								alt={`Bandeira ${brand}`}
 								width={36}
 								height={36}
 								className={cn(
-									"h-5 w-auto rounded",
+									"h-4 w-auto rounded",
 									isInactive && "grayscale opacity-40",
 								)}
 							/>
@@ -185,56 +157,65 @@ export function CardItem({
 					)}
 				</div>
 
-				<div className="flex items-center justify-between border-y py-3 text-xs font-medium text-muted-foreground sm:text-sm">
+				<div className="flex items-center justify-between border-y py-3 text-sm text-muted-foreground">
 					<span>
-						Fecha dia{" "}
-						<span className="font-medium text-foreground">
-							{formatDay(closingDay)}
+						Fecha em{" "}
+						<span className="font-semibold text-foreground">
+							dia {formatDay(closingDay)}
 						</span>
 					</span>
 					<span>
-						Vence dia{" "}
-						<span className="font-medium text-foreground">
-							{formatDay(dueDay)}
+						Vence em{" "}
+						<span className="font-semibold text-foreground">
+							dia {formatDay(dueDay)}
 						</span>
 					</span>
 				</div>
 			</CardHeader>
 
-			<CardContent className="flex flex-1 flex-col gap-5 px-0">
-				{metrics ? (
+			<CardContent className="flex flex-1 flex-col gap-4 px-0">
+				{hasMetrics &&
+				available !== null &&
+				used !== null &&
+				limitTotal !== null ? (
 					<>
-						<div className="grid grid-cols-3 gap-4">
-							<div className="flex flex-col items-start gap-1">
-								<p className="text-sm font-semibold text-foreground">
-									<MoneyValues amount={metrics[0].value} />
-								</p>
-								<span className="text-xs text-muted-foreground">
-									{metrics[0].label}
-								</span>
-							</div>
+						<div className="flex flex-col gap-0.5">
+							<span className="text-xs text-muted-foreground">Disponível</span>
+							<MoneyValues
+								amount={available}
+								className="text-xl font-semibold text-success"
+							/>
+						</div>
 
-							<div className="flex flex-col items-center gap-1">
-								<p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-									<span className="size-2 rounded-full bg-primary" />
-									<MoneyValues amount={metrics[1].value} />
-								</p>
+						<div className="grid grid-cols-2 gap-2">
+							<div className="flex flex-col gap-0.5">
 								<span className="text-xs text-muted-foreground">
-									{metrics[1].label}
+									Limite total
 								</span>
+								<MoneyValues
+									amount={limitTotal}
+									className="text-sm font-semibold text-foreground"
+								/>
 							</div>
-
-							<div className="flex flex-col items-end gap-1">
-								<p className="text-sm font-semibold text-foreground">
-									<MoneyValues amount={metrics[2].value} />
-								</p>
-								<span className="text-xs text-muted-foreground">
-									{metrics[2].label}
-								</span>
+							<div className="flex flex-col gap-0.5">
+								<span className="text-xs text-muted-foreground">Em uso</span>
+								<MoneyValues
+									amount={used}
+									className="text-sm font-semibold text-primary"
+								/>
 							</div>
 						</div>
 
-						<Progress value={usagePercent} className="h-3" />
+						<div className="flex flex-col gap-2">
+							<Progress
+								value={usagePercent}
+								className="h-2.5"
+								aria-label={`${usagePercent.toFixed(0)}% do limite utilizado`}
+							/>
+							<span className="text-xs text-muted-foreground">
+								{usagePercent.toFixed(1)}% utilizado
+							</span>
+						</div>
 					</>
 				) : (
 					<p className="text-sm text-muted-foreground">
@@ -243,21 +224,31 @@ export function CardItem({
 				)}
 			</CardContent>
 
-			<CardFooter className="mt-auto flex flex-wrap gap-4 px-0 text-sm">
-				{actions.map(({ label, icon, onClick, className }) => (
-					<button
-						key={label}
-						type="button"
-						onClick={onClick}
-						className={cn(
-							"flex items-center gap-1 font-medium transition-opacity hover:opacity-80",
-							className,
-						)}
-					>
-						{icon}
-						{label}
-					</button>
-				))}
+			<CardFooter className="mt-auto flex flex-wrap gap-4 px-0 pt-2 text-sm">
+				<button
+					type="button"
+					onClick={onEdit}
+					className="flex items-center gap-1 font-medium text-primary transition-opacity hover:opacity-80"
+				>
+					<RiPencilLine className="size-4" aria-hidden />
+					editar
+				</button>
+				<button
+					type="button"
+					onClick={onInvoice}
+					className="flex items-center gap-1 font-medium text-primary transition-opacity hover:opacity-80"
+				>
+					<RiFileList2Line className="size-4" aria-hidden />
+					ver fatura
+				</button>
+				<button
+					type="button"
+					onClick={onRemove}
+					className="flex items-center gap-1 font-medium text-destructive transition-opacity hover:opacity-80"
+				>
+					<RiDeleteBin5Line className="size-4" aria-hidden />
+					remover
+				</button>
 			</CardFooter>
 		</Card>
 	);

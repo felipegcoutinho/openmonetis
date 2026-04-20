@@ -419,7 +419,7 @@ function buildColumns({
 					<>
 						<Avatar className="size-7">
 							<AvatarImage src={avatarSrc} alt={`Avatar de ${label}`} />
-							<AvatarFallback className="text-[10px] font-medium uppercase">
+							<AvatarFallback className="text-xs font-medium uppercase">
 								{initial}
 							</AvatarFallback>
 						</Avatar>

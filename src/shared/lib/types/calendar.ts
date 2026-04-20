@@ -29,6 +29,8 @@ export type CalendarEvent =
 				status: string;
 				logo: string | null;
 				totalDue: number | null;
+				isPaid: boolean;
+				paymentDate: string | null;
 			};
 	  };
 

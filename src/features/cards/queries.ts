@@ -3,7 +3,7 @@ import { cards, financialAccounts, transactions } from "@/db/schema";
 import { db } from "@/shared/lib/db";
 import { loadLogoOptions } from "@/shared/lib/logo/options";
 
-export type CardData = {
+type CardData = {
 	id: string;
 	name: string;
 	brand: string;

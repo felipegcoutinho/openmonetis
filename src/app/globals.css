@@ -10,7 +10,7 @@
 :root {
   --background: oklch(97.412% 0.00332 67.032);
   --foreground: oklch(27% 0.008 45);
-  --card: oklch(99% 0.002 67);
+  --card: oklch(100% 0 0);
   --card-foreground: var(--foreground);
   --popover: oklch(100% 0 0);
   --popover-foreground: var(--foreground);
@@ -36,7 +36,7 @@
   --destructive: oklch(55% 0.22 27);
   --destructive-foreground: oklch(98% 0.005 30);
 
-  --border: oklch(90.274% 0.01362 60.342);
+  --border: oklch(92.323% 0.01276 63.703);
   --input: var(--border);
   --ring: var(--primary);
 
@@ -57,10 +57,6 @@
   --data-4:  oklch(74% 0.18 55);  /* âmbar */
   --data-5:  oklch(78% 0.16 68);  /* âmbar-dourado */
   --data-6:  oklch(76% 0.15 82);  /* amarelo-quente */
-  --data-7:  oklch(70% 0.17 95);  /* amarelo-lima */
-  --data-8:  oklch(65% 0.18 108); /* lima-verde */
-  --data-9:  oklch(62% 0.17 120); /* verde-oliva claro */
-  --data-10: oklch(56% 0.15 10);  /* terracota escuro */
 
   --sidebar: oklch(99.3% 0.0015 75);
   --sidebar-foreground: var(--foreground);
@@ -71,7 +67,7 @@
   --sidebar-border: oklch(91% 0.004 70);
   --sidebar-ring: var(--primary);
 
-  --radius: 0.625rem;
+  --radius: 0.7rem;
 
   --shadow-2xs: 0 1px 2px 0px oklch(35% 0.02 45 / 0.04);
   --shadow-xs: 0 1px 3px 0px oklch(35% 0.02 45 / 0.06);
@@ -94,7 +90,7 @@
 .dark {
   --background: oklch(18% 0.004 55);
   --foreground: oklch(93% 0.008 80);
-  --card: oklch(21.5% 0.004 55);
+  --card: oklch(21.531% 0.00369 48.293);
   --card-foreground: var(--foreground);
   --popover: oklch(24% 0.004 55);
   --popover-foreground: var(--foreground);
@@ -120,7 +116,7 @@
   --destructive: oklch(62% 0.2 28);
   --destructive-foreground: oklch(98% 0.005 30);
 
-  --border: oklch(31% 0.004 55);
+  --border: oklch(28% 0.0035 55);
   --input: var(--border);
   --ring: var(--primary);
 
@@ -141,10 +137,6 @@
   --data-4:  oklch(81% 0.18 55);
   --data-5:  oklch(84% 0.16 68);
   --data-6:  oklch(82% 0.15 82);
-  --data-7:  oklch(77% 0.17 95);
-  --data-8:  oklch(72% 0.18 108);
-  --data-9:  oklch(69% 0.17 120);
-  --data-10: oklch(63% 0.15 10);
 
   --sidebar: oklch(15.5% 0.004 55);
   --sidebar-foreground: var(--foreground);
@@ -155,7 +147,7 @@
   --sidebar-border: oklch(30% 0.004 55);
   --sidebar-ring: var(--primary);
 
-  --radius: 0.625rem;
+  --radius: 0.7rem;
 
   --shadow-2xs: 0 1px 2px 0px oklch(0% 0 0 / 0.3);
   --shadow-xs: 0 1px 3px 0px oklch(0% 0 0 / 0.4);

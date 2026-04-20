@@ -40,7 +40,9 @@ export default async function Page({ searchParams }: PageProps) {
 	// Extract query params
 	const inicioParam = getSingleParam(resolvedSearchParams, "inicio");
 	const fimParam = getSingleParam(resolvedSearchParams, "fim");
-	const categoriasParam = getSingleParam(resolvedSearchParams, "categories");
+	const categoriasParam =
+		getSingleParam(resolvedSearchParams, "categorias") ??
+		getSingleParam(resolvedSearchParams, "categories");
 
 	// Calculate default period (last 6 months)
 	const currentPeriod = getCurrentPeriod();

@@ -8,7 +8,7 @@ import { INITIAL_BALANCE_NOTE } from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 
-export type AccountSummaryData = {
+type AccountSummaryData = {
 	openingBalance: number;
 	currentBalance: number;
 	totalIncomes: number;

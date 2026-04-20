@@ -15,7 +15,6 @@ import type { Budget } from "./types";
 
 interface BudgetCardProps {
 	budget: Budget;
-	periodLabel: string;
 	onEdit: (budget: Budget) => void;
 	onRemove: (budget: Budget) => void;
 }
@@ -29,81 +28,88 @@ const buildUsagePercent = (spent: number, limit: number) => {
 };
 
 const formatCategoryName = (budget: Budget) =>
-	budget.category?.name ?? "Category removida";
+	budget.category?.name ?? "Categoria removida";
 
-export function BudgetCard({
-	budget,
-	periodLabel,
-	onEdit,
-	onRemove,
-}: BudgetCardProps) {
+export function BudgetCard({ budget, onEdit, onRemove }: BudgetCardProps) {
 	const { amount: limit, spent } = budget;
 	const exceeded = spent > limit && limit >= 0;
 	const difference = Math.abs(spent - limit);
 	const usagePercent = buildUsagePercent(spent, limit);
+	const remaining = Math.max(limit - spent, 0);
 
 	return (
-		<Card className="flex h-full flex-col">
-			<CardContent className="flex h-full flex-col gap-4">
-				<div className="flex items-start gap-3">
-					<CategoryIconBadge
-						icon={budget.category?.icon ?? undefined}
-						name={formatCategoryName(budget)}
-						size="lg"
+		<Card className="flex w-full flex-col p-6">
+			<div className="flex items-center gap-2">
+				<CategoryIconBadge
+					icon={budget.category?.icon ?? undefined}
+					name={formatCategoryName(budget)}
+					size="lg"
+				/>
+				<div className="min-w-0">
+					<h3 className="truncate font-semibold text-foreground">
+						{formatCategoryName(budget)}
+					</h3>
+				</div>
+			</div>
+
+			<CardContent className="flex flex-1 flex-col gap-4 p-0">
+				<div className="flex flex-col gap-0.5">
+					<span className="text-xs text-muted-foreground">
+						{exceeded ? "Excedido em" : "Disponível"}
+					</span>
+					<MoneyValues
+						amount={exceeded ? difference : remaining}
+						className={cn(
+							"text-xl font-semibold",
+							exceeded ? "text-destructive" : "text-success",
+						)}
 					/>
-					<div className="space-y-1">
-						<h3 className="text-base font-semibold leading-tight">
-							{formatCategoryName(budget)}
-						</h3>
-						<p className="text-xs text-muted-foreground">
-							Orçamento de {periodLabel}
-						</p>
-					</div>
 				</div>
 
-				<div className="flex flex-1 flex-col gap-2">
-					<div className="flex items-baseline justify-between text-sm">
-						<span className="text-muted-foreground">Gasto até agora</span>
+				<div className="grid grid-cols-2 gap-2">
+					<div className="flex flex-col gap-0.5">
+						<span className="text-xs text-muted-foreground">Orçamento</span>
 						<MoneyValues
-							amount={spent}
-							className={cn(exceeded && "text-destructive")}
+							amount={limit}
+							className="text-sm font-semibold text-foreground"
 						/>
 					</div>
-					<Progress
-						value={usagePercent}
-						className={cn("h-2", exceeded && "bg-destructive/20!")}
-					/>
-					<div className="flex flex-wrap items-baseline justify-between gap-1 text-sm">
-						<span className="text-muted-foreground">Limite</span>
-						<MoneyValues amount={limit} className="text-foreground" />
-					</div>
-
-					<div>
-						{exceeded ? (
-							<div className="text-xs text-destructive">
-								Excedeu em <MoneyValues amount={difference} />
-							</div>
-						) : (
-							<div className="text-xs text-success">
-								Restam <MoneyValues amount={Math.max(limit - spent, 0)} />{" "}
-								disponíveis.
-							</div>
-						)}
+					<div className="flex flex-col gap-0.5">
+						<span className="text-xs text-muted-foreground">Gasto</span>
+						<MoneyValues
+							amount={spent}
+							className={cn(
+								"text-sm font-semibold",
+								exceeded ? "text-destructive" : "text-primary",
+							)}
+						/>
 					</div>
 				</div>
+
+				<div className="flex flex-col gap-2">
+					<Progress
+						value={usagePercent}
+						className={cn("h-2.5", exceeded && "bg-destructive/20!")}
+						aria-label={`${usagePercent.toFixed(1)}% do orçamento utilizado`}
+					/>
+					<span className="text-xs text-muted-foreground">
+						{usagePercent.toFixed(1)}% utilizado
+					</span>
+				</div>
 			</CardContent>
-			<CardFooter className="flex flex-wrap gap-3 px-5 text-sm">
+
+			<CardFooter className="mt-auto flex flex-wrap gap-4 px-0 pt-2 text-sm">
 				<button
 					type="button"
 					onClick={() => onEdit(budget)}
-					className="flex items-center gap-1 text-primary font-medium transition-opacity hover:opacity-80"
+					className="flex items-center gap-1 font-medium text-primary transition-opacity hover:opacity-80"
 				>
 					<RiPencilLine className="size-4" aria-hidden /> editar
 				</button>
 				{budget.category && (
 					<Link
 						href={`/categories/${budget.category.id}`}
-						className="flex items-center gap-1 text-primary font-medium transition-opacity hover:opacity-80"
+						className="flex items-center gap-1 font-medium text-primary transition-opacity hover:opacity-80"
 					>
 						<RiFileList2Line className="size-4" aria-hidden /> detalhes
 					</Link>
@@ -111,7 +117,7 @@ export function BudgetCard({
 				<button
 					type="button"
 					onClick={() => onRemove(budget)}
-					className="flex items-center gap-1 text-destructive font-medium transition-opacity hover:opacity-80"
+					className="flex items-center gap-1 font-medium text-destructive transition-opacity hover:opacity-80"
 				>
 					<RiDeleteBin5Line className="size-4" aria-hidden /> remover
 				</button>

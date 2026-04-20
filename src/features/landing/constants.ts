@@ -49,42 +49,42 @@ export const mainFeatures: FeatureItem[] = [
 		icon: RiWalletLine,
 		title: "Contas e transações",
 		description:
-			"Registre suas contas bancárias, cartões e dinheiro. Adicione receitas, despesas e transferências. Organize por categorias. Extratos detalhados por conta.",
-		colorVar: "var(--data-9)",
+			"Contas bancárias, cartões e dinheiro em um só lugar, se organize como preferir.",
+		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiPercentLine,
 		title: "Parcelamentos avançados",
 		description:
-			"Controle completo de compras parceladas. Antecipe parcelas com cálculo automático de desconto. Veja análise consolidada de todas as parcelas em aberto.",
+			"Controle compras parceladas e antecipe parcelas com cálculo automático de desconto.",
 		colorVar: "var(--data-4)",
 	},
 	{
 		icon: RiRobot2Line,
 		title: "Insights com IA",
 		description:
-			"Análises financeiras geradas por IA (Claude, GPT, Gemini). Insights personalizados sobre seus padrões de gastos e recomendações inteligentes.",
-		colorVar: "var(--data-8)",
+			"Análises por IA com insights sobre padrões de gastos e recomendações personalizadas.",
+		colorVar: "var(--data-6)",
 	},
 	{
 		icon: RiBarChartBoxLine,
 		title: "Relatórios e gráficos",
 		description:
-			"Dashboard com 20+ widgets interativos. Relatórios detalhados por categoria. Gráficos de evolução e comparativos. Exportação em PDF e Excel.",
+			"20+ widgets interativos, relatórios por categoria e exportação em PDF e Excel.",
 		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiBankCard2Line,
 		title: "Faturas de cartão",
 		description:
-			"Cadastre seus cartões e acompanhe as faturas por período. Veja o que ainda não foi fechado. Controle limites, vencimentos e fechamentos.",
+			"Acompanhe faturas por período, limites e vencimentos de cada cartão.",
 		colorVar: "var(--data-1)",
 	},
 	{
 		icon: RiTeamLine,
 		title: "Gestão colaborativa",
 		description:
-			"Compartilhe pagadores com permissões granulares (admin/viewer). Notificações automáticas por e-mail. Colabore em lançamentos compartilhados.",
+			"Compartilhe acesso com permissões granulares (admin/viewer) e notificações por e-mail.",
 		colorVar: "var(--data-3)",
 	},
 ];
@@ -94,40 +94,40 @@ export const extraFeatures: FeatureItem[] = [
 		icon: RiPieChartLine,
 		title: "Categorias e orçamentos",
 		description:
-			"Crie categorias personalizadas e defina orçamentos mensais com indicadores visuais.",
-		colorVar: "var(--data-7)",
+			"Categorias personalizadas com orçamentos mensais e indicadores visuais de progresso.",
+		colorVar: "var(--data-6)",
 	},
 	{
 		icon: RiFileTextLine,
 		title: "Anotações e tarefas",
 		description:
-			"Notas de texto e listas de tarefas com checkboxes. Arquivamento para manter histórico.",
+			"Notas de texto e listas de tarefas com checkboxes e arquivamento.",
 		colorVar: "var(--data-6)",
 	},
 	{
 		icon: RiCalendarLine,
 		title: "Calendário financeiro",
 		description:
-			"Visualize transações em calendário mensal. Nunca perca prazos de pagamentos.",
+			"Visualize transações em calendário mensal para não perder prazos.",
 		colorVar: "var(--data-2)",
 	},
 	{
 		icon: RiDownloadCloudLine,
 		title: "Importação em massa",
-		description: "Lance múltiplos lançamentos de uma vez",
-		colorVar: "var(--data-9)",
+		description: "Importe múltiplos lançamentos de uma só vez.",
+		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiEyeOffLine,
 		title: "Modo privacidade",
 		description:
-			"Oculte valores sensíveis com um clique. Tema dark/light. Calculadora integrada.",
+			"Oculte valores com um clique. Tema dark/light e calculadora integrada.",
 		colorVar: "var(--data-4)",
 	},
 	{
 		icon: RiFlashlightLine,
 		title: "Performance otimizada",
-		description: "Sistema rápido e com alta performance",
+		description: "Interface rápida e otimizada para uso diário.",
 		colorVar: "var(--data-5)",
 	},
 ];
@@ -150,7 +150,7 @@ export const pwaHighlights: FeatureItem[] = [
 		icon: RiLayoutGridLine,
 		title: "Acesso rápido ao que importa",
 		description: "Dashboard, inbox e lançamentos a um toque.",
-		colorVar: "var(--data-9)",
+		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiFlashlightLine,
@@ -193,7 +193,7 @@ export const companionSteps: FeatureItem[] = [
 		icon: RiCheckLine,
 		title: "Revise e confirme no OpenMonetis",
 		description: "Pré-lançamentos ficam na inbox para sua aprovação",
-		colorVar: "var(--data-9)",
+		colorVar: "var(--data-5)",
 	},
 ];
 
@@ -210,7 +210,7 @@ export const stackItems = [
 		title: "Backend",
 		subtitle: "PostgreSQL, Drizzle ORM, Better Auth",
 		description: "Banco relacional robusto com type-safe ORM",
-		colorVar: "var(--data-9)",
+		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiShieldCheckLine,
@@ -242,7 +242,7 @@ export const whoIsItForItems: FeatureItem[] = [
 		title: "Quer controle total sobre seus dados",
 		description:
 			"Prefere hospedar seus próprios dados ao invés de depender de serviços terceiros",
-		colorVar: "var(--data-9)",
+		colorVar: "var(--data-5)",
 	},
 	{
 		icon: RiLineChartLine,
@@ -270,7 +270,7 @@ export const whoIsItForItems: FeatureItem[] = [
 		title: "Não sou responsável por nada",
 		description:
 			"Não sou responsável por nada que aconteça com você ou com seus dados.",
-		colorVar: "var(--data-9)",
+		colorVar: "var(--data-5)",
 	},
 ];
 
@@ -280,7 +280,7 @@ export function getMetricsItems(stars: number, forks: number) {
 			icon: RiLayoutGridLine,
 			value: "20+",
 			label: "Widgets no dashboard",
-			colorVar: "var(--data-9)",
+			colorVar: "var(--data-5)",
 		},
 		{
 			icon: RiShieldCheckLine,

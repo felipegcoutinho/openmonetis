@@ -30,10 +30,11 @@ import {
 import {
 	CATEGORY_TYPE_LABEL,
 	CATEGORY_TYPES,
+	type CategoryType,
 } from "@/shared/lib/categories/constants";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import { CategoryDialog } from "./category-dialog";
-import { CategoryIconBadge } from "./category-icon-badge";
-import type { Category, CategoryType } from "./types";
+import type { Category } from "./types";
 
 const CATEGORIAS_PROTEGIDAS = [
 	"Transferência interna",

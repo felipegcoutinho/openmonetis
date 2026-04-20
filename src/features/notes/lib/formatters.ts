@@ -40,7 +40,7 @@ export const formatNoteCreatedAt = (
 	value: string | Date | null | undefined,
 ) => {
 	const parsed = parseNoteDate(value);
-	return parsed ? NOTE_CREATED_AT_FORMATTER.format(parsed) : null;
+	return parsed ? NOTE_CREATED_AT_FORMATTER.format(parsed) : "";
 };
 
 export const formatNoteCreatedAtLong = (

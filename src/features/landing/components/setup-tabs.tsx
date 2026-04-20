@@ -86,6 +86,13 @@ export function SetupTabs() {
 	);
 }
 
+const DATA_COLORS = [
+	"var(--data-1)",
+	"var(--data-3)",
+	"var(--data-5)",
+	"var(--data-4)",
+];
+
 function StepCard({
 	step,
 	title,
@@ -95,11 +102,18 @@ function StepCard({
 	title: string;
 	children: React.ReactNode;
 }) {
+	const colorVar = DATA_COLORS[(step - 1) % DATA_COLORS.length];
 	return (
 		<Card className="border">
 			<CardContent>
 				<div className="flex gap-3 md:gap-4">
-					<div className="flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium text-sm md:text-base">
+					<div
+						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+						style={{
+							backgroundColor: `color-mix(in oklch, ${colorVar} 20%, transparent)`,
+							color: "var(--foreground)",
+						}}
+					>
 						{step}
 					</div>
 					<div className="min-w-0">

@@ -13,7 +13,7 @@ const toNumber = (value: string | number | null | undefined) => {
 	return 0;
 };
 
-export type BudgetData = {
+type BudgetData = {
 	id: string;
 	amount: number;
 	spent: number;

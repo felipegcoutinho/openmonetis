@@ -1,34 +1,32 @@
 "use client";
 
 import { EVENT_TYPE_STYLES } from "@/features/calendar/components/day-cell";
-import StatusDot from "@/shared/components/status-dot";
-import { Card } from "@/shared/components/ui/card";
-import type { CalendarEvent } from "@/shared/lib/types/calendar";
+import { cn } from "@/shared/utils/ui";
 
-const LEGEND_ITEMS: Array<{
-	type?: CalendarEvent["type"];
-	label: string;
-	dotColor?: string;
-}> = [
-	{ type: "transaction", label: "Lançamentos" },
-	{ type: "boleto", label: "Boleto com vencimento" },
-	{ type: "card", label: "Vencimento de cartão" },
-	{ label: "Pagamento fatura", dotColor: "bg-success" },
+const LEGEND_ITEMS = [
+	{ label: "Lançamentos", ...EVENT_TYPE_STYLES.transaction },
+	{ label: "Boletos", ...EVENT_TYPE_STYLES.boleto },
+	{ label: "Fatura de Cartão", ...EVENT_TYPE_STYLES.card },
 ];
 
 export function CalendarLegend() {
 	return (
-		<Card className="flex flex-row gap-2 p-2 text-sm">
-			{LEGEND_ITEMS.map((item, index) => {
-				const dotColor =
-					item.dotColor || (item.type ? EVENT_TYPE_STYLES[item.type].dot : "");
-				return (
-					<span key={item.type || index} className="flex items-center gap-2">
-						<StatusDot color={dotColor} />
-						{item.label}
-					</span>
-				);
-			})}
-		</Card>
+		<ul className="flex items-center justify-start gap-2 px-1">
+			{LEGEND_ITEMS.map((item) => (
+				<li
+					key={item.label}
+					className={cn(
+						"flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium",
+						item.wrapper,
+					)}
+				>
+					<span
+						className={cn("size-1.5 shrink-0 rounded-full", item.dot)}
+						aria-hidden
+					/>
+					{item.label}
+				</li>
+			))}
+		</ul>
 	);
 }
