@@ -6,6 +6,7 @@ import {
 	transactions,
 } from "@/db/schema";
 import type { DashboardBillsSnapshot } from "@/features/dashboard/bills/bills-queries";
+import type { PurchasesByCategoryData } from "@/features/dashboard/categories/purchases-by-category-queries";
 import type { InstallmentExpensesData } from "@/features/dashboard/expenses/installment-expenses-queries";
 import type { RecurringExpensesData } from "@/features/dashboard/expenses/recurring-expenses-queries";
 import type {
@@ -15,7 +16,6 @@ import type {
 import type { PaymentConditionsData } from "@/features/dashboard/payments/payment-conditions-queries";
 import type { PaymentMethodsData } from "@/features/dashboard/payments/payment-methods-queries";
 import type { PaymentStatusData } from "@/features/dashboard/payments/payment-status-queries";
-import type { PurchasesByCategoryData } from "@/features/dashboard/categories/purchases-by-category-queries";
 import type { TopEstablishmentsData } from "@/features/dashboard/top-establishments-queries";
 import { excludeTransactionsFromExcludedAccounts } from "@/features/dashboard/transaction-filters";
 import {

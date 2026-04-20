@@ -1,7 +1,7 @@
 import { RiMoneyDollarCircleLine, RiSlideshowLine } from "@remixicon/react";
-import type { PaymentOverviewTab } from "@/features/dashboard/payments/payment-overview-tabs";
 import type { PaymentConditionsData } from "@/features/dashboard/payments/payment-conditions-queries";
 import type { PaymentMethodsData } from "@/features/dashboard/payments/payment-methods-queries";
+import type { PaymentOverviewTab } from "@/features/dashboard/payments/payment-overview-tabs";
 import {
 	Tabs,
 	TabsContent,
