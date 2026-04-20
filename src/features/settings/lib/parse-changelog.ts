@@ -9,6 +9,7 @@ export type ChangelogSection = {
 export type ChangelogVersion = {
 	version: string;
 	date: string;
+	summary?: string;
 	sections: ChangelogSection[];
 	/** Linha de contribuições/autor (pode conter markdown, ex: [Nome](url)) */
 	contributor?: string;
@@ -22,6 +23,7 @@ export function parseChangelog(): ChangelogVersion[] {
 	const versions: ChangelogVersion[] = [];
 	let currentVersion: ChangelogVersion | null = null;
 	let currentSection: ChangelogSection | null = null;
+	let summaryLines: string[] = [];
 
 	for (const line of lines) {
 		const versionMatch = line.match(/^## \[(.+?)\] - (.+)$/);
@@ -37,11 +39,16 @@ export function parseChangelog(): ChangelogVersion[] {
 			};
 			versions.push(currentVersion);
 			currentSection = null;
+			summaryLines = [];
 			continue;
 		}
 
 		const sectionMatch = line.match(/^### (.+)$/);
 		if (sectionMatch && currentVersion) {
+			if (summaryLines.length > 0) {
+				currentVersion.summary = summaryLines.join(" ").trim();
+				summaryLines = [];
+			}
 			if (currentSection) {
 				currentVersion.sections.push(currentSection);
 			}
@@ -52,6 +59,11 @@ export function parseChangelog(): ChangelogVersion[] {
 		const itemMatch = line.match(/^- (.+)$/);
 		if (itemMatch && currentSection) {
 			currentSection.items.push(itemMatch[1]);
+			continue;
+		}
+
+		if (currentVersion && !currentSection && line.trim()) {
+			summaryLines.push(line.trim());
 			continue;
 		}
 

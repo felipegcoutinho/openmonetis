@@ -38,6 +38,11 @@ export function ChangelogTab({ versions }: { versions: ChangelogVersion[] }) {
 						</span>
 					</div>
 					<div className="space-y-4 w-full mx-auto sm:w-3/4">
+						{version.summary && (
+							<p className="text-sm text-muted-foreground leading-relaxed">
+								{version.summary}
+							</p>
+						)}
 						{version.sections.map((section) => (
 							<div key={section.type}>
 								<Badge
