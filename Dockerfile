@@ -40,9 +40,9 @@ COPY --from=deps /app/public/pdf.worker.min.mjs ./public/pdf.worker.min.mjs
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production
 
-# Token público do Logo.dev — injetado em build time (NEXT_PUBLIC_* é inlined pelo Next.js)
-ARG NEXT_PUBLIC_LOGO_DEV_TOKEN
-ENV NEXT_PUBLIC_LOGO_DEV_TOKEN=$NEXT_PUBLIC_LOGO_DEV_TOKEN
+# Nota: a integração Logo.dev não precisa mais de build args. O token
+# `LOGO_DEV_TOKEN` é lido em runtime no servidor — basta configurá-lo no
+# host (Coolify, Railway, etc.) junto com `LOGO_DEV_SECRET_KEY`.
 
 # Build da aplicação Next.js
 RUN pnpm build

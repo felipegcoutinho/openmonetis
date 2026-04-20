@@ -9,7 +9,7 @@ import {
 	PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { Spinner } from "@/shared/components/ui/spinner";
-import { buildLogoDevUrl, logoQueryKeys, toNameKey } from "@/shared/lib/logo";
+import { logoQueryKeys, toNameKey } from "@/shared/lib/logo";
 import {
 	removeEstablishmentLogoAction,
 	saveEstablishmentLogoAction,
@@ -24,6 +24,8 @@ import { cn } from "@/shared/utils/ui";
 interface LogoResult {
 	name: string;
 	domain: string;
+	/** URL da imagem construída server-side — cliente usa direto sem token. */
+	logoUrl: string | null;
 }
 
 async function fetchLogoResults(query: string): Promise<LogoResult[]> {
@@ -77,13 +79,14 @@ export function EstablishmentLogoPicker({
 		staleTime: 1000 * 60 * 60,
 	});
 
-	function handleSelect(domain: string) {
+	function handleSelect(result: LogoResult) {
 		startTransition(async () => {
-			await saveEstablishmentLogoAction(name, domain);
+			await saveEstablishmentLogoAction(name, result.domain);
 			queryClient.setQueryData(logoQueryKeys.mapping(toNameKey(name)), {
-				domain,
+				domain: result.domain,
+				logoUrl: result.logoUrl,
 			});
-			onSelect(domain);
+			onSelect(result.domain);
 		});
 	}
 
@@ -92,6 +95,7 @@ export function EstablishmentLogoPicker({
 			await removeEstablishmentLogoAction(name);
 			queryClient.setQueryData(logoQueryKeys.mapping(toNameKey(name)), {
 				domain: null,
+				logoUrl: null,
 			});
 			onSelect(null);
 		});
@@ -143,7 +147,7 @@ export function EstablishmentLogoPicker({
 								>
 									{buildInitials(name)}
 								</div>
-								<span className="w-full truncate text-[10px] leading-tight text-muted-foreground">
+								<span className="w-full truncate text-xs leading-tight text-muted-foreground">
 									Iniciais
 								</span>
 							</button>
@@ -153,7 +157,7 @@ export function EstablishmentLogoPicker({
 									key={r.domain}
 									type="button"
 									disabled={isPending}
-									onClick={() => handleSelect(r.domain)}
+									onClick={() => handleSelect(r)}
 									className={cn(
 										"flex flex-col items-center gap-1 rounded-md p-1.5 text-center transition-colors hover:bg-accent disabled:opacity-50",
 										resolvedDomain === r.domain &&
@@ -161,9 +165,8 @@ export function EstablishmentLogoPicker({
 									)}
 									title={r.name}
 								>
-									{/* eslint-disable-next-line @next/next/no-img-element */}
 									<img
-										src={buildLogoDevUrl(r.domain) ?? ""}
+										src={r.logoUrl ?? ""}
 										alt={r.name}
 										width={36}
 										height={36}
@@ -173,7 +176,7 @@ export function EstablishmentLogoPicker({
 											(e.target as HTMLImageElement).style.display = "none";
 										}}
 									/>
-									<span className="w-full truncate text-[10px] leading-tight">
+									<span className="w-full truncate text-xs leading-tight">
 										{r.name}
 									</span>
 								</button>

@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { getOptionalUserSession } from "@/shared/lib/auth/server";
+import { buildLogoDevUrl } from "@/shared/lib/logo/server";
 
 const LOGO_DEV_SEARCH_URL = "https://api.logo.dev/search";
 
 interface LogoResult {
 	name: string;
 	domain: string;
+}
+
+interface LogoResultWithUrl extends LogoResult {
+	logoUrl: string | null;
 }
 
 async function searchByStrategy(
@@ -66,12 +71,14 @@ export async function GET(request: Request) {
 
 	// Mescla e deduplica por domain, mantendo ordem (match tem prioridade)
 	const seen = new Set<string>();
-	const merged: LogoResult[] = [];
+	const merged: LogoResultWithUrl[] = [];
 
 	for (const result of [...matchResults, ...typeaheadResults]) {
 		if (!seen.has(result.domain)) {
 			seen.add(result.domain);
-			merged.push(result);
+			// logoUrl é construída server-side com o token — o cliente nunca
+			// precisa conhecer LOGO_DEV_TOKEN para renderizar a imagem.
+			merged.push({ ...result, logoUrl: buildLogoDevUrl(result.domain) });
 			if (merged.length >= 20) break;
 		}
 	}

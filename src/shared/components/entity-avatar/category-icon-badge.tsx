@@ -13,7 +13,7 @@ const sizeVariants = {
 	sm: {
 		container: "size-8",
 		icon: "size-4",
-		text: "text-[10px]",
+		text: "text-xs",
 	},
 	md: {
 		container: "size-9",

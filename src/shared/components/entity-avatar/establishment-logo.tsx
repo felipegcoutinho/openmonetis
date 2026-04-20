@@ -2,13 +2,9 @@
 
 import { RiPencilLine } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import {
-	buildLogoDevUrl,
-	LOGO_DEV_TOKEN,
-	logoQueryKeys,
-	toNameKey,
-} from "@/shared/lib/logo";
+import { useState } from "react";
+import { useLogoDevEnabled } from "@/shared/components/providers/logo-dev-provider";
+import { logoQueryKeys, toNameKey } from "@/shared/lib/logo";
 import {
 	buildInitials,
 	getCategoryBgColorFromName,
@@ -17,11 +13,14 @@ import {
 import { cn } from "@/shared/utils/ui";
 import { EstablishmentLogoPicker } from "./establishment-logo-picker";
 
-async function fetchLogoMapping(
-	name: string,
-): Promise<{ domain: string | null }> {
+interface LogoMappingResponse {
+	domain: string | null;
+	logoUrl: string | null;
+}
+
+async function fetchLogoMapping(name: string): Promise<LogoMappingResponse> {
 	const res = await fetch(`/api/logo/mapping?name=${encodeURIComponent(name)}`);
-	if (!res.ok) return { domain: null };
+	if (!res.ok) return { domain: null, logoUrl: null };
 	return res.json();
 }
 
@@ -29,6 +28,8 @@ interface EstablishmentLogoProps {
 	name: string;
 	/** Domínio Logo.dev pré-carregado pelo servidor (otimização opcional). */
 	domain?: string | null;
+	/** URL pré-construída no servidor — evita flicker no primeiro render. */
+	logoUrl?: string | null;
 	size?: number;
 	className?: string;
 }
@@ -36,31 +37,33 @@ interface EstablishmentLogoProps {
 export function EstablishmentLogo({
 	name,
 	domain: initialDomain,
+	logoUrl: initialLogoUrl,
 	size = 32,
 	className,
 }: EstablishmentLogoProps) {
+	const logoDevEnabled = useLogoDevEnabled();
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const [imgError, setImgError] = useState(false);
+
+	const hasPlaceholder =
+		initialDomain !== undefined || initialLogoUrl !== undefined;
 
 	const { data: mappingData } = useQuery({
 		queryKey: logoQueryKeys.mapping(toNameKey(name)),
 		queryFn: () => fetchLogoMapping(name),
-		placeholderData:
-			initialDomain !== undefined
-				? { domain: initialDomain ?? null }
-				: undefined,
+		placeholderData: hasPlaceholder
+			? {
+					domain: initialDomain ?? null,
+					logoUrl: initialLogoUrl ?? null,
+				}
+			: undefined,
 		staleTime: 1000 * 60 * 5,
-		enabled: LOGO_DEV_TOKEN !== undefined && LOGO_DEV_TOKEN !== "",
+		enabled: logoDevEnabled,
 	});
 
 	const resolvedDomain = mappingData?.domain ?? null;
+	const logoUrl = mappingData?.logoUrl ?? null;
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: resetar imgError é o efeito de domain mudar
-	useEffect(() => {
-		setImgError(false);
-	}, [resolvedDomain]);
-
-	const logoUrl = buildLogoDevUrl(resolvedDomain);
 	const showLogo = Boolean(logoUrl) && !imgError;
 
 	const initials = buildInitials(name);
@@ -85,7 +88,6 @@ export function EstablishmentLogo({
 
 	const logoImage =
 		showLogo && logoUrl ? (
-			// eslint-disable-next-line @next/next/no-img-element
 			<img
 				src={logoUrl}
 				alt={name}
@@ -99,7 +101,7 @@ export function EstablishmentLogo({
 			initialsAvatar
 		);
 
-	if (!LOGO_DEV_TOKEN) {
+	if (!logoDevEnabled) {
 		return (
 			<div className={cn("shrink-0", className)} aria-hidden>
 				{initialsAvatar}

@@ -1,14 +1,5 @@
 /**
- * Logo utilities
- *
- * Consolidated from:
- * - /lib/logo.ts (utility functions)
- */
-
-/**
  * Normalizes logo path to get just the filename
- * @param logo - Logo path or URL
- * @returns Filename only
  */
 export const normalizeLogo = (logo?: string | null) =>
 	logo?.split("/").filter(Boolean).pop() ?? "";
@@ -45,13 +36,11 @@ export const deriveNameFromLogo = (logo?: string | null) => {
 export const toNameKey = (name: string): string => name.trim().toLowerCase();
 
 // === Logo.dev ===
-
-export const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
-
-export function buildLogoDevUrl(domain?: string | null): string | null {
-	if (!LOGO_DEV_TOKEN || !domain) return null;
-	return `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=64&format=png`;
-}
+//
+// A construção de URLs e a leitura do token acontecem server-side em
+// `./server.ts`. O cliente consome `logoUrl` pré-construída a partir das
+// API routes (`/api/logo/mapping` e `/api/logo/search`) e usa o
+// `LogoDevProvider` para saber se a integração está habilitada.
 
 export const logoQueryKeys = {
 	mapping: (nameKey: string) => ["logo-mapping", nameKey] as const,
