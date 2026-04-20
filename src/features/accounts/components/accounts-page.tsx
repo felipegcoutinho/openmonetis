@@ -212,7 +212,7 @@ export function AccountsPage({
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
 				description="Ao remover esta conta, todos os dados relacionados a ela serão perdidos."
-				confirmLabel="Remover conta"
+				confirmLabel="Remover"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}

@@ -201,7 +201,7 @@ export function CardsPage({
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
 				description="Ao remover este cartão, os registros relacionados a ele serão excluídos permanentemente."
-				confirmLabel="Remover cartão"
+				confirmLabel="Remover"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}

@@ -59,7 +59,7 @@ export function GoalProgressItem({
 						size="icon-sm"
 						className="transition-opacity text-primary hover:opacity-80"
 						onClick={() => onEdit(item)}
-						aria-label={`Editar orçamento de ${item.categoryName}`}
+						aria-label={`Atualizar orçamento de ${item.categoryName}`}
 					>
 						<RiPencilLine className="size-3.5" />
 					</Button>

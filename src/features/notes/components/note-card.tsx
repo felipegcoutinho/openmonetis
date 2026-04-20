@@ -97,15 +97,11 @@ export function NoteCard({
 					<div className="min-h-0 flex-1 space-y-2 overflow-hidden">
 						{sortedTasks.slice(0, 5).map((task) => (
 							<div key={task.id} className="flex items-start gap-2 text-sm">
-								<div
-									className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
-										task.completed
-											? "bg-success border-success"
-											: "border-input"
-									}`}
-								>
-									{task.completed && (
-										<RiCheckLine className="h-3 w-3 text-background" />
+								<div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
+									{task.completed ? (
+										<RiCheckLine className="h-4 w-4 text-success" />
+									) : (
+										<div className="h-4 w-4 rounded-sm border border-input" />
 									)}
 								</div>
 								<span

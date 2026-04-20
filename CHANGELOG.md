@@ -31,6 +31,8 @@ Esta versão é quase toda sobre organização e polimento. O código interno do
 - Logo.dev: `NEXT_PUBLIC_LOGO_DEV_TOKEN` renomeado para `LOGO_DEV_TOKEN` (agora lido em runtime server-side apenas)
 - UI: conceito "Pagador/Pagadores" renomeado para **"Pessoa/Pessoas"** em toda a interface — labels, títulos, toasts, mensagens de erro, cabeçalhos de tabela e exportações. Código, rotas (`/payers`) e schema do banco (`pagadores`) permanecem inalterados; a divergência entre UI e código é intencional
 - Deps: next 16.2.3 → 16.2.4, better-auth 1.6.2 → 1.6.5, ai 6.0.159 → 6.0.168 e outros patches menores
+- Notas/Tarefas: ícone de tarefa concluída em visualização (card e detalhes) simplificado para `RiCheckLine` verde sem caixa; checkbox no modal de edição usa fundo e borda `success` com ícone `success-foreground` (claro no light, escuro no dark)
+- Notas/Detalhes: botões do footer reordenados ("Cancelar" à esquerda, "Alterar" primário à direita)
 
 ### Removido
 

@@ -242,7 +242,7 @@ export function TransactionDetailsDialog({
 						</Button>
 					</DialogClose>
 					{onEdit && !transaction.readonly && (
-						<Button onClick={handleEdit}>Editar</Button>
+						<Button onClick={handleEdit}>Alterar</Button>
 					)}
 				</DialogFooter>
 			</DialogContent>

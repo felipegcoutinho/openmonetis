@@ -229,8 +229,7 @@ export function TransactionDialog({
 		}
 
 		if (formState.isSplit && !formState.payerId) {
-			const message =
-				"Selecione a pessoa principal para dividir o lançamento.";
+			const message = "Selecione a pessoa principal para dividir o lançamento.";
 			setErrorMessage(message);
 			toast.error(message);
 			return;
@@ -460,7 +459,7 @@ export function TransactionDialog({
 							? "Nova Despesa"
 							: "Nova Receita"
 						: "Novo lançamento"
-			: "Editar lançamento";
+			: "Atualizar lançamento";
 	const description =
 		mode === "create"
 			? isImportMode
@@ -471,7 +470,7 @@ export function TransactionDialog({
 						? `Informe os dados abaixo para registrar ${defaultTransactionType === "Despesa" ? "uma nova despesa" : "uma nova receita"}.`
 						: "Informe os dados abaixo para registrar um novo lançamento."
 			: "Atualize as informações do lançamento selecionado.";
-	const submitLabel = mode === "create" ? "Salvar lançamento" : "Atualizar";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const showInstallments = formState.condition === "Parcelado";
 	const showRecurrence = formState.condition === "Recorrente";

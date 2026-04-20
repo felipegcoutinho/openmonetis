@@ -194,12 +194,12 @@ export function CardDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Novo cartão" : "Editar cartão";
+	const title = mode === "create" ? "Novo cartão" : "Atualizar cartão";
 	const description =
 		mode === "create"
 			? "Inclua um novo cartão de crédito para acompanhar seus gastos."
 			: "Atualize as informações do cartão selecionado.";
-	const submitLabel = mode === "create" ? "Salvar cartão" : "Atualizar cartão";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const handleMainDialogOpenChange = (open: boolean) => {
 		if (!open && logoDialogOpen) {

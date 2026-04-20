@@ -94,13 +94,14 @@ export function NoteDialog({
 		}
 	}, [dialogOpen, note, resetForm]);
 
-	const dialogTitle = mode === "create" ? "Nova anotação" : "Editar anotação";
+	const dialogTitle =
+		mode === "create" ? "Nova anotação" : "Atualizar anotação";
 	const description =
 		mode === "create"
 			? "Crie uma nota simples ou uma lista de tarefas."
 			: note?.type === "tarefa"
-				? "Editando lista de tarefas."
-				: "Editando nota.";
+				? "Atualize sua lista de tarefas"
+				: "Atualize sua nota";
 	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const titleCount = formState.title.length;
@@ -361,7 +362,6 @@ export function NoteDialog({
 										className="shrink-0 gap-1.5"
 									>
 										<RiAddCircleFill className="h-4 w-4" />
-										Adicionar
 									</Button>
 								</div>
 							</div>
@@ -374,7 +374,7 @@ export function NoteDialog({
 											className="flex items-center gap-3 rounded-md px-3 py-1.5 hover:bg-muted/50"
 										>
 											<Checkbox
-												className="data-[state=checked]:bg-success data-[state=checked]:border-success"
+												className="data-[state=checked]:bg-success! data-[state=checked]:border-success! data-[state=checked]:text-success-foreground!"
 												checked={task.completed}
 												onCheckedChange={() => handleToggleTask(task.id)}
 												disabled={isPending}

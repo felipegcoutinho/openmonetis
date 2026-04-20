@@ -65,15 +65,11 @@ export function NoteDetailsDialog({
 								key={task.id}
 								className="flex items-center gap-3 rounded-md px-3 py-1.5"
 							>
-								<div
-									className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
-										task.completed
-											? "bg-success border-success"
-											: "border-input"
-									}`}
-								>
-									{task.completed && (
-										<RiCheckLine className="h-4 w-4 text-primary-foreground" />
+								<div className="flex h-4 w-4 shrink-0 items-center justify-center">
+									{task.completed ? (
+										<RiCheckLine className="h-4 w-4 text-success" />
+									) : (
+										<div className="h-4 w-4 rounded-sm border border-input" />
 									)}
 								</div>
 								<span
@@ -95,23 +91,22 @@ export function NoteDetailsDialog({
 				)}
 
 				<DialogFooter>
+					<DialogClose asChild>
+						<Button type="button" variant="outline">
+							Cancelar
+						</Button>
+					</DialogClose>
 					{onEdit && (
 						<Button
 							type="button"
-							variant="outline"
 							onClick={() => {
 								onOpenChange(false);
 								onEdit(note);
 							}}
 						>
-							Editar
+							Alterar
 						</Button>
 					)}
-					<DialogClose asChild>
-						<Button type="button" variant="outline">
-							Fechar
-						</Button>
-					</DialogClose>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

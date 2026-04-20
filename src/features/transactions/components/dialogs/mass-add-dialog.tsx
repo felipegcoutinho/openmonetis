@@ -642,7 +642,7 @@ export function MassAddDialog({
 					</Button>
 					<Button onClick={handleSubmit} disabled={loading}>
 						{loading && <Spinner className="size-4" />}
-						Criar {transactions.length}{" "}
+						Salvar {transactions.length}{" "}
 						{transactions.length === 1 ? "lançamento" : "lançamentos"}
 					</Button>
 				</DialogFooter>

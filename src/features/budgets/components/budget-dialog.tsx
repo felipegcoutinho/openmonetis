@@ -161,13 +161,12 @@ export function BudgetDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Novo orçamento" : "Editar orçamento";
+	const title = mode === "create" ? "Novo orçamento" : "Atualizar orçamento";
 	const description =
 		mode === "create"
 			? "Defina um limite de gastos para acompanhar suas despesas."
 			: "Atualize os detalhes do orçamento selecionado.";
-	const submitLabel =
-		mode === "create" ? "Salvar orçamento" : "Atualizar orçamento";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 	const disabled = categories.length === 0;
 	const parsedAmount = Number.parseFloat(formState.amount);
 	const sliderValue = Number.isFinite(parsedAmount)

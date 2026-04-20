@@ -171,7 +171,7 @@ export function BillPaymentDialog({
 										Processando...
 									</>
 								) : (
-									"Confirmar pagamento"
+									"Confirmar"
 								)}
 							</Button>
 						</DialogFooter>

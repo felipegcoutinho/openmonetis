@@ -136,13 +136,12 @@ export function CategoryDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Nova categoria" : "Editar categoria";
+	const title = mode === "create" ? "Nova categoria" : "Atualizar categoria";
 	const description =
 		mode === "create"
 			? "Crie uma categoria para organizar seus lançamentos."
 			: "Atualize os detalhes da categoria selecionada.";
-	const submitLabel =
-		mode === "create" ? "Salvar categoria" : "Atualizar categoria";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	return (
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

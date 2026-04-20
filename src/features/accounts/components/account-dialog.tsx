@@ -227,12 +227,12 @@ export function AccountDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Nova conta" : "Editar conta";
+	const title = mode === "create" ? "Nova conta" : "Atualizar conta";
 	const description =
 		mode === "create"
 			? "Cadastre uma nova conta para organizar seus lançamentos."
 			: "Atualize as informações da conta selecionada.";
-	const submitLabel = mode === "create" ? "Salvar conta" : "Atualizar conta";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const handleMainDialogOpenChange = (open: boolean) => {
 		if (!open && logoDialogOpen) {

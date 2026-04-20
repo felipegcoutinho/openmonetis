@@ -193,7 +193,7 @@ export function InvoicePaymentDialog({
 										Processando...
 									</>
 								) : (
-									"Confirmar pagamento"
+									"Confirmar"
 								)}
 							</Button>
 						</DialogFooter>

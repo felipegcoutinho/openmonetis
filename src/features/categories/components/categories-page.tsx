@@ -11,6 +11,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { deleteCategoryAction } from "@/features/categories/actions";
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
+import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import {
@@ -32,7 +33,6 @@ import {
 	CATEGORY_TYPES,
 	type CategoryType,
 } from "@/shared/lib/categories/constants";
-import { CategoryIconBadge } from "@/shared/components/entity-avatar";
 import { CategoryDialog } from "./category-dialog";
 import type { Category } from "./types";
 
@@ -250,7 +250,7 @@ export function CategoriesPage({ categories }: CategoriesPageProps) {
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
 				description="Ao remover esta categoria, os lançamentos associados serão desrelacionados."
-				confirmLabel="Remover categoria"
+				confirmLabel="Remover"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}

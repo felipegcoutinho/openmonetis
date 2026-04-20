@@ -216,12 +216,12 @@ export function PayerDialog({
 		});
 	};
 
-	const title = mode === "create" ? "Nova pessoa" : "Editar pessoa";
+	const title = mode === "create" ? "Nova pessoa" : "Atualizar pessoa";
 	const description =
 		mode === "create"
 			? "Selecione um avatar e informe os detalhes para criar uma nova pessoa."
 			: "Atualize os detalhes da pessoa selecionada.";
-	const submitLabel = mode === "create" ? "Salvar pessoa" : "Atualizar pessoa";
+	const submitLabel = mode === "create" ? "Salvar" : "Atualizar";
 
 	const isUploadSelected =
 		uploadedAvatar !== null && formState.avatarUrl === uploadedAvatar;

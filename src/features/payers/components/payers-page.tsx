@@ -151,8 +151,8 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 				{orderedPayers.length === 0 ? (
 					<div className="flex min-h-[320px] items-center justify-center rounded-lg border border-dashed bg-muted/30">
 						<div className="max-w-sm text-center text-sm text-muted-foreground">
-							Cadastre seu primeira pessoa para organizar cobranças e
-							pagamentos recorrentes.
+							Cadastre seu primeira pessoa para organizar cobranças e pagamentos
+							recorrentes.
 						</div>
 					</div>
 				) : (
@@ -186,7 +186,7 @@ export function PayersPage({ payers, avatarOptions }: PayersPageProps) {
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
 				description="Ao remover esta pessoa, os registros relacionados a ele deixarão de ser associados automaticamente."
-				confirmLabel="Remover pessoa"
+				confirmLabel="Remover"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}

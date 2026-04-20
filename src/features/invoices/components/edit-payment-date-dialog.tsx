@@ -38,12 +38,12 @@ export function EditPaymentDateDialog({
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Editar data de pagamento</DialogTitle>
+					<DialogTitle>Atualizar data de pagamento</DialogTitle>
 					<DialogDescription>
 						Selecione a data em que o pagamento foi realizado.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="space-y-4 py-4">
+				<div className="space-y-4">
 					<div className="space-y-2">
 						<Label htmlFor="payment-date">Data de pagamento</Label>
 						<DatePicker

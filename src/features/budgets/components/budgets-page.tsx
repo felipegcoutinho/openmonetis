@@ -165,7 +165,7 @@ export function BudgetsPage({
 				onOpenChange={handleRemoveOpenChange}
 				title={removeTitle}
 				description="Esta ação remove o limite configurado para a categoria selecionada."
-				confirmLabel="Remover orçamento"
+				confirmLabel="Remover"
 				pendingLabel="Removendo..."
 				confirmVariant="destructive"
 				onConfirm={handleRemoveConfirm}
@@ -176,7 +176,7 @@ export function BudgetsPage({
 				onOpenChange={setDuplicateOpen}
 				title="Copiar orçamentos do último mês?"
 				description="Isso copiará os limites definidos no mês anterior para as categorias que ainda não possuem orçamento neste mês."
-				confirmLabel="Copiar orçamentos"
+				confirmLabel="Copiar"
 				pendingLabel="Copiando..."
 				onConfirm={handleDuplicateConfirm}
 			/>
