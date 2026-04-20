@@ -1,4 +1,7 @@
-import { formatCurrentDate, getGreeting } from "@/features/dashboard/widget-registry/welcome-widget";
+import {
+	formatCurrentDate,
+	getGreeting,
+} from "@/features/dashboard/widget-registry/welcome-widget";
 
 type DashboardWelcomeProps = {
 	name?: string | null;

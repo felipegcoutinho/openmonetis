@@ -151,7 +151,9 @@ export const InboxCard = memo(function InboxCard({
 
 			<CardContent className="min-h-0 flex-1 overflow-hidden py-2">
 				{item.originalTitle && (
-					<p className="mb-1 line-clamp-2 text-sm font-medium">{item.originalTitle}</p>
+					<p className="mb-1 line-clamp-2 text-sm font-medium">
+						{item.originalTitle}
+					</p>
 				)}
 				<p className="line-clamp-4 whitespace-pre-wrap text-sm text-muted-foreground">
 					{item.originalText}

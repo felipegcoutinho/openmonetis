@@ -51,9 +51,7 @@ type UniqueCategory = {
 	icon: string | null;
 };
 
-async function fetchAllCategories(
-	userId: string,
-): Promise<CategoryOption[]> {
+async function fetchAllCategories(userId: string): Promise<CategoryOption[]> {
 	const result = await db
 		.select({
 			id: categories.id,

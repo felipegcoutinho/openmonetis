@@ -99,8 +99,7 @@ export function DeleteAccountForm() {
 								Preferências do app, insights salvos e tokens do Companion
 							</li>
 							<li className="font-medium text-foreground">
-								Categorias padrão e pessoa admin serão recriadas
-								automaticamente
+								Categorias padrão e pessoa admin serão recriadas automaticamente
 							</li>
 						</ul>
 

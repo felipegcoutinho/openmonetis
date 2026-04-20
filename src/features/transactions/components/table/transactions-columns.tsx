@@ -228,9 +228,7 @@ function buildColumns({
 													className="text-muted-foreground"
 													aria-hidden
 												/>
-												<span className="sr-only">
-													Dividido entre pessoas
-												</span>
+												<span className="sr-only">Dividido entre pessoas</span>
 											</span>
 										</TooltipTrigger>
 										<TooltipContent side="top">
