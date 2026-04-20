@@ -5,7 +5,7 @@ import { usePrivacyMode } from "@/shared/components/providers/privacy-provider";
 import { Badge } from "@/shared/components/ui/badge";
 
 const itemClass =
-	"flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-accent transition-colors cursor-pointer";
+	"flex w-full items-center gap-2.5 rounded-sm px-2 py-3 text-sm text-foreground hover:bg-accent transition-colors cursor-pointer";
 
 type NavToolsDropdownProps = {
 	onOpenCalculator: () => void;
@@ -22,7 +22,7 @@ export function NavToolsDropdown({ onOpenCalculator }: NavToolsDropdownProps) {
 						<RiCalculatorLine className="size-4" />
 					</span>
 					<span className="flex flex-col flex-1 text-left">
-						<span className="font-medium">Calculadora</span>
+						<span className="font-semibold">Calculadora</span>
 						<span className="text-xs text-muted-foreground lowercase">
 							Faça cálculos rápidos
 						</span>
@@ -39,7 +39,7 @@ export function NavToolsDropdown({ onOpenCalculator }: NavToolsDropdownProps) {
 						)}
 					</span>
 					<span className="flex flex-col flex-1 text-left">
-						<span className="font-medium">Privacidade</span>
+						<span className="font-semibold">Privacidade</span>
 						<span className="text-xs text-muted-foreground lowercase">
 							Oculta valores na tela
 						</span>

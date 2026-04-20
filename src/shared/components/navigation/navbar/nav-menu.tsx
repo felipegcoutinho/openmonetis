@@ -29,9 +29,10 @@ import { NavPill } from "./nav-pill";
 import { MobileTools, NavToolsDropdown } from "./nav-tools";
 
 const triggerClass =
-	"h-8! rounded-md! px-2! py-0! text-sm! font-medium! bg-transparent! shadow-none! capitalize! [&_svg]:text-current! text-black/75! hover:text-black! hover:bg-black/10! focus:text-black! focus:bg-black/10! focus-visible:ring-black/20! data-[state=open]:text-black! data-[state=open]:bg-black/10!";
+	"h-8! rounded-md! px-2! py-0! text-sm! font-medium! bg-transparent! shadow-none! capitalize! [&_svg]:text-current! text-black/75! hover:text-black! hover:bg-black/10! focus:text-black! focus:bg-black/10! focus-visible:ring-black/20! data-[state=open]:text-black! data-[state=open]:bg-black/10! dark:text-white/75! dark:hover:text-white! dark:hover:bg-white/10! dark:focus:text-white! dark:focus:bg-white/10! dark:focus-visible:ring-white/20! dark:data-[state=open]:text-white! dark:data-[state=open]:bg-white/10!";
 
-const triggerActiveClass = "bg-black/15! text-black!";
+const triggerActiveClass =
+	"bg-black/15! text-black! dark:bg-white/15! dark:text-white!";
 
 export function NavMenu() {
 	const pathname = usePathname();

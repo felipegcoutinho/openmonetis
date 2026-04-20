@@ -25,10 +25,10 @@ export function NavDropdown({ items }: NavDropdownProps) {
 							href={item.href}
 							preservePeriod={item.preservePeriod}
 							className={cn(
-								"flex items-center gap-3 rounded-sm px-2 py-2 text-sm transition-colors",
+								"flex items-center gap-3 rounded-sm px-2 py-3 text-sm transition-colors",
 								isActive
-									? "bg-accent text-foreground"
-									: "text-foreground hover:bg-accent",
+									? "border-primary bg-accent text-foreground"
+									: "border-transparent text-foreground hover:bg-accent",
 							)}
 						>
 							<span

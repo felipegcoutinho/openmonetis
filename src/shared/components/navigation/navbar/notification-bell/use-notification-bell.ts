@@ -8,7 +8,7 @@ import {
 	markDashboardNotificationAsReadAction,
 	markDashboardNotificationAsUnreadAction,
 	unarchiveDashboardNotificationAction,
-} from "@/features/dashboard/notifications-actions";
+} from "@/features/dashboard/notifications/notifications-actions";
 import type {
 	NotificationActionState,
 	NotificationBellProps,
