@@ -101,7 +101,9 @@ export default async function proxy(request: NextRequest) {
 	}
 
 	const response = NextResponse.next();
-	response.headers.set("Content-Security-Policy", buildCsp());
+	if (!pathname.startsWith("/api/")) {
+		response.headers.set("Content-Security-Policy", buildCsp());
+	}
 	return response;
 }
 
