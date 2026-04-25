@@ -12,6 +12,7 @@ import {
 	deleteTransactionAction as deleteTransactionActionImpl,
 	toggleTransactionSettlementAction as toggleTransactionSettlementActionImpl,
 	updateTransactionAction as updateTransactionActionImpl,
+	updateTransactionSplitPairAction as updateTransactionSplitPairActionImpl,
 } from "./actions/single-actions";
 
 export async function createTransactionAction(
@@ -60,6 +61,12 @@ export async function deleteMultipleTransactionsAction(
 	...args: Parameters<typeof deleteMultipleTransactionsActionImpl>
 ): ReturnType<typeof deleteMultipleTransactionsActionImpl> {
 	return deleteMultipleTransactionsActionImpl(...args);
+}
+
+export async function updateTransactionSplitPairAction(
+	...args: Parameters<typeof updateTransactionSplitPairActionImpl>
+): ReturnType<typeof updateTransactionSplitPairActionImpl> {
+	return updateTransactionSplitPairActionImpl(...args);
 }
 
 export async function exportTransactionsDataAction(

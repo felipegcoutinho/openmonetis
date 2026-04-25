@@ -33,6 +33,7 @@ const exportTransactionsSchema: z.ZodType<TransactionsExportContext> = z.object(
 			searchFilter: z.string().nullable(),
 			settledFilter: z.string().nullable(),
 			attachmentFilter: z.string().nullable(),
+			dividedFilter: z.string().nullable(),
 		}),
 		accountId: z.string().min(1).nullable().optional(),
 		cardId: z.string().min(1).nullable().optional(),

@@ -8,6 +8,7 @@ export type TransactionExportFilters = {
 	searchFilter: string | null;
 	settledFilter: string | null;
 	attachmentFilter: string | null;
+	dividedFilter: string | null;
 };
 
 export type TransactionsExportContext = {

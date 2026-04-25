@@ -45,6 +45,7 @@ export type TransactionSearchFilters = {
 	searchFilter: string | null;
 	settledFilter: string | null;
 	attachmentFilter: string | null;
+	dividedFilter: string | null;
 };
 
 type BaseSluggedOption = {
@@ -134,6 +135,7 @@ export const extractTransactionSearchFilters = (
 	searchFilter: getSingleParam(params, "q"),
 	settledFilter: getSingleParam(params, "settled"),
 	attachmentFilter: getSingleParam(params, "hasAttachment"),
+	dividedFilter: getSingleParam(params, "isDivided"),
 });
 
 export const resolveTransactionPagination = (
@@ -402,6 +404,10 @@ export const buildTransactionWhere = ({
 		);
 	}
 
+	if (filters.dividedFilter === "true") {
+		where.push(eq(transactions.isDivided, true));
+	}
+
 	const searchPattern = buildSearchPattern(filters.searchFilter);
 	if (searchPattern) {
 		where.push(
@@ -468,6 +474,7 @@ export const mapTransactionsData = (rows: TransactionRowWithRelations[]) =>
 		isAnticipated: item.isAnticipated ?? false,
 		anticipationId: item.anticipationId ?? null,
 		seriesId: item.seriesId ?? null,
+		splitGroupId: item.splitGroupId ?? null,
 		hasAttachments: item.hasAttachments ?? false,
 		readonly:
 			Boolean(item.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX)) ||

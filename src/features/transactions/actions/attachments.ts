@@ -1,7 +1,7 @@
 "use server";
 
 import crypto, { randomUUID } from "node:crypto";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull } from "drizzle-orm";
 import { z } from "zod/v4";
 import { attachments, transactionAttachments, transactions } from "@/db/schema";
 import {
@@ -15,7 +15,6 @@ import {
 import { getUser } from "@/shared/lib/auth/server";
 import { db } from "@/shared/lib/db";
 import {
-	createPresignedGetUrl,
 	createPresignedPutUrl,
 	deleteS3Object,
 	headS3Object,
@@ -96,6 +95,46 @@ function signUploadToken(payload: UploadTokenPayload): string {
 		.replace(/=/g, "");
 
 	return `${encodedPayload}.${signature}`;
+}
+
+async function expandSplitSiblings(
+	transactionIds: string[],
+	userId: string,
+): Promise<string[]> {
+	if (transactionIds.length === 0) return transactionIds;
+
+	const groupRows = await db
+		.select({ splitGroupId: transactions.splitGroupId })
+		.from(transactions)
+		.where(
+			and(
+				inArray(transactions.id, transactionIds),
+				eq(transactions.userId, userId),
+				isNotNull(transactions.splitGroupId),
+			),
+		);
+
+	const splitGroupIds = [
+		...new Set(
+			groupRows
+				.map((r) => r.splitGroupId)
+				.filter((v): v is string => v !== null),
+		),
+	];
+
+	if (splitGroupIds.length === 0) return transactionIds;
+
+	const siblingRows = await db
+		.select({ id: transactions.id })
+		.from(transactions)
+		.where(
+			and(
+				inArray(transactions.splitGroupId, splitGroupIds),
+				eq(transactions.userId, userId),
+			),
+		);
+
+	return [...new Set([...transactionIds, ...siblingRows.map((r) => r.id)])];
 }
 
 function verifyUploadToken(token: string): UploadTokenPayload | null {
@@ -281,6 +320,8 @@ export async function confirmAttachmentUploadAction(input: {
 			}
 		}
 
+		transactionIds = await expandSplitSiblings(transactionIds, user.id);
+
 		await db.insert(transactionAttachments).values(
 			transactionIds.map((tid) => ({
 				transactionId: tid,
@@ -359,69 +400,6 @@ export async function detachTransactionAttachmentAction(input: {
 	}
 }
 
-export async function fetchTransactionAttachmentsAction(
-	transactionId: string,
-): Promise<
-	Array<{
-		attachmentId: string;
-		fileName: string;
-		fileSize: number;
-		mimeType: string;
-		createdAt: Date;
-		url: string;
-	}>
-> {
-	const user = await getUser();
-
-	const [transaction] = await db
-		.select({ id: transactions.id })
-		.from(transactions)
-		.where(
-			and(eq(transactions.id, transactionId), eq(transactions.userId, user.id)),
-		);
-
-	if (!transaction) {
-		return [];
-	}
-
-	const rows = await db
-		.select({
-			attachmentId: transactionAttachments.attachmentId,
-			fileName: attachments.fileName,
-			fileSize: attachments.fileSize,
-			mimeType: attachments.mimeType,
-			fileKey: attachments.fileKey,
-			createdAt: attachments.createdAt,
-		})
-		.from(transactionAttachments)
-		.innerJoin(
-			transactions,
-			and(
-				eq(transactionAttachments.transactionId, transactions.id),
-				eq(transactions.userId, user.id),
-			),
-		)
-		.innerJoin(
-			attachments,
-			and(
-				eq(transactionAttachments.attachmentId, attachments.id),
-				eq(attachments.userId, user.id),
-			),
-		)
-		.where(eq(transactionAttachments.transactionId, transactionId));
-
-	return Promise.all(
-		rows.map(async (row) => ({
-			attachmentId: row.attachmentId,
-			fileName: row.fileName,
-			fileSize: row.fileSize,
-			mimeType: row.mimeType,
-			createdAt: row.createdAt,
-			url: await createPresignedGetUrl(row.fileKey),
-		})),
-	);
-}
-
 const detachBulkSchema = z.object({
 	attachmentId: z.string().uuid(),
 	transactionId: z.string().uuid(),
@@ -496,6 +474,11 @@ export async function detachAttachmentBulkAction(input: {
 				targetTransactionIds = seriesRows.map((r) => r.id);
 			}
 		}
+
+		targetTransactionIds = await expandSplitSiblings(
+			targetTransactionIds,
+			user.id,
+		);
 
 		if (targetTransactionIds.length > 0) {
 			await db

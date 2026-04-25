@@ -670,6 +670,7 @@ export const transactions = pgTable(
 			onUpdate: "cascade",
 		}),
 		seriesId: uuid("series_id"),
+		splitGroupId: uuid("split_group_id"),
 		transferId: uuid("transfer_id"),
 		ofxFitId: text("ofx_fit_id"),
 		importBatchId: text("import_batch_id"),
@@ -702,6 +703,11 @@ export const transactions = pgTable(
 		),
 		// Índice para buscar parcelas de uma série
 		seriesIdIdx: index("lancamentos_series_id_idx").on(table.seriesId),
+		// Índice para buscar shares de um split (userId + splitGroupId)
+		userIdSplitGroupIdIdx: index("lancamentos_user_id_split_group_id_idx").on(
+			table.userId,
+			table.splitGroupId,
+		),
 		// Índice para buscar transferências relacionadas
 		transferIdIdx: index("lancamentos_transfer_id_idx").on(table.transferId),
 		// Índice para filtrar por condição (aberto, realizado, cancelado)

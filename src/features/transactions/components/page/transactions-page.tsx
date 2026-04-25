@@ -8,7 +8,9 @@ import {
 	deleteTransactionAction,
 	deleteTransactionBulkAction,
 	toggleTransactionSettlementAction,
+	updateTransactionAction,
 	updateTransactionBulkAction,
+	updateTransactionSplitPairAction,
 } from "@/features/transactions/actions";
 import {
 	confirmAttachmentUploadAction,
@@ -31,6 +33,10 @@ import {
 	MassAddDialog,
 	type MassAddFormData,
 } from "../dialogs/mass-add-dialog";
+import {
+	SplitPairDialog,
+	type SplitPairScope,
+} from "../dialogs/split-pair-dialog";
 import { TransactionDetailsDialog } from "../dialogs/transaction-details-dialog";
 import { TransactionDialog } from "../dialogs/transaction-dialog/transaction-dialog";
 import { TransactionsTable } from "../table/transactions-table";
@@ -125,6 +131,26 @@ export function TransactionsPage({
 	);
 	const [bulkEditOpen, setBulkEditOpen] = useState(false);
 	const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+	const [pendingSplitEditData, setPendingSplitEditData] = useState<{
+		id: string;
+		name: string;
+		purchaseDate: string;
+		period: string;
+		transactionType: string;
+		amount: number;
+		condition: string;
+		paymentMethod: string;
+		payerId: string | undefined;
+		accountId: string | undefined;
+		cardId: string | undefined;
+		categoryId: string | undefined;
+		note: string;
+		isSettled: boolean | null;
+		dueDate: string | null;
+		boletoPaymentDate: string | null;
+		pendingDetachIds: string[];
+		pendingUploadFiles: File[];
+	} | null>(null);
 	const [pendingEditData, setPendingEditData] = useState<{
 		id: string;
 		purchaseDate: string;
@@ -394,6 +420,90 @@ export function TransactionsPage({
 		setMassAddOpen(true);
 	};
 
+	const handleSplitEditRequest = (
+		data: NonNullable<typeof pendingSplitEditData>,
+	) => {
+		setPendingSplitEditData(data);
+		setEditOpen(false);
+	};
+
+	const handleSplitEdit = async (scope: SplitPairScope) => {
+		if (!pendingSplitEditData) {
+			return;
+		}
+
+		const payload = {
+			id: pendingSplitEditData.id,
+			name: pendingSplitEditData.name,
+			purchaseDate: pendingSplitEditData.purchaseDate,
+			period: pendingSplitEditData.period,
+			transactionType: pendingSplitEditData.transactionType as Parameters<
+				typeof updateTransactionAction
+			>[0]["transactionType"],
+			amount: pendingSplitEditData.amount,
+			condition: pendingSplitEditData.condition as Parameters<
+				typeof updateTransactionAction
+			>[0]["condition"],
+			paymentMethod: pendingSplitEditData.paymentMethod as Parameters<
+				typeof updateTransactionAction
+			>[0]["paymentMethod"],
+			payerId: pendingSplitEditData.payerId ?? null,
+			accountId: pendingSplitEditData.accountId ?? null,
+			cardId: pendingSplitEditData.cardId ?? null,
+			categoryId: pendingSplitEditData.categoryId ?? null,
+			note: pendingSplitEditData.note,
+			isSettled: pendingSplitEditData.isSettled,
+			dueDate: pendingSplitEditData.dueDate ?? undefined,
+			boletoPaymentDate: pendingSplitEditData.boletoPaymentDate ?? undefined,
+			isSplit: false,
+		};
+
+		const action =
+			scope === "both"
+				? updateTransactionSplitPairAction
+				: updateTransactionAction;
+		const result = await action(payload);
+
+		if (!result.success) {
+			toast.error(result.error);
+			throw new Error(result.error);
+		}
+
+		await Promise.all(
+			pendingSplitEditData.pendingDetachIds.map((attachmentId) =>
+				detachAttachmentBulkAction({
+					attachmentId,
+					transactionId: pendingSplitEditData.id,
+					scope: "current",
+				}),
+			),
+		);
+
+		await Promise.all(
+			pendingSplitEditData.pendingUploadFiles.map(async (file) => {
+				const presign = await getPresignedUploadUrlAction({
+					fileName: file.name,
+					mimeType: file.type,
+					fileSize: file.size,
+					transactionId: pendingSplitEditData.id,
+				});
+				if (!presign.success) return;
+				await fetch(presign.presignedUrl, {
+					method: "PUT",
+					body: file,
+					headers: { "Content-Type": file.type },
+				});
+				await confirmAttachmentUploadAction({
+					uploadToken: presign.uploadToken,
+					scope: "current",
+				});
+			}),
+		);
+
+		toast.success(result.message);
+		setPendingSplitEditData(null);
+	};
+
 	const handleEdit = (item: TransactionItem) => {
 		setSelectedTransaction(item);
 		setEditOpen(true);
@@ -557,6 +667,7 @@ export function TransactionsPage({
 				transaction={selectedTransaction ?? undefined}
 				defaultPeriod={selectedPeriod}
 				onBulkEditRequest={handleBulkEditRequest}
+				onSplitEditRequest={handleSplitEditRequest}
 				maxSizeMb={attachmentMaxSizeMb}
 			/>
 
@@ -624,6 +735,14 @@ export function TransactionsPage({
 					undefined
 				}
 				onConfirm={handleBulkEdit}
+			/>
+
+			<SplitPairDialog
+				open={pendingSplitEditData !== null}
+				onOpenChange={(open) => {
+					if (!open) setPendingSplitEditData(null);
+				}}
+				onConfirm={handleSplitEdit}
 			/>
 
 			{allowCreate && massAddOpen ? (

@@ -78,6 +78,7 @@ export function TransactionDialog({
 	onSuccess,
 	maxSizeMb,
 	onBulkEditRequest,
+	onSplitEditRequest,
 }: TransactionDialogProps) {
 	const [dialogOpen, setDialogOpen] = useControlledState(
 		open,
@@ -321,6 +322,10 @@ export function TransactionDialog({
 				formState.boletoPaymentDate
 					? formState.boletoPaymentDate
 					: undefined,
+			importFromTransactionId:
+				mode === "create" && isImporting && transaction?.id
+					? transaction.id
+					: undefined,
 		};
 
 		startTransition(async () => {
@@ -365,6 +370,11 @@ export function TransactionDialog({
 			}
 
 			const hasSeriesId = Boolean(transaction?.seriesId);
+			const hasSplitPair = Boolean(
+				transaction?.isDivided &&
+					transaction?.splitGroupId &&
+					!transaction?.seriesId,
+			);
 
 			if (hasSeriesId && onBulkEditRequest) {
 				// Para lançamentos em série, passa os arquivos para a página confirmar
@@ -392,6 +402,39 @@ export function TransactionDialog({
 						formState.paymentMethod === "Cartão de crédito"
 							? null
 							: Boolean(formState.isSettled),
+					pendingDetachIds,
+					pendingUploadFiles,
+				});
+				return;
+			}
+
+			if (hasSplitPair && onSplitEditRequest) {
+				onSplitEditRequest({
+					id: transaction?.id ?? "",
+					purchaseDate: formState.purchaseDate,
+					period: formState.period,
+					name: formState.name.trim(),
+					transactionType: formState.transactionType,
+					amount: sanitizedAmount,
+					condition: formState.condition,
+					paymentMethod: formState.paymentMethod,
+					categoryId: formState.categoryId,
+					note: formState.note.trim() || "",
+					payerId: formState.payerId,
+					accountId: formState.accountId,
+					cardId: formState.cardId,
+					isSettled:
+						formState.paymentMethod === "Cartão de crédito"
+							? null
+							: Boolean(formState.isSettled),
+					dueDate:
+						formState.paymentMethod === "Boleto"
+							? formState.dueDate || null
+							: null,
+					boletoPaymentDate:
+						mode === "update" && formState.paymentMethod === "Boleto"
+							? formState.boletoPaymentDate || null
+							: null,
 					pendingDetachIds,
 					pendingUploadFiles,
 				});
@@ -609,6 +652,17 @@ export function TransactionDialog({
 										formState={formState}
 										onFieldChange={handleFieldChange}
 									/>
+									{isImportMode && transaction?.id && (
+										<div className="space-y-2">
+											<Label className="text-xs font-medium leading-none">
+												Anexos que serão copiados
+											</Label>
+											<AttachmentSection
+												transactionId={transaction.id}
+												readonly
+											/>
+										</div>
+									)}
 									<AttachmentFilePicker
 										files={pendingFiles}
 										onAdd={(file) => setPendingFiles((prev) => [...prev, file])}

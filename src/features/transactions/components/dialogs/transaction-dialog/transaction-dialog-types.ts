@@ -49,6 +49,26 @@ export interface TransactionDialogProps {
 		pendingDetachIds: string[];
 		pendingUploadFiles: File[];
 	}) => void;
+	onSplitEditRequest?: (data: {
+		id: string;
+		purchaseDate: string;
+		period: string;
+		name: string;
+		transactionType: string;
+		amount: number;
+		condition: string;
+		paymentMethod: string;
+		categoryId: string | undefined;
+		note: string;
+		payerId: string | undefined;
+		accountId: string | undefined;
+		cardId: string | undefined;
+		isSettled: boolean | null;
+		dueDate: string | null;
+		boletoPaymentDate: string | null;
+		pendingDetachIds: string[];
+		pendingUploadFiles: File[];
+	}) => void;
 }
 
 export interface BaseFieldSectionProps {

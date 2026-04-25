@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -394,7 +395,11 @@ const refineLancamento = (
 	}
 };
 
-export const createSchema = baseFields.superRefine(refineLancamento);
+export const createSchema = baseFields
+	.extend({
+		importFromTransactionId: uuidSchema("Lançamento fonte").optional(),
+	})
+	.superRefine(refineLancamento);
 export const updateSchema = baseFields
 	.extend({
 		id: uuidSchema("Lançamento"),
@@ -544,6 +549,7 @@ export const buildLancamentoRecords = ({
 	seriesId,
 }: BuildTransactionRecordsParams): TransactionInsert[] => {
 	const records: TransactionInsert[] = [];
+	const isSplit = (data.isSplit ?? false) && shares.length > 1;
 
 	const basePayload = {
 		name: data.name,
@@ -561,6 +567,8 @@ export const buildLancamentoRecords = ({
 		userId,
 		seriesId,
 	};
+
+	const cycleSplitGroupId = () => (isSplit ? randomUUID() : null);
 
 	const resolveSettledValue = (cycleIndex: number) => {
 		if (shouldNullifySettled) {
@@ -588,6 +596,7 @@ export const buildLancamentoRecords = ({
 			const installmentDueDate = dueDate
 				? addMonthsToDate(dueDate, installment)
 				: null;
+			const splitGroupId = cycleSplitGroupId();
 
 			shares.forEach((share, shareIndex) => {
 				const amountCents = amountsByShare[shareIndex]?.[installment] ?? 0;
@@ -603,6 +612,7 @@ export const buildLancamentoRecords = ({
 					currentInstallment: installment + 1,
 					recurrenceCount: null,
 					dueDate: installmentDueDate,
+					splitGroupId,
 					boletoPaymentDate:
 						data.paymentMethod === "Boleto" && settled
 							? boletoPaymentDate
@@ -623,6 +633,7 @@ export const buildLancamentoRecords = ({
 			const recurrenceDueDate = dueDate
 				? addMonthsToDate(dueDate, index)
 				: null;
+			const splitGroupId = cycleSplitGroupId();
 
 			shares.forEach((share) => {
 				const settled = resolveSettledValue(index);
@@ -635,6 +646,7 @@ export const buildLancamentoRecords = ({
 					isSettled: settled,
 					recurrenceCount: recurrenceTotal,
 					dueDate: recurrenceDueDate,
+					splitGroupId,
 					boletoPaymentDate:
 						data.paymentMethod === "Boleto" && settled
 							? boletoPaymentDate
@@ -646,6 +658,8 @@ export const buildLancamentoRecords = ({
 		return records;
 	}
 
+	const splitGroupId = cycleSplitGroupId();
+
 	shares.forEach((share) => {
 		const settled = resolveSettledValue(0);
 		records.push({
@@ -656,6 +670,7 @@ export const buildLancamentoRecords = ({
 			period,
 			isSettled: settled,
 			dueDate,
+			splitGroupId,
 			boletoPaymentDate:
 				data.paymentMethod === "Boleto" && settled ? boletoPaymentDate : null,
 		});

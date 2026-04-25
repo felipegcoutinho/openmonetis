@@ -1,10 +1,11 @@
-import { and, desc, eq, type SQL } from "drizzle-orm";
+import { and, desc, eq, type SQL, sql } from "drizzle-orm";
 import {
 	cards,
 	categories,
 	financialAccounts,
 	payerShares,
 	payers,
+	transactionAttachments,
 	transactions,
 	user as usersTable,
 } from "@/db/schema";
@@ -73,6 +74,10 @@ export async function fetchPagadorLancamentos(filters: SQL[]) {
 			financialAccount: financialAccounts,
 			card: cards,
 			category: categories,
+			hasAttachments: sql<boolean>`EXISTS (
+				SELECT 1 FROM ${transactionAttachments}
+				WHERE ${transactionAttachments.transactionId} = ${transactions.id}
+			)`,
 		})
 		.from(transactions)
 		.leftJoin(payers, eq(transactions.payerId, payers.id))
@@ -85,12 +90,12 @@ export async function fetchPagadorLancamentos(filters: SQL[]) {
 		.where(and(...filters))
 		.orderBy(desc(transactions.purchaseDate), desc(transactions.createdAt));
 
-	// Transformar resultado para o formato esperado
 	return transactionRows.map((row) => ({
 		...row.transaction,
 		payer: row.payer,
 		financialAccount: row.financialAccount,
 		card: row.card,
 		category: row.category,
+		hasAttachments: row.hasAttachments,
 	}));
 }

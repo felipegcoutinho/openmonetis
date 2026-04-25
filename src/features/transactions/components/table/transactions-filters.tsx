@@ -265,7 +265,8 @@ export function TransactionsFilters({
 		searchParams.get("category") ||
 		searchParams.get("accountCard") ||
 		searchParams.get("settled") ||
-		searchParams.get("hasAttachment");
+		searchParams.get("hasAttachment") ||
+		searchParams.get("isDivided");
 
 	const handleResetFilters = () => {
 		handleReset();
@@ -625,6 +626,23 @@ export function TransactionsFilters({
 												"hasAttachment",
 												checked ? "true" : null,
 											);
+										}}
+									/>
+								</div>
+
+								<div className="flex items-center justify-between">
+									<label
+										htmlFor="filter-is-divided"
+										className="text-sm font-medium cursor-pointer"
+									>
+										Somente divididos
+									</label>
+									<Switch
+										id="filter-is-divided"
+										checked={searchParams.get("isDivided") === "true"}
+										disabled={isPending}
+										onCheckedChange={(checked) => {
+											handleFilterChange("isDivided", checked ? "true" : null);
 										}}
 									/>
 								</div>

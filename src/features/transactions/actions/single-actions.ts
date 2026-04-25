@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import {
 	attachments,
 	financialAccounts,
@@ -21,6 +21,7 @@ import {
 	getBusinessTodayDate,
 	parseLocalDateString,
 } from "@/shared/utils/date";
+import { copyAttachmentsForImport } from "../attachment-copy";
 import { cleanupAttachmentsAfterTransactionDelete } from "./attachments";
 import {
 	buildLancamentoRecords,
@@ -137,6 +138,14 @@ export async function createTransactionAction(
 			.insert(transactions)
 			.values(records)
 			.returning({ id: transactions.id });
+
+		if (data.importFromTransactionId && inserted.length > 0) {
+			await copyAttachmentsForImport({
+				sourceTransactionId: data.importFromTransactionId,
+				targetTransactionIds: inserted.map((r) => r.id),
+				targetUserId: user.id,
+			});
+		}
 
 		const notificationEntries = buildEntriesByPayer(
 			records.map((record) => ({
@@ -432,6 +441,134 @@ export async function deleteTransactionAction(
 		revalidate(user.id);
 
 		return { success: true, message: "Lançamento removido com sucesso." };
+	} catch (error) {
+		return handleActionError(error);
+	}
+}
+
+export async function updateTransactionSplitPairAction(
+	input: UpdateInput,
+): Promise<ActionResult> {
+	try {
+		const user = await getUser();
+		const data = updateSchema.parse(input);
+
+		const ownershipError = await validateAllOwnership(user.id, {
+			payerId: data.payerId,
+			categoryId: data.categoryId,
+			accountId: data.accountId,
+			cardId: data.cardId,
+		});
+		if (ownershipError) {
+			return { success: false, error: ownershipError };
+		}
+
+		const existing = await db.query.transactions.findFirst({
+			columns: {
+				id: true,
+				period: true,
+				transactionType: true,
+				condition: true,
+				paymentMethod: true,
+				accountId: true,
+				cardId: true,
+				categoryId: true,
+				splitGroupId: true,
+			},
+			where: and(
+				eq(transactions.id, data.id),
+				eq(transactions.userId, user.id),
+			),
+		});
+
+		if (!existing) {
+			return { success: false, error: "Lançamento não encontrado." };
+		}
+
+		const period = resolvePeriod(data.purchaseDate, data.period);
+		const amountSign: 1 | -1 = data.transactionType === "Despesa" ? -1 : 1;
+		const amountCents = Math.round(Math.abs(data.amount) * 100);
+		const normalizedAmount = centsToDecimalString(amountCents * amountSign);
+		const normalizedSettled =
+			data.paymentMethod === "Cartão de crédito"
+				? null
+				: (data.isSettled ?? false);
+		const shouldSetBoletoPaymentDate =
+			data.paymentMethod === "Boleto" && Boolean(normalizedSettled);
+		const boletoPaymentDateValue = shouldSetBoletoPaymentDate
+			? data.boletoPaymentDate
+				? parseLocalDateString(data.boletoPaymentDate)
+				: getBusinessTodayDate()
+			: null;
+		const targetCardId = data.cardId ?? existing.cardId;
+		const movedInvoice =
+			data.paymentMethod === "Cartão de crédito" &&
+			targetCardId &&
+			(targetCardId !== existing.cardId || period !== existing.period);
+
+		if (movedInvoice) {
+			const paidPeriods = await getPaidInvoicePeriods(user.id, targetCardId, [
+				period,
+			]);
+			if (paidPeriods.length > 0) {
+				return {
+					success: false,
+					error: `As faturas dos meses ${formatPaidInvoicePeriods(
+						paidPeriods,
+					)} já estão pagas. Desfaça o pagamento antes de mover este lançamento.`,
+				};
+			}
+		}
+
+		const purchaseDate = parseLocalDateString(data.purchaseDate);
+		const dueDate = data.dueDate ? parseLocalDateString(data.dueDate) : null;
+
+		const sharedPayload = {
+			name: data.name,
+			purchaseDate,
+			transactionType: data.transactionType,
+			condition: data.condition,
+			paymentMethod: data.paymentMethod,
+			accountId: data.accountId ?? null,
+			cardId: data.cardId ?? null,
+			categoryId: data.categoryId ?? null,
+			note: data.note ?? null,
+			dueDate,
+			period,
+			isSettled: normalizedSettled,
+			boletoPaymentDate: boletoPaymentDateValue,
+		};
+
+		await db.transaction(async (tx: typeof db) => {
+			await tx
+				.update(transactions)
+				.set({
+					...sharedPayload,
+					amount: normalizedAmount,
+					payerId: data.payerId ?? null,
+					installmentCount: data.installmentCount ?? null,
+					recurrenceCount: data.recurrenceCount ?? null,
+				})
+				.where(
+					and(eq(transactions.id, data.id), eq(transactions.userId, user.id)),
+				);
+
+			if (existing.splitGroupId) {
+				await tx
+					.update(transactions)
+					.set(sharedPayload)
+					.where(
+						and(
+							eq(transactions.splitGroupId, existing.splitGroupId),
+							eq(transactions.userId, user.id),
+							ne(transactions.id, data.id),
+						),
+					);
+			}
+		});
+
+		revalidate(user.id);
+		return { success: true, message: "Lançamentos atualizados com sucesso." };
 	} catch (error) {
 		return handleActionError(error);
 	}

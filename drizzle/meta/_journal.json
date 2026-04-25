@@ -183,6 +183,13 @@
 			"when": 1776351838548,
 			"tag": "0025_burly_colonel_america",
 			"breakpoints": true
+		},
+		{
+			"idx": 26,
+			"version": "7",
+			"when": 1777042423451,
+			"tag": "0026_bored_eternity",
+			"breakpoints": true
 		}
 	]
 }

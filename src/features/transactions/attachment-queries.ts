@@ -1,6 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { attachments, transactionAttachments, transactions } from "@/db/schema";
 import { db } from "@/shared/lib/db";
+import { getPayerAccess } from "@/shared/lib/payers/access";
 import { createPresignedGetUrl } from "@/shared/lib/storage/presign";
 
 export type TransactionAttachmentListItem = {
@@ -17,14 +18,22 @@ export async function fetchTransactionAttachments(
 	transactionId: string,
 ): Promise<TransactionAttachmentListItem[]> {
 	const [transaction] = await db
-		.select({ id: transactions.id })
+		.select({
+			id: transactions.id,
+			userId: transactions.userId,
+			payerId: transactions.payerId,
+		})
 		.from(transactions)
-		.where(
-			and(eq(transactions.id, transactionId), eq(transactions.userId, userId)),
-		);
+		.where(eq(transactions.id, transactionId));
 
 	if (!transaction) {
 		return [];
+	}
+
+	if (transaction.userId !== userId) {
+		if (!transaction.payerId) return [];
+		const access = await getPayerAccess(userId, transaction.payerId);
+		if (!access) return [];
 	}
 
 	const rows = await db
@@ -38,18 +47,8 @@ export async function fetchTransactionAttachments(
 		})
 		.from(transactionAttachments)
 		.innerJoin(
-			transactions,
-			and(
-				eq(transactionAttachments.transactionId, transactions.id),
-				eq(transactions.userId, userId),
-			),
-		)
-		.innerJoin(
 			attachments,
-			and(
-				eq(transactionAttachments.attachmentId, attachments.id),
-				eq(attachments.userId, userId),
-			),
+			eq(transactionAttachments.attachmentId, attachments.id),
 		)
 		.where(eq(transactionAttachments.transactionId, transactionId));
 
