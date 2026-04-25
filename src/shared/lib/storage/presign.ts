@@ -48,5 +48,16 @@ export async function deleteS3Object(fileKey: string): Promise<void> {
 		Bucket: S3_BUCKET,
 		Key: fileKey,
 	});
-	await s3.send(command);
+	try {
+		await s3.send(command);
+	} catch (err) {
+		if (
+			err instanceof Error &&
+			"Code" in err &&
+			(err as { Code: string }).Code === "NoSuchKey"
+		) {
+			return;
+		}
+		throw err;
+	}
 }

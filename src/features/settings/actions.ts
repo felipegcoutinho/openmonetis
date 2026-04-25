@@ -18,6 +18,7 @@ import {
 } from "@/shared/lib/payers/constants";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { normalizeNameFromEmail } from "@/shared/lib/payers/utils";
+import { deleteS3Object } from "@/shared/lib/storage/presign";
 
 type ActionResponse<T = void> = {
 	success: boolean;
@@ -85,6 +86,11 @@ async function resetUserAppData(
 	const avatarUrl = user.image ?? DEFAULT_PAYER_AVATAR;
 	const defaultPayerStatus = PAYER_STATUS_OPTIONS[0];
 
+	const userAttachments = await db
+		.select({ id: schema.attachments.id, fileKey: schema.attachments.fileKey })
+		.from(schema.attachments)
+		.where(eq(schema.attachments.userId, userId));
+
 	await db.transaction(async (tx: typeof db) => {
 		await tx
 			.delete(schema.payerShares)
@@ -115,6 +121,9 @@ async function resetUserAppData(
 		await tx
 			.delete(schema.transactions)
 			.where(eq(schema.transactions.userId, userId));
+		await tx
+			.delete(schema.attachments)
+			.where(eq(schema.attachments.userId, userId));
 		await tx.delete(schema.invoices).where(eq(schema.invoices.userId, userId));
 		await tx.delete(schema.cards).where(eq(schema.cards.userId, userId));
 		await tx
@@ -147,6 +156,14 @@ async function resetUserAppData(
 			userId,
 		});
 	});
+
+	await Promise.all(
+		userAttachments.map((att) =>
+			deleteS3Object(att.fileKey).catch((err) => {
+				console.error("Falha ao remover anexo do S3 no reset:", err);
+			}),
+		),
+	);
 }
 
 // Actions

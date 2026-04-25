@@ -1,7 +1,7 @@
 "use server";
 
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { transactions } from "@/db/schema";
+import { attachments, transactionAttachments, transactions } from "@/db/schema";
 import {
 	PAYMENT_METHODS,
 	TRANSACTION_CONDITIONS,
@@ -17,6 +17,7 @@ import {
 import type { ActionResult } from "@/shared/lib/types/actions";
 import { addMonthsToDate, parseLocalDateString } from "@/shared/utils/date";
 import { addMonthsToPeriod, parsePeriod } from "@/shared/utils/period";
+import { cleanupAttachmentsAfterTransactionDelete } from "./attachments";
 import {
 	centsToDecimalString,
 	type DeleteBulkInput,
@@ -78,71 +79,64 @@ export async function deleteTransactionBulkAction(
 			};
 		}
 
+		let scopeFilter: ReturnType<typeof and>;
+		let successMessage: string;
+
 		if (data.scope === "current") {
-			await db
-				.delete(transactions)
-				.where(
-					and(eq(transactions.id, data.id), eq(transactions.userId, user.id)),
-				);
-
-			revalidate(user.id);
-			return { success: true, message: "Lançamento removido com sucesso." };
+			scopeFilter = eq(transactions.id, data.id);
+			successMessage = "Lançamento removido com sucesso.";
+		} else if (data.scope === "period") {
+			scopeFilter = and(
+				eq(transactions.seriesId, existing.seriesId),
+				eq(transactions.period, existing.period ?? ""),
+			);
+			successMessage = "Todos os lançamentos do período foram removidos.";
+		} else if (data.scope === "future") {
+			scopeFilter = and(
+				eq(transactions.seriesId, existing.seriesId),
+				sql`${transactions.period} >= ${existing.period}`,
+			);
+			successMessage = "Lançamentos removidos com sucesso.";
+		} else if (data.scope === "all") {
+			scopeFilter = eq(transactions.seriesId, existing.seriesId);
+			successMessage = "Todos os lançamentos da série foram removidos.";
+		} else {
+			return { success: false, error: "Escopo de ação inválido." };
 		}
 
-		if (data.scope === "period") {
-			await db
-				.delete(transactions)
-				.where(
-					and(
-						eq(transactions.seriesId, existing.seriesId),
-						eq(transactions.userId, user.id),
-						eq(transactions.period, existing.period ?? ""),
-					),
-				);
+		const targetRows = await db
+			.select({ id: transactions.id })
+			.from(transactions)
+			.where(and(scopeFilter, eq(transactions.userId, user.id)));
 
-			revalidate(user.id);
-			return {
-				success: true,
-				message: "Todos os lançamentos do período foram removidos.",
-			};
+		const targetIds = targetRows.map((r) => r.id);
+
+		if (targetIds.length === 0) {
+			return { success: false, error: "Nenhum lançamento encontrado." };
 		}
 
-		if (data.scope === "future") {
-			await db
-				.delete(transactions)
-				.where(
-					and(
-						eq(transactions.seriesId, existing.seriesId),
-						eq(transactions.userId, user.id),
-						sql`${transactions.period} >= ${existing.period}`,
-					),
-				);
+		const linkedAttachments = await db
+			.select({ id: attachments.id, fileKey: attachments.fileKey })
+			.from(transactionAttachments)
+			.innerJoin(
+				attachments,
+				eq(transactionAttachments.attachmentId, attachments.id),
+			)
+			.where(inArray(transactionAttachments.transactionId, targetIds));
 
-			revalidate(user.id);
-			return {
-				success: true,
-				message: "Lançamentos removidos com sucesso.",
-			};
-		}
+		await db
+			.delete(transactions)
+			.where(
+				and(
+					inArray(transactions.id, targetIds),
+					eq(transactions.userId, user.id),
+				),
+			);
 
-		if (data.scope === "all") {
-			await db
-				.delete(transactions)
-				.where(
-					and(
-						eq(transactions.seriesId, existing.seriesId),
-						eq(transactions.userId, user.id),
-					),
-				);
+		await cleanupAttachmentsAfterTransactionDelete(linkedAttachments);
 
-			revalidate(user.id);
-			return {
-				success: true,
-				message: "Todos os lançamentos da série foram removidos.",
-			};
-		}
-
-		return { success: false, error: "Escopo de ação inválido." };
+		revalidate(user.id);
+		return { success: true, message: successMessage };
 	} catch (error) {
 		return handleActionError(error);
 	}
@@ -759,6 +753,15 @@ export async function deleteMultipleTransactionsAction(
 			return { success: false, error: "Nenhum lançamento encontrado." };
 		}
 
+		const linkedAttachments = await db
+			.select({ id: attachments.id, fileKey: attachments.fileKey })
+			.from(transactionAttachments)
+			.innerJoin(
+				attachments,
+				eq(transactionAttachments.attachmentId, attachments.id),
+			)
+			.where(inArray(transactionAttachments.transactionId, data.ids));
+
 		await db
 			.delete(transactions)
 			.where(
@@ -767,6 +770,8 @@ export async function deleteMultipleTransactionsAction(
 					eq(transactions.userId, user.id),
 				),
 			);
+
+		await cleanupAttachmentsAfterTransactionDelete(linkedAttachments);
 
 		const notificationData = existing
 			.filter(
