@@ -7,6 +7,43 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [2.4.3] - 2026-04-25
+
+Esta versão amplia o trabalho com lançamentos divididos: anexos passam a ser visíveis para pessoas com acesso compartilhado, a importação para conta própria copia os arquivos de forma independente e a edição ganha a opção de aplicar a alteração nos dois lados do par. Três caminhos de deleção foram corrigidos para não deixar arquivos órfãos no storage. Também traz refresh visual nos badges de tipo e radio buttons, prefetch server-side de logos para reduzir chamadas de API no dashboard, e ajustes pontuais no healthcheck do container e em rótulos da UI.
+
+### Adicionado
+
+- Schema: coluna `split_group_id` (uuid, nullable) em `lancamentos` com índice `(user_id, split_group_id)` — liga as shares do mesmo evento de divisão
+- Split: `buildLancamentoRecords` atribui um `splitGroupId` único por cycle (parcelado, recorrente ou único) para ambas as shares
+- Split: edição cooperativa via `updateTransactionSplitPairAction` — ao editar um lançamento dividido, novo dialog `SplitPairDialog` permite escolher entre aplicar somente neste lado ou nos dois lados (nome, data, categoria e demais campos compartilhados; valor e payer permanecem por share)
+- Importação: "Importar para Minha Conta" agora copia os anexos do lançamento-fonte para a conta de quem está importando (novo arquivo, novo `userId`, novo `fileKey` — cópia independente via S3 CopyObject). `createSchema` ganhou campo opcional `importFromTransactionId`; helper `copyAttachmentsForImport` valida acesso à fonte via ownership direto ou `payerShares`
+- Importação: dialog "Importar para Minha Conta" exibe seção read-only "Anexos que serão copiados" listando os anexos do lançamento-fonte antes da confirmação
+- Filtros: nova chave `isDivided` na tabela de lançamentos — toggle "Somente divididos" no drawer de filtros mantém o estado na URL
+- Performance: prefetch server-side de mapeamentos Logo.dev no `/dashboard`, `/transactions` e `/payers/[payerId]` — uma única query SQL em batch (`fetchEstablishmentLogoMap`) semeia o cache do React Query antes do primeiro render, eliminando os N requests para `/api/logo/mapping`
+
+### Alterado
+
+- Anexos: `fetchTransactionAttachments` e `fetchTransactionAttachmentsAction` passam a autorizar leitura por acesso à transação (direto ou via `payerShares`), permitindo que pessoas com pagador compartilhado visualizem anexos de lançamentos divididos
+- Anexos: upload (`confirmAttachmentUploadAction`) e detach em massa (`detachAttachmentBulkAction`) agora expandem `transactionIds` para incluir shares irmãs via `splitGroupId` — o vínculo em `transaction_attachments` é replicado para manter simetria
+- Anexos: delete/detach continuam restritos ao criador (sem alteração de escrita); dashboard (`fetchAttachmentsForPeriod`) permanece listando apenas os anexos do próprio usuário
+- Migração: lançamentos divididos criados antes desta versão ficam com `split_group_id` NULL e mantêm o comportamento antigo (anexos não visíveis para a contraparte); apenas splits novos são afetados
+- Storage: `deleteS3Object` passa a ignorar `NoSuchKey` silenciosamente — providers S3-compatíveis (ex.: Cloudflare R2) lançam esse erro ao deletar objeto inexistente, ao contrário do comportamento idempotente do S3 padrão
+- UI/Badges: `TransactionTypeBadge` redesenhado — substitui o `StatusDot` por ícones direcionais (`RiArrowRightDownLine` receita, `RiArrowRightUpLine` despesa, `RiArrowLeftRightLine` transferência), com borda visível, shadow sutil e variantes dark mode dessaturadas; rótulo "Transferência" abreviado para "Transf."
+- UI/Forms: indicador do `RadioGroup` trocado de círculo (`RiCircleLine`) por check (`RiCheckLine`) com fundo sólido `primary` no estado selecionado
+- UI/Antecipação: tabela de seleção de parcelas reduzida de quatro para três colunas (estabelecimento + fatura + valor) — informações de parcela e vencimento absorvidas pela coluna do estabelecimento
+- Tipografia: fonte Inter agora carrega explicitamente os pesos 500, 600 e 700 (antes derivava de 400)
+- Deps: better-auth 1.6.5 → 1.6.9, @aws-sdk/client-s3 3.1032 → 3.1037, @tanstack/react-query 5.99.2 → 5.100.3, @biomejs/biome 2.4.12 → 2.4.13, tailwindcss 4.2.2 → 4.2.4, resend 6.12.0 → 6.12.2
+
+### Corrigido
+
+- Anexos: deleção em massa por série (`deleteTransactionBulkAction`) não chamava cleanup de storage — arquivos ficavam órfãos no S3 após apagar "este e futuros" ou "todos" de uma série parcelada/recorrente com anexo
+- Anexos: deleção múltipla por seleção (`deleteMultipleTransactionsAction`) não chamava cleanup de storage — mesmo problema ao selecionar vários lançamentos com anexo e deletar em lote
+- Anexos: reset de conta em Ajustes (`resetUserAppData`) não limpava o storage — todos os arquivos do usuário ficavam órfãos no S3 após a operação de zeragem
+- Página da pessoa (`/payers/[payerId]`): `fetchPagadorLancamentos` agora calcula `hasAttachments` via `EXISTS`, fazendo o ícone de clipe aparecer na tabela de lançamentos (antes só aparecia em `/transactions`)
+- Categorias: mensagem de sucesso ao atualizar exibia "Category atualizada com sucesso." — corrigido para "Categoria atualizada com sucesso."
+- Antecipação: rótulos "Category" e "Período" no dialog corrigidos para "Categoria" e "Fatura"
+- Docker: healthcheck do container `app` agora usa `127.0.0.1:3000` em vez de `localhost:3000`, evitando connection timeout em hosts com IPv6 (resolvendo [#44](https://github.com/felipegcoutinho/openmonetis/issues/44))
+
 ## [2.4.2] - 2026-04-20
 
 Esta versão é quase toda sobre organização e polimento. O código interno do Dashboard foi reestruturado — módulos espalhados pela raiz da feature foram agrupados em subdiretórios coesos e a arquitetura de widgets foi renovada com um novo `widget-registry`. A sidebar lateral foi aposentada em favor de uma navegação concentrada na navbar. A interface passou por um refinamento visual amplo: cards redesenhados, dark mode mais consistente e efeitos decorativos removidos para uma composição mais limpa. As imagens de preview da landing page foram atualizadas. Por fim, a integração com Logo.dev ganhou uma arquitetura mais segura — o token agora é lido apenas no servidor e nunca chega ao cliente. O conceito de "Pagador" foi renomeado para "Pessoa" em toda a interface.
