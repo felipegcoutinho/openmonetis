@@ -17,8 +17,10 @@ import {
 	fetchTransactionFilterSources,
 	fetchTransactionsPage,
 } from "@/features/transactions/queries";
+import { LogoPrefetchProvider } from "@/shared/components/entity-avatar";
 import MonthNavigation from "@/shared/components/month-picker/month-navigation";
 import { getUserId } from "@/shared/lib/auth/server";
+import { prefetchLogoMappings } from "@/shared/lib/logo/prefetch-server";
 import { parsePeriodParam } from "@/shared/utils/period";
 
 type PageSearchParams = Promise<ResolvedSearchParams>;
@@ -74,38 +76,45 @@ export default async function Page({ searchParams }: PageProps) {
 		payerRows: filterSources.payerRows,
 	});
 
+	const logoMappings = await prefetchLogoMappings(
+		userId,
+		transactionData.map((t) => t.name),
+	);
+
 	return (
 		<main className="flex flex-col gap-6">
 			<MonthNavigation />
-			<TransactionsPage
-				currentUserId={userId}
-				transactions={transactionData}
-				payerOptions={payerOptions}
-				splitPayerOptions={splitPayerOptions}
-				defaultPayerId={defaultPayerId}
-				accountOptions={accountOptions}
-				cardOptions={cardOptions}
-				categoryOptions={categoryOptions}
-				payerFilterOptions={payerFilterOptions}
-				categoryFilterOptions={categoryFilterOptions}
-				accountCardFilterOptions={accountCardFilterOptions}
-				selectedPeriod={selectedPeriod}
-				estabelecimentos={estabelecimentos}
-				pagination={{
-					page: transactionsPage.page,
-					pageSize: transactionsPage.pageSize,
-					totalItems: transactionsPage.totalItems,
-					totalPages: transactionsPage.totalPages,
-				}}
-				exportContext={{
-					source: "transactions",
-					period: selectedPeriod,
-					filters: searchFilters,
-				}}
-				noteAsColumn={userPreferences?.statementNoteAsColumn ?? false}
-				columnOrder={userPreferences?.transactionsColumnOrder ?? null}
-				attachmentMaxSizeMb={userPreferences?.attachmentMaxSizeMb ?? 50}
-			/>
+			<LogoPrefetchProvider mappings={logoMappings}>
+				<TransactionsPage
+					currentUserId={userId}
+					transactions={transactionData}
+					payerOptions={payerOptions}
+					splitPayerOptions={splitPayerOptions}
+					defaultPayerId={defaultPayerId}
+					accountOptions={accountOptions}
+					cardOptions={cardOptions}
+					categoryOptions={categoryOptions}
+					payerFilterOptions={payerFilterOptions}
+					categoryFilterOptions={categoryFilterOptions}
+					accountCardFilterOptions={accountCardFilterOptions}
+					selectedPeriod={selectedPeriod}
+					estabelecimentos={estabelecimentos}
+					pagination={{
+						page: transactionsPage.page,
+						pageSize: transactionsPage.pageSize,
+						totalItems: transactionsPage.totalItems,
+						totalPages: transactionsPage.totalPages,
+					}}
+					exportContext={{
+						source: "transactions",
+						period: selectedPeriod,
+						filters: searchFilters,
+					}}
+					noteAsColumn={userPreferences?.statementNoteAsColumn ?? false}
+					columnOrder={userPreferences?.transactionsColumnOrder ?? null}
+					attachmentMaxSizeMb={userPreferences?.attachmentMaxSizeMb ?? 50}
+				/>
+			</LogoPrefetchProvider>
 		</main>
 	);
 }
