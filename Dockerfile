@@ -109,7 +109,7 @@ USER nextjs
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 # Entrypoint: roda migrations e depois executa o CMD
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
