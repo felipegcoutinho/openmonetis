@@ -116,7 +116,7 @@ export async function updateCategoryAction(
 
 		revalidateForEntity("categories", user.id);
 
-		return { success: true, message: "Category atualizada com sucesso." };
+		return { success: true, message: "Categoria atualizada com sucesso." };
 	} catch (error) {
 		return handleActionError(error);
 	}

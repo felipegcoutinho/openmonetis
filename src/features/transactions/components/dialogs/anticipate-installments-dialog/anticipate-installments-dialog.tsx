@@ -240,7 +240,7 @@ export function AnticipateInstallmentsDialog({
 
 						<div className="grid gap-2 sm:grid-cols-2">
 							<Field className="gap-1">
-								<FieldLabel htmlFor="anticipation-period">Período</FieldLabel>
+								<FieldLabel htmlFor="anticipation-period">Fatura</FieldLabel>
 								<FieldContent>
 									<PeriodPicker
 										value={formState.anticipationPeriod}
@@ -292,7 +292,7 @@ export function AnticipateInstallmentsDialog({
 
 							<Field className="gap-1">
 								<FieldLabel htmlFor="anticipation-categoria">
-									Category
+									Categoria
 								</FieldLabel>
 								<FieldContent>
 									<Select
