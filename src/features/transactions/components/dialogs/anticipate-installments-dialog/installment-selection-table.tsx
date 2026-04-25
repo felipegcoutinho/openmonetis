@@ -1,7 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import MoneyValues from "@/shared/components/money-values";
 import { Badge } from "@/shared/components/ui/badge";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -44,11 +42,6 @@ export function InstallmentSelectionTable({
 		}
 	};
 
-	const formatDate = (date: Date | null) => {
-		if (!date) return "—";
-		return format(date, "dd/MM/yyyy", { locale: ptBR });
-	};
-
 	if (installments.length === 0) {
 		return (
 			<div className="rounded-lg border border-dashed p-8 text-center">
@@ -63,11 +56,11 @@ export function InstallmentSelectionTable({
 	}
 
 	return (
-		<div className="overflow-hidden rounded-lg border">
+		<div className="overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead className="w-12">
+						<TableHead>
 							<Checkbox
 								checked={
 									selectedIds.length === installments.length &&
@@ -77,9 +70,8 @@ export function InstallmentSelectionTable({
 								aria-label="Selecionar todas as parcelas"
 							/>
 						</TableHead>
-						<TableHead>Parcela</TableHead>
-						<TableHead>Período</TableHead>
-						<TableHead>Vencimento</TableHead>
+						<TableHead>Estabelecimento</TableHead>
+						<TableHead>Fatura</TableHead>
 						<TableHead className="text-right">Valor</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -103,6 +95,7 @@ export function InstallmentSelectionTable({
 									/>
 								</TableCell>
 								<TableCell>
+									{inst.name}{" "}
 									<Badge variant="outline">
 										{formatCurrentInstallment(
 											inst.currentInstallment ?? 0,
@@ -110,12 +103,11 @@ export function InstallmentSelectionTable({
 										)}
 									</Badge>
 								</TableCell>
+
 								<TableCell className="font-medium">
 									{formatShortPeriodLabel(inst.period)}
 								</TableCell>
-								<TableCell className="text-muted-foreground">
-									{formatDate(inst.dueDate)}
-								</TableCell>
+
 								<TableCell className="text-right font-medium">
 									<MoneyValues amount={Number(inst.amount)} />
 								</TableCell>
