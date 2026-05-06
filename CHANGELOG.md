@@ -5,6 +5,29 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.5.4] - 2026-05-06
+
+Esta versão é uma faxina arquitetural de larga escala sem nenhuma mudança visível ao usuário. Removido código morto, padronizamos identificadores em inglês conforme a convenção do projeto, simplificamos o barrel de Server Actions e consolidamos os arquivos de helpers/queries soltos nas raízes das features dentro de pastas `lib/`. O resultado é uma estrutura previsível e consistente entre features (`actions.ts`, `queries.ts`, `actions/`, `components/`, `hooks/`, `lib/`) e um saldo líquido de −428 linhas de código com zero impacto em comportamento, performance ou banco de dados.
+
+### Alterado
+- Padronização da estrutura de `transactions/`: 14 helpers soltos na raiz movidos para `lib/`; barrel `actions.ts` reduzido de 76 linhas de wrappers redundantes para 14 linhas de re-exports puros; `anticipation-actions.ts` movido para `actions/anticipation.ts`.
+- Reorganização de `dashboard/`: 8 helpers soltos consolidados em `dashboard/lib/`; orquestradores (`fetch-dashboard-data.ts`, `page-data-queries.ts`) permanecem na raiz como entry points.
+- Reorganização de `reports/`: 5 query files na raiz consolidados em `reports/lib/`.
+- Reorganização de `payers/`: god file `detail-actions.ts` (21KB) e `detail-queries.ts` movidos para `payers/lib/`.
+- `shared/components/`: 9 dos 16 componentes soltos agrupados em 3 novas subpastas temáticas (`brand/`, `widgets/`, `feedback/`).
+- `shared/lib/fetch-json.ts` movido para `shared/utils/fetch-json.ts` (categorização correta — utilitário genérico de transporte HTTP).
+- Padronização EN dos identificadores remanescentes: 4 constantes globais (`LANCAMENTOS_*` → `TRANSACTIONS_*`), 12 tipos/interfaces (`Lancamento*`/`Pagador*`/`Estabelecimento*` → equivalentes em EN), 13 funções/components exportados (`fetchPagador*`, `EstabelecimentoInput`, `PagadorInfoCard`, etc.), 5 props cross-file (`preLancamentosCount` → `inboxPendingCount`, etc.).
+- Server Actions de `insights/` simplificadas: barrel reduzido para re-exports puros.
+- Mantidas intencionalmente em PT-BR conforme exceção do `CLAUDE.md`: variáveis locais (`pagador`, `categoria`, `lancamento`), accessor key `pagadorName` (persistida em preferências do usuário), strings de UI.
+
+### Removido
+- 14 funções/constantes mortas verificadas via `grep` em todo o repo: `validateCategoriaOwnership`, `getInstallmentAnticipationsAction`, `getAnticipationDetailsAction`, `formatDecimalForDb`, `currencyFormatterNoCents`, `optionalDecimalSchema`, `formatMonthLabel`, `getGoalProgressStatusColorClass`, `MONTH_PERIOD_PARAM`, `calculateRemainingInstallments`, e 5 funções `fetch*` não usadas em `inbox/queries.ts`.
+- 1 tipo morto: `ImportRow` em `transactions/actions/import-action.ts`.
+- 2 tipos órfãos consequentes: `InstallmentAnticipationWithRelations`, `GoalProgressStatus` (este último convertido em interno).
+- ~30 `export` keywords desnecessários (símbolos usados apenas no próprio arquivo) — visibilidade reduzida sem mudar comportamento.
+- Re-exports mortos em barrels: `EstablishmentLogoPicker` em `entity-avatar/index.ts`, `CategoryReportSkeleton` e `WidgetSkeleton` em `skeletons/index.ts`, `toNameKey` em `establishment-logo-queries.ts`.
+- Arquivo `features/reports/types.ts` (barrel inteiro era órfão — todos os 5 tipos eram importados direto de `@/shared/lib/types/reports`).
+
 ## [2.5.3] - 2026-05-05
 
 Esta versão foca em polimento do diálogo de detalhes do lançamento, refresh visual da linha do tempo de parcelas e limpeza terminológica em torno de contas/cartões inativos. O diálogo de detalhes ganhou logo da conta/cartão, ícone colorido por categoria e avatar do responsável; a barra de progresso de parcelas foi redesenhada num layout horizontal compacto; e o widget "Minhas Contas" do dashboard passou a ocultar automaticamente contas marcadas como inativas. Internamente, o termo "arquivadas" foi padronizado como "inativas" nas tabs de contas e cartões, surgiram constantes compartilhadas para formas de pagamento liquidáveis e um helper `isAccountInactive`, e o seed de mock data ganhou cobertura mais realista (novas pessoas, contas, cartões e assinaturas recorrentes).
