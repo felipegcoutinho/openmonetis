@@ -9,6 +9,7 @@ import {
 	transactions,
 } from "@/db/schema";
 import { handleActionError } from "@/shared/lib/actions/helpers";
+import { ACCOUNT_AUTO_INVOICE_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
 import { getUser } from "@/shared/lib/auth/server";
 import { db } from "@/shared/lib/db";
 import {
@@ -256,7 +257,14 @@ export async function updateTransactionAction(
 			return { success: false, error: "Lançamento não encontrado." };
 		}
 
-		const categoriasProtegidasEdicao = ["Saldo inicial", "Pagamentos"];
+		if (existing.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX)) {
+			return {
+				success: false,
+				error: "Pagamentos com cartão são conciliados automaticamente.",
+			};
+		}
+
+		const categoriasProtegidasEdicao = ["Saldo inicial"];
 		if (
 			existing.category?.name &&
 			categoriasProtegidasEdicao.includes(existing.category.name)
@@ -419,7 +427,14 @@ export async function deleteTransactionAction(
 			return { success: false, error: "Lançamento não encontrado." };
 		}
 
-		const categoriasProtegidasRemocao = ["Saldo inicial", "Pagamentos"];
+		if (existing.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX)) {
+			return {
+				success: false,
+				error: "Pagamentos com cartão são conciliados automaticamente.",
+			};
+		}
+
+		const categoriasProtegidasRemocao = ["Saldo inicial"];
 		if (
 			existing.category?.name &&
 			categoriasProtegidasRemocao.includes(existing.category.name)

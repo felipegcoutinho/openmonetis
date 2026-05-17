@@ -5,6 +5,13 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.5.8] - 2026-05-17
+
+Esta versão corrige a proteção indevida de lançamentos comuns categorizados como Pagamentos, preservando o bloqueio apenas para pagamentos automáticos de fatura gerados pelo sistema.
+
+### Corrigido
+- Lançamentos: despesas comuns na categoria `Pagamentos` voltam a permitir editar, remover, copiar e importar; somente lançamentos automáticos com anotação técnica `AUTO_FATURA:` permanecem protegidos.
+
 ## [2.5.7] - 2026-05-14
 
 Esta versão faz um polimento visual no relatório de análise de parcelas, deixando o estabelecimento como referência principal do card e mantendo o cartão visível de forma mais discreta no contexto da compra.

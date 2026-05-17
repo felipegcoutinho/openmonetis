@@ -50,7 +50,10 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { REFUND_NOTE_PREFIX } from "@/shared/lib/accounts/constants";
+import {
+	ACCOUNT_AUTO_INVOICE_NOTE_PREFIX,
+	REFUND_NOTE_PREFIX,
+} from "@/shared/lib/accounts/constants";
 import { resolveLogoSrc } from "@/shared/lib/logo";
 import { getAvatarSrc } from "@/shared/lib/payers/utils";
 import { formatDate } from "@/shared/utils/date";
@@ -654,14 +657,14 @@ function buildColumns({
 									Editar
 								</DropdownMenuItem>
 							)}
-							{row.original.categoriaName !== "Pagamentos" &&
+							{!row.original.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX) &&
 								row.original.userId === currentUserId && (
 									<DropdownMenuItem onSelect={() => handleCopy(row.original)}>
 										<RiFileCopyLine className="size-4" />
 										Copiar
 									</DropdownMenuItem>
 								)}
-							{row.original.categoriaName !== "Pagamentos" &&
+							{!row.original.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX) &&
 								row.original.userId !== currentUserId && (
 									<DropdownMenuItem onSelect={() => handleImport(row.original)}>
 										<RiFileCopyLine className="size-4" />

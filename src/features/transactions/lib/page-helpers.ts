@@ -551,8 +551,7 @@ export const mapTransactionsData = (rows: TransactionRowWithRelations[]) =>
 		hasAttachments: item.hasAttachments ?? false,
 		readonly:
 			Boolean(item.note?.startsWith(ACCOUNT_AUTO_INVOICE_NOTE_PREFIX)) ||
-			item.category?.name === "Saldo inicial" ||
-			item.category?.name === "Pagamentos",
+			item.category?.name === "Saldo inicial",
 	}));
 
 const sortByLabel = <T extends { label: string }>(items: T[]) =>
