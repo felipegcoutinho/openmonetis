@@ -17,15 +17,20 @@ const navLinks = [
 	{ href: "#mobile", label: "Mobile" },
 	{ href: "#stack", label: "Stack" },
 	{ href: "#como-usar", label: "Como usar" },
-	{ href: "#para-quem-e", label: "Para quem é?" },
+	{ href: "#para-quem-e", label: "Para quem �?" },
 ];
 
 interface MobileNavProps {
 	isPublicDomain: boolean;
 	isLoggedIn: boolean;
+	signupDisabled: boolean;
 }
 
-export function MobileNav({ isPublicDomain, isLoggedIn }: MobileNavProps) {
+export function MobileNav({
+	isPublicDomain,
+	isLoggedIn,
+	signupDisabled,
+}: MobileNavProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -75,12 +80,14 @@ export function MobileNav({ isPublicDomain, isLoggedIn }: MobileNavProps) {
 											Entrar
 										</Button>
 									</Link>
-									<Link href="/signup" onClick={() => setOpen(false)}>
-										<Button className="w-full gap-2">
-											Começar
-											<RiArrowRightSLine size={16} />
-										</Button>
-									</Link>
+									{!signupDisabled && (
+										<Link href="/signup" onClick={() => setOpen(false)}>
+											<Button className="w-full gap-2">
+												Começar
+												<RiArrowRightSLine size={16} />
+											</Button>
+										</Link>
+									)}
 								</>
 							)}
 						</div>

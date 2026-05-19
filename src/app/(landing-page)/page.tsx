@@ -43,6 +43,8 @@ export default async function Page() {
 		"",
 	).replace(/:\d+$/, "");
 	const isPublicDomain = !!(publicDomain && hostname === publicDomain);
+	const disableSignupValue = process.env.DISABLE_SIGNUP?.toLowerCase();
+	const signupDisabled = disableSignupValue === "true";
 	const metricsItems = getMetricsItems(githubStats.stars, githubStats.forks);
 
 	return (
@@ -86,20 +88,23 @@ export default async function Page() {
 										Entrar
 									</Button>
 								</Link>
-								<Link href="/signup">
-									<Button
-										variant="ghost"
-										size="sm"
-										className="h-9 text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground shadow-none dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white"
-									>
-										Começar
-									</Button>
-								</Link>
+								{!signupDisabled && (
+									<Link href="/signup">
+										<Button
+											variant="ghost"
+											size="sm"
+											className="h-9 text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground shadow-none dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white"
+										>
+											Começar
+										</Button>
+									</Link>
+								)}
 							</div>
 						))}
 					<MobileNav
 						isPublicDomain={isPublicDomain}
 						isLoggedIn={!!session?.user}
+						signupDisabled={signupDisabled}
 					/>
 				</nav>
 			</NavbarShell>
@@ -707,3 +712,5 @@ export default async function Page() {
 		</div>
 	);
 }
+
+

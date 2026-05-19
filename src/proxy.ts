@@ -21,6 +21,11 @@ const PROTECTED_ROUTES = [
 // Rotas públicas (não requerem autenticação)
 const PUBLIC_AUTH_ROUTES = ["/login", "/signup"];
 
+function isSignupDisabled(): boolean {
+	const value = process.env.DISABLE_SIGNUP?.toLowerCase();
+	return value === "true";
+}
+
 function buildCsp(): string {
 	const isDev = process.env.NODE_ENV === "development";
 
@@ -60,6 +65,7 @@ function buildCsp(): string {
 
 export default async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
+	const signupDisabled = isSignupDisabled();
 
 	// Multi-domain: block all routes except landing on public domain
 	// Normalize PUBLIC_DOMAIN: strip protocol and port if provided
@@ -77,6 +83,19 @@ export default async function proxy(request: NextRequest) {
 			return NextResponse.redirect(new URL("/", request.url));
 		}
 		return NextResponse.next();
+	}
+
+	if (signupDisabled) {
+		if (pathname === "/signup" || pathname.startsWith("/signup/")) {
+			return NextResponse.redirect(new URL("/login", request.url));
+		}
+
+		if (pathname.startsWith("/api/auth/sign-up")) {
+			return NextResponse.json(
+				{ error: "Novos cadastros estão desativados." },
+				{ status: 403 },
+			);
+		}
 	}
 
 	// Validate actual session, not just cookie existence

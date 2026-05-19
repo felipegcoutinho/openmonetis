@@ -21,10 +21,18 @@ import { GoogleAuthButton } from "./google-auth-button";
 
 type DivProps = React.ComponentProps<"div">;
 
+interface LoginFormProps extends DivProps {
+	signupDisabled?: boolean;
+}
+
 const authLinkClassName =
 	"font-medium text-foreground/88 underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/30 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40";
 
-export function LoginForm({ className, ...props }: DivProps) {
+export function LoginForm({
+	className,
+	signupDisabled = false,
+	...props
+}: LoginFormProps) {
 	const router = useRouter();
 	const isGoogleAvailable = googleSignInAvailable;
 
@@ -233,12 +241,14 @@ export function LoginForm({ className, ...props }: DivProps) {
 							</div>
 						</Field>
 
-						<FieldDescription className="pt-1 text-center">
-							Não tem uma conta?{" "}
-							<a href="/signup" className={authLinkClassName}>
-								Inscreva-se
-							</a>
-						</FieldDescription>
+						{!signupDisabled && (
+							<FieldDescription className="pt-1 text-center">
+								Não tem uma conta?{" "}
+								<a href="/signup" className={authLinkClassName}>
+									Inscreva-se
+								</a>
+							</FieldDescription>
+						)}
 
 						<FieldDescription className="text-center text-sm text-muted-foreground">
 							<a href="/" className={authLinkClassName}>

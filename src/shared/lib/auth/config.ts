@@ -1,5 +1,6 @@
 import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { GoogleProfile } from "better-auth/social-providers";
 import { seedDefaultCategoriesForUser } from "@/shared/lib/categories/defaults";
@@ -13,6 +14,11 @@ import { normalizeNameFromEmail } from "@/shared/lib/payers/utils";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+function isSignupDisabled(): boolean {
+	const value = process.env.DISABLE_SIGNUP?.toLowerCase();
+	return value === "true";
+}
 
 /**
  * Extrai nome do usuário do perfil do Google com fallback hierárquico:
@@ -122,6 +128,12 @@ export const auth = betterAuth({
 	databaseHooks: {
 		user: {
 			create: {
+				before: async () => {
+					if (!isSignupDisabled()) return;
+					throw new APIError("FORBIDDEN", {
+						message: "Novos cadastros estão desativados.",
+					});
+				},
 				/**
 				 * Após criar novo usuário, inicializa:
 				 * 1. Categorias padrão (Receitas/Despesas)
