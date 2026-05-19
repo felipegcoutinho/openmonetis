@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/shared/lib/auth/config";
+import { isSignupDisabled } from "@/shared/lib/auth/signup";
 
 // Rotas protegidas que requerem autenticação
 const PROTECTED_ROUTES = [
@@ -20,11 +21,6 @@ const PROTECTED_ROUTES = [
 
 // Rotas públicas (não requerem autenticação)
 const PUBLIC_AUTH_ROUTES = ["/login", "/signup"];
-
-function isSignupDisabled(): boolean {
-	const value = process.env.DISABLE_SIGNUP?.toLowerCase();
-	return value === "true";
-}
 
 function buildCsp(): string {
 	const isDev = process.env.NODE_ENV === "development";
@@ -65,7 +61,6 @@ function buildCsp(): string {
 
 export default async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-	const signupDisabled = isSignupDisabled();
 
 	// Multi-domain: block all routes except landing on public domain
 	// Normalize PUBLIC_DOMAIN: strip protocol and port if provided
@@ -85,9 +80,21 @@ export default async function proxy(request: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// Validate actual session, not just cookie existence
+	const session = await auth.api.getSession({
+		headers: request.headers,
+	});
+
+	const isAuthenticated = !!session?.user;
+
+	// Block signup routes when signup is disabled
+	const signupDisabled = isSignupDisabled();
 	if (signupDisabled) {
 		if (pathname === "/signup" || pathname.startsWith("/signup/")) {
-			return NextResponse.redirect(new URL("/login", request.url));
+			// Authenticated users go directly to dashboard, not through login
+			return NextResponse.redirect(
+				new URL(isAuthenticated ? "/dashboard" : "/login", request.url),
+			);
 		}
 
 		if (pathname.startsWith("/api/auth/sign-up")) {
@@ -97,13 +104,6 @@ export default async function proxy(request: NextRequest) {
 			);
 		}
 	}
-
-	// Validate actual session, not just cookie existence
-	const session = await auth.api.getSession({
-		headers: request.headers,
-	});
-
-	const isAuthenticated = !!session?.user;
 
 	// Redirect authenticated users away from login/signup pages
 	if (isAuthenticated && PUBLIC_AUTH_ROUTES.includes(pathname)) {

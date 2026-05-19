@@ -131,6 +131,8 @@ curl -fsSL https://raw.githubusercontent.com/felipegcoutinho/openmonetis/main/do
 # .env mínimo recomendado para produção
 BETTER_AUTH_SECRET=gere-um-valor-com-openssl-rand-base64-32
 BETTER_AUTH_URL=http://seu-dominio.com
+# Bloqueia novos cadastros quando true (default: false)
+DISABLE_SIGNUP=false
 
 # 3. Suba tudo
 docker compose up -d
@@ -471,6 +473,9 @@ OPENROUTER_API_KEY=
 # Ambas as variáveis são runtime — basta definir no host; nenhum build arg necessário.
 LOGO_DEV_TOKEN=
 LOGO_DEV_SECRET_KEY=
+
+# Autenticação
+DISABLE_SIGNUP=false    # Bloqueia novos cadastros (true/false)
 ```
 
 ---

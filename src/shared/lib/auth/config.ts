@@ -15,10 +15,7 @@ import { normalizeNameFromEmail } from "@/shared/lib/payers/utils";
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-function isSignupDisabled(): boolean {
-	const value = process.env.DISABLE_SIGNUP?.toLowerCase();
-	return value === "true";
-}
+import { isSignupDisabled } from "@/shared/lib/auth/signup";
 
 /**
  * Extrai nome do usuário do perfil do Google com fallback hierárquico:

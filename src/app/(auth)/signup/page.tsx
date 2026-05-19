@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
+import { isSignupDisabled } from "@/shared/lib/auth/signup";
 import { SignupForm } from "@/features/auth/components/signup-form";
 
 export default function SignupPage() {
-	const disableSignupValue = process.env.DISABLE_SIGNUP?.toLowerCase();
-	const signupDisabled = disableSignupValue === "true"
-	if (signupDisabled) {
+	if (isSignupDisabled()) {
 		redirect("/login");
 	}
 

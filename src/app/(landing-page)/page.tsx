@@ -30,6 +30,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { getOptionalUserSession } from "@/shared/lib/auth/server";
+import { isSignupDisabled } from "@/shared/lib/auth/signup";
 
 export default async function Page() {
 	const [session, headersList, githubStats] = await Promise.all([
@@ -43,8 +44,7 @@ export default async function Page() {
 		"",
 	).replace(/:\d+$/, "");
 	const isPublicDomain = !!(publicDomain && hostname === publicDomain);
-	const disableSignupValue = process.env.DISABLE_SIGNUP?.toLowerCase();
-	const signupDisabled = disableSignupValue === "true";
+	const signupDisabled = isSignupDisabled();
 	const metricsItems = getMetricsItems(githubStats.stars, githubStats.forks);
 
 	return (
