@@ -72,7 +72,7 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 
 💸 **Parcelamentos avançados** — Séries de parcelas, antecipação com cálculo de desconto, análise consolidada.
 
-🤖 **Insights com IA** — Análises geradas por Claude, GPT, Gemini ou OpenRouter. Insights personalizados e histórico salvo.
+🤖 **Insights com IA** — Análises geradas por Claude, GPT, Gemini, MiniMax ou OpenRouter. Insights personalizados e histórico salvo.
 
 👥 **Gestão colaborativa** — Pagadores com permissões (admin/viewer), notificações automáticas por e-mail, códigos de compartilhamento.
 
@@ -96,7 +96,7 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
 - **shadcn/ui** (Radix UI) + **Tailwind CSS**
 - **Docker** (multi-stage build)
 - **Biome** (linting + formatting)
-- **Vercel AI SDK** (Claude, GPT, Gemini, OpenRouter)
+- **Vercel AI SDK** (Claude, GPT, Gemini, MiniMax, OpenRouter)
 
 ---
 
@@ -470,6 +470,7 @@ RESEND_FROM_EMAIL=
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 GOOGLE_GENERATIVE_AI_API_KEY=
+MINIMAX_API_KEY=
 OPENROUTER_API_KEY=
 
 # Logo.dev (opcional, necessário para logos automáticos de estabelecimentos)

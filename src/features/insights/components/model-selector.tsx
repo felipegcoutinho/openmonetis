@@ -45,6 +45,9 @@ const PROVIDER_ICON_PATHS: Record<
 		light: "/providers/openrouter_light.svg",
 		dark: "/providers/openrouter_dark.svg",
 	},
+	minimax: {
+		light: "/providers/minimax.svg",
+	},
 };
 
 export function ModelSelector({
@@ -61,7 +64,7 @@ export function ModelSelector({
 	// Sincronizar customModel quando value mudar (importante para pré-carregamento)
 	useEffect(() => {
 		// Se o value tem "/" é um modelo OpenRouter customizado
-		if (value.includes("/")) {
+		if (value.includes("/") || selectedProvider === "openrouter") {
 			setCustomModel(value);
 			setSelectedProvider("openrouter");
 		} else {
@@ -98,6 +101,7 @@ export function ModelSelector({
 			anthropic: [],
 			google: [],
 			openrouter: [],
+			minimax: [],
 		};
 
 		AVAILABLE_MODELS.forEach((model) => {

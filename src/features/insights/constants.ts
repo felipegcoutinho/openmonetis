@@ -1,77 +1,94 @@
 /**
  * Tipos de providers disponíveis
  */
-export type AIProvider = "openai" | "anthropic" | "google" | "openrouter";
+export type AIProvider = "openai" | "anthropic" | "google" | "openrouter" | "minimax";
 
 /**
  * Metadados dos providers
  */
 export const PROVIDERS = {
-	openai: {
-		id: "openai" as const,
-		name: "ChatGPT",
-		icon: "RiOpenaiLine",
-	},
-	anthropic: {
-		id: "anthropic" as const,
-		name: "Claude AI",
+  openai: {
+    id: "openai" as const,
+    name: "ChatGPT",
+    icon: "RiOpenaiLine",
+  },
+  anthropic: {
+    id: "anthropic" as const,
+    name: "Claude AI",
+    icon: "RiRobot2Line",
+  },
+  google: {
+    id: "google" as const,
+    name: "Gemini",
+    icon: "RiGoogleLine",
+  },
+	minimax: {
+		id: "minimax" as const,
+		name: "MiniMax",
 		icon: "RiRobot2Line",
 	},
-	google: {
-		id: "google" as const,
-		name: "Gemini",
-		icon: "RiGoogleLine",
-	},
-	openrouter: {
-		id: "openrouter" as const,
-		name: "OpenRouter",
-		icon: "RiRouterLine",
-	},
+  openrouter: {
+    id: "openrouter" as const,
+    name: "OpenRouter",
+    icon: "RiRouterLine",
+  },
 } as const;
 
 /**
  * Lista de modelos de IA disponíveis para análise de insights
  */
 export const AVAILABLE_MODELS = [
-	// OpenAI
-	{ id: "gpt-5.5-pro", name: "GPT-5.5 Pro", provider: "openai" as const },
-	{ id: "gpt-5.5", name: "GPT-5.5", provider: "openai" as const },
-	{ id: "gpt-5.4", name: "GPT-5.4", provider: "openai" as const },
-	{ id: "gpt-5.4-mini", name: "GPT-5.4 Mini", provider: "openai" as const },
-	{ id: "gpt-5.4-nano", name: "GPT-5.4 Nano", provider: "openai" as const },
+  // OpenAI
+  { id: "gpt-5.5-pro", name: "GPT-5.5 Pro", provider: "openai" as const },
+  { id: "gpt-5.5", name: "GPT-5.5", provider: "openai" as const },
+  { id: "gpt-5.4", name: "GPT-5.4", provider: "openai" as const },
+  { id: "gpt-5.4-mini", name: "GPT-5.4 Mini", provider: "openai" as const },
+  { id: "gpt-5.4-nano", name: "GPT-5.4 Nano", provider: "openai" as const },
 
-	// Anthropic
-	{
-		id: "claude-opus-4-7",
-		name: "Claude Opus 4.7",
-		provider: "anthropic" as const,
-	},
-	{
-		id: "claude-sonnet-4-6",
-		name: "Claude Sonnet 4.6",
-		provider: "anthropic" as const,
-	},
-	{
-		id: "claude-haiku-4-5-20251001",
-		name: "Claude Haiku 4.5",
-		provider: "anthropic" as const,
-	},
+  // Anthropic
+  {
+    id: "claude-opus-4-7",
+    name: "Claude Opus 4.7",
+    provider: "anthropic" as const,
+  },
+  {
+    id: "claude-sonnet-4-6",
+    name: "Claude Sonnet 4.6",
+    provider: "anthropic" as const,
+  },
+  {
+    id: "claude-haiku-4-5-20251001",
+    name: "Claude Haiku 4.5",
+    provider: "anthropic" as const,
+  },
 
-	// Google
+  // Google
+  {
+    id: "gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro",
+    provider: "google" as const,
+  },
+  {
+    id: "gemini-3-flash-preview",
+    name: "Gemini 3 Flash",
+    provider: "google" as const,
+  },
+  {
+    id: "gemini-3.1-flash-lite-preview",
+    name: "Gemini 3.1 Flash Lite",
+    provider: "google" as const,
+  },
+
+  // MiniMax
 	{
-		id: "gemini-3.1-pro-preview",
-		name: "Gemini 3.1 Pro",
-		provider: "google" as const,
+		id: "MiniMax-M2.7",
+		name: "MiniMax M2.7",
+		provider: "minimax" as const,
 	},
 	{
-		id: "gemini-3-flash-preview",
-		name: "Gemini 3 Flash",
-		provider: "google" as const,
-	},
-	{
-		id: "gemini-3.1-flash-lite-preview",
-		name: "Gemini 3.1 Flash Lite",
-		provider: "google" as const,
+		id: "MiniMax-M2.5",
+		name: "MiniMax M2.5",
+		provider: "minimax" as const,
 	},
 ] as const;
 
