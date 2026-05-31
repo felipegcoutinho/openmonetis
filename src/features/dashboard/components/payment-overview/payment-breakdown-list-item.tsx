@@ -1,4 +1,3 @@
-import { RiExternalLinkLine } from "@remixicon/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -24,13 +23,18 @@ export type PaymentBreakdownListItemData = {
 
 type PaymentBreakdownListItemProps = {
 	item: PaymentBreakdownListItemData;
+	position: number;
 };
 
 export function PaymentBreakdownListItem({
 	item,
+	position,
 }: PaymentBreakdownListItemProps) {
 	return (
-		<div className="flex items-center gap-3 transition-all duration-300 py-1.5">
+		<div className="flex items-center gap-2 transition-all duration-300 py-1">
+			<span className="w-3 shrink-0 text-left text-xs font-medium text-muted-foreground">
+				{position}
+			</span>
 			<div
 				className="flex size-9.5 shrink-0 items-center justify-center rounded-full"
 				style={{
@@ -49,22 +53,20 @@ export function PaymentBreakdownListItem({
 							className="inline-flex items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
 						>
 							<span className="truncate">{item.title}</span>
-							<RiExternalLinkLine
-								className="size-3 shrink-0 text-muted-foreground"
-								aria-hidden
-							/>
 						</Link>
 					) : (
 						<p className="text-sm font-medium text-foreground">{item.title}</p>
 					)}
-					<MoneyValues className="font-medium" amount={item.amount} />
+					<MoneyValues className="shrink-0 font-medium" amount={item.amount} />
 				</div>
 
 				<div className="flex items-center justify-between text-xs text-muted-foreground">
 					<span>
 						{formatPaymentBreakdownTransactionsLabel(item.transactions)}
 					</span>
-					<span>{formatPaymentBreakdownPercentage(item.percentage)}</span>
+					<span>
+						{formatPaymentBreakdownPercentage(item.percentage)} do total
+					</span>
 				</div>
 
 				<div className="mt-1">

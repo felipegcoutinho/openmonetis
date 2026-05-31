@@ -27,7 +27,7 @@ export function NotesWidgetView({
 }: NotesWidgetViewProps) {
 	return (
 		<>
-			<div className="flex flex-col gap-4 px-0">
+			<div className="flex flex-col px-0">
 				<NotesList
 					notes={notes}
 					onOpenEdit={onOpenEdit}

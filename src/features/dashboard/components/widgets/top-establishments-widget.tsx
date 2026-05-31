@@ -28,13 +28,16 @@ export function TopEstablishmentsWidget({
 				/>
 			) : (
 				<div className="flex flex-col">
-					{data.establishments.map((establishment) => {
+					{data.establishments.map((establishment, index) => {
 						return (
 							<div
 								key={establishment.id}
-								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
+								className="flex items-center justify-between gap-2 transition-all duration-300 py-1.5"
 							>
-								<div className="flex min-w-0 flex-1 items-center gap-3">
+								<span className="w-3 shrink-0 text-left text-xs font-medium text-muted-foreground">
+									{index + 1}
+								</span>
+								<div className="flex min-w-0 flex-1 items-center gap-2">
 									<EstablishmentLogo name={establishment.name} size={37} />
 
 									<div className="min-w-0">
@@ -42,7 +45,8 @@ export function TopEstablishmentsWidget({
 											{establishment.name}
 										</p>
 										<p className="text-xs text-muted-foreground">
-											{formatOccurrencesLabel(establishment.occurrences)}
+											{formatOccurrencesLabel(establishment.occurrences)} ·
+											total acumulado
 										</p>
 									</div>
 								</div>

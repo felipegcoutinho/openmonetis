@@ -65,7 +65,6 @@ async function fetchDashboardDataInternal(userId: string, period: string) {
 		installmentExpensesData: currentPeriodOverview.installmentExpensesData,
 		topEstablishmentsData: currentPeriodOverview.topEstablishmentsData,
 		topExpensesAll: currentPeriodOverview.topExpensesAll,
-		topExpensesCardOnly: currentPeriodOverview.topExpensesCardOnly,
 		purchasesByCategoryData: currentPeriodOverview.purchasesByCategoryData,
 		incomeByCategoryData: categoryOverview.incomeByCategoryData,
 		expensesByCategoryData: categoryOverview.expensesByCategoryData,

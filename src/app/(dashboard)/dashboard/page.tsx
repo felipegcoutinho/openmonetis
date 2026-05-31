@@ -27,6 +27,10 @@ export default async function Page({ searchParams }: PageProps) {
 	const { dashboardData, preferences, quickActionOptions } =
 		await fetchDashboardPageData(user.id, selectedPeriod);
 	const { dashboardWidgets } = preferences;
+	const adminPayerSlug =
+		quickActionOptions.payerOptions.find(
+			(option) => option.value === quickActionOptions.defaultPayerId,
+		)?.slug ?? null;
 
 	const logoMappings = await prefetchLogoMappings(
 		user.id,
@@ -37,7 +41,11 @@ export default async function Page({ searchParams }: PageProps) {
 		<main className="flex flex-col gap-4">
 			<DashboardWelcome name={user.name} />
 			<MonthNavigation />
-			<DashboardMetricsCards metrics={dashboardData.metrics} />
+			<DashboardMetricsCards
+				metrics={dashboardData.metrics}
+				period={selectedPeriod}
+				adminPayerSlug={adminPayerSlug}
+			/>
 			<LogoPrefetchProvider mappings={logoMappings}>
 				<DashboardGridEditable
 					data={dashboardData}

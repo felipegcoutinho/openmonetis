@@ -6,6 +6,7 @@ import {
 	RiDeleteBinLine,
 } from "@remixicon/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +20,11 @@ import { TransactionDialog } from "@/features/transactions/components/dialogs/tr
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
 import MoneyValues from "@/shared/components/money-values";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { WidgetEmptyState } from "@/shared/components/widgets/widget-empty-state";
 import { resolveLogoSrc } from "@/shared/lib/logo";
 
@@ -44,6 +50,24 @@ function getDateString(date: Date | string | null | undefined): string | null {
 	if (!date) return null;
 	if (typeof date === "string") return date.slice(0, 10);
 	return date.toISOString().slice(0, 10);
+}
+
+function findMatchingLogo(
+	sourceAppName: string | null,
+	logoMap: Record<string, string>,
+): string | null {
+	if (!sourceAppName) return null;
+
+	const appName = sourceAppName.toLowerCase();
+	if (logoMap[appName]) return resolveLogoSrc(logoMap[appName]);
+
+	for (const [name, logo] of Object.entries(logoMap)) {
+		if (name.includes(appName) || appName.includes(name)) {
+			return resolveLogoSrc(logo);
+		}
+	}
+
+	return null;
 }
 
 export function InboxWidget({
@@ -149,12 +173,17 @@ export function InboxWidget({
 	if (snapshot.pendingCount === 0) {
 		return (
 			<WidgetEmptyState
-				icon={<RiCheckboxCircleFill color="green" className="size-6" />}
+				icon={<RiCheckboxCircleFill className="size-6 text-success" />}
 				title="Tudo em dia"
 				description="Nenhum pré-lançamento aguardando revisão."
 			/>
 		);
 	}
+
+	const remainingCount = Math.max(
+		snapshot.pendingCount - snapshot.recentItems.length,
+		0,
+	);
 
 	return (
 		<div className="flex flex-col">
@@ -168,17 +197,12 @@ export function InboxWidget({
 					parsedAmount !== null && Number.isFinite(parsedAmount)
 						? parsedAmount
 						: null;
-				const logoKey = item.sourceAppName?.toLowerCase() ?? "";
-				const rawLogo = snapshot.logoMap[logoKey] ?? null;
-				const logoSrc = resolveLogoSrc(rawLogo);
+				const logoSrc = findMatchingLogo(item.sourceAppName, snapshot.logoMap);
 				const displayLogo = logoSrc ?? DEFAULT_INBOX_APP_LOGO;
 
 				return (
-					<div
-						key={item.id}
-						className="flex items-center justify-between py-1.5"
-					>
-						<div className="flex flex-1 items-center gap-2">
+					<div key={item.id} className="flex items-center justify-between py-2">
+						<div className="flex min-w-0 flex-1 items-center gap-2">
 							<Image
 								src={displayLogo}
 								alt={item.sourceAppName ?? ""}
@@ -188,51 +212,73 @@ export function InboxWidget({
 								unoptimized
 							/>
 
-							<div>
-								<p className="text-sm font-medium text-foreground">
-									{displayName.length > 30
-										? `${displayName.slice(0, 30)}...`
-										: displayName}
+							<div className="min-w-0">
+								<p className="truncate text-sm font-medium text-foreground">
+									{displayName}
 								</p>
-								<div className="flex items-center gap-2 text-xs text-muted-foreground">
-									{item.sourceAppName && <span>{item.sourceAppName}</span>}
+								<div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+									{item.sourceAppName && (
+										<span className="truncate">{item.sourceAppName}</span>
+									)}
 									<span className="text-muted-foreground/60">
-										{relativeTime(item.createdAt)}
+										{relativeTime(item.notificationTimestamp)}
 									</span>
 								</div>
 							</div>
 						</div>
 
-						<div className="flex shrink-0 flex-col items-end">
+						<div className="ml-2 flex shrink-0 items-center gap-1">
 							{amount !== null && (
 								<MoneyValues className="font-medium" amount={amount} />
 							)}
+							{amount === null && (
+								<span className="max-w-20 text-right text-xs leading-tight text-muted-foreground">
+									Valor não identificado
+								</span>
+							)}
 							<div className="flex items-center">
-								<Button
-									size="icon-sm"
-									variant="ghost"
-									className="size-6 text-muted-foreground hover:text-foreground"
-									onClick={() => handleProcessRequest(item)}
-									aria-label="Processar notificação"
-									title="Processar"
-								>
-									<RiCheckLine className="size-3.5" />
-								</Button>
-								<Button
-									size="icon-sm"
-									variant="ghost"
-									className="size-6 text-muted-foreground hover:text-destructive"
-									onClick={() => handleDiscardRequest(item)}
-									aria-label="Descartar notificação"
-									title="Descartar"
-								>
-									<RiDeleteBinLine className="size-3.5" />
-								</Button>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											size="icon-sm"
+											variant="ghost"
+											className="text-muted-foreground hover:text-foreground"
+											onClick={() => handleProcessRequest(item)}
+											aria-label="Lançar notificação"
+										>
+											<RiCheckLine className="size-3.5" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent side="top">Lançar</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											size="icon-sm"
+											variant="ghost"
+											className="text-muted-foreground hover:text-destructive"
+											onClick={() => handleDiscardRequest(item)}
+											aria-label="Descartar notificação"
+										>
+											<RiDeleteBinLine className="size-3.5" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent side="top">Descartar</TooltipContent>
+								</Tooltip>
 							</div>
 						</div>
 					</div>
 				);
 			})}
+
+			{remainingCount > 0 && (
+				<Link
+					href="/inbox"
+					className="mt-2 inline-flex items-center justify-center text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+				>
+					+ {remainingCount} pendentes · Revisar todos
+				</Link>
+			)}
 
 			<TransactionDialog
 				mode="create"

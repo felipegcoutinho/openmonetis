@@ -28,7 +28,7 @@ export function PaymentStatusWidgetView({
 	return (
 		<CardContent className="space-y-6 px-0">
 			<PaymentStatusCategorySection
-				title="A Receber"
+				type="income"
 				total={data.income.total}
 				confirmed={data.income.confirmed}
 				pending={data.income.pending}
@@ -37,7 +37,7 @@ export function PaymentStatusWidgetView({
 			<div className="border-t" />
 
 			<PaymentStatusCategorySection
-				title="A Pagar"
+				type="expenses"
 				total={data.expenses.total}
 				confirmed={data.expenses.confirmed}
 				pending={data.expenses.pending}

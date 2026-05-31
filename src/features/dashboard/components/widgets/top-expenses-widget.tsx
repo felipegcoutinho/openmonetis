@@ -1,20 +1,18 @@
 "use client";
 
 import { RiArrowUpDoubleLine } from "@remixicon/react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type {
 	TopExpense,
 	TopExpensesData,
 } from "@/features/dashboard/expenses/top-expenses-queries";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
 import MoneyValues from "@/shared/components/money-values";
-import { Switch } from "@/shared/components/ui/switch";
 import { WidgetEmptyState } from "@/shared/components/widgets/widget-empty-state";
 import { formatTransactionDate } from "@/shared/utils/date";
 
 type TopExpensesWidgetProps = {
-	allExpenses: TopExpensesData;
-	cardOnlyExpenses: TopExpensesData;
+	data: TopExpensesData;
 };
 
 const shouldIncludeExpense = (expense: TopExpense) => {
@@ -31,75 +29,34 @@ const shouldIncludeExpense = (expense: TopExpense) => {
 	return true;
 };
 
-const isCardExpense = (expense: TopExpense) =>
-	expense.paymentMethod?.toLowerCase().includes("cartão") ?? false;
-
-export function TopExpensesWidget({
-	allExpenses,
-	cardOnlyExpenses,
-}: TopExpensesWidgetProps) {
-	const [cardOnly, setCardOnly] = useState(false);
-	const normalizedAllExpenses = useMemo(() => {
-		return allExpenses.expenses.filter(shouldIncludeExpense);
-	}, [allExpenses]);
-
-	const normalizedCardOnlyExpenses = useMemo(() => {
-		const merged = [...cardOnlyExpenses.expenses, ...normalizedAllExpenses];
-		const seen = new Set<string>();
-
-		return merged.filter((expense) => {
-			if (seen.has(expense.id)) {
-				return false;
-			}
-
-			if (!isCardExpense(expense) || !shouldIncludeExpense(expense)) {
-				return false;
-			}
-
-			seen.add(expense.id);
-			return true;
-		});
-	}, [cardOnlyExpenses, normalizedAllExpenses]);
-
-	const data = cardOnly
-		? { expenses: normalizedCardOnlyExpenses }
-		: { expenses: normalizedAllExpenses };
+export function TopExpensesWidget({ data }: TopExpensesWidgetProps) {
+	const expenses = useMemo(
+		() => data.expenses.filter(shouldIncludeExpense),
+		[data.expenses],
+	);
 
 	return (
-		<div className="flex flex-col gap-4 px-0">
-			<div className="flex items-center justify-between gap-3">
-				<label
-					htmlFor="card-only-toggle"
-					className="text-sm text-muted-foreground"
-				>
-					Apenas cartões
-				</label>
-				<Switch
-					id="card-only-toggle"
-					checked={cardOnly}
-					onCheckedChange={setCardOnly}
+		<div className="flex flex-col px-0">
+			{expenses.length === 0 ? (
+				<WidgetEmptyState
+					icon={
+						<RiArrowUpDoubleLine className="size-6 text-muted-foreground" />
+					}
+					title="Nenhuma despesa encontrada"
+					description="Quando houver despesas registradas, elas aparecerão aqui."
 				/>
-			</div>
-
-			{data.expenses.length === 0 ? (
-				<div className="-mt-10">
-					<WidgetEmptyState
-						icon={
-							<RiArrowUpDoubleLine className="size-6 text-muted-foreground" />
-						}
-						title="Nenhuma despesa encontrada"
-						description="Quando houver despesas registradas, elas aparecerão aqui."
-					/>
-				</div>
 			) : (
 				<div className="flex flex-col">
-					{data.expenses.map((expense) => {
+					{expenses.map((expense, index) => {
 						return (
 							<div
 								key={expense.id}
-								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
+								className="flex items-center justify-between gap-2 transition-all duration-300 py-1.5"
 							>
-								<div className="flex min-w-0 flex-1 items-center gap-3">
+								<span className="w-3 shrink-0 text-left text-xs font-medium text-muted-foreground">
+									{index + 1}
+								</span>
+								<div className="flex min-w-0 flex-1 items-center gap-2">
 									<EstablishmentLogo name={expense.name} size={37} />
 
 									<div className="min-w-0">

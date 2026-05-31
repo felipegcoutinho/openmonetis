@@ -6,6 +6,7 @@ export type DashboardBill = {
 	boletoPaymentDate: string | null;
 	isSettled: boolean;
 	accountId: string | null;
+	transactionType: string;
 };
 
 export type BillPaymentAccountOption = {

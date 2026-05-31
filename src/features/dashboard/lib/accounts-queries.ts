@@ -1,6 +1,9 @@
 import { and, eq, sql } from "drizzle-orm";
 import { financialAccounts, transactions } from "@/db/schema";
-import { INITIAL_BALANCE_NOTE } from "@/shared/lib/accounts/constants";
+import {
+	INITIAL_BALANCE_NOTE,
+	isAccountInactive,
+} from "@/shared/lib/accounts/constants";
 import { db } from "@/shared/lib/db";
 import { getAdminPayerId } from "@/shared/lib/payers/get-admin-id";
 import { safeToNumber as toNumber } from "@/shared/utils/number";
@@ -101,7 +104,10 @@ export async function fetchDashboardAccounts(
 		.sort((a, b) => b.balance - a.balance);
 
 	const totalBalance = accounts
-		.filter((account) => !account.excludeFromBalance)
+		.filter(
+			(account) =>
+				!account.excludeFromBalance && !isAccountInactive(account.status),
+		)
 		.reduce((total, account) => total + account.balance, 0);
 
 	return {

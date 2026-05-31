@@ -1,9 +1,11 @@
 import {
 	RiArrowLeftRightLine,
 	RiArrowRightDownLine,
+	RiArrowRightLine,
 	RiArrowRightUpLine,
 	RiCalendar2Line,
 } from "@remixicon/react";
+import Link from "next/link";
 import { MetricsCardInfoButton } from "@/features/dashboard/components/metrics-card-info-button";
 import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
 import type { DashboardCardMetrics } from "@/features/dashboard/overview/dashboard-metrics-queries";
@@ -18,10 +20,13 @@ import {
 } from "@/shared/components/ui/card";
 import { Separator } from "@/shared/components/ui/separator";
 import { formatPercentage } from "@/shared/utils/percentage";
+import { formatPeriodForUrl } from "@/shared/utils/period";
 import { cn } from "@/shared/utils/ui";
 
 type DashboardMetricsCardsProps = {
 	metrics: DashboardCardMetrics;
+	period: string;
+	adminPayerSlug: string | null;
 };
 
 type Trend = "up" | "down" | "flat";
@@ -36,6 +41,7 @@ const CARDS = [
 		icon: RiArrowRightDownLine,
 		invertTrend: false,
 		iconClass: "text-success",
+		transactionType: "receita",
 		helpTitle: "Como calculamos receitas",
 		helpLines: [
 			"Somamos os lançamentos do tipo Receita no período selecionado.",
@@ -53,6 +59,7 @@ const CARDS = [
 		icon: RiArrowRightUpLine,
 		invertTrend: true,
 		iconClass: "text-destructive",
+		transactionType: "despesa",
 		helpTitle: "Como calculamos despesas",
 		helpLines: [
 			"Somamos os lançamentos do tipo Despesa no período selecionado.",
@@ -70,6 +77,7 @@ const CARDS = [
 		icon: RiArrowLeftRightLine,
 		invertTrend: false,
 		iconClass: "text-warning",
+		transactionType: null,
 		helpTitle: "Como calculamos o balanço",
 		helpLines: [
 			"Partimos de receitas menos despesas do período.",
@@ -86,6 +94,7 @@ const CARDS = [
 		icon: RiCalendar2Line,
 		invertTrend: false,
 		iconClass: "text-cyan-600",
+		transactionType: null,
 		helpTitle: "Como calculamos o previsto",
 		helpLines: [
 			"Acumulamos o balanço mês a mês até o período atual.",
@@ -123,7 +132,11 @@ const getPercentChange = (current: number, previous: number): string | null => {
 	});
 };
 
-export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
+export function DashboardMetricsCards({
+	metrics,
+	period,
+	adminPayerSlug,
+}: DashboardMetricsCardsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-3 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
 			{CARDS.map(
@@ -134,6 +147,7 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 					icon: Icon,
 					invertTrend,
 					iconClass,
+					transactionType,
 					helpTitle,
 					helpLines,
 				}) => {
@@ -143,19 +157,33 @@ export function DashboardMetricsCards({ metrics }: DashboardMetricsCardsProps) {
 						metric.current,
 						metric.previous,
 					);
+					const transactionsHref = transactionType
+						? `/transactions?periodo=${formatPeriodForUrl(period)}&type=${transactionType}${adminPayerSlug ? `&payer=${adminPayerSlug}` : ""}`
+						: null;
 
 					return (
-						<Card key={label} className="gap-2 overflow-hidden">
+						<Card key={label} className="gap-2 overflow-hidden py-6">
 							<CardHeader className="gap-1">
-								<CardTitle className="flex items-center gap-1">
-									<Icon className={cn("size-4", iconClass)} aria-hidden />
-									{label}
-									<MetricsCardInfoButton
-										label={label}
-										helpTitle={helpTitle}
-										helpLines={helpLines}
-									/>
-								</CardTitle>
+								<div className="flex items-center justify-between gap-2">
+									<CardTitle className="flex items-center gap-1">
+										<Icon className={cn("size-4", iconClass)} aria-hidden />
+										{label}
+										<MetricsCardInfoButton
+											label={label}
+											helpTitle={helpTitle}
+											helpLines={helpLines}
+										/>
+									</CardTitle>
+									{transactionsHref ? (
+										<Link
+											href={transactionsHref}
+											className="rounded-sm px-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-primary focus-visible:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+											aria-label={`Ver lançamentos de ${label.toLowerCase()}`}
+										>
+											<RiArrowRightLine className="size-4" aria-hidden />
+										</Link>
+									) : null}
+								</div>
 								<CardDescription className="mt-1 tracking-tight">
 									{subtitle}
 								</CardDescription>

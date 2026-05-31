@@ -69,8 +69,8 @@ export type WidgetConfig = {
 export const widgetsConfig: WidgetConfig[] = [
 	{
 		id: "my-accounts",
-		title: "Minhas Contas",
-		subtitle: "Saldo consolidado disponível",
+		title: "Minhas contas",
+		subtitle: "Saldo atualizado das contas ativas",
 		icon: <RiBarChartBoxLine className="size-4" />,
 		component: ({
 			data,
@@ -114,7 +114,7 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "payment-status",
-		title: "Status de Pagamento",
+		title: "Status de pagamento",
 		subtitle: "Valores confirmados e pendentes",
 		icon: <RiWallet3Line className="size-4" />,
 		component: ({ data }) => (
@@ -144,8 +144,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "income-expense-balance",
-		title: "Receita, Despesa e Balanço",
-		subtitle: "Últimos 6 meses",
+		title: "Receita, despesa e balanço",
+		subtitle: "Últimos 6 meses até o período selecionado",
 		icon: <RiLineChartLine className="size-4" />,
 		component: ({ data }) => (
 			<IncomeExpenseBalanceWidget data={data.incomeExpenseBalanceData} />
@@ -153,8 +153,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "goals-progress",
-		title: "Progresso de Orçamentos",
-		subtitle: "Orçamentos por categoria no período",
+		title: "Progresso de orçamentos",
+		subtitle: "Categorias mais próximas do limite",
 		icon: <RiExchangeLine className="size-4" />,
 		component: ({ data }) => (
 			<GoalsProgressWidget data={data.goalsProgressData} />
@@ -171,7 +171,7 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "category-trends",
-		title: "Tendências de Categorias",
+		title: "Tendências de categorias",
 		subtitle: "Top 10 maiores variações vs. mês anterior",
 		icon: <RiLineChartLine className="size-4" />,
 		component: ({ data }) => (
@@ -182,21 +182,20 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "spending-overview",
-		title: "Panorama de Gastos",
+		title: "Panorama de gastos",
 		subtitle: "Principais despesas e frequência por local",
 		icon: <RiArrowUpDoubleLine className="size-4" />,
 		component: ({ data }) => (
 			<SpendingOverviewWidget
 				topExpensesAll={data.topExpensesAll}
-				topExpensesCardOnly={data.topExpensesCardOnly}
 				topEstablishmentsData={data.topEstablishmentsData}
 			/>
 		),
 	},
 	{
 		id: "payment-overview",
-		title: "Comportamento de Pagamento",
-		subtitle: "Despesas por condição e forma de pagamento",
+		title: "Distribuição de despesas",
+		subtitle: "Por condição e forma de pagamento",
 		icon: <RiWallet3Line className="size-4" />,
 		component: ({ data, period, adminPayerSlug }) => (
 			<PaymentOverviewWidget
@@ -209,8 +208,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "expenses-by-category",
-		title: "Categorias por Despesas",
-		subtitle: "Distribuição de despesas por categoria",
+		title: "Despesas por categoria",
+		subtitle: "Maiores despesas por categoria",
 		icon: <RiPieChartLine className="size-4" />,
 		component: ({ data, period }) => (
 			<ExpensesByCategoryWidgetWithChart
@@ -221,8 +220,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "income-by-category",
-		title: "Categorias por Receitas",
-		subtitle: "Distribuição de receitas por categoria",
+		title: "Receitas por categoria",
+		subtitle: "Maiores receitas por categoria",
 		icon: <RiPieChartLine className="size-4" />,
 		component: ({ data, period }) => (
 			<IncomeByCategoryWidgetWithChart
@@ -233,8 +232,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "purchases-by-category",
-		title: "Lançamentos por Categorias",
-		subtitle: "Distribuição de lançamentos por categoria",
+		title: "Lançamentos por categoria",
+		subtitle: "Lançamentos recentes da categoria selecionada",
 		icon: <RiStore3Line className="size-4" />,
 		component: ({ data }) => (
 			<PurchasesByCategoryWidget data={data.purchasesByCategoryData} />
@@ -242,8 +241,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "recurring-expenses",
-		title: "Lançamentos Recorrentes",
-		subtitle: "Despesas recorrentes do período",
+		title: "Despesas recorrentes",
+		subtitle: "Despesas recorrentes deste mês",
 		icon: <RiRefreshLine className="size-4" />,
 		component: ({ data }) => (
 			<RecurringExpensesWidget data={data.recurringExpensesData} />
@@ -251,8 +250,8 @@ export const widgetsConfig: WidgetConfig[] = [
 	},
 	{
 		id: "installment-expenses",
-		title: "Lançamentos Parcelados",
-		subtitle: "Acompanhe as parcelas abertas",
+		title: "Despesas parceladas",
+		subtitle: "Parcelamentos mais próximos da quitação",
 		icon: <RiNumbersLine className="size-4" />,
 		component: ({ data }) => (
 			<InstallmentExpensesWidget data={data.installmentExpensesData} />
@@ -261,7 +260,7 @@ export const widgetsConfig: WidgetConfig[] = [
 	{
 		id: "pagadores",
 		title: "Pessoas",
-		subtitle: "Despesas por pessoa no período",
+		subtitle: "Maiores despesas por pessoa no período",
 		icon: <RiGroupLine className="size-4" />,
 		component: ({ data }) => (
 			<PayersWidget payers={data.pagadoresSnapshot.payers} />
@@ -279,7 +278,7 @@ export const widgetsConfig: WidgetConfig[] = [
 	{
 		id: "notes",
 		title: "Anotações",
-		subtitle: "Últimas anotações ativas",
+		subtitle: "Anotações ativas adicionadas recentemente",
 		icon: <RiTodoLine className="size-4" />,
 		component: ({ data }) => <NotesWidget notes={data.notesData} />,
 		action: (

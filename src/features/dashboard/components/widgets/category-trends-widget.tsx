@@ -1,6 +1,11 @@
 "use client";
 
-import { RiLineChartLine } from "@remixicon/react";
+import {
+	RiArrowRightLine,
+	RiCalendarLine,
+	RiHistoryLine,
+	RiLineChartLine,
+} from "@remixicon/react";
 import type { DashboardCategoryBreakdownItem } from "@/features/dashboard/categories/category-breakdown-helpers";
 import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
 import { CategoryIconBadge } from "@/shared/components/entity-avatar";
@@ -50,12 +55,30 @@ export function CategoryTrendsWidget({
 								<p className="truncate text-sm font-medium text-foreground">
 									{category.categoryName}
 								</p>
-								<p className="text-xs text-muted-foreground">
-									<MoneyValues amount={category.previousAmount} /> vs{" "}
-									<MoneyValues
-										amount={category.currentAmount}
-										className="font-semibold"
-									/>
+								<p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									<span
+										className="inline-flex items-center gap-1"
+										title="Mês anterior"
+									>
+										<RiHistoryLine className="size-3.5" aria-hidden />
+										<span className="sr-only">Mês anterior:</span>
+										<MoneyValues amount={category.previousAmount} />
+									</span>
+									<RiArrowRightLine className="size-3" aria-hidden />
+									<span
+										className="inline-flex items-center gap-1 text-foreground"
+										title="Mês atual"
+									>
+										<RiCalendarLine
+											className="size-3.5 text-primary"
+											aria-hidden
+										/>
+										<span className="sr-only">Mês atual:</span>
+										<MoneyValues
+											amount={category.currentAmount}
+											className="font-semibold"
+										/>
+									</span>
 								</p>
 							</div>
 							<PercentageChangeIndicator

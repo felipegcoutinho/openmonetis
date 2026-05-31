@@ -15,13 +15,11 @@ import { TopExpensesWidget } from "./top-expenses-widget";
 
 type SpendingOverviewWidgetProps = {
 	topExpensesAll: TopExpensesData;
-	topExpensesCardOnly: TopExpensesData;
 	topEstablishmentsData: TopEstablishmentsData;
 };
 
 export function SpendingOverviewWidget({
 	topExpensesAll,
-	topExpensesCardOnly,
 	topEstablishmentsData,
 }: SpendingOverviewWidgetProps) {
 	const [activeTab, setActiveTab] = useState<"expenses" | "establishments">(
@@ -54,10 +52,7 @@ export function SpendingOverviewWidget({
 			</TabsList>
 
 			<TabsContent value="expenses" className="mt-2">
-				<TopExpensesWidget
-					allExpenses={topExpensesAll}
-					cardOnlyExpenses={topExpensesCardOnly}
-				/>
+				<TopExpensesWidget data={topExpensesAll} />
 			</TabsContent>
 
 			<TabsContent value="establishments" className="mt-2">

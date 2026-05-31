@@ -9,6 +9,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { getPaymentMethodIcon } from "@/shared/utils/icons";
 
 type InstallmentExpenseListItemProps = {
 	expense: InstallmentExpense;
@@ -28,7 +29,7 @@ export function InstallmentExpenseListItem({
 	} = buildInstallmentExpenseDisplay(expense);
 
 	return (
-		<div className="flex items-center gap-3 transition-all duration-300 py-2">
+		<div className="flex items-center gap-2 transition-all duration-300 py-1.5">
 			<EstablishmentLogo name={expense.name} size={37} />
 
 			<div className="min-w-0 flex-1">
@@ -66,22 +67,32 @@ export function InstallmentExpenseListItem({
 					/>
 				</div>
 
-				{remainingInstallments === 0 ? (
-					<p className="text-xs text-muted-foreground">
-						{endDate ? `Termina em ${endDate}` : null}
-						{" · Quitado"}
-					</p>
-				) : (
-					<p className="text-xs text-muted-foreground">
-						{endDate ? `Termina em ${endDate}` : null}
-						{` · ${remainingLabel}: `}
-						<MoneyValues
-							amount={remainingAmount}
-							className="inline-block font-semibold"
-						/>{" "}
-						({remainingInstallments}x)
-					</p>
-				)}
+				<div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+					<span className="inline-flex min-w-0 items-center gap-1">
+						<span
+							className="inline-flex shrink-0 [&_svg]:size-3.5"
+							title={expense.paymentMethod}
+						>
+							{getPaymentMethodIcon(expense.paymentMethod)}
+							<span className="sr-only">{expense.paymentMethod}</span>
+						</span>
+						{endDate ? <span className="shrink-0">Até {endDate}</span> : null}
+					</span>
+					<span className="shrink-0">
+						{remainingInstallments === 0 ? (
+							"Quitado"
+						) : (
+							<>
+								{remainingLabel}:{" "}
+								<MoneyValues
+									amount={remainingAmount}
+									className="inline-block font-semibold"
+								/>{" "}
+								({remainingInstallments}x)
+							</>
+						)}
+					</span>
+				</div>
 
 				<Progress value={progress} className="mt-1 h-2" />
 			</div>

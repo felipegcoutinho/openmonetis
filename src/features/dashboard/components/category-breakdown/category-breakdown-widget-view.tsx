@@ -34,7 +34,7 @@ const VARIANT_CONFIG = {
 		shareLabel: "receita total",
 		percentageDigits: 1,
 		positiveTrend: "up",
-		includeBudgetAmount: true,
+		showBudget: false,
 	},
 	expense: {
 		emptyTitle: "Nenhuma despesa encontrada",
@@ -43,7 +43,7 @@ const VARIANT_CONFIG = {
 		shareLabel: "despesa total",
 		percentageDigits: 0,
 		positiveTrend: "down",
-		includeBudgetAmount: false,
+		showBudget: true,
 	},
 } as const;
 

@@ -43,7 +43,7 @@ export function PaymentOverviewWidgetView({
 					className="text-xs data-[state=active]:bg-transparent"
 				>
 					<RiMoneyDollarCircleLine className="mr-1 size-3.5" />
-					Formas
+					Formas de pagamento
 				</TabsTrigger>
 			</TabsList>
 

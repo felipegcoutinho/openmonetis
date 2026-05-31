@@ -14,17 +14,17 @@ export function InstallmentExpensesList({
 		return (
 			<WidgetEmptyState
 				icon={<RiNumbersLine className="size-6 text-muted-foreground" />}
-				title="Nenhuma despesa parcelada"
+				title="Nenhuma despesa parcelada encontrada"
 				description="Lançamentos parcelados aparecerão aqui conforme forem registrados."
 			/>
 		);
 	}
 
 	return (
-		<ul className="flex flex-col">
+		<div className="flex flex-col">
 			{expenses.map((expense) => (
 				<InstallmentExpenseListItem key={expense.id} expense={expense} />
 			))}
-		</ul>
+		</div>
 	);
 }

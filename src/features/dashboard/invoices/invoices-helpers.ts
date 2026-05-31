@@ -4,7 +4,11 @@ import {
 	INVOICE_PAYMENT_STATUS,
 	type InvoicePaymentStatus,
 } from "@/shared/lib/invoices";
-import { getBusinessDateString } from "@/shared/utils/date";
+import {
+	getBusinessDateString,
+	parseUtcDateString,
+	toDateOnlyString,
+} from "@/shared/utils/date";
 import {
 	buildDueDateInfoFromPeriodDay,
 	buildRelativeDueDateInfoFromPeriodDay,
@@ -78,6 +82,29 @@ export const formatInvoiceWidgetPaymentDate = (
 	return {
 		label,
 	};
+};
+
+export const formatInvoiceWidgetOverdueLabel = (
+	value: string | null,
+): string | null => {
+	const dueDateValue = toDateOnlyString(value);
+	const todayValue = getBusinessDateString();
+	if (!dueDateValue || dueDateValue >= todayValue) {
+		return null;
+	}
+
+	const dueDate = parseUtcDateString(dueDateValue);
+	const today = parseUtcDateString(todayValue);
+	if (!dueDate || !today) {
+		return null;
+	}
+
+	const overdueDays = Math.round(
+		(today.getTime() - dueDate.getTime()) / (24 * 60 * 60 * 1000),
+	);
+	return overdueDays === 1
+		? "Atrasada · venceu ontem"
+		: `Atrasada · venceu há ${overdueDays} dias`;
 };
 
 export const getCurrentDateString = () => getBusinessDateString();

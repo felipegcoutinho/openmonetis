@@ -5,7 +5,7 @@ import { capitalize } from "@/shared/utils/string";
 type InstallmentExpenseDisplay = {
 	compactLabel: string | null;
 	isLast: boolean;
-	remainingLabel: "Próx." | "Aberto";
+	remainingLabel: "Próximas" | "Em aberto";
 	remainingInstallments: number;
 	remainingAmount: number;
 	endDate: string | null;
@@ -17,7 +17,7 @@ const buildInstallmentCompactLabel = (
 	installmentCount: number | null,
 ) => {
 	if (currentInstallment && installmentCount) {
-		return `${currentInstallment} de ${installmentCount}`;
+		return `Parcela ${currentInstallment} de ${installmentCount}`;
 	}
 
 	return null;
@@ -111,7 +111,7 @@ export const buildInstallmentExpenseDisplay = (
 			installmentCount,
 		),
 		isLast: isInstallmentLast(currentInstallment, installmentCount),
-		remainingLabel: isSettled === true ? "Próx." : "Aberto",
+		remainingLabel: isSettled === true ? "Próximas" : "Em aberto",
 		remainingInstallments: calculateInstallmentRemainingCount(
 			currentInstallment,
 			installmentCount,

@@ -21,13 +21,8 @@ export function GoalsProgressList({ items, onEdit }: GoalsProgressListProps) {
 
 	return (
 		<ul className="flex flex-col">
-			{items.map((item, index) => (
-				<GoalProgressListItem
-					key={item.id}
-					item={item}
-					index={index}
-					onEdit={onEdit}
-				/>
+			{items.map((item) => (
+				<GoalProgressListItem key={item.id} item={item} onEdit={onEdit} />
 			))}
 		</ul>
 	);

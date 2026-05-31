@@ -1,6 +1,6 @@
 "use client";
 
-import { RiArrowDownSFill, RiStore3Line } from "@remixicon/react";
+import { RiFileList2Line, RiStore3Line } from "@remixicon/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PurchasesByCategoryData } from "@/features/dashboard/categories/purchases-by-category-queries";
 import { EstablishmentLogo } from "@/shared/components/entity-avatar";
@@ -8,7 +8,9 @@ import MoneyValues from "@/shared/components/money-values";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -129,18 +131,18 @@ export function PurchasesByCategoryWidget({
 					</SelectTrigger>
 					<SelectContent>
 						{Object.entries(categoriesByType).map(([type, categories]) => (
-							<div key={type}>
-								<div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+							<SelectGroup key={type}>
+								<SelectLabel className="font-medium">
 									{CATEGORY_TYPE_LABEL[
 										type as keyof typeof CATEGORY_TYPE_LABEL
 									] ?? type}
-								</div>
+								</SelectLabel>
 								{categories.map((category) => (
 									<SelectItem key={category.id} value={category.id}>
 										{category.name}
 									</SelectItem>
 								))}
-							</div>
+							</SelectGroup>
 						))}
 					</SelectContent>
 				</Select>
@@ -148,12 +150,12 @@ export function PurchasesByCategoryWidget({
 
 			{currentTransactions.length === 0 ? (
 				<WidgetEmptyState
-					icon={<RiArrowDownSFill className="size-6 text-muted-foreground" />}
-					title="Nenhuma compra encontrada"
+					icon={<RiFileList2Line className="size-6 text-muted-foreground" />}
+					title="Nenhum lançamento encontrado"
 					description={
 						selectedCategory
 							? `Não há lançamentos na categoria "${selectedCategory.name}".`
-							: "Selecione uma categoria para visualizar as compras."
+							: "Selecione uma categoria para visualizar os lançamentos."
 					}
 				/>
 			) : (
@@ -162,9 +164,9 @@ export function PurchasesByCategoryWidget({
 						return (
 							<div
 								key={transaction.id}
-								className="flex items-center justify-between gap-3 transition-all duration-300 py-2"
+								className="flex items-center justify-between gap-2 transition-all duration-300 py-1.5"
 							>
-								<div className="flex min-w-0 flex-1 items-center gap-3">
+								<div className="flex min-w-0 flex-1 items-center gap-2">
 									<EstablishmentLogo name={transaction.name} size={37} />
 
 									<div className="min-w-0">

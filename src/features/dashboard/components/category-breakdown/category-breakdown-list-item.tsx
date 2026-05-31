@@ -1,4 +1,3 @@
-import { RiExternalLinkLine } from "@remixicon/react";
 import Link from "next/link";
 import type { DashboardCategoryBreakdownItem } from "@/features/dashboard/categories/category-breakdown-helpers";
 import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
@@ -11,13 +10,14 @@ type CategoryBreakdownListItemConfig = {
 	shareLabel: string;
 	percentageDigits: number;
 	positiveTrend: "up" | "down";
-	includeBudgetAmount: boolean;
+	showBudget: boolean;
 };
 
 type CategoryBreakdownListItemProps = {
 	category: DashboardCategoryBreakdownItem;
 	periodParam: string;
 	config: CategoryBreakdownListItemConfig;
+	position: number;
 };
 
 const formatPercentage = (value: number, digits: number) =>
@@ -31,8 +31,9 @@ export function CategoryBreakdownListItem({
 	category,
 	periodParam,
 	config,
+	position,
 }: CategoryBreakdownListItemProps) {
-	const hasBudget = category.budgetAmount !== null;
+	const hasBudget = config.showBudget && category.budgetAmount !== null;
 	const budgetExceeded =
 		hasBudget &&
 		category.budgetUsedPercentage !== null &&
@@ -44,7 +45,10 @@ export function CategoryBreakdownListItem({
 
 	return (
 		<div>
-			<div className="flex items-center justify-between gap-3 transition-all duration-300 py-2">
+			<div className="flex items-center justify-between gap-2 transition-all duration-300 py-1.5">
+				<span className="w-3 shrink-0 text-left text-xs font-medium text-muted-foreground">
+					{position}
+				</span>
 				<div className="flex min-w-0 flex-1 items-center gap-2">
 					<CategoryIconBadge
 						icon={category.categoryIcon}
@@ -54,13 +58,9 @@ export function CategoryBreakdownListItem({
 						<div className="flex items-center gap-2">
 							<Link
 								href={`/categories/${category.categoryId}?periodo=${periodParam}`}
-								className="flex max-w-full items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:underline"
+								className="flex max-w-full items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
 							>
 								<span className="truncate">{category.categoryName}</span>
-								<RiExternalLinkLine
-									className="size-3 shrink-0 text-muted-foreground"
-									aria-hidden
-								/>
 							</Link>
 						</div>
 						<div className="flex flex-wrap items-center gap-x-1 text-xs text-muted-foreground">
@@ -71,36 +71,29 @@ export function CategoryBreakdownListItem({
 								)}{" "}
 								da {config.shareLabel}
 							</span>
-							{hasBudget && category.budgetUsedPercentage !== null ? (
-								<>
-									<span aria-hidden>·</span>
-									<span
-										className={`flex items-center gap-1 ${budgetExceeded ? "text-destructive" : "text-info"}`}
-									>
-										{budgetExceeded ? (
-											<>
-												Excedeu{" "}
-												<span className="font-medium">
-													{formatCurrency(exceededAmount)}
-												</span>
-											</>
-										) : (
-											<>
-												{formatPercentage(
-													category.budgetUsedPercentage,
-													config.percentageDigits,
-												)}{" "}
-												do limite
-												{config.includeBudgetAmount &&
-												category.budgetAmount !== null
-													? ` ${formatCurrency(category.budgetAmount)}`
-													: ""}
-											</>
-										)}
-									</span>
-								</>
-							) : null}
 						</div>
+						{hasBudget && category.budgetUsedPercentage !== null ? (
+							<div
+								className={`mt-0.5 text-xs ${budgetExceeded ? "text-destructive" : "text-info"}`}
+							>
+								{budgetExceeded ? (
+									<>
+										Limite excedido em{" "}
+										<span className="font-medium">
+											{formatCurrency(exceededAmount)}
+										</span>
+									</>
+								) : (
+									<>
+										{formatPercentage(
+											category.budgetUsedPercentage,
+											config.percentageDigits,
+										)}{" "}
+										do limite utilizado
+									</>
+								)}
+							</div>
+						) : null}
 					</div>
 				</div>
 

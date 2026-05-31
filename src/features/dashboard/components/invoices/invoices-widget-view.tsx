@@ -39,9 +39,7 @@ export function InvoicesWidgetView({
 }: InvoicesWidgetViewProps) {
 	return (
 		<>
-			<div className="flex flex-col gap-4">
-				<InvoicesList invoices={invoices} onPay={onOpenPaymentDialog} />
-			</div>
+			<InvoicesList invoices={invoices} onPay={onOpenPaymentDialog} />
 
 			<InvoicePaymentDialog
 				invoice={selectedInvoice}

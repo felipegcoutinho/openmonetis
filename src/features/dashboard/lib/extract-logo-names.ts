@@ -16,8 +16,6 @@ export function extractDashboardLogoNames(data: DashboardData): string[] {
 	for (const establishment of data.topEstablishmentsData.establishments)
 		names.push(establishment.name);
 	for (const expense of data.topExpensesAll.expenses) names.push(expense.name);
-	for (const expense of data.topExpensesCardOnly.expenses)
-		names.push(expense.name);
 	for (const transactions of Object.values(
 		data.purchasesByCategoryData.transactionsByCategory,
 	)) {

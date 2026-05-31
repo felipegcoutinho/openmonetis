@@ -1,10 +1,11 @@
-import { RiCheckboxCircleFill, RiExternalLinkLine } from "@remixicon/react";
+import { RiCheckboxCircleFill, RiGroupLine } from "@remixicon/react";
 import Link from "next/link";
 import { PercentageChangeIndicator } from "@/features/dashboard/components/percentage-change-indicator";
 import {
 	buildInvoiceDetailsHref,
 	buildInvoiceInitials,
 	formatInvoicePaymentDate,
+	formatInvoiceWidgetOverdueLabel,
 	formatInvoiceWidgetPaymentDate,
 	getInvoiceShareLabel,
 	parseInvoiceDueDate,
@@ -48,9 +49,13 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 	const absolutePaymentInfo = formatInvoicePaymentDate(invoice.paidAt);
 	const breakdown = invoice.pagadorBreakdown ?? [];
 	const hasBreakdown = breakdown.length > 0;
+	const hasMultiplePayers = breakdown.length > 1;
 	const detailHref = buildInvoiceDetailsHref(invoice.cardId, invoice.period);
+	const overdueLabel = formatInvoiceWidgetOverdueLabel(dueInfo.date);
 	const dueTooltipLabel =
-		dueInfo.label !== absoluteDueInfo.label ? absoluteDueInfo.label : null;
+		overdueLabel || dueInfo.label !== absoluteDueInfo.label
+			? absoluteDueInfo.label
+			: null;
 	const paymentTooltipLabel =
 		paymentInfo?.label && paymentInfo.label !== absolutePaymentInfo?.label
 			? absolutePaymentInfo?.label
@@ -63,15 +68,11 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 			className="inline-flex max-w-full items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
 		>
 			<span className="truncate">{invoice.cardName}</span>
-			<RiExternalLinkLine
-				className="size-3 shrink-0 text-muted-foreground"
-				aria-hidden
-			/>
 		</Link>
 	);
 
 	return (
-		<div className="flex items-center justify-between transition-all duration-300 py-1.5">
+		<li className="flex items-center justify-between transition-all duration-300 py-1.5">
 			<div className="flex min-w-0 flex-1 items-center gap-2 py-1">
 				<InvoiceLogo
 					cardName={invoice.cardName}
@@ -81,70 +82,99 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 				/>
 
 				<div className="min-w-0">
-					{hasBreakdown ? (
-						<HoverCard openDelay={150}>
-							<HoverCardTrigger asChild>{linkNode}</HoverCardTrigger>
-							<HoverCardContent align="start" className="w-80 space-y-3">
-								<p className="text-xs text-muted-foreground">
-									Distribuição por pessoa
-								</p>
-								<ul className="space-y-2">
-									{breakdown.map((share, index) => (
-										<li
-											key={`${invoice.id}-${
-												share.payerId ?? share.pagadorName ?? index
-											}`}
-											className="flex items-center gap-3"
-										>
-											<Avatar className="size-9">
-												<AvatarImage
-													src={getAvatarSrc(share.pagadorAvatar)}
-													alt={`Avatar de ${share.pagadorName}`}
-												/>
-												<AvatarFallback>
-													{buildInvoiceInitials(share.pagadorName)}
-												</AvatarFallback>
-											</Avatar>
-											<div className="min-w-0 flex-1">
-												<p className="truncate text-sm font-medium text-foreground">
-													{share.pagadorName}
-												</p>
-												<p className="text-xs text-muted-foreground">
-													{getInvoiceShareLabel(
-														share.amount,
-														Math.abs(invoice.totalAmount),
-													)}
-												</p>
-											</div>
-											<div className="flex shrink-0 flex-col items-end gap-0.5 text-sm font-medium text-foreground">
-												<MoneyValues
-													className="font-medium"
-													amount={share.amount}
-												/>
-												<PercentageChangeIndicator
-													value={share.percentageChange}
-												/>
-											</div>
-										</li>
-									))}
-								</ul>
-							</HoverCardContent>
-						</HoverCard>
-					) : (
-						linkNode
-					)}
+					<div className="flex max-w-full items-center gap-1">
+						{hasBreakdown ? (
+							<HoverCard openDelay={150}>
+								<HoverCardTrigger asChild>{linkNode}</HoverCardTrigger>
+								<HoverCardContent align="start" className="w-80 space-y-3">
+									<p className="text-xs text-muted-foreground">
+										Distribuição por pessoa
+									</p>
+									<ul className="space-y-2">
+										{breakdown.map((share, index) => (
+											<li
+												key={`${invoice.id}-${
+													share.payerId ?? share.pagadorName ?? index
+												}`}
+												className="flex items-center gap-3"
+											>
+												<Avatar className="size-9">
+													<AvatarImage
+														src={getAvatarSrc(share.pagadorAvatar)}
+														alt={`Avatar de ${share.pagadorName}`}
+													/>
+													<AvatarFallback>
+														{buildInvoiceInitials(share.pagadorName)}
+													</AvatarFallback>
+												</Avatar>
+												<div className="min-w-0 flex-1">
+													<p className="truncate text-sm font-medium text-foreground">
+														{share.pagadorName}
+													</p>
+													<p className="text-xs text-muted-foreground">
+														{getInvoiceShareLabel(
+															share.amount,
+															Math.abs(invoice.totalAmount),
+														)}
+													</p>
+												</div>
+												<div className="flex shrink-0 flex-col items-end gap-0.5 text-sm font-medium text-foreground">
+													<MoneyValues
+														className="font-medium"
+														amount={share.amount}
+													/>
+													<PercentageChangeIndicator
+														value={share.percentageChange}
+													/>
+												</div>
+											</li>
+										))}
+									</ul>
+								</HoverCardContent>
+							</HoverCard>
+						) : (
+							linkNode
+						)}
+						{hasMultiplePayers ? (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span className="inline-flex shrink-0 cursor-help text-muted-foreground">
+										<RiGroupLine className="size-3.5" aria-hidden />
+										<span className="sr-only">Ver distribuição por pessoa</span>
+									</span>
+								</TooltipTrigger>
+								<TooltipContent side="top">
+									Ver distribuição por pessoa
+								</TooltipContent>
+							</Tooltip>
+						) : null}
+					</div>
 
 					<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
 						{!isPaid ? (
 							dueTooltipLabel ? (
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<span className="cursor-help">{dueInfo.label}</span>
+										<span
+											className={
+												isOverdue
+													? "cursor-help font-semibold text-destructive"
+													: "cursor-help"
+											}
+										>
+											{overdueLabel ?? dueInfo.label}
+										</span>
 									</TooltipTrigger>
 									<TooltipContent side="top">{dueTooltipLabel}</TooltipContent>
 								</Tooltip>
 							) : (
-								<span>{dueInfo.label}</span>
+								<span
+									className={
+										isOverdue ? "font-semibold text-destructive" : undefined
+									}
+								>
+									{overdueLabel ?? dueInfo.label}
+								</span>
 							)
 						) : null}
 						{isPaid && paymentInfo ? (
@@ -174,30 +204,31 @@ export function InvoiceListItem({ invoice, onPay }: InvoiceListItemProps) {
 					className="font-medium"
 					amount={Math.abs(invoice.totalAmount)}
 				/>
-				<Button
-					type="button"
-					size="sm"
-					variant="link"
-					className="h-auto p-0 disabled:opacity-100"
-					disabled={isPaid}
-					onClick={() => onPay(invoice.id)}
-				>
-					{isPaid ? (
-						<span className="flex items-center gap-0.5 text-success">
-							<RiCheckboxCircleFill className="size-3.5" /> Pago
-						</span>
-					) : isOverdue ? (
-						<span className="overdue-blink">
-							<span className="overdue-blink-primary text-destructive">
-								Atrasado
+				{isPaid ? (
+					<span className="flex h-7 items-center gap-0.5 text-xs font-medium text-success">
+						<RiCheckboxCircleFill className="size-3.5" /> Pago
+					</span>
+				) : (
+					<Button
+						type="button"
+						size="sm"
+						variant="link"
+						className="-mr-1.5 h-7 px-1.5 py-0"
+						onClick={() => onPay(invoice.id)}
+					>
+						{isOverdue ? (
+							<span className="overdue-blink">
+								<span className="overdue-blink-primary text-destructive">
+									Atrasado
+								</span>
+								<span className="overdue-blink-secondary">Pagar</span>
 							</span>
-							<span className="overdue-blink-secondary">Pagar</span>
-						</span>
-					) : (
-						<span>Pagar</span>
-					)}
-				</Button>
+						) : (
+							<span>Pagar</span>
+						)}
+					</Button>
+				)}
 			</div>
-		</div>
+		</li>
 	);
 }

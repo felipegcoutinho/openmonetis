@@ -96,7 +96,7 @@ export function CategoryBreakdownChart({
 	}, [categories, chartConfig]);
 
 	return (
-		<div className="flex items-center gap-4">
+		<div className="flex flex-col items-center gap-4 sm:flex-row">
 			<ChartContainer config={chartConfig} className="h-[280px] flex-1">
 				<PieChart>
 					<Pie
@@ -143,7 +143,7 @@ export function CategoryBreakdownChart({
 				</PieChart>
 			</ChartContainer>
 
-			<div className="min-w-[140px] flex flex-col gap-2">
+			<div className="grid w-full grid-cols-2 gap-2 sm:min-w-[140px] sm:w-auto sm:grid-cols-1">
 				{chartData.map((entry, index) => (
 					<div key={`legend-${index}`} className="flex items-center gap-2">
 						<div
