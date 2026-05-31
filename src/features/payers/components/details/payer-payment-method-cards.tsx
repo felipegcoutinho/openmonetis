@@ -30,7 +30,7 @@ export function PayerBoletoCard({ items }: PayerBoletoCardProps) {
 				<WidgetEmptyState
 					icon={<RiBarcodeLine className="size-6 text-muted-foreground" />}
 					title="Nenhum boleto cadastrado para o período"
-					description="Quando houver despesas registradas com boleto, elas aparecerão aqui."
+					description="Quando houver lançamentos registrados com boleto, eles aparecerão aqui."
 				/>
 			</CardContent>
 		);

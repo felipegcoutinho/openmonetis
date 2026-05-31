@@ -15,7 +15,7 @@ export function BillsList({ bills, period, onPay }: BillsListProps) {
 			<WidgetEmptyState
 				icon={<RiBarcodeFill className="size-6 text-muted-foreground" />}
 				title="Nenhum boleto cadastrado para o período selecionado"
-				description="Cadastre boletos para monitorar os pagamentos aqui."
+				description="Cadastre boletos para monitorar os vencimentos aqui."
 			/>
 		);
 	}

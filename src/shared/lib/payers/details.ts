@@ -63,6 +63,7 @@ export type PayerBoletoItem = {
 	dueDate: string | null;
 	boletoPaymentDate: string | null;
 	isSettled: boolean;
+	transactionType: string;
 };
 
 export type PayerPaymentStatusData = {
@@ -322,6 +323,7 @@ export async function fetchPayerBoletoItems({
 			dueDate: transactions.dueDate,
 			boletoPaymentDate: transactions.boletoPaymentDate,
 			isSettled: transactions.isSettled,
+			transactionType: transactions.transactionType,
 		})
 		.from(transactions)
 		.leftJoin(
@@ -350,6 +352,7 @@ export async function fetchPayerBoletoItems({
 			dueDate: toDateOnlyString(row.dueDate),
 			boletoPaymentDate: toDateOnlyString(row.boletoPaymentDate),
 			isSettled: Boolean(row.isSettled),
+			transactionType: row.transactionType,
 		});
 	}
 

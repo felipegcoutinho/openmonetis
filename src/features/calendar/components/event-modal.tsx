@@ -81,6 +81,8 @@ const renderLancamento = (
 
 const renderBoleto = (event: Extract<CalendarEvent, { type: "boleto" }>) => {
 	const isPaid = Boolean(event.transaction.isSettled);
+	const isIncome = event.transaction.transactionType === "Receita";
+	const settlementLabel = isIncome ? "Recebido" : "Pago";
 	const dueDateLabel = formatFinancialDateLabel(
 		event.transaction.dueDate,
 		"Vence em",
@@ -89,7 +91,7 @@ const renderBoleto = (event: Extract<CalendarEvent, { type: "boleto" }>) => {
 	const paymentDateLabel = isPaid
 		? formatFinancialDateLabel(
 				event.transaction.boletoPaymentDate,
-				"Pago em",
+				`${settlementLabel} em`,
 				DATE_FORMAT,
 			)
 		: null;
@@ -109,7 +111,9 @@ const renderBoleto = (event: Extract<CalendarEvent, { type: "boleto" }>) => {
 							<span className="text-success">{paymentDateLabel}</span>
 						)}
 					</div>
-					<Badge variant="outline">{isPaid ? "Pago" : "Pendente"}</Badge>
+					<Badge variant="outline">
+						{isPaid ? settlementLabel : "Pendente"}
+					</Badge>
 				</div>
 				<MoneyValues
 					className="font-medium whitespace-nowrap"

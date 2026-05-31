@@ -19,7 +19,7 @@ type FinancialDueDateInfo = {
 	date: string | null;
 };
 
-type RelativeFinancialDateContext = "due" | "paid";
+type RelativeFinancialDateContext = "due" | "paid" | "received";
 
 export function formatFinancialDateLabel(
 	value: string | null,
@@ -75,15 +75,17 @@ export function formatRelativeFinancialDateLabel(
 		return formatFinancialDateLabel(normalizedValue, "Vence em");
 	}
 
+	const settlementLabel = context === "received" ? "Recebido" : "Pago";
+
 	if (normalizedValue === referenceDate) {
-		return "Pago hoje";
+		return `${settlementLabel} hoje`;
 	}
 
 	if (normalizedValue === yesterday) {
-		return "Pago ontem";
+		return `${settlementLabel} ontem`;
 	}
 
-	return formatFinancialDateLabel(normalizedValue, "Pago em");
+	return formatFinancialDateLabel(normalizedValue, `${settlementLabel} em`);
 }
 
 export function buildFinancialStatusLabel({

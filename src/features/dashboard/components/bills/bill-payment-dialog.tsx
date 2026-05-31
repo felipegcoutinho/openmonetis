@@ -7,6 +7,7 @@ import {
 	type BillDialogState,
 	formatBillDateLabel,
 	getBillStatusBadgeVariant,
+	isIncomeBill,
 } from "@/features/dashboard/bills/bills-helpers";
 import type {
 	BillPaymentAccountOption,
@@ -66,11 +67,13 @@ export function BillPaymentDialog({
 	onConfirm,
 }: BillPaymentDialogProps) {
 	const isProcessing = modalState === "processing" || isPending;
+	const income = bill ? isIncomeBill(bill) : false;
+	const settlementLabel = income ? "Recebido" : "Pago";
 	const dueLabel = bill
 		? formatBillDateLabel(bill.dueDate, "Vencimento:")
 		: null;
 	const paidLabel = bill
-		? formatBillDateLabel(bill.boletoPaymentDate, "Pago em:")
+		? formatBillDateLabel(bill.boletoPaymentDate, `${settlementLabel} em:`)
 		: null;
 	const isBillPending = bill ? !bill.isSettled : false;
 	const paymentDateValue = paymentDate.toISOString().split("T")[0] ?? "";
@@ -103,8 +106,8 @@ export function BillPaymentDialog({
 			>
 				{modalState === "success" ? (
 					<PaymentSuccess
-						title="Pagamento registrado!"
-						description="Atualizamos o status do boleto para pago. Em instantes ele aparecerá como baixado no histórico."
+						title={income ? "Recebimento registrado!" : "Pagamento registrado!"}
+						description={`Atualizamos o status do boleto para ${income ? "recebido" : "pago"}. Em instantes ele aparecerá como baixado no histórico.`}
 						onClose={onClose}
 					/>
 				) : (
@@ -112,10 +115,12 @@ export function BillPaymentDialog({
 						<DialogHeader>
 							<div className="mb-1 flex items-center gap-3">
 								<div>
-									<DialogTitle>Confirmar pagamento</DialogTitle>
+									<DialogTitle>
+										{income ? "Confirmar recebimento" : "Confirmar pagamento"}
+									</DialogTitle>
 									<DialogDescription className="mt-1 text-xs">
 										{isBillPending
-											? "Escolha a conta de origem e a data em que o boleto foi pago."
+											? `Escolha a conta de ${income ? "destino" : "origem"} e a data em que o boleto foi ${income ? "recebido" : "pago"}.`
 											: "Boleto"}
 									</DialogDescription>
 								</div>
@@ -158,12 +163,15 @@ export function BillPaymentDialog({
 										<div className="flex items-center gap-1.5 text-muted-foreground">
 											<RiCalendarLine className="size-3.5" />
 											<span className="text-xs font-medium uppercase">
-												{bill.isSettled ? "Pago em" : "Vencimento"}
+												{bill.isSettled
+													? `${settlementLabel} em`
+													: "Vencimento"}
 											</span>
 										</div>
 										<p className="font-semibold">
 											{bill.isSettled
-												? (paidLabel?.replace("Pago em: ", "") ?? "—")
+												? (paidLabel?.replace(`${settlementLabel} em: `, "") ??
+													"—")
 												: (dueLabel?.replace("Vencimento: ", "") ?? "—")}
 										</p>
 									</Card>
@@ -175,7 +183,7 @@ export function BillPaymentDialog({
 									<div className="space-y-3">
 										<div className="space-y-2">
 											<Label htmlFor="bill-widget-payment-account">
-												Conta de pagamento
+												Conta de {income ? "recebimento" : "pagamento"}
 											</Label>
 											<Select
 												value={paymentAccountId}
@@ -212,7 +220,7 @@ export function BillPaymentDialog({
 
 										<div className="space-y-2">
 											<Label htmlFor="bill-widget-payment-date">
-												Data do pagamento
+												Data do {income ? "recebimento" : "pagamento"}
 											</Label>
 											<DatePicker
 												id="bill-widget-payment-date"
@@ -231,8 +239,8 @@ export function BillPaymentDialog({
 										<span className="text-sm text-muted-foreground">
 											Status atual
 										</span>
-										<Badge variant={getBillStatusBadgeVariant("Pago")}>
-											Pago
+										<Badge variant={getBillStatusBadgeVariant(settlementLabel)}>
+											{settlementLabel}
 										</Badge>
 									</div>
 								)}

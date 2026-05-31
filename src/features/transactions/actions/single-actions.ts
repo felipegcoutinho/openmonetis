@@ -608,7 +608,12 @@ export async function toggleTransactionSettlementAction(
 		const data = toggleSettlementSchema.parse(input);
 
 		const existing = await db.query.transactions.findFirst({
-			columns: { id: true, paymentMethod: true, accountId: true },
+			columns: {
+				id: true,
+				paymentMethod: true,
+				accountId: true,
+				transactionType: true,
+			},
 			where: and(
 				eq(transactions.id, data.id),
 				eq(transactions.userId, user.id),
@@ -627,6 +632,7 @@ export async function toggleTransactionSettlementAction(
 		}
 
 		const isBoleto = existing.paymentMethod === "Boleto";
+		const isIncomeBill = isBoleto && existing.transactionType === "Receita";
 		const customPaymentDate =
 			isBoleto && data.value && data.paymentDate
 				? parseLocalDateString(data.paymentDate)
@@ -652,7 +658,7 @@ export async function toggleTransactionSettlementAction(
 			if (!paymentAccount) {
 				return {
 					success: false,
-					error: "Conta de pagamento não encontrada.",
+					error: `Conta de ${isIncomeBill ? "recebimento" : "pagamento"} não encontrada.`,
 				};
 			}
 		}
@@ -682,8 +688,8 @@ export async function toggleTransactionSettlementAction(
 		return {
 			success: true,
 			message: data.value
-				? "Lançamento marcado como pago."
-				: "Pagamento desfeito com sucesso.",
+				? `Lançamento marcado como ${isIncomeBill ? "recebido" : "pago"}.`
+				: `${isIncomeBill ? "Recebimento" : "Pagamento"} desfeito com sucesso.`,
 		};
 	} catch (error) {
 		return handleActionError(error);

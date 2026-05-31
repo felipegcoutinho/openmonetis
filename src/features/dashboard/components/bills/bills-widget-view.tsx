@@ -41,9 +41,7 @@ export function BillsWidgetView({
 }: BillsWidgetViewProps) {
 	return (
 		<>
-			<div className="flex flex-col gap-4">
-				<BillsList bills={bills} period={period} onPay={onOpenPaymentDialog} />
-			</div>
+			<BillsList bills={bills} period={period} onPay={onOpenPaymentDialog} />
 
 			<BillPaymentDialog
 				bill={selectedBill}
