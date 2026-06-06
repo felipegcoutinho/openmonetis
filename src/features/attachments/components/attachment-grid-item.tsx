@@ -32,7 +32,7 @@ function PdfCanvas({ url }: PdfCanvasProps) {
 
 			let pdf: Awaited<ReturnType<typeof pdfjsLib.getDocument>["promise"]>;
 			try {
-				pdf = await pdfjsLib.getDocument(url).promise;
+				pdf = await pdfjsLib.getDocument({ url }).promise;
 			} catch (err) {
 				if ((err as { name?: string }).name === "PasswordException") {
 					if (!cancelled) setLocked(true);

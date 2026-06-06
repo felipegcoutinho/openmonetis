@@ -7,29 +7,7 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 
-minimumReleaseAgeExclude:
-  - '@aws-sdk/client-s3@3.1050.0'
-  - '@aws-sdk/s3-request-presigner@3.1050.0'
-  - '@types/node@25.9.1'
-  - '@types/react@19.2.15'
-  - '@aws-sdk/client-s3@3.1054.0'
-  - '@aws-sdk/core@3.974.14'
-  - '@aws-sdk/credential-provider-env@3.972.40'
-  - '@aws-sdk/credential-provider-http@3.972.42'
-  - '@aws-sdk/credential-provider-ini@3.972.44'
-  - '@aws-sdk/credential-provider-login@3.972.44'
-  - '@aws-sdk/credential-provider-node@3.972.45'
-  - '@aws-sdk/credential-provider-process@3.972.40'
-  - '@aws-sdk/credential-provider-sso@3.972.44'
-  - '@aws-sdk/credential-provider-web-identity@3.972.44'
-  - '@aws-sdk/middleware-bucket-endpoint@3.972.16'
-  - '@aws-sdk/middleware-flexible-checksums@3.974.22'
-  - '@aws-sdk/middleware-sdk-s3@3.972.43'
-  - '@aws-sdk/nested-clients@3.997.12'
-  - '@aws-sdk/s3-request-presigner@3.1054.0'
-  - '@aws-sdk/signature-v4-multi-region@3.996.29'
-  - '@aws-sdk/token-providers@3.1054.0'
-  - '@aws-sdk/xml-builder@3.972.26'
+minimumReleaseAge: 0
 
 overrides:
   defu: 6.1.7
