@@ -99,6 +99,7 @@ export async function parseXls(buffer: ArrayBuffer): Promise<ImportStatement> {
 		const typeRaw =
 			values[4] != null ? String(values[4]).toLowerCase().trim() : "";
 		const transactionType = typeRaw === "receita" ? "income" : "expense";
+		const categoryRaw = values[5] != null ? String(values[5]).trim() : null;
 
 		if (!date || !description || amount === null || amount <= 0) return;
 
@@ -108,6 +109,7 @@ export async function parseXls(buffer: ArrayBuffer): Promise<ImportStatement> {
 			amount,
 			description,
 			transactionType,
+			categoryRaw,
 		});
 	});
 
@@ -132,16 +134,17 @@ export async function generateXlsTemplate(): Promise<ArrayBuffer> {
 	const ws = workbook.addWorksheet("Lançamentos");
 
 	ws.addRows([
-		["Data", "Descrição", "Valor", "Tipo"],
-		["01/03/2026", "Ingressos São Januário", 160, "despesa"],
-		["01/03/2026", "Salário", 3000.0, "receita"],
-		["01/03/2026", "Posto do Vasco da Gama", 89.9, "despesa"],
+		["Data", "Descrição", "Valor", "Tipo", "Categoria"],
+		["01/03/2026", "Ingressos São Januário", 160, "despesa", "Lazer"],
+		["01/03/2026", "Salário", 3000.0, "receita", "Salário"],
+		["01/03/2026", "Posto do Vasco da Gama", 89.9, "despesa", "Transporte"],
 	]);
 
 	ws.getColumn(1).width = 14;
 	ws.getColumn(2).width = 32;
 	ws.getColumn(3).width = 12;
 	ws.getColumn(4).width = 10;
+	ws.getColumn(5).width = 24;
 
 	// Dropdown para coluna Tipo (D2:D100)
 	for (let i = 2; i <= 100; i++) {

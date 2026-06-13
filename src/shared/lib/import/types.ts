@@ -4,6 +4,7 @@ export type ImportedTransaction = {
 	amount: number; // positivo = receita, negativo = despesa
 	description: string; // MEMO ou NAME
 	transactionType: "income" | "expense";
+	categoryRaw?: string | null;
 };
 
 export type ImportStatement = {
