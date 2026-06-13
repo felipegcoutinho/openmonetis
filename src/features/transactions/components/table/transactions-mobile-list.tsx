@@ -39,6 +39,8 @@ type TransactionsMobileListProps = {
 	onToggleSettlement?: (item: TransactionItem) => void;
 	onAnticipate?: (item: TransactionItem) => void;
 	onViewAnticipationHistory?: (item: TransactionItem) => void;
+	onConvertToInstallment?: (item: TransactionItem) => void;
+	onConvertToRecurring?: (item: TransactionItem) => void;
 	isSettlementLoading: (id: string) => boolean;
 	showActions?: boolean;
 };
@@ -55,6 +57,8 @@ export function TransactionsMobileList({
 	onToggleSettlement,
 	onAnticipate,
 	onViewAnticipationHistory,
+	onConvertToInstallment,
+	onConvertToRecurring,
 	isSettlementLoading,
 	showActions = true,
 }: TransactionsMobileListProps) {
@@ -74,6 +78,8 @@ export function TransactionsMobileList({
 					onToggleSettlement={onToggleSettlement}
 					onAnticipate={onAnticipate}
 					onViewAnticipationHistory={onViewAnticipationHistory}
+					onConvertToInstallment={onConvertToInstallment}
+					onConvertToRecurring={onConvertToRecurring}
 					isSettlementLoading={isSettlementLoading}
 					showActions={showActions}
 				/>
@@ -98,6 +104,8 @@ function TransactionMobileCard({
 	onToggleSettlement,
 	onAnticipate,
 	onViewAnticipationHistory,
+	onConvertToInstallment,
+	onConvertToRecurring,
 	isSettlementLoading,
 	showActions = true,
 }: TransactionMobileCardProps) {
@@ -261,6 +269,8 @@ function TransactionMobileCard({
 									onRefund={onRefund}
 									onAnticipate={onAnticipate}
 									onViewAnticipationHistory={onViewAnticipationHistory}
+									onConvertToInstallment={onConvertToInstallment}
+									onConvertToRecurring={onConvertToRecurring}
 								/>
 							</div>
 						) : null}

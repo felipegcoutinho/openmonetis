@@ -513,11 +513,28 @@ export const toggleSettlementSchema = z.object({
 		.optional(),
 });
 
+export const convertToInstallmentSchema = z.object({
+	id: uuidSchema("Lançamento"),
+});
+
+export const convertToRecurringSchema = z.object({
+	id: uuidSchema("Lançamento"),
+	recurrenceCount: z.coerce
+		.number({ message: "Informe por quantos meses repetir." })
+		.int()
+		.min(2, "A recorrência deve ter ao menos dois meses.")
+		.max(60, "Selecione até 60 meses."),
+});
+
 type BaseInput = z.infer<typeof baseFields>;
 export type CreateInput = z.infer<typeof createSchema>;
 export type UpdateInput = z.infer<typeof updateSchema>;
 export type DeleteInput = z.infer<typeof deleteSchema>;
 export type ToggleSettlementInput = z.infer<typeof toggleSettlementSchema>;
+export type ConvertToInstallmentInput = z.infer<
+	typeof convertToInstallmentSchema
+>;
+export type ConvertToRecurringInput = z.infer<typeof convertToRecurringSchema>;
 
 export const revalidate = (userId: string) =>
 	revalidateForEntity("transactions", userId);

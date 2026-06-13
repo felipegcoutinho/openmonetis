@@ -4,6 +4,8 @@ import { RiAddFill } from "@remixicon/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
+	convertTransactionToInstallmentAction,
+	convertTransactionToRecurringAction,
 	createMassTransactionsAction,
 	deleteMultipleTransactionsAction,
 	deleteTransactionAction,
@@ -18,8 +20,19 @@ import {
 	detachAttachmentBulkAction,
 	getPresignedUploadUrlAction,
 } from "@/features/transactions/actions/attachments";
+import { detectInstallmentFromName } from "@/features/transactions/lib/installment-detection";
 import { ConfirmActionDialog } from "@/shared/components/confirm-action-dialog";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import type {
 	TransactionsExportContext,
 	TransactionsPaginationState,
@@ -190,6 +203,14 @@ export function TransactionsPage({
 	const [refundOpen, setRefundOpen] = useState(false);
 	const [transactionToRefund, setTransactionToRefund] =
 		useState<TransactionItem | null>(null);
+	const [convertInstallmentOpen, setConvertInstallmentOpen] = useState(false);
+	const [transactionToConvert, setTransactionToConvert] =
+		useState<TransactionItem | null>(null);
+	const [convertRecurringOpen, setConvertRecurringOpen] = useState(false);
+	const [transactionToConvertRecurring, setTransactionToConvertRecurring] =
+		useState<TransactionItem | null>(null);
+	const [recurrenceCount, setRecurrenceCount] = useState("12");
+	const [recurrencePending, setRecurrencePending] = useState(false);
 
 	const handleToggleSettlement = async (item: TransactionItem) => {
 		if (item.paymentMethod === "Cartão de crédito") {
@@ -542,6 +563,71 @@ export function TransactionsPage({
 		setRefundOpen(true);
 	};
 
+	const handleConvertToInstallment = (item: TransactionItem) => {
+		setTransactionToConvert(item);
+		setConvertInstallmentOpen(true);
+	};
+
+	const confirmConvertToInstallment = async () => {
+		if (!transactionToConvert) {
+			return;
+		}
+
+		const result = await convertTransactionToInstallmentAction({
+			id: transactionToConvert.id,
+		});
+
+		if (!result.success) {
+			toast.error(result.error);
+			throw new Error(result.error);
+		}
+
+		toast.success(result.message);
+		setConvertInstallmentOpen(false);
+		setTransactionToConvert(null);
+	};
+
+	const conversionPreview = transactionToConvert
+		? detectInstallmentFromName(transactionToConvert.name)
+		: null;
+
+	const handleConvertToRecurring = (item: TransactionItem) => {
+		setTransactionToConvertRecurring(item);
+		setRecurrenceCount("12");
+		setConvertRecurringOpen(true);
+	};
+
+	const confirmConvertToRecurring = async () => {
+		if (!transactionToConvertRecurring) {
+			return;
+		}
+
+		const count = Number(recurrenceCount);
+		if (!Number.isInteger(count) || count < 2 || count > 60) {
+			toast.error("Informe uma recorrência entre 2 e 60 meses.");
+			return;
+		}
+
+		try {
+			setRecurrencePending(true);
+			const result = await convertTransactionToRecurringAction({
+				id: transactionToConvertRecurring.id,
+				recurrenceCount: count,
+			});
+
+			if (!result.success) {
+				toast.error(result.error);
+				return;
+			}
+
+			toast.success(result.message);
+			setConvertRecurringOpen(false);
+			setTransactionToConvertRecurring(null);
+		} finally {
+			setRecurrencePending(false);
+		}
+	};
+
 	const handleAnticipate = (item: TransactionItem) => {
 		setSelectedForAnticipation(item);
 		setAnticipateOpen(true);
@@ -628,6 +714,8 @@ export function TransactionsPage({
 				onBulkImport={handleBulkImport}
 				onViewDetails={handleViewDetails}
 				onRefund={handleRefund}
+				onConvertToInstallment={handleConvertToInstallment}
+				onConvertToRecurring={handleConvertToRecurring}
 				onToggleSettlement={handleToggleSettlement}
 				onAnticipate={handleAnticipate}
 				onViewAnticipationHistory={handleViewAnticipationHistory}
@@ -748,6 +836,79 @@ export function TransactionsPage({
 				onConfirm={handleDelete}
 				disabled={!transactionToDelete}
 			/>
+
+			<ConfirmActionDialog
+				open={convertInstallmentOpen && !!transactionToConvert}
+				onOpenChange={(open) => {
+					setConvertInstallmentOpen(open);
+					if (!open) {
+						setTransactionToConvert(null);
+					}
+				}}
+				title="Converter em parcelamento?"
+				description={
+					conversionPreview
+						? `Este lançamento será convertido para "${conversionPreview.name}" como parcela ${conversionPreview.currentInstallment} de ${conversionPreview.installmentCount}. As próximas parcelas serão criadas automaticamente.`
+						: "Este lançamento será convertido em uma série parcelada."
+				}
+				confirmLabel="Converter"
+				pendingLabel="Convertendo..."
+				onConfirm={confirmConvertToInstallment}
+				disabled={!transactionToConvert}
+			/>
+
+			<Dialog
+				open={convertRecurringOpen && !!transactionToConvertRecurring}
+				onOpenChange={(open) => {
+					setConvertRecurringOpen(open);
+					if (!open) {
+						setTransactionToConvertRecurring(null);
+					}
+				}}
+			>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle>Converter em recorrente?</DialogTitle>
+						<DialogDescription>
+							O lançamento atual será mantido como a primeira recorrência e os
+							próximos meses serão criados automaticamente.
+						</DialogDescription>
+					</DialogHeader>
+
+					<div className="space-y-2">
+						<Label htmlFor="recurrenceCount">Repetir por</Label>
+						<Input
+							id="recurrenceCount"
+							type="number"
+							min={2}
+							max={60}
+							value={recurrenceCount}
+							onChange={(event) => setRecurrenceCount(event.target.value)}
+						/>
+						<p className="text-muted-foreground text-sm">
+							Use o total de meses da série, incluindo este lançamento.
+						</p>
+					</div>
+
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setConvertRecurringOpen(false)}
+							disabled={recurrencePending}
+						>
+							Cancelar
+						</Button>
+						<Button
+							type="button"
+							onClick={confirmConvertToRecurring}
+							disabled={recurrencePending}
+						>
+							{recurrencePending ? "Convertendo..." : "Converter"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
 			<BulkActionDialog
 				open={bulkDeleteOpen && !!pendingDeleteData}
