@@ -22,9 +22,14 @@ import type { Note } from "./types";
 interface NotesPageProps {
 	notes: Note[];
 	archivedNotes: Note[];
+	attachmentMaxSizeMb?: number;
 }
 
-export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
+export function NotesPage({
+	notes,
+	archivedNotes,
+	attachmentMaxSizeMb,
+}: NotesPageProps) {
 	const [activeTab, setActiveTab] = useState("ativas");
 	const [createOpen, setCreateOpen] = useState(false);
 	const [editOpen, setEditOpen] = useState(false);
@@ -192,6 +197,7 @@ export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
 						mode="create"
 						open={createOpen}
 						onOpenChange={handleCreateOpenChange}
+						attachmentMaxSizeMb={attachmentMaxSizeMb}
 						trigger={
 							<Button className="w-full sm:w-auto">
 								<RiAddFill className="size-4" />
@@ -222,6 +228,7 @@ export function NotesPage({ notes, archivedNotes }: NotesPageProps) {
 				note={noteToEdit ?? undefined}
 				open={editOpen}
 				onOpenChange={handleEditOpenChange}
+				attachmentMaxSizeMb={attachmentMaxSizeMb}
 			/>
 
 			<NoteDetailsDialog

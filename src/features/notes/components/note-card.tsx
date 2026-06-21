@@ -2,6 +2,7 @@
 
 import {
 	RiArchiveLine,
+	RiAttachment2,
 	RiCheckLine,
 	RiDeleteBin5Line,
 	RiFileList2Line,
@@ -87,11 +88,19 @@ export function NoteCard({
 							</span>
 						)}
 					</div>
-					{isTask && (
-						<Badge variant="outline" className="shrink-0 text-xs">
-							{completedCount}/{totalCount} concluídas
-						</Badge>
-					)}
+					<div className="flex shrink-0 flex-col items-end gap-1.5">
+						{isTask && (
+							<Badge variant="outline" className="shrink-0 text-xs">
+								{completedCount}/{totalCount} concluídas
+							</Badge>
+						)}
+						{!isTask && note.attachments.length > 0 && (
+							<Badge variant="outline" className="gap-1 text-xs">
+								<RiAttachment2 className="size-3.5" />
+								{note.attachments.length}
+							</Badge>
+						)}
+					</div>
 				</div>
 
 				{isTask ? (

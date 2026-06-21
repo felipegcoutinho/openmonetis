@@ -14,6 +14,14 @@ export interface Note {
 	tasks?: Task[];
 	archived: boolean;
 	createdAt: string;
+	attachments: NoteAttachment[];
+}
+
+export interface NoteAttachment {
+	attachmentId: string;
+	fileName: string;
+	fileSize: number;
+	mimeType: string;
 }
 
 export interface NoteFormValues {

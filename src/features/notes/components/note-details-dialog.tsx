@@ -1,6 +1,7 @@
 "use client";
 
 import { RiCheckLine, RiSubtractLine } from "@remixicon/react";
+import { NoteAttachmentsField } from "@/features/notes/components/note-attachments-field";
 import {
 	buildNoteDisplayTitle,
 	formatNoteCreatedAtLong,
@@ -85,8 +86,20 @@ export function NoteDetailsDialog({
 						))}
 					</div>
 				) : (
-					<div className="max-h-[320px] overflow-auto whitespace-pre-line wrap-break-word text-sm text-foreground">
-						{note.description}
+					<div className="max-h-[55vh] space-y-4 overflow-auto">
+						<div className="whitespace-pre-line wrap-break-word text-sm text-foreground">
+							{note.description}
+						</div>
+						{note.attachments.length > 0 && (
+							<NoteAttachmentsField
+								noteId={note.id}
+								attachments={note.attachments}
+								pendingFiles={[]}
+								onAttachmentsChange={() => undefined}
+								onPendingFilesChange={() => undefined}
+								readonly
+							/>
+						)}
 					</div>
 				)}
 

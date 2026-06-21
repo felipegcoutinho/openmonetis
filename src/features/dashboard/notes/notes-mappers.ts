@@ -9,6 +9,7 @@ const mapDashboardNoteToNote = (note: DashboardNote): Note => ({
 	tasks: note.tasks,
 	archived: note.archived,
 	createdAt: note.createdAt,
+	attachments: [],
 });
 
 export const mapDashboardNotesToNotes = (notes: DashboardNote[]) =>

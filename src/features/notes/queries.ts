@@ -1,6 +1,13 @@
-import { and, eq } from "drizzle-orm";
-import { type Note, notes } from "@/db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { attachments, type Note, noteAttachments, notes } from "@/db/schema";
 import { db } from "@/shared/lib/db";
+
+export type NoteAttachmentData = {
+	attachmentId: string;
+	fileName: string;
+	fileSize: number;
+	mimeType: string;
+};
 
 type Task = {
 	id: string;
@@ -16,6 +23,7 @@ type NoteData = {
 	tasks?: Task[];
 	archived: boolean;
 	createdAt: string;
+	attachments: NoteAttachmentData[];
 };
 
 function parseTasks(value: string | null): Task[] | undefined {
@@ -31,7 +39,10 @@ function parseTasks(value: string | null): Task[] | undefined {
 	}
 }
 
-function toNoteData(note: Note): NoteData {
+function toNoteData(
+	note: Note,
+	linkedAttachments: NoteAttachmentData[],
+): NoteData {
 	return {
 		id: note.id,
 		title: (note.title ?? "").trim(),
@@ -40,34 +51,53 @@ function toNoteData(note: Note): NoteData {
 		tasks: parseTasks(note.tasks),
 		archived: note.archived,
 		createdAt: note.createdAt.toISOString(),
+		attachments: linkedAttachments,
 	};
-}
-
-async function fetchNotesForUser(userId: string): Promise<NoteData[]> {
-	const noteRows = await db.query.notes.findMany({
-		where: and(eq(notes.userId, userId), eq(notes.archived, false)),
-		orderBy: (table, { desc }) => [desc(table.createdAt)],
-	});
-
-	return noteRows.map(toNoteData);
 }
 
 export async function fetchAllNotesForUser(
 	userId: string,
 ): Promise<{ activeNotes: NoteData[]; archivedNotes: NoteData[] }> {
-	const [activeNotes, archivedNotes] = await Promise.all([
-		fetchNotesForUser(userId),
-		fetchArchivedForUser(userId),
+	const [noteRows, attachmentRows] = await Promise.all([
+		db.query.notes.findMany({
+			where: eq(notes.userId, userId),
+			orderBy: (table, { desc }) => [desc(table.createdAt)],
+		}),
+		db
+			.select({
+				noteId: noteAttachments.noteId,
+				attachmentId: attachments.id,
+				fileName: attachments.fileName,
+				fileSize: attachments.fileSize,
+				mimeType: attachments.mimeType,
+			})
+			.from(noteAttachments)
+			.innerJoin(
+				notes,
+				and(eq(noteAttachments.noteId, notes.id), eq(notes.userId, userId)),
+			)
+			.innerJoin(
+				attachments,
+				and(
+					eq(noteAttachments.attachmentId, attachments.id),
+					eq(attachments.userId, userId),
+				),
+			)
+			.orderBy(desc(attachments.createdAt)),
 	]);
 
-	return { activeNotes, archivedNotes };
-}
+	const attachmentsByNote = new Map<string, NoteAttachmentData[]>();
+	for (const { noteId, ...attachment } of attachmentRows) {
+		const current = attachmentsByNote.get(noteId) ?? [];
+		current.push(attachment);
+		attachmentsByNote.set(noteId, current);
+	}
+	const mapped = noteRows.map((note) =>
+		toNoteData(note, attachmentsByNote.get(note.id) ?? []),
+	);
 
-async function fetchArchivedForUser(userId: string): Promise<NoteData[]> {
-	const noteRows = await db.query.notes.findMany({
-		where: and(eq(notes.userId, userId), eq(notes.archived, true)),
-		orderBy: (table, { desc }) => [desc(table.createdAt)],
-	});
-
-	return noteRows.map(toNoteData);
+	return {
+		activeNotes: mapped.filter((note) => !note.archived),
+		archivedNotes: mapped.filter((note) => note.archived),
+	};
 }

@@ -1,13 +1,7 @@
-export const ALLOWED_MIME_TYPES = [
-	"application/pdf",
-	"image/jpeg",
-	"image/png",
-	"image/webp",
-] as const;
-
-export const DEFAULT_MAX_FILE_SIZE_MB = 50;
-
-export const MAX_FILE_SIZE = DEFAULT_MAX_FILE_SIZE_MB * 1024 * 1024; // 50MB (fallback)
-
-export const ATTACHMENT_SIZE_OPTIONS = [5, 10, 25, 50, 100] as const;
-export type AttachmentSizeOption = (typeof ATTACHMENT_SIZE_OPTIONS)[number];
+export {
+	ALLOWED_MIME_TYPES,
+	ATTACHMENT_SIZE_OPTIONS,
+	type AttachmentSizeOption,
+	DEFAULT_MAX_FILE_SIZE_MB,
+	MAX_FILE_SIZE,
+} from "@/shared/lib/attachments/config";

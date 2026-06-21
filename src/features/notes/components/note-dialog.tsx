@@ -15,6 +15,10 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { createNoteAction, updateNoteAction } from "@/features/notes/actions";
+import {
+	NoteAttachmentsField,
+	uploadNoteAttachment,
+} from "@/features/notes/components/note-attachments-field";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
@@ -34,6 +38,7 @@ import { useFormState } from "@/shared/hooks/use-form-state";
 import { cn } from "@/shared/utils/ui";
 import {
 	type Note,
+	type NoteAttachment,
 	type NoteFormValues,
 	sortTasksByStatus,
 	type Task,
@@ -46,6 +51,7 @@ interface NoteDialogProps {
 	note?: Note;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	attachmentMaxSizeMb?: number;
 }
 
 const MAX_TITLE = 30;
@@ -69,12 +75,16 @@ export function NoteDialog({
 	note,
 	open,
 	onOpenChange,
+	attachmentMaxSizeMb,
 }: NoteDialogProps) {
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [newTaskText, setNewTaskText] = useState("");
 	const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 	const [editingTaskText, setEditingTaskText] = useState("");
+	const [noteAttachments, setNoteAttachments] = useState<NoteAttachment[]>([]);
+	const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+	const [isAttachmentPending, setIsAttachmentPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
@@ -99,6 +109,9 @@ export function NoteDialog({
 			setNewTaskText("");
 			setEditingTaskId(null);
 			setEditingTaskText("");
+			setNoteAttachments(note?.attachments ?? []);
+			setPendingFiles([]);
+			setIsAttachmentPending(false);
 			requestAnimationFrame(() => titleRef.current?.focus());
 		}
 	}, [dialogOpen, note, resetForm]);
@@ -137,12 +150,14 @@ export function NoteDialog({
 
 	const disableSubmit =
 		isPending ||
+		isAttachmentPending ||
 		onlySpaces ||
 		unchanged ||
 		invalidLen ||
 		Boolean(editingTaskId);
 
 	const handleOpenChange = (v: boolean) => {
+		if (!v && (isPending || isAttachmentPending)) return;
 		setDialogOpen(v);
 		if (!v) setErrorMessage(null);
 	};
@@ -252,7 +267,9 @@ export function NoteDialog({
 		}
 
 		startTransition(async () => {
-			let result: { success: boolean; message?: string; error?: string };
+			let result:
+				| Awaited<ReturnType<typeof createNoteAction>>
+				| Awaited<ReturnType<typeof updateNoteAction>>;
 			if (mode === "create") {
 				result = await createNoteAction(payload);
 			} else {
@@ -266,7 +283,31 @@ export function NoteDialog({
 			}
 
 			if (result.success) {
-				toast.success(result.message);
+				if (mode === "create" && pendingFiles.length > 0) {
+					const noteId = "data" in result ? result.data?.noteId : undefined;
+					if (noteId) {
+						let failedUploads = 0;
+						for (const file of pendingFiles) {
+							const upload = await uploadNoteAttachment(noteId, file);
+							if (!upload.success) failedUploads += 1;
+						}
+						if (failedUploads > 0) {
+							toast.warning(
+								failedUploads === 1
+									? "A nota foi salva, mas um anexo não pôde ser enviado."
+									: `A nota foi salva, mas ${failedUploads} anexos não puderam ser enviados.`,
+							);
+						} else {
+							toast.success(
+								pendingFiles.length === 1
+									? "Anotação e anexo salvos."
+									: "Anotação e anexos salvos.",
+							);
+						}
+					}
+				} else {
+					toast.success(result.message);
+				}
 				setDialogOpen(false);
 				return;
 			}
@@ -355,35 +396,48 @@ export function NoteDialog({
 					</div>
 
 					{isNote && (
-						<div className="space-y-1">
-							<div className="flex items-center justify-between">
-								<Label htmlFor="note-description">Conteúdo</Label>
-								<span
-									className={cn(
-										"text-xs",
-										descCount > MAX_DESC
-											? "text-destructive"
-											: "text-muted-foreground",
-									)}
-								>
-									{descCount}/{MAX_DESC}
-								</span>
+						<div className="space-y-3">
+							<div className="space-y-1">
+								<div className="flex items-center justify-between">
+									<Label htmlFor="note-description">Conteúdo</Label>
+									<span
+										className={cn(
+											"text-xs",
+											descCount > MAX_DESC
+												? "text-destructive"
+												: "text-muted-foreground",
+										)}
+									>
+										{descCount}/{MAX_DESC}
+									</span>
+								</div>
+								<Textarea
+									id="note-description"
+									className="field-sizing-fixed"
+									ref={descRef}
+									value={formState.description}
+									onChange={(e) => updateField("description", e.target.value)}
+									placeholder="Detalhe sua anotação..."
+									rows={5}
+									maxLength={MAX_DESC + 10}
+									disabled={isPending}
+									required
+								/>
+								<p className="text-xs text-muted-foreground">
+									Ctrl+Enter para salvar
+								</p>
 							</div>
-							<Textarea
-								id="note-description"
-								className="field-sizing-fixed"
-								ref={descRef}
-								value={formState.description}
-								onChange={(e) => updateField("description", e.target.value)}
-								placeholder="Detalhe sua anotação..."
-								rows={5}
-								maxLength={MAX_DESC + 10}
+
+							<NoteAttachmentsField
+								noteId={mode === "update" ? note?.id : undefined}
+								attachments={noteAttachments}
+								pendingFiles={pendingFiles}
+								onAttachmentsChange={setNoteAttachments}
+								onPendingFilesChange={setPendingFiles}
+								onBusyChange={setIsAttachmentPending}
+								maxSizeMb={attachmentMaxSizeMb}
 								disabled={isPending}
-								required
 							/>
-							<p className="text-xs text-muted-foreground">
-								Ctrl+Enter para salvar
-							</p>
 						</div>
 					)}
 
@@ -517,7 +571,7 @@ export function NoteDialog({
 						type="button"
 						variant="outline"
 						onClick={() => handleOpenChange(false)}
-						disabled={isPending}
+						disabled={isPending || isAttachmentPending}
 					>
 						Cancelar
 					</Button>
