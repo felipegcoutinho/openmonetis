@@ -5,6 +5,15 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.7.9] - 2026-06-21
+
+Esta versão torna a publicação mais previsível ao separar a validação contínua da entrega de versões oficiais. Pull requests e a branch principal continuam sendo verificadas, enquanto imagens Docker e releases passam a ser produzidas somente a partir de uma tag SemVer validada.
+
+### Alterado
+- CI: pull requests e pushes na `main` agora executam geração de tipos, verificação TypeScript, lint e build sem publicar imagens.
+- Releases: tags `vX.Y.Z` agora validam sua correspondência com o `package.json` e o `CHANGELOG.md` antes de publicar as imagens Docker e criar a GitHub Release.
+- Docker: as tags versionadas e `latest` passam a ser publicadas exclusivamente por releases oficiais, depois das verificações de qualidade.
+
 ## [2.7.8] - 2026-06-21
 
 Esta versão deixa documentos e comprovantes mais fáceis de guardar e encontrar sem tirar o foco da rotina financeira. Agora é possível manter arquivos junto às notas, consultar a galeria por pessoa com identificação visual e abrir uma categoria diretamente das tendências do dashboard, sempre preservando o contexto do período selecionado.

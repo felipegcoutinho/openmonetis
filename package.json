@@ -1,6 +1,6 @@
 {
 	"name": "openmonetis",
-	"version": "2.7.8",
+	"version": "2.7.9",
 	"private": true,
 	"packageManager": "pnpm@11.1.3",
 	"scripts": {

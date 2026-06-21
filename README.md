@@ -10,7 +10,7 @@
 
 > **Não há versão online hospedada.** Você precisa clonar o repositório e rodar localmente ou no seu próprio servidor.
 
-[![Version](https://img.shields.io/badge/version-2.7.8-blue?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.7.9-blue?style=flat-square)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -622,6 +622,17 @@ A regra é: `actions.ts` e `queries.ts` são as portas de entrada da feature. Tu
 6. Abra um **Pull Request**
 
 Antes de começar, leia o [`CLAUDE.md`](CLAUDE.md) — ele documenta a arquitetura, convenções de nomenclatura, regras de queries e o checklist para novas features. Use TypeScript, commits semânticos e mantenha o `CHANGELOG.md` atualizado.
+
+### Publicando uma versão
+
+As validações rodam em pull requests e em cada push na `main`. A publicação só começa quando uma tag SemVer aponta para um commit validado e a versão da tag corresponde ao `package.json` e ao `CHANGELOG.md`.
+
+```bash
+git tag -a v2.7.9 -m "v2.7.9"
+git push origin v2.7.9
+```
+
+O workflow da tag valida o código, publica as imagens Docker versionadas e `latest` e, somente depois, cria a GitHub Release com as notas do changelog.
 
 ---
 
