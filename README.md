@@ -10,7 +10,7 @@
 
 > **Não há versão online hospedada.** Você precisa clonar o repositório e rodar localmente ou no seu próprio servidor.
 
-[![Version](https://img.shields.io/badge/version-2.7.10-blue?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.7.11-blue?style=flat-square)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -89,7 +89,7 @@ A ideia é simples: ter um lugar onde consigo ver todas as minhas contas, cartõ
   <img src="./public/images/companion-preview-light.webp" alt="OpenMonetis Companion" width="300" height="600" />
 </p>
 
-⚙️ **Personalização** — Tema dark/light, modo privacidade, ordem das colunas, exibição de anotações, tamanho máximo de anexos, resumo opcional no modal de lançamento e changelog visual para acompanhar as novidades do app.
+⚙️ **Personalização** — Tema dark/light, modo privacidade, ordem das colunas, agrupamento por data em lançamentos, exibição de anotações, tamanho máximo de anexos, resumo opcional no modal de lançamento e changelog visual para acompanhar as novidades do app.
 
 ### Stack técnica
 
@@ -628,8 +628,8 @@ Antes de começar, leia o [`CLAUDE.md`](CLAUDE.md) — ele documenta a arquitetu
 As validações rodam em pull requests e em cada push na `main`. A publicação só começa quando uma tag SemVer aponta para um commit validado e a versão da tag corresponde ao `package.json` e ao `CHANGELOG.md`.
 
 ```bash
-git tag -a v2.7.10 -m "v2.7.10"
-git push origin v2.7.10
+git tag -a v2.7.11 -m "v2.7.11"
+git push origin v2.7.11
 ```
 
 O workflow da tag valida o código, publica as imagens Docker versionadas e `latest` e, somente depois, cria a GitHub Release com as notas do changelog.

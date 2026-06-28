@@ -5,6 +5,23 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.7.11] - 2026-06-28
+
+Esta atualização melhora a leitura diária dos lançamentos e deixa a nova visualização opcional, mantendo a possibilidade de voltar ao formato anterior quando a lista agrupada não for a melhor escolha para o usuário.
+
+### Adicionado
+- Preferências: nova opção `Agrupar por data` em Ajustes > Preferências > Lançamentos para alternar entre a lista agrupada por data e a visualização anterior.
+- Lançamentos: a lista agora pode exibir uma barra de data por grupo no formato `TER, 26 JUN 2026`, reunindo os lançamentos daquele dia.
+
+### Alterado
+- Lançamentos: quando o agrupamento por data está ativo, os cards e linhas deixam de repetir a data em cada item, reduzindo ruído visual e mantendo vencimentos de boleto como informação do lançamento.
+- Lançamentos: a preferência de agrupamento por data é aplicada nas listagens principais, extratos de conta, faturas de cartão, detalhes de pessoa e detalhes de categoria.
+- Interface: checkboxes passam a usar um visual mais compacto.
+- Documentação: o README agora cita o agrupamento por data entre as opções de personalização.
+
+### Corrigido
+- Lançamentos: o seletor de data em modais de criação e edição volta a aceitar a data selecionada no calendário.
+
 ## [2.7.10] - 2026-06-27
 
 Esta versão ajusta a experiência de leitura dos lançamentos parcelados após antecipações, permitindo esconder parcelas já liquidadas por antecipação sem perder o histórico quando ele ainda for necessário.
