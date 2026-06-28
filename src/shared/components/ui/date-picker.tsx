@@ -148,7 +148,7 @@ export function DatePicker({
 				required={required}
 				disabled={disabled}
 			/>
-			<Popover open={open} onOpenChange={setOpen}>
+			<Popover modal open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<Button
 						type="button"
