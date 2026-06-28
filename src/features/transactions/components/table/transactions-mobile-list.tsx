@@ -20,7 +20,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { formatDate } from "@/shared/utils/date";
+import { formatDate, formatDateGroupLabel } from "@/shared/utils/date";
 import { getConditionIcon, getPaymentMethodIcon } from "@/shared/utils/icons";
 import { cn } from "@/shared/utils/ui";
 import type { TransactionItem } from "../types";
@@ -43,6 +43,7 @@ type TransactionsMobileListProps = {
 	onConvertToRecurring?: (item: TransactionItem) => void;
 	isSettlementLoading: (id: string) => boolean;
 	showActions?: boolean;
+	showDateGroups?: boolean;
 };
 
 export function TransactionsMobileList({
@@ -61,28 +62,87 @@ export function TransactionsMobileList({
 	onConvertToRecurring,
 	isSettlementLoading,
 	showActions = true,
+	showDateGroups = true,
 }: TransactionsMobileListProps) {
+	const groups = data.reduce<
+		Array<{ date: string; label: string; items: TransactionItem[] }>
+	>((acc, item) => {
+		const date = item.purchaseDate?.slice(0, 10) ?? "";
+		const existingGroup = acc.find((group) => group.date === date);
+		if (existingGroup) {
+			existingGroup.items.push(item);
+			return acc;
+		}
+
+		acc.push({
+			date,
+			label: formatDateGroupLabel(item.purchaseDate),
+			items: [item],
+		});
+		return acc;
+	}, []);
+
+	if (!showDateGroups) {
+		return (
+			<div className="space-y-3 md:hidden">
+				{data.map((item) => (
+					<TransactionMobileCard
+						key={item.id}
+						item={item}
+						currentUserId={currentUserId}
+						onEdit={onEdit}
+						onCopy={onCopy}
+						onImport={onImport}
+						onConfirmDelete={onConfirmDelete}
+						onViewDetails={onViewDetails}
+						onRefund={onRefund}
+						onToggleSettlement={onToggleSettlement}
+						onAnticipate={onAnticipate}
+						onViewAnticipationHistory={onViewAnticipationHistory}
+						onConvertToInstallment={onConvertToInstallment}
+						onConvertToRecurring={onConvertToRecurring}
+						isSettlementLoading={isSettlementLoading}
+						showActions={showActions}
+						showDate
+					/>
+				))}
+			</div>
+		);
+	}
+
 	return (
-		<div className="space-y-3 md:hidden">
-			{data.map((item) => (
-				<TransactionMobileCard
-					key={item.id}
-					item={item}
-					currentUserId={currentUserId}
-					onEdit={onEdit}
-					onCopy={onCopy}
-					onImport={onImport}
-					onConfirmDelete={onConfirmDelete}
-					onViewDetails={onViewDetails}
-					onRefund={onRefund}
-					onToggleSettlement={onToggleSettlement}
-					onAnticipate={onAnticipate}
-					onViewAnticipationHistory={onViewAnticipationHistory}
-					onConvertToInstallment={onConvertToInstallment}
-					onConvertToRecurring={onConvertToRecurring}
-					isSettlementLoading={isSettlementLoading}
-					showActions={showActions}
-				/>
+		<div className="space-y-4 md:hidden">
+			{groups.map((group, groupIndex) => (
+				<section
+					key={`${group.date || group.label}-${groupIndex}`}
+					className="space-y-2"
+				>
+					<div className="rounded-md border bg-muted/60 px-3 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground">
+						{group.label}
+					</div>
+					<div className="space-y-3">
+						{group.items.map((item) => (
+							<TransactionMobileCard
+								key={item.id}
+								item={item}
+								currentUserId={currentUserId}
+								onEdit={onEdit}
+								onCopy={onCopy}
+								onImport={onImport}
+								onConfirmDelete={onConfirmDelete}
+								onViewDetails={onViewDetails}
+								onRefund={onRefund}
+								onToggleSettlement={onToggleSettlement}
+								onAnticipate={onAnticipate}
+								onViewAnticipationHistory={onViewAnticipationHistory}
+								onConvertToInstallment={onConvertToInstallment}
+								onConvertToRecurring={onConvertToRecurring}
+								isSettlementLoading={isSettlementLoading}
+								showActions={showActions}
+							/>
+						))}
+					</div>
+				</section>
 			))}
 		</div>
 	);
@@ -90,6 +150,7 @@ export function TransactionsMobileList({
 
 type TransactionMobileCardProps = Omit<TransactionsMobileListProps, "data"> & {
 	item: TransactionItem;
+	showDate?: boolean;
 };
 
 function TransactionMobileCard({
@@ -108,6 +169,7 @@ function TransactionMobileCard({
 	onConvertToRecurring,
 	isSettlementLoading,
 	showActions = true,
+	showDate = false,
 }: TransactionMobileCardProps) {
 	const installmentBadge =
 		item.currentInstallment && item.installmentCount
@@ -156,10 +218,12 @@ function TransactionMobileCard({
 								{item.name}
 							</h3>
 							<div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-								<span className="inline-flex items-center gap-1">
-									<RiCalendarEventLine className="size-3.5" aria-hidden />
-									{formatDate(item.purchaseDate)}
-								</span>
+								{showDate ? (
+									<span className="inline-flex items-center gap-1">
+										<RiCalendarEventLine className="size-3.5" aria-hidden />
+										{formatDate(item.purchaseDate)}
+									</span>
+								) : null}
 								{dueDateLabel ? (
 									<span className="font-medium text-primary">
 										{dueDateLabel}

@@ -43,6 +43,7 @@ interface PreferencesFormProps {
 	transactionsColumnOrder: string[] | null;
 	attachmentMaxSizeMb: number;
 	showTransactionSummary: boolean;
+	groupTransactionsByDate: boolean;
 	hideAnticipatedInstallments: boolean;
 }
 
@@ -88,6 +89,7 @@ export function PreferencesForm({
 	transactionsColumnOrder: initialColumnOrder,
 	attachmentMaxSizeMb: initialAttachmentMaxSizeMb,
 	showTransactionSummary: initialShowTransactionSummary,
+	groupTransactionsByDate: initialGroupTransactionsByDate,
 	hideAnticipatedInstallments: initialHideAnticipatedInstallments,
 }: PreferencesFormProps) {
 	const router = useRouter();
@@ -110,6 +112,9 @@ export function PreferencesForm({
 		);
 	const [showTransactionSummary, setShowTransactionSummary] = useState(
 		initialShowTransactionSummary,
+	);
+	const [groupTransactionsByDate, setGroupTransactionsByDate] = useState(
+		initialGroupTransactionsByDate,
 	);
 	const [hideAnticipatedInstallments, setHideAnticipatedInstallments] =
 		useState(initialHideAnticipatedInstallments);
@@ -139,6 +144,7 @@ export function PreferencesForm({
 				transactionsColumnOrder: columnOrder,
 				attachmentMaxSizeMb,
 				showTransactionSummary,
+				groupTransactionsByDate,
 				hideAnticipatedInstallments,
 			});
 
@@ -197,6 +203,26 @@ export function PreferencesForm({
 						id="show-transaction-summary"
 						checked={showTransactionSummary}
 						onCheckedChange={setShowTransactionSummary}
+						disabled={isPending}
+					/>
+				</section>
+
+				<Separator />
+
+				<section className="flex items-center justify-between max-w-md gap-4">
+					<div className="space-y-2">
+						<Label htmlFor="group-transactions-by-date" className="text-sm">
+							Agrupar por data
+						</Label>
+						<p className="text-sm text-muted-foreground">
+							Mostra uma barra de data acima dos lançamentos daquele dia. Quando
+							desativado, a data volta a aparecer em cada lançamento.
+						</p>
+					</div>
+					<Switch
+						id="group-transactions-by-date"
+						checked={groupTransactionsByDate}
+						onCheckedChange={setGroupTransactionsByDate}
 						disabled={isPending}
 					/>
 				</section>

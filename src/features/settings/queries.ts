@@ -7,6 +7,7 @@ interface UserPreferences {
 	transactionsColumnOrder: string[] | null;
 	attachmentMaxSizeMb: number;
 	showTransactionSummary: boolean;
+	groupTransactionsByDate: boolean;
 	hideAnticipatedInstallments: boolean;
 }
 
@@ -37,6 +38,7 @@ export async function fetchUserPreferences(
 			transactionsColumnOrder: schema.userPreferences.transactionsColumnOrder,
 			attachmentMaxSizeMb: schema.userPreferences.attachmentMaxSizeMb,
 			showTransactionSummary: schema.userPreferences.showTransactionSummary,
+			groupTransactionsByDate: schema.userPreferences.groupTransactionsByDate,
 			hideAnticipatedInstallments:
 				schema.userPreferences.hideAnticipatedInstallments,
 		})

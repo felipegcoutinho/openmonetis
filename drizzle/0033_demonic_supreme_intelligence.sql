@@ -1,0 +1,1 @@
+ALTER TABLE "preferencias_usuario" ADD COLUMN "agrupar_lancamentos_por_data" boolean DEFAULT true NOT NULL;

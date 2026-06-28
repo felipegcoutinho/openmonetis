@@ -212,6 +212,9 @@ export default async function Page({ params, searchParams }: PageProps) {
 					allowCreate
 					noteAsColumn={userPreferences?.statementNoteAsColumn ?? false}
 					columnOrder={userPreferences?.transactionsColumnOrder ?? null}
+					groupTransactionsByDate={
+						userPreferences?.groupTransactionsByDate ?? true
+					}
 					attachmentMaxSizeMb={userPreferences?.attachmentMaxSizeMb ?? 50}
 					defaultCardId={card.id}
 					defaultPaymentMethod="Cartão de crédito"

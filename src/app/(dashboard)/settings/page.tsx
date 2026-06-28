@@ -85,6 +85,9 @@ export default async function Page() {
 								showTransactionSummary={
 									userPreferences?.showTransactionSummary ?? true
 								}
+								groupTransactionsByDate={
+									userPreferences?.groupTransactionsByDate ?? true
+								}
 								hideAnticipatedInstallments={
 									userPreferences?.hideAnticipatedInstallments ?? false
 								}

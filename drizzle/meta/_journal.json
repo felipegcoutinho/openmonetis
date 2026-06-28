@@ -225,6 +225,13 @@
 			"when": 1782569103402,
 			"tag": "0032_bumpy_spencer_smythe",
 			"breakpoints": true
+		},
+		{
+			"idx": 33,
+			"version": "7",
+			"when": 1782685465530,
+			"tag": "0033_demonic_supreme_intelligence",
+			"breakpoints": true
 		}
 	]
 }

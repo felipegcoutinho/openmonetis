@@ -332,6 +332,45 @@ export function formatDate(value: string | Date | null | undefined): string {
 }
 
 /**
+ * Formats a date-only value as a compact group label.
+ * @example
+ * formatDateGroupLabel("2026-06-26") // "SEX, 26 JUN 2026"
+ */
+export function formatDateGroupLabel(
+	value: string | Date | null | undefined,
+): string {
+	const dateString = toDateOnlyString(value);
+	if (!dateString) {
+		return "—";
+	}
+
+	const parsed = parseUtcDateString(dateString);
+	if (!parsed) {
+		return "—";
+	}
+
+	const parts = new Intl.DateTimeFormat("pt-BR", {
+		weekday: "short",
+		day: "2-digit",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	}).formatToParts(parsed);
+	const weekday = parts.find((part) => part.type === "weekday")?.value;
+	const day = parts.find((part) => part.type === "day")?.value;
+	const month = parts.find((part) => part.type === "month")?.value;
+	const year = parts.find((part) => part.type === "year")?.value;
+
+	if (!weekday || !day || !month || !year) {
+		return "—";
+	}
+
+	return `${weekday.replace(".", "").toUpperCase()}, ${day} ${month
+		.replace(".", "")
+		.toUpperCase()} ${year}`;
+}
+
+/**
  * Formats a date-only value (YYYY-MM-DD) using UTC to preserve the civil day
  */
 export function formatDateOnly(

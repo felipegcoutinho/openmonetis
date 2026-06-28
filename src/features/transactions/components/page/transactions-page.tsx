@@ -82,6 +82,7 @@ interface TransactionsPageProps {
 	allowCreate?: boolean;
 	noteAsColumn?: boolean;
 	columnOrder?: string[] | null;
+	groupTransactionsByDate?: boolean;
 	defaultCardId?: string | null;
 	defaultPaymentMethod?: string | null;
 	lockCardSelection?: boolean;
@@ -119,6 +120,7 @@ export function TransactionsPage({
 	allowCreate = true,
 	noteAsColumn = false,
 	columnOrder = null,
+	groupTransactionsByDate = true,
 	defaultCardId,
 	defaultPaymentMethod,
 	lockCardSelection,
@@ -745,6 +747,7 @@ export function TransactionsPage({
 				currentUserId={currentUserId}
 				noteAsColumn={noteAsColumn}
 				columnOrder={columnOrder}
+				groupTransactionsByDate={groupTransactionsByDate}
 				payerFilterOptions={payerFilterOptions}
 				categoryFilterOptions={categoryFilterOptions}
 				accountCardFilterOptions={accountCardFilterOptions}
