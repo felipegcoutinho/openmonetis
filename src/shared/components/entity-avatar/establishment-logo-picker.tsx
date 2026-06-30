@@ -102,7 +102,7 @@ export function EstablishmentLogoPicker({
 	}
 
 	return (
-		<Popover open={open} onOpenChange={onOpenChange}>
+		<Popover modal open={open} onOpenChange={onOpenChange}>
 			<PopoverTrigger asChild>{children}</PopoverTrigger>
 			<PopoverContent className="w-80 p-3" align="start" side="bottom">
 				<p className="mb-2 text-muted-foreground text-xs">

@@ -128,6 +128,7 @@ function MonthCal({
 				</div>
 				<div className="space-x-1 flex items-center">
 					<button
+						type="button"
 						onClick={() => {
 							setMenuYear(menuYear - 1);
 							if (onYearBackward) onYearBackward();
@@ -140,6 +141,7 @@ function MonthCal({
 						<RiArrowLeftSFill className="opacity-50 size-4" />
 					</button>
 					<button
+						type="button"
 						onClick={() => {
 							setMenuYear(menuYear + 1);
 							if (onYearForward) onYearForward();
@@ -165,6 +167,7 @@ function MonthCal({
 											className="h-10 w-1/4 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
 										>
 											<button
+												type="button"
 												onClick={() => {
 													setMonth(m.number);
 													setYear(menuYear);

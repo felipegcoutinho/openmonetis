@@ -44,9 +44,10 @@ export function PeriodPicker({
 	};
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover modal open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
+					type="button"
 					variant={variant}
 					size={size}
 					disabled={disabled}

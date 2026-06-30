@@ -45,7 +45,7 @@ function InlinePeriodPicker({
 	return (
 		<div className="ml-1">
 			<span className="text-xs text-muted-foreground">Fatura de </span>
-			<Popover open={open} onOpenChange={setOpen}>
+			<Popover modal open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<button
 						type="button"

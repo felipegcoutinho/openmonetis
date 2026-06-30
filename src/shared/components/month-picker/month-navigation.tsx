@@ -93,6 +93,7 @@ export default function MonthNavigation() {
 					<Popover open={isPickerOpen} onOpenChange={setIsPickerOpen}>
 						<PopoverTrigger asChild>
 							<Button
+								type="button"
 								variant="ghost"
 								size="sm"
 								disabled={isPending}
