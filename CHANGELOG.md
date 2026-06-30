@@ -5,6 +5,15 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.7.12] - 2026-06-30
+
+Esta versão corrige a seleção de faturas e períodos em popovers usados dentro de diálogos, alinhando esses componentes ao mesmo comportamento seguro aplicado recentemente aos seletores de data.
+
+### Corrigido
+- Lançamentos: o seletor inline de fatura volta a aceitar cliques no mês em diálogos de criação/edição e no modal de múltiplos lançamentos.
+- Períodos: botões internos do seletor mensal agora são explicitamente `type="button"`, evitando submits acidentais quando o componente aparece dentro de formulários.
+- Interface: popovers de período e escolha de logo de estabelecimento passam a usar modo modal quando podem aparecer sobre diálogos, preservando foco e clique.
+
 ## [2.7.11] - 2026-06-28
 
 Esta atualização melhora a leitura diária dos lançamentos e deixa a nova visualização opcional, mantendo a possibilidade de voltar ao formato anterior quando a lista agrupada não for a melhor escolha para o usuário.
